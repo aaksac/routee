@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>Admin Panel | Rota Planlayıcı</title>
+    <link rel="stylesheet" href="./css/style.css" />
+    <style>
+      .admin-page {
+        padding: 18px;
+      }
+
+      .admin-grid {
+        display: grid;
+        grid-template-columns: 360px minmax(0, 1fr);
+        gap: 18px;
+      }
+
+      .admin-user-list {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        max-height: 70vh;
+        overflow: auto;
+      }
+
+      .admin-user-card {
+        width: 100%;
+        text-align: left;
+        padding: 14px;
+        border: 1px solid var(--border);
+        background: #fff;
+        border-radius: 16px;
+      }
+
+      .admin-user-card.active {
+        border-color: var(--primary);
+        background: rgba(37, 99, 235, 0.06);
+      }
+
+      .admin-form-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+      }
+
+      .mono {
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        font-size: 0.88rem;
+        color: var(--muted);
+      }
+
+      @media (max-width: 900px) {
+        .admin-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .admin-form-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app">
+      <header class="topbar">
+        <div class="brand-area">
+          <div class="brand-icon">A</div>
+          <div class="brand-text">
+            <h1>Admin Panel</h1>
+            <p>Kullanıcı ve erişim yönetimi</p>
+          </div>
+        </div>
+
+        <div class="topbar-actions">
+          <button class="icon-btn" id="btnBackApp" type="button">
+            ←
+            <span>Uygulamaya Dön</span>
+          </button>
+          <button class="icon-btn" id="btnLogout" type="button">
+            🚪
+            <span>Çıkış</span>
+          </button>
+        </div>
+      </header>
+
+      <div class="admin-page">
+        <section class="panel" style="margin-bottom: 18px">
+          <div class="panel-header">
+            <h2>Oturum</h2>
+          </div>
+          <p id="adminStatus" class="auth-status">Yükleniyor...</p>
+        </section>
+
+        <div class="admin-grid">
+          <section class="panel">
+            <div class="panel-header">
+              <h2>Kullanıcılar</h2>
+              <button class="small-btn" id="btnRefreshUsers" type="button">Yenile</button>
+            </div>
+            <div id="adminUserList" class="admin-user-list"></div>
+          </section>
+
+          <div>
+            <section class="panel" style="margin-bottom: 18px">
+              <div class="panel-header">
+                <h2>Yeni Kullanıcı Oluştur</h2>
+              </div>
+
+              <div class="field-group">
+                <label for="newUserEmail">E-posta</label>
+                <input id="newUserEmail" type="email" placeholder="kullanici@mail.com" />
+              </div>
+
+              <div class="field-group">
+                <label for="newUserPassword">Geçici Şifre</label>
+                <input id="newUserPassword" type="text" placeholder="En az 6 karakter" />
+              </div>
+
+              <div class="panel-actions">
+                <button class="small-btn primary" id="btnCreateUser" type="button">Kullanıcı Oluştur</button>
+              </div>
+            </section>
+
+            <section class="panel">
+              <div class="panel-header">
+                <h2>Seçili Kullanıcı Yönetimi</h2>
+              </div>
+
+              <div class="field-group">
+                <label>Seçili Kullanıcı</label>
+                <div id="selectedUserInfo" class="mono">Henüz kullanıcı seçilmedi.</div>
+              </div>
+
+              <div class="admin-form-grid">
+                <div class="field-group">
+                  <label for="accessDays">Tam Erişim Süresi (gün)</label>
+                  <input id="accessDays" type="number" min="1" placeholder="30" />
+                </div>
+                <div class="field-group">
+                  <label for="accessUntilText">Bitiş Tarihi</label>
+                  <input id="accessUntilText" type="text" placeholder="Otomatik hesaplanır" disabled />
+                </div>
+              </div>
+
+              <div class="panel-actions">
+                <button class="small-btn primary" id="btnGrantAccess" type="button">Tam Erişim Ver</button>
+                <button class="small-btn" id="btnSetTrial" type="button">Trial Yap</button>
+                <button class="small-btn danger" id="btnDeleteUser" type="button">Kullanıcıyı Sil</button>
+              </div>
+            </section>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script type="module" src="./js/admin.js"></script>
+  </body>
+</html>
