@@ -636,9 +636,9 @@ select:focus {
   }
 
   .topbar-actions .page-action-btn {
-    min-height: 38px;
-    padding: 8px 12px;
-    font-size: 0.88rem;
+    min-height: 36px;
+    padding: 7px 11px;
+    font-size: 0.84rem;
     white-space: nowrap;
     width: auto;
   }
@@ -648,8 +648,8 @@ select:focus {
   }
 
   .auth-status {
-    font-size: 0.88rem;
-    line-height: 1.4;
+    font-size: 0.86rem;
+    line-height: 1.35;
   }
 
   .app-layout {
@@ -664,36 +664,37 @@ select:focus {
     border-radius: 22px;
   }
 
-  /* SOL ÜST */
+  /* SOL ÜST KÜÇÜLTÜLDÜ */
   .top-left {
-    top: 68px;
+    top: 66px;
     left: 12px;
     right: auto;
-    width: 148px;
+    width: 126px;
     max-width: none;
   }
 
   .top-left .stack-row {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 6px;
     width: 100%;
   }
 
   .top-left .overlay-btn {
     width: 100%;
-    min-height: 38px;
-    padding: 8px 10px;
-    font-size: 0.86rem;
+    min-height: 32px;
+    padding: 6px 8px;
+    font-size: 0.78rem;
     justify-content: center;
+    border-radius: 14px;
   }
 
-  /* SAĞ ÜST */
+  /* SAĞ ÜST KÜÇÜLTÜLDÜ */
   .top-right {
     top: 12px;
     right: 58px;
     left: auto;
-    width: 156px;
+    width: 136px;
     max-width: none;
   }
 
@@ -701,16 +702,17 @@ select:focus {
   .top-right .right-tools {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 6px;
     align-items: stretch;
     width: 100%;
   }
 
   .top-right .map-search-input {
     width: 100%;
-    min-height: 38px;
-    padding: 8px 10px;
-    font-size: 0.84rem;
+    min-height: 32px;
+    padding: 6px 8px;
+    font-size: 0.76rem;
+    border-radius: 14px;
   }
 
   .top-right .menu-wrapper {
@@ -720,72 +722,119 @@ select:focus {
   .top-right .overlay-btn,
   .top-right .menu-trigger {
     width: 100%;
-    min-height: 38px;
-    padding: 8px 10px;
-    font-size: 0.86rem;
+    min-height: 32px;
+    padding: 6px 8px;
+    font-size: 0.78rem;
     justify-content: center;
+    border-radius: 14px;
   }
 
+  /* MENÜ KARTI KÜÇÜLTÜLDÜ */
   .floating-menu {
     right: 0;
     left: auto;
-    width: 156px;
+    width: 136px;
     max-width: calc(100vw - 24px);
-    padding: 8px;
-    border-radius: 16px;
+    padding: 6px;
+    border-radius: 14px;
   }
 
   .menu-item {
-    min-height: 36px;
-    padding: 8px 10px;
-    font-size: 0.84rem;
+    min-height: 30px;
+    padding: 6px 8px;
+    font-size: 0.74rem;
     white-space: normal;
-    line-height: 1.25;
+    line-height: 1.2;
+    border-radius: 12px;
   }
 
-  /* MOBİLDE AÇILAN PANELLER */
+  /* AÇILAN PANELLER ARTIK KOMPAKT */
   .floating-card,
   .compact-card {
     position: fixed;
-    left: 12px !important;
-    right: 12px !important;
-    top: 132px !important;
-    width: auto !important;
+    left: 50% !important;
+    right: auto !important;
+    transform: translateX(-50%);
+    top: 122px !important;
+    width: min(280px, calc(100vw - 32px)) !important;
     max-width: none !important;
-    padding: 12px;
-    border-radius: 18px;
+    padding: 10px;
+    border-radius: 16px;
     z-index: 30;
   }
 
   .card-title-row {
-    gap: 10px;
-    margin-bottom: 10px;
+    gap: 8px;
+    margin-bottom: 8px;
   }
 
   .card-title-row h2 {
-    font-size: 0.96rem;
+    font-size: 0.9rem;
   }
 
   .card-title-row p {
-    font-size: 0.84rem;
+    font-size: 0.78rem;
+  }
+
+  .icon-close {
+    width: 30px;
+    height: 30px;
+    font-size: 0.9rem;
+  }
+
+  .field-group {
+    margin-bottom: 8px;
+  }
+
+  .field-group label {
+    font-size: 0.78rem;
+    margin-bottom: 4px;
+  }
+
+  .floating-card input,
+  .floating-card select,
+  .compact-card input,
+  .compact-card select {
+    padding: 8px 10px;
+    min-height: 34px;
+    font-size: 0.82rem;
+    border-radius: 10px;
   }
 
   .field-row,
   .summary-grid,
   .map-list-row {
     grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .summary-card {
+    padding: 10px;
+    border-radius: 12px;
+  }
+
+  .summary-card span {
+    font-size: 0.74rem;
+  }
+
+  .summary-card strong {
+    font-size: 0.88rem;
   }
 
   .panel-actions {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 6px;
     align-items: stretch;
   }
 
   .panel-actions .small-btn {
     width: 100%;
     justify-content: center;
+    min-height: 34px;
+    padding: 7px 10px;
+    font-size: 0.8rem;
+    border-radius: 12px;
   }
 
   .bottom-left {
@@ -794,10 +843,11 @@ select:focus {
   }
 
   .fab-btn {
-    min-height: 40px;
-    padding: 8px 12px;
-    font-size: 0.88rem;
+    min-height: 36px;
+    padding: 7px 10px;
+    font-size: 0.8rem;
     width: auto;
+    border-radius: 14px;
   }
 
   .trip-panel {
@@ -868,22 +918,28 @@ select:focus {
   }
 
   .topbar-actions .page-action-btn {
-    padding: 8px 10px;
-    font-size: 0.84rem;
+    padding: 7px 9px;
+    font-size: 0.8rem;
   }
 
   .top-left {
-    width: 138px;
+    width: 118px;
     top: 60px;
   }
 
   .top-right {
-    width: 146px;
+    width: 128px;
     right: 54px;
   }
 
   .floating-menu {
-    width: 146px;
+    width: 128px;
+  }
+
+  .floating-card,
+  .compact-card {
+    top: 116px !important;
+    width: min(260px, calc(100vw - 28px)) !important;
   }
 
   .map-canvas {
