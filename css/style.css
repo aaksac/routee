@@ -579,7 +579,6 @@ select:focus {
   }
 }
 
-/* TABLET VE KÜÇÜK EKRAN */
 @media (max-width: 900px) {
   .brand-text p {
     display: none;
@@ -604,7 +603,6 @@ select:focus {
   }
 }
 
-/* MOBİL */
 @media (max-width: 720px) {
   .topbar {
     padding: 12px 14px;
@@ -638,6 +636,7 @@ select:focus {
     padding: 8px 12px;
     font-size: 0.88rem;
     white-space: nowrap;
+    width: auto;
   }
 
   .auth-status {
@@ -658,7 +657,8 @@ select:focus {
   .top-left {
     top: 64px;
     left: 12px;
-    right: 12px;
+    right: auto;
+    width: min(180px, calc(100vw - 24px));
     max-width: none;
   }
 
@@ -666,7 +666,8 @@ select:focus {
     top: 12px;
     right: 58px;
     left: auto;
-    max-width: min(190px, calc(100vw - 88px));
+    width: min(180px, calc(100vw - 82px));
+    max-width: none;
   }
 
   .bottom-left {
@@ -691,24 +692,24 @@ select:focus {
   .top-right .stack-row {
     display: flex;
     flex-direction: column;
-    align-items: flex-end;
-    width: auto;
+    align-items: stretch;
+    width: 100%;
     gap: 8px;
   }
 
   .top-right .map-search-input {
-    width: min(170px, calc(100vw - 92px));
+    width: 100%;
     min-height: 38px;
     font-size: 0.88rem;
     padding: 10px 12px;
   }
 
   .top-right .menu-wrapper {
-    width: auto;
+    width: 100%;
   }
 
   .top-right .overlay-btn {
-    width: auto;
+    width: 100%;
     min-height: 38px;
     padding: 8px 12px;
     font-size: 0.88rem;
@@ -717,14 +718,14 @@ select:focus {
   .floating-menu {
     right: 0;
     left: auto;
-    width: 210px;
-    max-width: calc(100vw - 24px);
+    width: 100%;
+    max-width: 210px;
   }
 
   .floating-card,
   .compact-card {
-    width: calc(100vw - 24px);
-    max-width: none;
+    width: min(320px, calc(100vw - 24px));
+    max-width: calc(100vw - 24px);
     padding: 12px;
     border-radius: 18px;
   }
@@ -751,6 +752,7 @@ select:focus {
     min-height: 40px;
     padding: 9px 12px;
     font-size: 0.88rem;
+    width: auto;
   }
 
   .trip-panel {
@@ -819,18 +821,14 @@ select:focus {
     font-size: 0.84rem;
   }
 
-  .top-right {
-    right: 54px;
-    max-width: min(168px, calc(100vw - 82px));
-  }
-
-  .top-right .map-search-input {
-    width: min(156px, calc(100vw - 86px));
-    font-size: 0.84rem;
-  }
-
   .top-left {
+    width: min(164px, calc(100vw - 24px));
     top: 60px;
+  }
+
+  .top-right {
+    width: min(160px, calc(100vw - 78px));
+    right: 54px;
   }
 
   .map-canvas {
