@@ -593,8 +593,8 @@ select:focus {
   }
 
   .map-canvas {
-    min-height: 58vh;
-    height: 58vh;
+    min-height: 54vh;
+    height: 54vh;
     border-radius: 22px;
   }
 
@@ -604,18 +604,18 @@ select:focus {
 
   .top-right {
     top: 12px;
-    left: 12px;
-    right: 54px;
-    max-width: none;
+    right: 50px;
+    left: auto;
+    max-width: calc(100% - 72px);
     width: auto;
-    align-items: stretch;
+    align-items: flex-end;
   }
 
   .top-left {
-    top: 64px;
+    top: 58px;
     left: 12px;
-    right: 12px;
-    max-width: none;
+    right: auto;
+    max-width: calc(100% - 24px);
     width: auto;
   }
 
@@ -625,96 +625,156 @@ select:focus {
   }
 
   .panel-actions,
-  .trip-panel-actions {
+  .trip-panel-actions,
+  .summary-grid,
+  .map-list-row {
+    grid-template-columns: 1fr;
     flex-direction: column;
     align-items: stretch;
   }
 
-  .field-row,
-  .summary-grid,
-  .map-list-row {
+  .field-row {
     grid-template-columns: 1fr;
   }
 
-  .top-right .stack-row.right-tools {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
-    gap: 8px;
+  .stack-row {
+    width: auto;
+    max-width: 100%;
+    flex-wrap: nowrap;
     align-items: center;
-    width: 100%;
   }
 
-  .top-left .stack-row.compact-buttons {
-    display: flex;
-    gap: 8px;
+  .top-left .stack-row,
+  .top-right .stack-row,
+  .right-tools {
+    width: auto;
+    max-width: 100%;
     flex-wrap: nowrap;
-    width: 100%;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .compact-buttons {
+    gap: 6px;
   }
 
   .overlay-btn,
   .fab-btn,
   .small-btn,
   .page-action-btn {
-    min-height: 40px;
-    padding: 8px 12px;
-    font-size: 0.95rem;
+    width: auto;
+    max-width: 100%;
+    min-height: 34px;
+    padding: 6px 10px;
+    font-size: 0.86rem;
+    flex: 0 0 auto;
+    border-radius: 999px;
   }
 
-  .top-left .overlay-btn {
-    flex: 1 1 0;
-    min-width: 0;
-    width: auto;
-    justify-content: center;
+  #btnOpenStartPanel,
+  #btnOpenPointPanel,
+  .menu-trigger {
+    min-height: 34px;
+    padding: 6px 10px;
+    font-size: 0.84rem;
+    line-height: 1;
+  }
+
+  #btnOpenStartPanel,
+  #btnOpenPointPanel {
+    min-width: 104px;
+  }
+
+  .menu-trigger {
+    min-width: 76px;
   }
 
   .map-search-input {
-    width: 100%;
-    min-width: 0;
-    max-width: none;
-    min-height: 40px;
-    padding: 10px 14px;
-    font-size: 0.95rem;
+    width: min(160px, calc(100vw - 160px));
+    min-width: 120px;
+    max-width: calc(100vw - 160px);
+    min-height: 34px;
+    padding: 7px 12px;
+    font-size: 0.86rem;
   }
 
   .menu-wrapper {
     width: auto;
-    flex: 0 0 auto;
-  }
-
-  .menu-trigger {
-    min-width: 104px;
-    width: auto;
-    white-space: nowrap;
+    max-width: 100%;
   }
 
   .floating-menu {
     top: calc(100% + 6px);
     right: 0;
     left: auto;
-    width: min(200px, calc(100vw - 78px));
+    width: min(170px, calc(100vw - 72px));
     padding: 6px;
     gap: 4px;
     border-radius: 16px;
   }
 
   .menu-item {
-    min-height: 38px;
-    padding: 8px 10px;
-    font-size: 0.9rem;
-  }
-
-  .floating-card,
-  .compact-card {
-    width: min(320px, calc(100vw - 24px));
-    max-width: calc(100vw - 24px);
-    padding: 12px;
-    border-radius: 18px;
+    min-height: 34px;
+    padding: 7px 9px;
+    font-size: 0.82rem;
   }
 
   .top-left .floating-card,
+  .top-left .compact-card {
+    width: 220px;
+    max-width: calc(100vw - 32px);
+    padding: 10px;
+    border-radius: 16px;
+  }
+
   .top-right .floating-card,
   .top-right .compact-card {
-    margin-top: 0;
+    width: 210px;
+    max-width: calc(100vw - 72px);
+    padding: 10px;
+    border-radius: 16px;
+  }
+
+  .floating-card .card-title-row {
+    margin-bottom: 10px;
+    gap: 8px;
+  }
+
+  .floating-card .card-title-row h2 {
+    font-size: 0.9rem;
+  }
+
+  .floating-card .field-group {
+    margin-bottom: 8px;
+  }
+
+  .floating-card .field-group label {
+    font-size: 0.76rem;
+    margin-bottom: 4px;
+  }
+
+  .floating-card input,
+  .floating-card select {
+    min-height: 34px;
+    padding: 7px 10px;
+    font-size: 0.84rem;
+    border-radius: 10px;
+  }
+
+  .floating-card .panel-actions {
+    gap: 6px;
+  }
+
+  .floating-card .small-btn {
+    min-height: 32px;
+    padding: 6px 9px;
+    font-size: 0.8rem;
+  }
+
+  .icon-close {
+    width: 28px;
+    height: 28px;
+    min-width: 28px;
   }
 
   .trip-panel {
@@ -763,24 +823,25 @@ select:focus {
   }
 
   .page-action-btn {
-    padding: 8px 12px;
-    min-height: 40px;
+    padding: 7px 11px;
+    min-height: 36px;
+    font-size: 0.88rem;
   }
 
   .map-canvas {
-    min-height: 56vh;
-    height: 56vh;
+    min-height: 50vh;
+    height: 50vh;
   }
 
   .top-right {
-    left: 10px;
-    right: 50px;
+    right: 48px;
+    max-width: calc(100% - 62px);
   }
 
   .top-left {
-    top: 60px;
+    top: 54px;
     left: 10px;
-    right: 10px;
+    max-width: calc(100% - 20px);
   }
 
   .bottom-left {
@@ -788,35 +849,69 @@ select:focus {
     bottom: 10px;
   }
 
-  .top-right .stack-row.right-tools,
-  .top-left .stack-row.compact-buttons {
-    gap: 6px;
+  .compact-buttons {
+    gap: 5px;
+  }
+
+  #btnOpenStartPanel,
+  #btnOpenPointPanel {
+    min-width: 92px;
+    padding: 5px 9px;
+    font-size: 0.78rem;
+  }
+
+  .menu-trigger {
+    min-width: 68px;
+    padding: 5px 9px;
+    font-size: 0.78rem;
   }
 
   .map-search-input {
-    font-size: 0.92rem;
-    padding: 9px 12px;
+    width: min(136px, calc(100vw - 146px));
+    min-width: 104px;
+    max-width: calc(100vw - 146px);
+    min-height: 32px;
+    padding: 6px 10px;
+    font-size: 0.8rem;
   }
 
-  .menu-trigger,
-  .top-left .overlay-btn,
-  .fab-btn,
-  .small-btn {
-    padding: 8px 10px;
-    font-size: 0.92rem;
+  .top-left .floating-card,
+  .top-left .compact-card {
+    width: 196px;
+    max-width: calc(100vw - 24px);
+  }
+
+  .top-right .floating-card,
+  .top-right .compact-card {
+    width: 188px;
+    max-width: calc(100vw - 64px);
+  }
+
+  .floating-card {
+    padding: 9px;
+  }
+
+  .floating-card .field-group label {
+    font-size: 0.74rem;
+  }
+
+  .floating-card input,
+  .floating-card select {
+    min-height: 32px;
+    padding: 6px 9px;
+    font-size: 0.8rem;
+  }
+
+  .floating-card .small-btn {
+    min-height: 30px;
+    padding: 5px 8px;
+    font-size: 0.77rem;
   }
 
   .floating-menu {
-    width: min(180px, calc(100vw - 64px));
-  }
-
-  .floating-card,
-  .compact-card {
-    width: calc(100vw - 20px);
-    max-width: calc(100vw - 20px);
+    width: min(156px, calc(100vw - 66px));
   }
 }
-
 @media (min-width: 721px) {
   .topbar.is-hidden-on-scroll {
     transform: none;
