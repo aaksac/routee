@@ -530,3 +530,196 @@
     margin-top: 36px;
   }
 }
+@media (max-width: 720px) {
+  /* Gezi listesi mobilde fazla küçülmesin */
+  .trip-panel {
+    padding: 14px !important;
+    border-radius: 22px !important;
+  }
+
+  .trip-panel-header h2 {
+    font-size: 1rem !important;
+    line-height: 1.2 !important;
+  }
+
+  .trip-list {
+    gap: 10px !important;
+  }
+
+  .trip-item {
+    grid-template-columns: 40px minmax(0, 1fr) auto !important;
+    gap: 10px !important;
+    padding: 11px !important;
+    border-radius: 16px !important;
+    align-items: center !important;
+  }
+
+  .trip-order {
+    width: 40px !important;
+    height: 40px !important;
+    border-radius: 12px !important;
+    font-size: 0.84rem !important;
+  }
+
+  .trip-content strong {
+    font-size: 0.92rem !important;
+    line-height: 1.15 !important;
+  }
+
+  .trip-content span {
+    font-size: 0.8rem !important;
+    line-height: 1.25 !important;
+  }
+
+  .tiny-btn {
+    min-height: 30px !important;
+    padding: 5px 9px !important;
+    font-size: 0.72rem !important;
+    border-radius: 999px !important;
+    white-space: nowrap !important;
+  }
+
+  /* Harita Listelerim daha klas görünsün */
+  .screen-overlay-panel {
+    width: calc(100vw - 16px) !important;
+    margin-top: 34px !important;
+    padding: 14px !important;
+    border-radius: 20px !important;
+  }
+
+  .screen-overlay-panel .card-title-row.large-gap {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 10px !important;
+    margin-bottom: 14px !important;
+  }
+
+  .screen-overlay-panel .card-title-row.large-gap .panel-actions {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    gap: 8px !important;
+    justify-content: flex-start !important;
+  }
+
+  .screen-overlay-panel .card-title-row.large-gap .small-btn {
+    min-height: 34px !important;
+    padding: 6px 10px !important;
+    font-size: 0.75rem !important;
+    border-radius: 999px !important;
+    white-space: nowrap !important;
+  }
+
+  /* Liste satırı: sil butonu alta kaymasın */
+  .map-list-row {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) auto !important;
+    gap: 8px !important;
+    align-items: center !important;
+  }
+
+  .map-list-item {
+    min-width: 0 !important;
+    padding: 12px 13px !important;
+    border-radius: 16px !important;
+    box-shadow: 0 8px 18px rgba(15, 23, 42, 0.06) !important;
+  }
+
+  .map-list-item strong,
+  .map-list-item b {
+    font-size: 0.9rem !important;
+    line-height: 1.15 !important;
+  }
+
+  .map-list-item span {
+    font-size: 0.76rem !important;
+    line-height: 1.3 !important;
+  }
+
+  .map-list-row .danger-outline,
+  .map-list-row .small-btn,
+  .map-list-row .tiny-btn {
+    min-height: 34px !important;
+    height: 34px !important;
+    padding: 0 10px !important;
+    font-size: 0.72rem !important;
+    border-radius: 999px !important;
+    white-space: nowrap !important;
+    align-self: center !important;
+    justify-self: end !important;
+  }
+
+  /* Çok uzun satırlar taşarsa içerik düzgün kırılsın */
+  .map-list-item,
+  .trip-content {
+    overflow-wrap: anywhere !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .trip-panel {
+    padding: 13px !important;
+    border-radius: 20px !important;
+  }
+
+  .trip-item {
+    grid-template-columns: 38px minmax(0, 1fr) auto !important;
+    padding: 10px !important;
+  }
+
+  .trip-order {
+    width: 38px !important;
+    height: 38px !important;
+    font-size: 0.8rem !important;
+  }
+
+  .trip-content strong {
+    font-size: 0.88rem !important;
+  }
+
+  .trip-content span {
+    font-size: 0.77rem !important;
+  }
+
+  .tiny-btn {
+    min-height: 28px !important;
+    padding: 4px 8px !important;
+    font-size: 0.68rem !important;
+  }
+
+  .screen-overlay-panel {
+    width: calc(100vw - 12px) !important;
+    margin-top: 28px !important;
+    padding: 12px !important;
+    border-radius: 18px !important;
+  }
+
+  .screen-overlay-panel .card-title-row.large-gap .small-btn {
+    min-height: 32px !important;
+    padding: 5px 9px !important;
+    font-size: 0.71rem !important;
+  }
+
+  .map-list-row {
+    grid-template-columns: minmax(0, 1fr) auto !important;
+    gap: 7px !important;
+  }
+
+  .map-list-item {
+    padding: 11px 12px !important;
+    border-radius: 15px !important;
+  }
+
+  .map-list-item span {
+    font-size: 0.73rem !important;
+  }
+
+  .map-list-row .danger-outline,
+  .map-list-row .small-btn,
+  .map-list-row .tiny-btn {
+    min-height: 32px !important;
+    height: 32px !important;
+    padding: 0 9px !important;
+    font-size: 0.68rem !important;
+  }
+}
