@@ -627,6 +627,10 @@ select:focus {
     font-size: 0.98rem;
   }
 
+  .brand-text p {
+    display: none;
+  }
+
   .topbar-actions {
     flex: 0 0 auto;
   }
@@ -639,11 +643,17 @@ select:focus {
     width: auto;
   }
 
+  .status-strip {
+    padding: 10px 14px 0;
+  }
+
   .auth-status {
     font-size: 0.88rem;
+    line-height: 1.4;
   }
 
   .app-layout {
+    grid-template-columns: 1fr;
     padding: 12px;
     gap: 12px;
   }
@@ -654,80 +664,110 @@ select:focus {
     border-radius: 22px;
   }
 
+  /* SOL ÜST */
   .top-left {
-    top: 64px;
+    top: 68px;
     left: 12px;
     right: auto;
-    width: min(180px, calc(100vw - 24px));
+    width: 148px;
     max-width: none;
-  }
-
-  .top-right {
-    top: 12px;
-    right: 58px;
-    left: auto;
-    width: min(180px, calc(100vw - 82px));
-    max-width: none;
-  }
-
-  .bottom-left {
-    left: 12px;
-    bottom: 12px;
   }
 
   .top-left .stack-row {
     display: flex;
     flex-direction: column;
-    width: 100%;
     gap: 8px;
+    width: 100%;
   }
 
   .top-left .overlay-btn {
     width: 100%;
-    min-height: 40px;
-    padding: 9px 12px;
-    font-size: 0.9rem;
+    min-height: 38px;
+    padding: 8px 10px;
+    font-size: 0.86rem;
+    justify-content: center;
   }
 
-  .top-right .stack-row {
+  /* SAĞ ÜST */
+  .top-right {
+    top: 12px;
+    right: 58px;
+    left: auto;
+    width: 156px;
+    max-width: none;
+  }
+
+  .top-right .stack-row,
+  .top-right .right-tools {
     display: flex;
     flex-direction: column;
+    gap: 8px;
     align-items: stretch;
     width: 100%;
-    gap: 8px;
   }
 
   .top-right .map-search-input {
     width: 100%;
     min-height: 38px;
-    font-size: 0.88rem;
-    padding: 10px 12px;
+    padding: 8px 10px;
+    font-size: 0.84rem;
   }
 
   .top-right .menu-wrapper {
     width: 100%;
   }
 
-  .top-right .overlay-btn {
+  .top-right .overlay-btn,
+  .top-right .menu-trigger {
     width: 100%;
     min-height: 38px;
-    padding: 8px 12px;
-    font-size: 0.88rem;
+    padding: 8px 10px;
+    font-size: 0.86rem;
+    justify-content: center;
   }
 
   .floating-menu {
     right: 0;
     left: auto;
-    width: 100%;
-    max-width: 210px;
+    width: 156px;
+    max-width: calc(100vw - 24px);
+    padding: 8px;
+    border-radius: 16px;
   }
 
+  .menu-item {
+    min-height: 36px;
+    padding: 8px 10px;
+    font-size: 0.84rem;
+    white-space: normal;
+    line-height: 1.25;
+  }
+
+  /* MOBİLDE AÇILAN PANELLER */
   .floating-card,
   .compact-card {
-    width: min(320px, calc(100vw - 24px));
-    max-width: calc(100vw - 24px);
+    position: fixed;
+    left: 12px !important;
+    right: 12px !important;
+    top: 132px !important;
+    width: auto !important;
+    max-width: none !important;
     padding: 12px;
     border-radius: 18px;
+    z-index: 30;
+  }
+
+  .card-title-row {
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+
+  .card-title-row h2 {
+    font-size: 0.96rem;
+  }
+
+  .card-title-row p {
+    font-size: 0.84rem;
   }
 
   .field-row,
@@ -736,26 +776,32 @@ select:focus {
     grid-template-columns: 1fr;
   }
 
-  .panel-actions,
-  .trip-panel-actions {
+  .panel-actions {
     display: flex;
     flex-direction: column;
+    gap: 8px;
     align-items: stretch;
   }
 
-  .panel-actions .small-btn,
-  .trip-panel-actions .small-btn {
+  .panel-actions .small-btn {
     width: 100%;
+    justify-content: center;
+  }
+
+  .bottom-left {
+    left: 12px;
+    bottom: 12px;
   }
 
   .fab-btn {
     min-height: 40px;
-    padding: 9px 12px;
+    padding: 8px 12px;
     font-size: 0.88rem;
     width: auto;
   }
 
   .trip-panel {
+    min-height: auto;
     border-radius: 22px;
     padding: 14px;
   }
@@ -779,8 +825,8 @@ select:focus {
   .trip-item > div:last-child,
   .trip-item > button:last-child {
     grid-column: 2;
-    justify-self: stretch;
     width: 100%;
+    justify-self: stretch;
   }
 
   .trip-item .tiny-btn {
@@ -791,19 +837,24 @@ select:focus {
   .trip-item > div[style] {
     display: flex !important;
     flex-direction: column;
-    align-items: stretch !important;
     gap: 8px !important;
+    align-items: stretch !important;
     width: 100%;
   }
-
-  .desktop-only-inline { display: none !important; }
-  .mobile-only-inline { display: inline-flex; }
 
   .screen-overlay-panel {
     width: calc(100vw - 12px);
     margin-top: 40px;
     padding: 14px;
     border-radius: 20px;
+  }
+
+  .desktop-only-inline {
+    display: none !important;
+  }
+
+  .mobile-only-inline {
+    display: inline-flex;
   }
 }
 
@@ -822,13 +873,17 @@ select:focus {
   }
 
   .top-left {
-    width: min(164px, calc(100vw - 24px));
+    width: 138px;
     top: 60px;
   }
 
   .top-right {
-    width: min(160px, calc(100vw - 78px));
+    width: 146px;
     right: 54px;
+  }
+
+  .floating-menu {
+    width: 146px;
   }
 
   .map-canvas {
