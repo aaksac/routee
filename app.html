@@ -1,0 +1,254 @@
+<!doctype html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>Rota Planlayıcı</title>
+    <meta name="theme-color" content="#0f172a" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="Rota Planlayıcı" />
+    <link rel="stylesheet" href="./css/style.css" />
+    <link rel="stylesheet" href="./css/mobile.css" />
+    <link rel="stylesheet" href="./css/auth.css" />
+  </head>
+  <body>
+    <div id="app">
+      <header class="topbar">
+        <div class="brand-area">
+          <div class="brand-icon">R</div>
+          <div class="brand-text">
+            <h1>Rota Planlayıcı</h1>
+            <p>Kuş uçuşu rota planlama ve harita yönetimi</p>
+          </div>
+        </div>
+        <div class="topbar-actions">
+          <button class="page-action-btn" id="btnLogoutTop" type="button" title="Çıkış Yap">Çıkış Yap</button>
+        </div>
+      </header>
+
+      <section class="status-strip">
+        <p id="authStatus" class="auth-status">Yükleniyor...</p>
+      </section>
+
+      <main class="app-layout">
+        <section class="map-area">
+          <div class="map-shell">
+            <div id="mapCanvas" class="map-canvas"></div>
+
+            <div class="map-overlay top-left">
+              <div class="stack-row compact-buttons">
+                <button class="overlay-btn icon-only-btn" id="btnOpenStartPanel" type="button" aria-label="Başlangıç Ekle" title="Başlangıç Ekle">
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M5 3v18"></path>
+                    <path d="M7 4h9l-2.4 3L16 10H7z"></path>
+                  </svg>
+                </button>
+
+                <button class="overlay-btn icon-only-btn" id="btnOpenPointPanel" type="button" aria-label="Konum Ekle" title="Konum Ekle">
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M12 21s-5-4.8-5-9a5 5 0 1 1 10 0c0 4.2-5 9-5 9z"></path>
+                    <circle cx="12" cy="12" r="1.8"></circle>
+                  </svg>
+                </button>
+              </div>
+
+              <section class="floating-card hidden" id="startPanel">
+                <div class="card-title-row">
+                  <h2>Başlangıç Noktası</h2>
+                  <button class="icon-close" id="btnCloseStartPanel" type="button" aria-label="Kapat">×</button>
+                </div>
+                <div class="field-group">
+                  <label for="startName">İsim</label>
+                  <input id="startName" type="text" placeholder="Başlangıç adı" />
+                </div>
+                <div class="field-row">
+                  <div class="field-group">
+                    <label for="startLat">Enlem</label>
+                    <input id="startLat" type="number" step="any" placeholder="37.0000" />
+                  </div>
+                  <div class="field-group">
+                    <label for="startLng">Boylam</label>
+                    <input id="startLng" type="number" step="any" placeholder="35.3213" />
+                  </div>
+                </div>
+                <div class="panel-actions">
+                  <button class="small-btn primary" id="btnAddStartPoint" type="button">Ekle</button>
+                </div>
+              </section>
+
+              <section class="floating-card hidden" id="pointPanel">
+                <div class="card-title-row">
+                  <h2>Konum Ekle</h2>
+                  <button class="icon-close" id="btnClosePointPanel" type="button" aria-label="Kapat">×</button>
+                </div>
+                <div class="field-group">
+                  <label for="pointName">Konum Adı</label>
+                  <input id="pointName" type="text" placeholder="Örn. Müşteri A" />
+                </div>
+                <div class="field-row">
+                  <div class="field-group">
+                    <label for="pointLat">Enlem</label>
+                    <input id="pointLat" type="number" step="any" placeholder="37.0100" />
+                  </div>
+                  <div class="field-group">
+                    <label for="pointLng">Boylam</label>
+                    <input id="pointLng" type="number" step="any" placeholder="35.3300" />
+                  </div>
+                </div>
+                <div class="panel-actions">
+                  <button class="small-btn primary" id="btnAddPoint" type="button">Ekle</button>
+                </div>
+              </section>
+            </div>
+
+            <div class="map-overlay top-right">
+              <div class="stack-row right-tools">
+                <div class="search-input-wrap">
+                  <input id="placeSearch" class="map-search-input" type="text" placeholder="Haritada yer ara" />
+                  <button
+                    id="btnClearSearch"
+                    class="search-clear-btn hidden"
+                    type="button"
+                    aria-label="Aramayı temizle"
+                    title="Temizle"
+                  >
+                    ×
+                  </button>
+                </div>
+
+                <div class="menu-wrapper">
+                  <button class="overlay-btn menu-trigger icon-only-btn" id="btnToggleMenu" type="button" aria-label="Menü" title="Menü">
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                      <path d="M5 7h14"></path>
+                      <path d="M5 12h14"></path>
+                      <path d="M5 17h14"></path>
+                    </svg>
+                  </button>
+                  <div class="floating-menu hidden" id="mapMenu">
+                    <button class="menu-item" id="btnOpenSavePanel" type="button">Haritayı Kaydet</button>
+                    <button class="menu-item" id="btnOpenImportExportPanel" type="button">İçe / Dışa Aktar</button>
+                    <button class="menu-item" id="btnOpenMapListPanel" type="button">Harita Listelerim</button>
+                  </div>
+                </div>
+              </div>
+
+              <section class="floating-card compact-card hidden" id="savePanel">
+                <div class="card-title-row">
+                  <h2>Haritayı Kaydet</h2>
+                  <button class="icon-close" id="btnCloseSavePanel" type="button" aria-label="Kapat">×</button>
+                </div>
+                <div class="field-group">
+                  <label for="mapName">Harita Adı</label>
+                  <input id="mapName" type="text" placeholder="Örn. Müşteri Rotası" />
+                </div>
+                <div class="summary-grid compact-summary-grid">
+                  <div class="summary-card">
+                    <span>Toplam Nokta</span>
+                    <strong id="totalPoints">0</strong>
+                  </div>
+                  <div class="summary-card">
+                    <span>Toplam Mesafe</span>
+                    <strong id="totalDistance">0.00 km</strong>
+                  </div>
+                </div>
+                <div class="panel-actions top-gap">
+                  <button class="small-btn primary" id="btnSaveMap" type="button">Kaydet</button>
+                </div>
+              </section>
+
+              <section class="floating-card compact-card hidden" id="importExportPanel">
+                <div class="card-title-row">
+                  <h2>İçe / Dışa Aktar</h2>
+                  <button class="icon-close" id="btnCloseImportExportPanel" type="button" aria-label="Kapat">×</button>
+                </div>
+                <div class="field-group">
+                  <label for="exportType">Dışa Aktarma Türü</label>
+                  <select id="exportType">
+                    <option value="csv">CSV</option>
+                    <option value="xlsx">XLSX</option>
+                  </select>
+                </div>
+                <div class="panel-actions bottom-gap">
+                  <button class="small-btn" id="btnExport" type="button">Dışa Aktar</button>
+                </div>
+                <div class="field-group">
+                  <label for="importType">İçe Aktarma Türü</label>
+                  <select id="importType">
+                    <option value="csv">CSV</option>
+                    <option value="xlsx">XLSX</option>
+                  </select>
+                </div>
+                <div class="panel-actions">
+                  <button class="small-btn" id="btnImport" type="button">İçe Aktar</button>
+                </div>
+                <input id="csvFileInput" type="file" accept=".csv" hidden />
+                <input id="xlsxFileInput" type="file" accept=".xlsx,.xls" hidden />
+              </section>
+            </div>
+
+            <div class="map-overlay bottom-left">
+              <button class="fab-btn icon-only-btn" id="btnCurrentLocation" type="button" aria-label="Mevcut Konumum" title="Mevcut Konumum">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <circle cx="12" cy="12" r="4"></circle>
+                  <path d="M12 2v3"></path>
+                  <path d="M12 19v3"></path>
+                  <path d="M2 12h3"></path>
+                  <path d="M19 12h3"></path>
+                </svg>
+              </button>
+            </div>
+
+            <div class="map-overlay top-center desktop-only-inline">
+              <div class="map-badges">
+                <span class="badge">Kuş uçuşu rota</span>
+                <span class="badge" id="badgeDistance">Toplam: 0.00 km</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <aside class="trip-column open" id="tripPanel">
+          <section class="trip-panel">
+            <div class="trip-panel-header">
+              <div>
+                <h2>Gezi Listesi</h2>
+              </div>
+            </div>
+            <div id="tripList" class="trip-list">
+              <div class="trip-item start">
+                <div class="trip-order">S</div>
+                <div class="trip-content">
+                  <strong>Başlangıç</strong>
+                  <span>Henüz eklenmedi</span>
+                </div>
+                <button class="tiny-btn" type="button" disabled>Yol Tarifi Al</button>
+              </div>
+            </div>
+          </section>
+        </aside>
+      </main>
+
+      <div class="screen-overlay hidden" id="savedMapsOverlay">
+        <div class="screen-overlay-backdrop" id="savedMapsBackdrop"></div>
+        <section class="screen-overlay-panel">
+          <div class="card-title-row large-gap">
+            <div>
+              <h2>Harita Listelerim</h2>
+              <p>Kayıtlı haritalarınızı buradan seçebilirsiniz.</p>
+            </div>
+            <div class="panel-actions">
+              <button class="small-btn" id="btnNewMap" type="button">+ Yeni</button>
+              <button class="small-btn" id="btnCloseMapListPanel" type="button">Kapat</button>
+            </div>
+          </div>
+          <div id="mapList" class="map-list"></div>
+        </section>
+      </div>
+    </div>
+
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCtdGc1qLohM2cDIt2GGyGaT5tS4wF8hfM&libraries=places"></script>
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+    <script type="module" src="./js/app.js"></script>
+  </body>
+</html>
