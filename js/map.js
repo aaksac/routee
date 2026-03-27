@@ -18,13 +18,14 @@ function initMap() {
 
   const defaultCenter = { lat: 37.0, lng: 35.3213 };
 
-  map = new google.maps.Map(mapElement, {
-    center: defaultCenter,
-    zoom: 11,
-    mapTypeControl: false,
-    streetViewControl: false,
-    fullscreenControl: true
-  });
+map = new google.maps.Map(mapElement, {
+  center: defaultCenter,
+  zoom: 11,
+  mapTypeControl: false,
+  streetViewControl: false,
+  fullscreenControl: true,
+  gestureHandling: "cooperative"
+});
 
   activeInfoWindow = new google.maps.InfoWindow();
 
