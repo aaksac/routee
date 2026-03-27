@@ -1,0 +1,657 @@
+@media (max-width: 720px) {
+  .topbar {
+    padding: 12px 14px;
+    gap: 10px;
+  }
+
+  .brand-area {
+    gap: 10px;
+    min-width: 0;
+  }
+
+  .brand-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 14px;
+    flex: 0 0 40px;
+  }
+
+  .brand-text h1 {
+    font-size: 1rem;
+    line-height: 1.15;
+  }
+
+  .brand-text p {
+    display: none;
+  }
+
+  .page-action-btn {
+    min-height: 36px;
+    padding: 6px 10px;
+    font-size: 0.84rem;
+  }
+
+  .status-strip {
+    padding: 8px 14px 0;
+  }
+
+  .auth-status {
+    font-size: 0.88rem;
+    line-height: 1.35;
+  }
+
+  .app-layout {
+    padding: 12px 14px 16px;
+    gap: 12px;
+  }
+
+  .map-canvas {
+    min-height: 56vh;
+    height: 56vh;
+    border-radius: 20px;
+  }
+
+  .map-overlay {
+    gap: 6px;
+  }
+
+  .top-left {
+    top: 10px;
+    left: 10px;
+    max-width: 52px;
+  }
+
+  .top-right {
+    top: 8px;
+    right: 8px;
+    width: calc(100% - 74px);
+    max-width: calc(100% - 74px);
+    align-items: stretch;
+  }
+
+  .bottom-left {
+    left: 10px;
+    bottom: 10px;
+  }
+
+  .top-left .compact-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    align-items: stretch;
+    width: 44px;
+  }
+
+  #btnOpenStartPanel,
+  #btnOpenPointPanel,
+  #btnToggleMenu,
+  #btnCurrentLocation,
+  .icon-only-btn {
+    width: 44px !important;
+    min-width: 44px !important;
+    max-width: 44px !important;
+    height: 44px !important;
+    min-height: 44px !important;
+    padding: 0 !important;
+    border-radius: 15px !important;
+    display: grid !important;
+    place-items: center !important;
+  }
+
+  #btnOpenStartPanel svg,
+  #btnOpenPointPanel svg,
+  #btnToggleMenu svg,
+  #btnCurrentLocation svg,
+  .icon-only-btn svg {
+    width: 20px !important;
+    height: 20px !important;
+  }
+
+  .right-tools {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 6px;
+    align-items: start;
+    justify-content: stretch;
+    width: 100%;
+  }
+
+  .search-input-wrap {
+    width: 100%;
+    min-width: 0;
+    max-width: none;
+  }
+
+  .search-input-wrap .map-search-input {
+    width: 100%;
+    min-width: 0;
+    max-width: none;
+    min-height: 44px;
+    height: 44px;
+    padding: 10px 40px 10px 14px;
+    font-size: 0.83rem;
+    line-height: 1.1;
+    border-radius: 16px;
+  }
+
+  .search-clear-btn {
+    right: 8px;
+    width: 26px;
+    height: 26px;
+    min-width: 26px;
+    min-height: 26px;
+    font-size: 0.95rem;
+  }
+
+  .menu-wrapper {
+    position: relative;
+    justify-self: end;
+    flex: 0 0 auto;
+  }
+
+  .floating-menu {
+    top: calc(100% + 6px);
+    right: 0;
+    width: 170px;
+    max-width: calc(100vw - 16px);
+    padding: 6px;
+    gap: 5px;
+    border-radius: 16px;
+  }
+
+  .menu-item {
+    min-height: 34px;
+    padding: 7px 9px;
+    font-size: 0.74rem;
+    border-radius: 12px;
+  }
+
+  #startPanel,
+  #pointPanel {
+    width: 178px !important;
+    min-width: 178px !important;
+    max-width: calc(100vw - 16px) !important;
+    padding: 9px !important;
+    border-radius: 14px !important;
+  }
+
+  #savePanel,
+  #importExportPanel {
+    width: 198px !important;
+    max-width: calc(100vw - 16px) !important;
+    padding: 9px !important;
+    border-radius: 14px !important;
+  }
+
+  #startPanel .card-title-row,
+  #pointPanel .card-title-row,
+  #savePanel .card-title-row,
+  #importExportPanel .card-title-row {
+    margin-bottom: 6px !important;
+    gap: 6px !important;
+    align-items: center !important;
+  }
+
+  #startPanel .card-title-row h2,
+  #pointPanel .card-title-row h2,
+  #savePanel .card-title-row h2,
+  #importExportPanel .card-title-row h2 {
+    font-size: 0.78rem !important;
+    line-height: 1.12 !important;
+    margin: 0 !important;
+  }
+
+  #startPanel .field-group,
+  #pointPanel .field-group,
+  #savePanel .field-group,
+  #importExportPanel .field-group {
+    margin-bottom: 6px !important;
+  }
+
+  #startPanel .field-group label,
+  #pointPanel .field-group label,
+  #savePanel .field-group label,
+  #importExportPanel .field-group label {
+    font-size: 0.66rem !important;
+    margin-bottom: 3px !important;
+    line-height: 1.08 !important;
+  }
+
+  #startPanel input,
+  #pointPanel input,
+  #savePanel input,
+  #importExportPanel input,
+  #savePanel select,
+  #importExportPanel select {
+    min-height: 28px !important;
+    height: 28px !important;
+    padding: 4px 7px !important;
+    font-size: 0.7rem !important;
+    line-height: 1.05 !important;
+    border-radius: 8px !important;
+  }
+
+  #startPanel .field-row,
+  #pointPanel .field-row {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    gap: 5px !important;
+  }
+
+  #savePanel .summary-grid,
+  #importExportPanel .summary-grid {
+    grid-template-columns: 1fr !important;
+    gap: 5px !important;
+  }
+
+  #startPanel .panel-actions,
+  #pointPanel .panel-actions,
+  #savePanel .panel-actions,
+  #importExportPanel .panel-actions {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: wrap !important;
+    justify-content: flex-start !important;
+    gap: 5px !important;
+    margin-top: 4px !important;
+  }
+
+  #startPanel .small-btn,
+  #pointPanel .small-btn,
+  #savePanel .small-btn,
+  #importExportPanel .small-btn {
+    width: auto !important;
+    min-width: 0 !important;
+    flex: 0 0 auto !important;
+    min-height: 26px !important;
+    height: 26px !important;
+    padding: 3px 8px !important;
+    font-size: 0.63rem !important;
+    line-height: 1 !important;
+    border-radius: 999px !important;
+  }
+
+  #btnCloseStartPanel,
+  #btnClosePointPanel,
+  #btnCloseSavePanel,
+  #btnCloseImportExportPanel {
+    width: 22px !important;
+    height: 22px !important;
+    min-width: 22px !important;
+    min-height: 22px !important;
+    padding: 0 !important;
+    font-size: 0.76rem !important;
+    line-height: 1 !important;
+    border-radius: 999px !important;
+    flex: 0 0 22px !important;
+  }
+
+  .trip-panel {
+    padding: 14px !important;
+    border-radius: 22px !important;
+  }
+
+  .trip-panel-header h2 {
+    font-size: 1rem !important;
+    line-height: 1.2 !important;
+  }
+
+  .trip-list {
+    gap: 10px !important;
+  }
+
+  .trip-item {
+    grid-template-columns: 40px minmax(0, 1fr) auto !important;
+    gap: 10px !important;
+    padding: 11px !important;
+    border-radius: 16px !important;
+    align-items: center !important;
+  }
+
+  .trip-order {
+    width: 40px !important;
+    height: 40px !important;
+    border-radius: 12px !important;
+    font-size: 0.84rem !important;
+  }
+
+  .trip-content strong {
+    font-size: 0.92rem !important;
+    line-height: 1.15 !important;
+  }
+
+  .trip-content span {
+    font-size: 0.8rem !important;
+    line-height: 1.25 !important;
+  }
+
+  .tiny-btn {
+    min-height: 30px !important;
+    padding: 5px 9px !important;
+    font-size: 0.72rem !important;
+    border-radius: 999px !important;
+    white-space: nowrap !important;
+  }
+
+  .screen-overlay-panel {
+    width: calc(100vw - 16px) !important;
+    margin-top: 34px !important;
+    padding: 14px !important;
+    border-radius: 20px !important;
+  }
+
+  .screen-overlay-panel .card-title-row.large-gap {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 10px !important;
+    margin-bottom: 14px !important;
+  }
+
+  .screen-overlay-panel .card-title-row.large-gap .panel-actions {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    gap: 8px !important;
+    justify-content: flex-start !important;
+  }
+
+  .screen-overlay-panel .card-title-row.large-gap .small-btn {
+    min-height: 34px !important;
+    padding: 6px 10px !important;
+    font-size: 0.75rem !important;
+    border-radius: 999px !important;
+    white-space: nowrap !important;
+  }
+
+  .map-list-row {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) auto !important;
+    gap: 8px !important;
+    align-items: center !important;
+  }
+
+  .map-list-item {
+    min-width: 0 !important;
+    padding: 12px 13px !important;
+    border-radius: 16px !important;
+    box-shadow: 0 8px 18px rgba(15, 23, 42, 0.06) !important;
+  }
+
+  .map-list-item strong,
+  .map-list-item b {
+    font-size: 0.9rem !important;
+    line-height: 1.15 !important;
+  }
+
+  .map-list-item span {
+    font-size: 0.76rem !important;
+    line-height: 1.3 !important;
+  }
+
+  .map-list-row .danger-outline,
+  .map-list-row .small-btn,
+  .map-list-row .tiny-btn {
+    min-height: 34px !important;
+    height: 34px !important;
+    padding: 0 10px !important;
+    font-size: 0.72rem !important;
+    border-radius: 999px !important;
+    white-space: nowrap !important;
+    align-self: center !important;
+    justify-self: end !important;
+  }
+
+  .map-list-item,
+  .trip-content {
+    overflow-wrap: anywhere !important;
+  }
+
+  .desktop-only-inline {
+    display: none !important;
+  }
+
+  .mobile-only-inline {
+    display: inline-flex;
+  }
+}
+
+@media (max-width: 480px) {
+  .topbar {
+    padding: 10px 12px;
+  }
+
+  .brand-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 12px;
+    flex-basis: 36px;
+  }
+
+  .brand-text h1 {
+    font-size: 0.92rem;
+  }
+
+  .page-action-btn {
+    min-height: 34px;
+    padding: 5px 9px;
+    font-size: 0.78rem;
+  }
+
+  .app-layout {
+    padding: 10px 12px 14px;
+  }
+
+  .map-canvas {
+    min-height: 54vh;
+    height: 54vh;
+  }
+
+  .top-left {
+    top: 8px;
+    left: 8px;
+    max-width: 46px;
+  }
+
+  .top-right {
+    top: 6px;
+    right: 6px;
+    width: calc(100% - 62px);
+    max-width: calc(100% - 62px);
+  }
+
+  .bottom-left {
+    left: 8px;
+    bottom: 8px;
+  }
+
+  .top-left .compact-buttons {
+    width: 38px;
+  }
+
+  #btnOpenStartPanel,
+  #btnOpenPointPanel,
+  #btnToggleMenu,
+  #btnCurrentLocation,
+  .icon-only-btn {
+    width: 38px !important;
+    min-width: 38px !important;
+    max-width: 38px !important;
+    height: 38px !important;
+    min-height: 38px !important;
+    border-radius: 13px !important;
+  }
+
+  #btnOpenStartPanel svg,
+  #btnOpenPointPanel svg,
+  #btnToggleMenu svg,
+  #btnCurrentLocation svg,
+  .icon-only-btn svg {
+    width: 18px !important;
+    height: 18px !important;
+  }
+
+  .search-input-wrap {
+    width: 100%;
+    min-width: 0;
+    max-width: none;
+  }
+
+  .search-input-wrap .map-search-input {
+    width: 100%;
+    min-width: 0;
+    max-width: none;
+    min-height: 38px;
+    height: 38px;
+    padding: 8px 36px 8px 12px;
+    font-size: 0.77rem;
+    border-radius: 14px;
+  }
+
+  .search-clear-btn {
+    width: 24px;
+    height: 24px;
+    min-width: 24px;
+    min-height: 24px;
+    font-size: 0.9rem;
+  }
+
+  .floating-menu {
+    width: 150px;
+    max-width: calc(100vw - 12px);
+  }
+
+  .menu-item {
+    min-height: 30px;
+    padding: 5px 7px;
+    font-size: 0.68rem;
+  }
+
+  #startPanel,
+  #pointPanel {
+    width: 164px !important;
+    min-width: 164px !important;
+    max-width: calc(100vw - 12px) !important;
+    padding: 7px !important;
+  }
+
+  #savePanel,
+  #importExportPanel {
+    width: 182px !important;
+    max-width: calc(100vw - 12px) !important;
+    padding: 7px !important;
+  }
+
+  #startPanel .card-title-row h2,
+  #pointPanel .card-title-row h2,
+  #savePanel .card-title-row h2,
+  #importExportPanel .card-title-row h2 {
+    font-size: 0.72rem !important;
+  }
+
+  #startPanel .field-group label,
+  #pointPanel .field-group label,
+  #savePanel .field-group label,
+  #importExportPanel .field-group label {
+    font-size: 0.63rem !important;
+  }
+
+  #startPanel input,
+  #pointPanel input,
+  #savePanel input,
+  #importExportPanel input,
+  #savePanel select,
+  #importExportPanel select {
+    min-height: 25px !important;
+    height: 25px !important;
+    padding: 3px 6px !important;
+    font-size: 0.65rem !important;
+    border-radius: 7px !important;
+  }
+
+  #startPanel .small-btn,
+  #pointPanel .small-btn,
+  #savePanel .small-btn,
+  #importExportPanel .small-btn {
+    min-height: 24px !important;
+    height: 24px !important;
+    padding: 3px 6px !important;
+    font-size: 0.61rem !important;
+  }
+
+  #btnCloseStartPanel,
+  #btnClosePointPanel,
+  #btnCloseSavePanel,
+  #btnCloseImportExportPanel {
+    width: 21px !important;
+    height: 21px !important;
+    min-width: 21px !important;
+    min-height: 21px !important;
+    font-size: 0.72rem !important;
+  }
+
+  .trip-panel {
+    padding: 13px !important;
+    border-radius: 20px !important;
+  }
+
+  .trip-item {
+    grid-template-columns: 38px minmax(0, 1fr) auto !important;
+    padding: 10px !important;
+  }
+
+  .trip-order {
+    width: 38px !important;
+    height: 38px !important;
+    font-size: 0.8rem !important;
+  }
+
+  .trip-content strong {
+    font-size: 0.88rem !important;
+  }
+
+  .trip-content span {
+    font-size: 0.77rem !important;
+  }
+
+  .tiny-btn {
+    min-height: 28px !important;
+    padding: 4px 8px !important;
+    font-size: 0.68rem !important;
+  }
+
+  .screen-overlay-panel {
+    width: calc(100vw - 12px) !important;
+    margin-top: 28px !important;
+    padding: 12px !important;
+    border-radius: 18px !important;
+  }
+
+  .screen-overlay-panel .card-title-row.large-gap .small-btn {
+    min-height: 32px !important;
+    padding: 5px 9px !important;
+    font-size: 0.71rem !important;
+  }
+
+  .map-list-row {
+    grid-template-columns: minmax(0, 1fr) auto !important;
+    gap: 7px !important;
+  }
+
+  .map-list-item {
+    padding: 11px 12px !important;
+    border-radius: 15px !important;
+  }
+
+  .map-list-item span {
+    font-size: 0.73rem !important;
+  }
+
+  .map-list-row .danger-outline,
+  .map-list-row .small-btn,
+  .map-list-row .tiny-btn {
+    min-height: 32px !important;
+    height: 32px !important;
+    padding: 0 9px !important;
+    font-size: 0.68rem !important;
+  }
+}
