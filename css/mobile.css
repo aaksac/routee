@@ -1,24 +1,24 @@
 @media (max-width: 720px) {
   .topbar {
-    padding: 10px 12px;
-    gap: 8px;
+    padding: 12px 14px;
+    gap: 10px;
   }
 
   .brand-area {
-    gap: 8px;
+    gap: 10px;
     min-width: 0;
   }
 
   .brand-icon {
-    width: 36px;
-    height: 36px;
-    border-radius: 12px;
-    flex: 0 0 36px;
+    width: 40px;
+    height: 40px;
+    border-radius: 14px;
+    flex: 0 0 40px;
   }
 
   .brand-text h1 {
-    font-size: 0.96rem;
-    line-height: 1.1;
+    font-size: 1rem;
+    line-height: 1.15;
   }
 
   .brand-text p {
@@ -26,241 +26,287 @@
   }
 
   .page-action-btn {
-    min-height: 32px;
-    padding: 4px 9px;
-    font-size: 0.74rem;
+    min-height: 36px;
+    padding: 6px 10px;
+    font-size: 0.84rem;
   }
 
   .status-strip {
-    padding: 6px 12px 0;
+    padding: 8px 14px 0;
   }
 
   .auth-status {
-    font-size: 0.8rem;
-    line-height: 1.3;
+    font-size: 0.88rem;
+    line-height: 1.35;
   }
 
   .app-layout {
-    padding: 10px 12px 14px;
-    gap: 10px;
+    padding: 12px 14px 16px;
+    gap: 12px;
   }
 
   .map-canvas {
-    min-height: 55vh;
-    height: 55vh;
-    border-radius: 18px;
+    min-height: 56vh;
+    height: 56vh;
+    border-radius: 20px;
   }
 
   .map-overlay {
-    gap: 5px;
+    gap: 6px;
   }
 
   .top-left {
-    top: 8px;
-    left: 8px;
-    max-width: calc(100% - 16px);
+    top: 10px;
+    left: 10px;
+    max-width: calc(100% - 20px);
   }
 
   .top-right {
-    top: 8px;
-    right: 46px;
-    max-width: calc(100% - 54px);
+    top: 10px;
+    right: 50px;
+    max-width: calc(100% - 62px);
     align-items: flex-end;
   }
 
   .bottom-left {
-    left: 8px;
-    bottom: 8px;
+    left: 10px;
+    bottom: 10px;
   }
 
   .top-left .compact-buttons {
-    display: inline-flex;
+    display: flex;
+    gap: 6px;
     flex-wrap: nowrap;
-    gap: 5px;
-    width: auto;
+    align-items: center;
   }
 
   #btnOpenStartPanel,
-  #btnOpenPointPanel,
-  #btnToggleMenu {
-    min-height: 28px;
-    height: 28px;
-    padding: 0 8px;
-    font-size: 0.68rem;
-    line-height: 1;
+  #btnOpenPointPanel {
+    min-height: 30px !important;
+    height: 30px !important;
+    padding: 4px 8px !important;
+    font-size: 0.72rem !important;
+    line-height: 1.05 !important;
     white-space: nowrap;
     border-radius: 999px;
-    width: auto;
-    min-width: 0;
-    box-shadow: 0 5px 14px rgba(15, 23, 42, 0.08);
+    flex: 0 0 auto;
   }
 
   .right-tools {
-    display: inline-flex;
+    display: flex;
+    gap: 6px;
     flex-wrap: nowrap;
     align-items: center;
     justify-content: flex-end;
-    gap: 5px;
-    width: auto;
   }
 
   .map-search-input {
-    width: clamp(96px, 28vw, 126px);
-    min-width: 96px;
-    max-width: 126px;
-    min-height: 28px;
-    height: 28px;
-    padding: 0 9px;
-    font-size: 0.68rem;
-    border-radius: 999px;
+    width: min(150px, calc(100vw - 124px));
+    min-width: 108px;
+    max-width: calc(100vw - 124px);
+    min-height: 30px;
+    height: 30px;
+    padding: 5px 9px;
+    font-size: 0.75rem;
+    line-height: 1.1;
+  }
+
+  #btnToggleMenu {
+    min-height: 30px;
+    height: 30px;
+    padding: 4px 8px;
+    font-size: 0.72rem;
+    line-height: 1.05;
+    white-space: nowrap;
   }
 
   .floating-menu {
-    top: calc(100% + 4px);
+    top: calc(100% + 5px);
     right: 0;
-    width: 136px;
-    padding: 4px;
-    gap: 3px;
-    border-radius: 12px;
+    width: min(156px, calc(100vw - 62px));
+    padding: 5px;
+    gap: 4px;
+    border-radius: 14px;
   }
 
   .menu-item {
-    min-height: 30px;
+    min-height: 32px;
     padding: 6px 8px;
-    font-size: 0.68rem;
+    font-size: 0.73rem;
     border-radius: 10px;
   }
 
   #startPanel,
   #pointPanel {
-    width: 196px;
-    max-width: calc(100vw - 16px);
-    padding: 8px;
-    border-radius: 12px;
+    width: 176px !important;
+    max-width: calc(100vw - 16px) !important;
+    min-width: 176px !important;
+    padding: 8px !important;
+    border-radius: 12px !important;
   }
 
   #savePanel,
   #importExportPanel {
-    width: 188px;
-    max-width: calc(100vw - 54px);
-    padding: 8px;
-    border-radius: 12px;
+    width: min(192px, calc(100vw - 62px)) !important;
+    max-width: calc(100vw - 62px) !important;
+    padding: 8px !important;
+    border-radius: 12px !important;
   }
 
-  .floating-card .card-title-row {
-    margin-bottom: 6px;
-    gap: 6px;
+  #startPanel .card-title-row,
+  #pointPanel .card-title-row,
+  #savePanel .card-title-row,
+  #importExportPanel .card-title-row {
+    margin-bottom: 6px !important;
+    gap: 6px !important;
+    align-items: center !important;
   }
 
-  .floating-card .card-title-row h2 {
-    font-size: 0.74rem;
-    line-height: 1.15;
+  #startPanel .card-title-row h2,
+  #pointPanel .card-title-row h2,
+  #savePanel .card-title-row h2,
+  #importExportPanel .card-title-row h2 {
+    font-size: 0.78rem !important;
+    line-height: 1.15 !important;
+    margin: 0 !important;
   }
 
-  .floating-card .card-title-row p {
-    margin-top: 3px;
-    font-size: 0.64rem;
-    line-height: 1.2;
+  #startPanel .field-group,
+  #pointPanel .field-group,
+  #savePanel .field-group,
+  #importExportPanel .field-group {
+    margin-bottom: 6px !important;
   }
 
-  .floating-card .field-group {
-    margin-bottom: 6px;
+  #startPanel .field-group label,
+  #pointPanel .field-group label,
+  #savePanel .field-group label,
+  #importExportPanel .field-group label {
+    font-size: 0.68rem !important;
+    margin-bottom: 3px !important;
+    line-height: 1.1 !important;
   }
 
-  .floating-card .field-group label {
-    font-size: 0.62rem;
-    margin-bottom: 3px;
+  #startPanel input,
+  #pointPanel input,
+  #savePanel input,
+  #importExportPanel input,
+  #savePanel select,
+  #importExportPanel select {
+    min-height: 28px !important;
+    height: 28px !important;
+    padding: 4px 7px !important;
+    font-size: 0.71rem !important;
+    line-height: 1.1 !important;
+    border-radius: 8px !important;
   }
 
-  .floating-card .field-row {
-    grid-template-columns: 1fr;
-    gap: 5px;
+  #startPanel .field-row,
+  #pointPanel .field-row {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    gap: 5px !important;
   }
 
-  .floating-card input,
-  .floating-card select {
-    min-height: 28px;
-    height: 28px;
-    padding: 0 8px;
-    font-size: 0.66rem;
-    border-radius: 8px;
+  #savePanel .summary-grid,
+  #importExportPanel .summary-grid {
+    grid-template-columns: 1fr !important;
+    gap: 5px !important;
   }
 
-  .floating-card .panel-actions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 5px;
+  #startPanel .panel-actions,
+  #pointPanel .panel-actions,
+  #savePanel .panel-actions,
+  #importExportPanel .panel-actions {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 5px !important;
+    margin-top: 4px !important;
   }
 
-  .floating-card .small-btn {
-    min-height: 28px;
-    height: 28px;
-    padding: 0 8px;
-    font-size: 0.66rem;
-    border-radius: 999px;
+  #startPanel .small-btn,
+  #pointPanel .small-btn,
+  #savePanel .small-btn,
+  #importExportPanel .small-btn {
+    width: 100% !important;
+    min-height: 28px !important;
+    height: 28px !important;
+    padding: 4px 7px !important;
+    font-size: 0.69rem !important;
+    line-height: 1.05 !important;
+    border-radius: 999px !important;
   }
 
-  .icon-close {
-    width: 24px;
-    height: 24px;
-    font-size: 0.86rem;
-    flex: 0 0 24px;
+  #btnCloseStartPanel,
+  #btnClosePointPanel,
+  #btnCloseSavePanel,
+  #btnCloseImportExportPanel {
+    width: 24px !important;
+    height: 24px !important;
+    min-width: 24px !important;
+    min-height: 24px !important;
+    padding: 0 !important;
+    font-size: 0.82rem !important;
+    line-height: 1 !important;
+    border-radius: 999px !important;
+    flex: 0 0 24px !important;
   }
 
   .summary-grid,
   .map-list-row {
     grid-template-columns: 1fr;
-    gap: 5px;
   }
 
   .summary-card {
-    padding: 7px 8px;
+    padding: 8px 9px;
     border-radius: 10px;
   }
 
   .summary-card span {
-    font-size: 0.62rem;
+    font-size: 0.7rem;
     margin-bottom: 3px;
   }
 
   .summary-card strong {
-    font-size: 0.74rem;
+    font-size: 0.82rem;
   }
 
   .fab-btn {
     min-height: 30px;
-    padding: 0 9px;
-    font-size: 0.68rem;
+    height: 30px;
+    padding: 4px 8px;
+    font-size: 0.72rem;
+    line-height: 1.05;
   }
 
   .trip-panel {
-    padding: 10px;
-    border-radius: 18px;
+    padding: 12px;
+    border-radius: 20px;
   }
 
   .trip-panel-header h2 {
-    font-size: 0.9rem;
+    font-size: 0.96rem;
   }
 
   .trip-item {
-    grid-template-columns: 34px minmax(0, 1fr);
-    gap: 8px;
-    padding: 8px;
+    grid-template-columns: 38px minmax(0, 1fr);
+    gap: 10px;
+    padding: 10px;
   }
 
   .trip-order {
-    width: 34px;
-    height: 34px;
-    border-radius: 10px;
-    font-size: 0.74rem;
+    width: 38px;
+    height: 38px;
+    border-radius: 12px;
+    font-size: 0.84rem;
   }
 
   .trip-content strong {
-    font-size: 0.82rem;
+    font-size: 0.9rem;
   }
 
   .trip-content span {
-    font-size: 0.72rem;
+    font-size: 0.8rem;
   }
 
   .trip-item > div:last-child,
@@ -270,9 +316,9 @@
   }
 
   .tiny-btn {
-    min-height: 26px;
-    padding: 0 7px;
-    font-size: 0.64rem;
+    min-height: 28px;
+    padding: 4px 7px;
+    font-size: 0.7rem;
   }
 
   .desktop-only-inline {
@@ -284,116 +330,174 @@
   }
 
   .screen-overlay-panel {
-    width: calc(100vw - 10px);
-    margin-top: 36px;
-    padding: 12px;
-    border-radius: 16px;
+    width: calc(100vw - 14px);
+    margin-top: 42px;
+    padding: 14px;
+    border-radius: 18px;
+  }
+
+  .screen-overlay-panel .panel-actions {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
   }
 
   .screen-overlay-panel .small-btn {
-    min-height: 30px;
-    padding: 0 8px;
-    font-size: 0.68rem;
+    min-height: 32px;
+    padding: 5px 8px;
+    font-size: 0.73rem;
   }
 }
 
-@media (max-width: 420px) {
+@media (max-width: 480px) {
   .topbar {
-    padding: 8px 10px;
+    padding: 10px 12px;
   }
 
   .brand-icon {
-    width: 34px;
-    height: 34px;
-    flex-basis: 34px;
+    width: 36px;
+    height: 36px;
+    border-radius: 12px;
+    flex-basis: 36px;
   }
 
   .brand-text h1 {
-    font-size: 0.9rem;
+    font-size: 0.92rem;
   }
 
   .page-action-btn {
-    min-height: 30px;
-    padding: 0 8px;
-    font-size: 0.7rem;
+    min-height: 34px;
+    padding: 5px 9px;
+    font-size: 0.78rem;
   }
 
   .app-layout {
-    padding: 8px 10px 12px;
+    padding: 10px 12px 14px;
   }
 
   .map-canvas {
-    min-height: 53vh;
-    height: 53vh;
-  }
-
-  .top-left,
-  .top-right,
-  .bottom-left {
-    top: auto;
+    min-height: 54vh;
+    height: 54vh;
   }
 
   .top-left {
-    top: 7px;
-    left: 7px;
+    top: 8px;
+    left: 8px;
   }
 
   .top-right {
-    top: 7px;
-    right: 42px;
-    max-width: calc(100% - 49px);
+    top: 8px;
+    right: 46px;
+    max-width: calc(100% - 56px);
   }
 
   .bottom-left {
-    left: 7px;
-    bottom: 7px;
+    left: 8px;
+    bottom: 8px;
   }
 
   #btnOpenStartPanel,
   #btnOpenPointPanel,
-  #btnToggleMenu,
-  .map-search-input,
-  .fab-btn {
-    font-size: 0.64rem;
+  #btnToggleMenu {
+    min-height: 28px !important;
+    height: 28px !important;
+    padding: 3px 7px !important;
+    font-size: 0.68rem !important;
   }
 
   .map-search-input {
-    width: 92px;
-    min-width: 92px;
-    max-width: 92px;
+    width: min(132px, calc(100vw - 110px));
+    min-width: 96px;
+    max-width: calc(100vw - 110px);
+    min-height: 28px;
+    height: 28px;
+    padding: 4px 7px;
+    font-size: 0.71rem;
+  }
+
+  .floating-menu {
+    width: min(146px, calc(100vw - 56px));
+  }
+
+  .menu-item {
+    min-height: 30px;
+    padding: 5px 7px;
+    font-size: 0.7rem;
   }
 
   #startPanel,
   #pointPanel {
-    width: 184px;
-    max-width: calc(100vw - 14px);
-    padding: 7px;
+    width: 164px !important;
+    min-width: 164px !important;
+    max-width: calc(100vw - 12px) !important;
+    padding: 7px !important;
   }
 
   #savePanel,
   #importExportPanel {
-    width: 176px;
-    max-width: calc(100vw - 50px);
-    padding: 7px;
+    width: min(182px, calc(100vw - 56px)) !important;
+    max-width: calc(100vw - 56px) !important;
+    padding: 7px !important;
   }
 
-  .floating-menu {
-    width: 128px;
+  #startPanel .card-title-row h2,
+  #pointPanel .card-title-row h2,
+  #savePanel .card-title-row h2,
+  #importExportPanel .card-title-row h2 {
+    font-size: 0.74rem !important;
   }
 
-  .floating-card .field-group label,
-  .summary-card span {
-    font-size: 0.6rem;
+  #startPanel .field-group label,
+  #pointPanel .field-group label,
+  #savePanel .field-group label,
+  #importExportPanel .field-group label {
+    font-size: 0.65rem !important;
   }
 
-  .floating-card .card-title-row h2 {
-    font-size: 0.7rem;
+  #startPanel input,
+  #pointPanel input,
+  #savePanel input,
+  #importExportPanel input,
+  #savePanel select,
+  #importExportPanel select {
+    min-height: 26px !important;
+    height: 26px !important;
+    padding: 3px 6px !important;
+    font-size: 0.67rem !important;
+    border-radius: 7px !important;
   }
 
-  .floating-card input,
-  .floating-card select,
-  .floating-card .small-btn,
-  .menu-item {
-    font-size: 0.64rem;
+  #startPanel .small-btn,
+  #pointPanel .small-btn,
+  #savePanel .small-btn,
+  #importExportPanel .small-btn {
+    min-height: 26px !important;
+    height: 26px !important;
+    padding: 3px 6px !important;
+    font-size: 0.65rem !important;
+  }
+
+  #btnCloseStartPanel,
+  #btnClosePointPanel,
+  #btnCloseSavePanel,
+  #btnCloseImportExportPanel {
+    width: 22px !important;
+    height: 22px !important;
+    min-width: 22px !important;
+    min-height: 22px !important;
+    font-size: 0.76rem !important;
+  }
+
+  .fab-btn {
+    min-height: 28px;
+    height: 28px;
+    padding: 3px 7px;
+    font-size: 0.68rem;
+  }
+
+  .screen-overlay-panel {
+    width: calc(100vw - 10px);
+    padding: 12px;
+    margin-top: 36px;
   }
 }
