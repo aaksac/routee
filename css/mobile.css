@@ -1,0 +1,399 @@
+@media (max-width: 720px) {
+  .topbar {
+    padding: 10px 12px;
+    gap: 8px;
+  }
+
+  .brand-area {
+    gap: 8px;
+    min-width: 0;
+  }
+
+  .brand-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 12px;
+    flex: 0 0 36px;
+  }
+
+  .brand-text h1 {
+    font-size: 0.96rem;
+    line-height: 1.1;
+  }
+
+  .brand-text p {
+    display: none;
+  }
+
+  .page-action-btn {
+    min-height: 32px;
+    padding: 4px 9px;
+    font-size: 0.74rem;
+  }
+
+  .status-strip {
+    padding: 6px 12px 0;
+  }
+
+  .auth-status {
+    font-size: 0.8rem;
+    line-height: 1.3;
+  }
+
+  .app-layout {
+    padding: 10px 12px 14px;
+    gap: 10px;
+  }
+
+  .map-canvas {
+    min-height: 55vh;
+    height: 55vh;
+    border-radius: 18px;
+  }
+
+  .map-overlay {
+    gap: 5px;
+  }
+
+  .top-left {
+    top: 8px;
+    left: 8px;
+    max-width: calc(100% - 16px);
+  }
+
+  .top-right {
+    top: 8px;
+    right: 46px;
+    max-width: calc(100% - 54px);
+    align-items: flex-end;
+  }
+
+  .bottom-left {
+    left: 8px;
+    bottom: 8px;
+  }
+
+  .top-left .compact-buttons {
+    display: inline-flex;
+    flex-wrap: nowrap;
+    gap: 5px;
+    width: auto;
+  }
+
+  #btnOpenStartPanel,
+  #btnOpenPointPanel,
+  #btnToggleMenu {
+    min-height: 28px;
+    height: 28px;
+    padding: 0 8px;
+    font-size: 0.68rem;
+    line-height: 1;
+    white-space: nowrap;
+    border-radius: 999px;
+    width: auto;
+    min-width: 0;
+    box-shadow: 0 5px 14px rgba(15, 23, 42, 0.08);
+  }
+
+  .right-tools {
+    display: inline-flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 5px;
+    width: auto;
+  }
+
+  .map-search-input {
+    width: clamp(96px, 28vw, 126px);
+    min-width: 96px;
+    max-width: 126px;
+    min-height: 28px;
+    height: 28px;
+    padding: 0 9px;
+    font-size: 0.68rem;
+    border-radius: 999px;
+  }
+
+  .floating-menu {
+    top: calc(100% + 4px);
+    right: 0;
+    width: 136px;
+    padding: 4px;
+    gap: 3px;
+    border-radius: 12px;
+  }
+
+  .menu-item {
+    min-height: 30px;
+    padding: 6px 8px;
+    font-size: 0.68rem;
+    border-radius: 10px;
+  }
+
+  #startPanel,
+  #pointPanel {
+    width: 196px;
+    max-width: calc(100vw - 16px);
+    padding: 8px;
+    border-radius: 12px;
+  }
+
+  #savePanel,
+  #importExportPanel {
+    width: 188px;
+    max-width: calc(100vw - 54px);
+    padding: 8px;
+    border-radius: 12px;
+  }
+
+  .floating-card .card-title-row {
+    margin-bottom: 6px;
+    gap: 6px;
+  }
+
+  .floating-card .card-title-row h2 {
+    font-size: 0.74rem;
+    line-height: 1.15;
+  }
+
+  .floating-card .card-title-row p {
+    margin-top: 3px;
+    font-size: 0.64rem;
+    line-height: 1.2;
+  }
+
+  .floating-card .field-group {
+    margin-bottom: 6px;
+  }
+
+  .floating-card .field-group label {
+    font-size: 0.62rem;
+    margin-bottom: 3px;
+  }
+
+  .floating-card .field-row {
+    grid-template-columns: 1fr;
+    gap: 5px;
+  }
+
+  .floating-card input,
+  .floating-card select {
+    min-height: 28px;
+    height: 28px;
+    padding: 0 8px;
+    font-size: 0.66rem;
+    border-radius: 8px;
+  }
+
+  .floating-card .panel-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+  }
+
+  .floating-card .small-btn {
+    min-height: 28px;
+    height: 28px;
+    padding: 0 8px;
+    font-size: 0.66rem;
+    border-radius: 999px;
+  }
+
+  .icon-close {
+    width: 24px;
+    height: 24px;
+    font-size: 0.86rem;
+    flex: 0 0 24px;
+  }
+
+  .summary-grid,
+  .map-list-row {
+    grid-template-columns: 1fr;
+    gap: 5px;
+  }
+
+  .summary-card {
+    padding: 7px 8px;
+    border-radius: 10px;
+  }
+
+  .summary-card span {
+    font-size: 0.62rem;
+    margin-bottom: 3px;
+  }
+
+  .summary-card strong {
+    font-size: 0.74rem;
+  }
+
+  .fab-btn {
+    min-height: 30px;
+    padding: 0 9px;
+    font-size: 0.68rem;
+  }
+
+  .trip-panel {
+    padding: 10px;
+    border-radius: 18px;
+  }
+
+  .trip-panel-header h2 {
+    font-size: 0.9rem;
+  }
+
+  .trip-item {
+    grid-template-columns: 34px minmax(0, 1fr);
+    gap: 8px;
+    padding: 8px;
+  }
+
+  .trip-order {
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    font-size: 0.74rem;
+  }
+
+  .trip-content strong {
+    font-size: 0.82rem;
+  }
+
+  .trip-content span {
+    font-size: 0.72rem;
+  }
+
+  .trip-item > div:last-child,
+  .trip-item > button:last-child {
+    grid-column: 2;
+    justify-self: start;
+  }
+
+  .tiny-btn {
+    min-height: 26px;
+    padding: 0 7px;
+    font-size: 0.64rem;
+  }
+
+  .desktop-only-inline {
+    display: none !important;
+  }
+
+  .mobile-only-inline {
+    display: inline-flex;
+  }
+
+  .screen-overlay-panel {
+    width: calc(100vw - 10px);
+    margin-top: 36px;
+    padding: 12px;
+    border-radius: 16px;
+  }
+
+  .screen-overlay-panel .small-btn {
+    min-height: 30px;
+    padding: 0 8px;
+    font-size: 0.68rem;
+  }
+}
+
+@media (max-width: 420px) {
+  .topbar {
+    padding: 8px 10px;
+  }
+
+  .brand-icon {
+    width: 34px;
+    height: 34px;
+    flex-basis: 34px;
+  }
+
+  .brand-text h1 {
+    font-size: 0.9rem;
+  }
+
+  .page-action-btn {
+    min-height: 30px;
+    padding: 0 8px;
+    font-size: 0.7rem;
+  }
+
+  .app-layout {
+    padding: 8px 10px 12px;
+  }
+
+  .map-canvas {
+    min-height: 53vh;
+    height: 53vh;
+  }
+
+  .top-left,
+  .top-right,
+  .bottom-left {
+    top: auto;
+  }
+
+  .top-left {
+    top: 7px;
+    left: 7px;
+  }
+
+  .top-right {
+    top: 7px;
+    right: 42px;
+    max-width: calc(100% - 49px);
+  }
+
+  .bottom-left {
+    left: 7px;
+    bottom: 7px;
+  }
+
+  #btnOpenStartPanel,
+  #btnOpenPointPanel,
+  #btnToggleMenu,
+  .map-search-input,
+  .fab-btn {
+    font-size: 0.64rem;
+  }
+
+  .map-search-input {
+    width: 92px;
+    min-width: 92px;
+    max-width: 92px;
+  }
+
+  #startPanel,
+  #pointPanel {
+    width: 184px;
+    max-width: calc(100vw - 14px);
+    padding: 7px;
+  }
+
+  #savePanel,
+  #importExportPanel {
+    width: 176px;
+    max-width: calc(100vw - 50px);
+    padding: 7px;
+  }
+
+  .floating-menu {
+    width: 128px;
+  }
+
+  .floating-card .field-group label,
+  .summary-card span {
+    font-size: 0.6rem;
+  }
+
+  .floating-card .card-title-row h2 {
+    font-size: 0.7rem;
+  }
+
+  .floating-card input,
+  .floating-card select,
+  .floating-card .small-btn,
+  .menu-item {
+    font-size: 0.64rem;
+  }
+}
