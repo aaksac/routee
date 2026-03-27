@@ -573,11 +573,19 @@ select:focus {
 @media (max-width: 720px) {
   .topbar {
     padding: 14px 16px;
+    gap: 12px;
   }
 
   .brand-text p { display: none; }
 
-  .status-strip { padding: 10px 16px 0; }
+  .status-strip {
+    padding: 10px 16px 0;
+  }
+
+  .auth-status {
+    font-size: 0.94rem;
+    line-height: 1.4;
+  }
 
   .app-layout {
     padding: 14px 16px 18px;
@@ -585,28 +593,35 @@ select:focus {
   }
 
   .map-canvas {
-    min-height: 52vh;
-    height: 52vh;
+    min-height: 54vh;
+    height: 54vh;
     border-radius: 22px;
   }
 
+  .map-overlay {
+    gap: 8px;
+  }
+
   .top-right {
-    top: 14px;
-    right: 62px;
+    top: 12px;
+    right: 54px;
     left: auto;
-    max-width: 220px;
+    max-width: calc(100% - 110px);
+    width: auto;
+    align-items: flex-end;
   }
 
   .top-left {
-    top: 66px;
-    left: 14px;
-    right: 14px;
-    max-width: none;
+    top: 74px;
+    left: 12px;
+    right: auto;
+    max-width: calc(100% - 24px);
+    width: auto;
   }
 
   .bottom-left {
-    left: 14px;
-    bottom: 14px;
+    left: 12px;
+    bottom: 12px;
   }
 
   .panel-actions,
@@ -620,50 +635,92 @@ select:focus {
   }
 
   .stack-row {
-    width: 100%;
+    width: auto;
+    max-width: 100%;
+    flex-wrap: nowrap;
+    align-items: center;
   }
 
-  .top-left .stack-row {
-    width: 100%;
+  .top-left .stack-row,
+  .top-right .stack-row,
+  .right-tools {
+    width: auto;
+    max-width: 100%;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .overlay-btn,
+  .fab-btn,
+  .small-btn,
+  .page-action-btn {
+    width: auto;
+    max-width: 100%;
+    min-height: 40px;
+    padding: 8px 12px;
+    font-size: 0.95rem;
+    flex: 0 0 auto;
+  }
+
+  .map-search-input {
+    width: min(210px, calc(100vw - 150px));
+    min-width: 150px;
+    max-width: calc(100vw - 150px);
+    min-height: 40px;
+    padding: 10px 14px;
+    font-size: 0.95rem;
   }
 
   .top-left .overlay-btn,
   .top-left .fab-btn,
   .top-left .small-btn {
-    width: 100%;
+    width: auto;
+    min-width: 130px;
+    max-width: calc(100vw - 40px);
   }
 
-  .map-search-input,
-  .overlay-btn,
-  .fab-btn,
-  .small-btn,
-  .page-action-btn {
-    width: 100%;
-  }
-
-  .top-right .map-search-input,
   .top-right .overlay-btn,
-  .top-right .fab-btn {
-    width: 100%;
+  .top-right .fab-btn,
+  .top-right .small-btn {
+    min-width: 110px;
   }
 
   .menu-wrapper {
-    width: 100%;
+    width: auto;
+    max-width: 100%;
   }
 
   .floating-menu {
-    left: auto;
+    top: calc(100% + 6px);
     right: 0;
-    width: 220px;
+    left: auto;
+    width: min(200px, calc(100vw - 74px));
+    padding: 6px;
+    gap: 4px;
+    border-radius: 16px;
+  }
+
+  .menu-item {
+    min-height: 38px;
+    padding: 8px 10px;
+    font-size: 0.9rem;
   }
 
   .floating-card,
   .compact-card {
-    width: min(320px, calc(100vw - 28px));
+    width: min(300px, calc(100vw - 24px));
+    padding: 12px;
+    border-radius: 18px;
+  }
+
+  .trip-panel {
+    padding: 14px;
+    border-radius: 22px;
   }
 
   .trip-item {
-    grid-template-columns: 42px 1fr;
+    grid-template-columns: 42px minmax(0, 1fr);
   }
 
   .trip-item > div:last-child,
@@ -674,11 +731,84 @@ select:focus {
 
   .desktop-only-inline { display: none !important; }
   .mobile-only-inline { display: inline-flex; }
+
   .screen-overlay-panel {
     width: calc(100vw - 16px);
     margin-top: 48px;
     padding: 16px;
     border-radius: 22px;
+  }
+}
+
+@media (max-width: 480px) {
+  .topbar {
+    padding: 12px 14px;
+  }
+
+  .brand-area {
+    gap: 10px;
+  }
+
+  .brand-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 14px;
+  }
+
+  .brand-text h1 {
+    font-size: 1rem;
+  }
+
+  .page-action-btn {
+    padding: 8px 12px;
+    min-height: 40px;
+  }
+
+  .map-canvas {
+    min-height: 50vh;
+    height: 50vh;
+  }
+
+  .top-right {
+    right: 50px;
+    max-width: calc(100% - 96px);
+  }
+
+  .top-left {
+    top: 70px;
+    left: 10px;
+  }
+
+  .bottom-left {
+    left: 10px;
+    bottom: 10px;
+  }
+
+  .map-search-input {
+    width: min(190px, calc(100vw - 136px));
+    min-width: 138px;
+    max-width: calc(100vw - 136px);
+    font-size: 0.92rem;
+  }
+
+  .top-left .overlay-btn,
+  .top-left .fab-btn,
+  .top-left .small-btn,
+  .top-right .overlay-btn,
+  .top-right .fab-btn,
+  .top-right .small-btn {
+    min-width: 0;
+    padding: 8px 11px;
+    font-size: 0.92rem;
+  }
+
+  .floating-menu {
+    width: min(180px, calc(100vw - 68px));
+  }
+
+  .floating-card,
+  .compact-card {
+    width: min(280px, calc(100vw - 20px));
   }
 }
 
