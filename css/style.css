@@ -593,8 +593,8 @@ select:focus {
   }
 
   .map-canvas {
-    min-height: 54vh;
-    height: 54vh;
+    min-height: 58vh;
+    height: 58vh;
     border-radius: 22px;
   }
 
@@ -604,18 +604,18 @@ select:focus {
 
   .top-right {
     top: 12px;
+    left: 12px;
     right: 54px;
-    left: auto;
-    max-width: calc(100% - 110px);
+    max-width: none;
     width: auto;
-    align-items: flex-end;
+    align-items: stretch;
   }
 
   .top-left {
-    top: 74px;
+    top: 64px;
     left: 12px;
-    right: auto;
-    max-width: calc(100% - 24px);
+    right: 12px;
+    max-width: none;
     width: auto;
   }
 
@@ -625,77 +625,73 @@ select:focus {
   }
 
   .panel-actions,
-  .trip-panel-actions,
-  .field-row,
-  .summary-grid,
-  .map-list-row {
-    grid-template-columns: 1fr;
+  .trip-panel-actions {
     flex-direction: column;
     align-items: stretch;
   }
 
-  .stack-row {
-    width: auto;
-    max-width: 100%;
-    flex-wrap: nowrap;
-    align-items: center;
+  .field-row,
+  .summary-grid,
+  .map-list-row {
+    grid-template-columns: 1fr;
   }
 
-  .top-left .stack-row,
-  .top-right .stack-row,
-  .right-tools {
-    width: auto;
-    max-width: 100%;
-    flex-wrap: nowrap;
-    align-items: center;
+  .top-right .stack-row.right-tools {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
     gap: 8px;
+    align-items: center;
+    width: 100%;
+  }
+
+  .top-left .stack-row.compact-buttons {
+    display: flex;
+    gap: 8px;
+    flex-wrap: nowrap;
+    width: 100%;
   }
 
   .overlay-btn,
   .fab-btn,
   .small-btn,
   .page-action-btn {
-    width: auto;
-    max-width: 100%;
     min-height: 40px;
     padding: 8px 12px;
     font-size: 0.95rem;
-    flex: 0 0 auto;
+  }
+
+  .top-left .overlay-btn {
+    flex: 1 1 0;
+    min-width: 0;
+    width: auto;
+    justify-content: center;
   }
 
   .map-search-input {
-    width: min(210px, calc(100vw - 150px));
-    min-width: 150px;
-    max-width: calc(100vw - 150px);
+    width: 100%;
+    min-width: 0;
+    max-width: none;
     min-height: 40px;
     padding: 10px 14px;
     font-size: 0.95rem;
   }
 
-  .top-left .overlay-btn,
-  .top-left .fab-btn,
-  .top-left .small-btn {
-    width: auto;
-    min-width: 130px;
-    max-width: calc(100vw - 40px);
-  }
-
-  .top-right .overlay-btn,
-  .top-right .fab-btn,
-  .top-right .small-btn {
-    min-width: 110px;
-  }
-
   .menu-wrapper {
     width: auto;
-    max-width: 100%;
+    flex: 0 0 auto;
+  }
+
+  .menu-trigger {
+    min-width: 104px;
+    width: auto;
+    white-space: nowrap;
   }
 
   .floating-menu {
     top: calc(100% + 6px);
     right: 0;
     left: auto;
-    width: min(200px, calc(100vw - 74px));
+    width: min(200px, calc(100vw - 78px));
     padding: 6px;
     gap: 4px;
     border-radius: 16px;
@@ -709,9 +705,16 @@ select:focus {
 
   .floating-card,
   .compact-card {
-    width: min(300px, calc(100vw - 24px));
+    width: min(320px, calc(100vw - 24px));
+    max-width: calc(100vw - 24px);
     padding: 12px;
     border-radius: 18px;
+  }
+
+  .top-left .floating-card,
+  .top-right .floating-card,
+  .top-right .compact-card {
+    margin-top: 0;
   }
 
   .trip-panel {
@@ -765,18 +768,19 @@ select:focus {
   }
 
   .map-canvas {
-    min-height: 50vh;
-    height: 50vh;
+    min-height: 56vh;
+    height: 56vh;
   }
 
   .top-right {
+    left: 10px;
     right: 50px;
-    max-width: calc(100% - 96px);
   }
 
   .top-left {
-    top: 70px;
+    top: 60px;
     left: 10px;
+    right: 10px;
   }
 
   .bottom-left {
@@ -784,31 +788,32 @@ select:focus {
     bottom: 10px;
   }
 
-  .map-search-input {
-    width: min(190px, calc(100vw - 136px));
-    min-width: 138px;
-    max-width: calc(100vw - 136px);
-    font-size: 0.92rem;
+  .top-right .stack-row.right-tools,
+  .top-left .stack-row.compact-buttons {
+    gap: 6px;
   }
 
+  .map-search-input {
+    font-size: 0.92rem;
+    padding: 9px 12px;
+  }
+
+  .menu-trigger,
   .top-left .overlay-btn,
-  .top-left .fab-btn,
-  .top-left .small-btn,
-  .top-right .overlay-btn,
-  .top-right .fab-btn,
-  .top-right .small-btn {
-    min-width: 0;
-    padding: 8px 11px;
+  .fab-btn,
+  .small-btn {
+    padding: 8px 10px;
     font-size: 0.92rem;
   }
 
   .floating-menu {
-    width: min(180px, calc(100vw - 68px));
+    width: min(180px, calc(100vw - 64px));
   }
 
   .floating-card,
   .compact-card {
-    width: min(280px, calc(100vw - 20px));
+    width: calc(100vw - 20px);
+    max-width: calc(100vw - 20px);
   }
 }
 
