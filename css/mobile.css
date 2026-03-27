@@ -58,14 +58,15 @@
   .top-left {
     top: 10px;
     left: 10px;
-    max-width: calc(100% - 74px);
+    max-width: 92px;
   }
 
   .top-right {
     top: 8px;
     right: 8px;
-    max-width: calc(100% - 16px);
-    align-items: flex-end;
+    width: calc(100% - 116px);
+    max-width: calc(100% - 116px);
+    align-items: stretch;
   }
 
   .bottom-left {
@@ -75,35 +76,41 @@
 
   .top-left .compact-buttons {
     display: flex;
+    flex-direction: column;
     gap: 6px;
-    flex-wrap: nowrap;
-    align-items: center;
+    align-items: stretch;
+    width: 86px;
   }
 
   #btnOpenStartPanel,
   #btnOpenPointPanel {
+    width: 86px !important;
+    min-width: 86px !important;
+    max-width: 86px !important;
     min-height: 29px !important;
     height: 29px !important;
-    padding: 4px 8px !important;
-    font-size: 0.7rem !important;
+    padding: 4px 6px !important;
+    font-size: 0.68rem !important;
     line-height: 1.05 !important;
-    white-space: nowrap;
-    border-radius: 999px !important;
+    white-space: normal !important;
+    text-align: center !important;
+    border-radius: 12px !important;
     flex: 0 0 auto;
   }
 
   .right-tools {
-    display: flex;
-    gap: 5px;
-    flex-wrap: nowrap;
-    align-items: flex-start;
-    justify-content: flex-end;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 6px;
+    align-items: start;
+    justify-content: stretch;
+    width: 100%;
   }
 
   .map-search-input {
-    width: min(138px, calc(100vw - 92px));
-    min-width: 98px;
-    max-width: calc(100vw - 92px);
+    width: 100%;
+    min-width: 0;
+    max-width: none;
     min-height: 29px;
     height: 29px;
     padding: 4px 8px;
@@ -113,6 +120,7 @@
 
   .menu-wrapper {
     position: relative;
+    justify-self: end;
     flex: 0 0 auto;
   }
 
@@ -120,7 +128,7 @@
     min-height: 29px;
     height: 29px;
     padding: 4px 8px;
-    font-size: 0.7rem;
+    font-size: 0.68rem;
     line-height: 1.05;
     white-space: nowrap;
     border-radius: 999px;
@@ -394,13 +402,14 @@
   .top-left {
     top: 8px;
     left: 8px;
-    max-width: calc(100% - 70px);
+    max-width: 84px;
   }
 
   .top-right {
     top: 6px;
     right: 6px;
-    max-width: calc(100% - 12px);
+    width: calc(100% - 102px);
+    max-width: calc(100% - 102px);
   }
 
   .bottom-left {
@@ -408,8 +417,21 @@
     bottom: 8px;
   }
 
+  .top-left .compact-buttons {
+    width: 78px;
+  }
+
   #btnOpenStartPanel,
-  #btnOpenPointPanel,
+  #btnOpenPointPanel {
+    width: 78px !important;
+    min-width: 78px !important;
+    max-width: 78px !important;
+    min-height: 27px !important;
+    height: 27px !important;
+    padding: 3px 5px !important;
+    font-size: 0.64rem !important;
+  }
+
   #btnToggleMenu {
     min-height: 27px !important;
     height: 27px !important;
@@ -418,9 +440,9 @@
   }
 
   .map-search-input {
-    width: min(126px, calc(100vw - 86px));
-    min-width: 92px;
-    max-width: calc(100vw - 86px);
+    width: 100%;
+    min-width: 0;
+    max-width: none;
     min-height: 27px;
     height: 27px;
     padding: 4px 7px;
