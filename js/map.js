@@ -24,7 +24,7 @@ map = new google.maps.Map(mapElement, {
   mapTypeControl: false,
   streetViewControl: false,
   fullscreenControl: true,
-  gestureHandling: "cooperative"
+  gestureHandling: "greedy"
 });
 
   activeInfoWindow = new google.maps.InfoWindow();
