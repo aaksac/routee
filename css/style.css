@@ -631,3 +631,53 @@ select:focus {
     opacity: 1;
   }
 }
+@media (min-width: 721px) and (max-width: 1400px) {
+  .top-left {
+    max-width: none;
+  }
+
+  .top-left .stack-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: nowrap;
+  }
+
+  .top-left .map-badges {
+    display: flex;
+    gap: 10px;
+    flex-wrap: nowrap;
+    margin-left: 8px;
+  }
+
+  .top-center {
+    left: 18px;
+    top: 18px;
+    transform: none;
+    max-width: none;
+    pointer-events: none;
+  }
+
+  .top-center .map-badges {
+    pointer-events: auto;
+  }
+
+  .top-right {
+    left: 560px;
+    right: 72px;
+    top: 18px;
+    max-width: none;
+    align-items: stretch;
+  }
+
+  .top-right .right-tools {
+    width: 100%;
+    justify-content: flex-end;
+    flex-wrap: nowrap;
+  }
+
+  .map-search-input {
+    width: 100%;
+    min-width: 220px;
+  }
+}
