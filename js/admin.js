@@ -56,6 +56,15 @@ function formatDate(ms) {
   }
 }
 
+function escapeHtml(value) {
+  return String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
 function getRoleClass(role) {
   return role === "premium" ? "role-premium" : "role-trial";
 }
@@ -101,7 +110,7 @@ function renderUsers() {
         data-uid="${user.uid}"
       >
         <div class="admin-user-main">
-          <strong>${user.email || "E-posta yok"}</strong>
+          <strong>${escapeHtml(user.email || "E-posta yok")}</strong>
           <div class="admin-user-meta">
             <span class="user-chip ${getRoleClass(user.role || "trial")}">${user.role || "trial"}</span>
             <span class="user-chip">Bitiş: ${formatDate(user.accessUntilMs)}</span>
