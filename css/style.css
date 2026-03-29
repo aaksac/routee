@@ -659,10 +659,11 @@ select:focus {
 
   .top-right {
     top: 18px;
-    left: 500px;
+    left: auto;
     right: 72px;
     max-width: none;
     z-index: 6;
+    align-items: flex-end;
   }
 
   .top-right .right-tools {
@@ -671,11 +672,11 @@ select:focus {
     align-items: center;
     justify-content: flex-end;
     gap: 10px;
-    width: 100%;
   }
 
   .map-search-input {
-    width: 100%;
-    min-width: 0;
+    width: 250px;
+    min-width: 250px;
+    max-width: 250px;
   }
 }
