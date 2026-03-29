@@ -912,7 +912,7 @@ function handleTripListClick(event) {
   if (action === "directions-start") {
     if (!state.startPoint) return;
     const url = `https://www.google.com/maps/dir/?api=1&destination=${state.startPoint.lat},${state.startPoint.lng}`;
-    window.open(url, "_blank", "noopener,noreferrer");
+    window.location.href = url;
     return;
   }
 
@@ -920,7 +920,7 @@ function handleTripListClick(event) {
     const point = state.points.find((item) => String(item.id) === String(target.dataset.id));
     if (!point) return;
     const url = `https://www.google.com/maps/dir/?api=1&destination=${point.lat},${point.lng}`;
-    window.open(url, "_blank", "noopener,noreferrer");
+    window.location.href = url;
   }
 }
 
