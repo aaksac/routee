@@ -101,7 +101,7 @@ function createInfoWindowContent(pointData) {
 
   button.addEventListener("click", () => {
     const url = createGoogleMapsDirectionsUrl(pointData.lat, pointData.lng);
-    window.open(url, "_blank");
+    window.open(url, "_blank", "noopener,noreferrer");
   });
 
   wrapper.appendChild(title);
