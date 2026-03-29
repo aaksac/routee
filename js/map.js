@@ -401,10 +401,15 @@ function drawRouteSegments(startPoint, orderedPoints) {
     const midLat = (previous.lat + point.lat) / 2;
     const midLng = (previous.lng + point.lng) / 2;
 
-    createDistanceOverlay(
-      new google.maps.LatLng(midLat, midLng),
-      `${point.distanceFromPrevious.toFixed(2)} km`
-    );
+const distanceLabel =
+  point.distanceFromPrevious < 1
+    ? `${Math.round(point.distanceFromPrevious * 1000)} m`
+    : `${point.distanceFromPrevious.toFixed(2)} km`;
+
+createDistanceOverlay(
+  new google.maps.LatLng(midLat, midLng),
+  distanceLabel
+);
 
     previous = point;
   });
