@@ -18,14 +18,14 @@ function initMap() {
 
   const defaultCenter = { lat: 37.0, lng: 35.3213 };
 
-map = new google.maps.Map(mapElement, {
-  center: defaultCenter,
-  zoom: 11,
-  mapTypeControl: false,
-  streetViewControl: false,
-  fullscreenControl: true,
-  gestureHandling: "greedy"
-});
+  map = new google.maps.Map(mapElement, {
+    center: defaultCenter,
+    zoom: 11,
+    mapTypeControl: false,
+    streetViewControl: false,
+    fullscreenControl: true,
+    gestureHandling: "greedy"
+  });
 
   activeInfoWindow = new google.maps.InfoWindow();
 
@@ -353,7 +353,38 @@ function enableMapClickPicker(callback) {
     const lng = event.latLng.lng();
 
     showDraftMarker(lat, lng);
-    callback({ lat, lng });
+
+    if (event.placeId) {
+      event.stop();
+
+      const service = new google.maps.places.PlacesService(map);
+      service.getDetails(
+        {
+          placeId: event.placeId,
+          fields: ["name", "formatted_address"]
+        },
+        (place, status) => {
+          const suggestedName =
+            status === google.maps.places.PlacesServiceStatus.OK
+              ? place?.name || place?.formatted_address || ""
+              : "";
+
+          callback({
+            lat,
+            lng,
+            name: suggestedName
+          });
+        }
+      );
+
+      return;
+    }
+
+    callback({
+      lat,
+      lng,
+      name: ""
+    });
   });
 }
 
