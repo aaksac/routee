@@ -320,17 +320,18 @@ function fillBothFormsFromMap(lat, lng, suggestedName = "") {
 function fillPointFormFromMarker(pointData) {
   if (!pointData) return;
 
+  fillBothFormsFromMap(
+    Number(pointData.lat),
+    Number(pointData.lng),
+    pointData.name || ""
+  );
+
   if (pointData.type === "start") {
-    elements.startName.value = pointData.name || "";
-    elements.startLat.value = Number(pointData.lat).toFixed(6);
-    elements.startLng.value = Number(pointData.lng).toFixed(6);
+    state.editingPointId = null;
     elements.authStatus.textContent = `Başlangıç bilgisi yüklendi: ${pointData.name}`;
     return;
   }
 
-  elements.pointName.value = pointData.name || "";
-  elements.pointLat.value = Number(pointData.lat).toFixed(6);
-  elements.pointLng.value = Number(pointData.lng).toFixed(6);
   state.editingPointId = pointData.id;
   elements.authStatus.textContent = `Nokta düzenleme için yüklendi: ${pointData.name}`;
 }
