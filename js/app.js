@@ -1072,11 +1072,16 @@ function bindEvents() {
 }
 
 function initMapClickPicker() {
-  enableMapClickPicker(({ lat, lng }) => {
+  enableMapClickPicker(({ lat, lng, name }) => {
     if (!hasActiveAccess()) return;
-    fillBothFormsFromMap(lat, lng);
+    fillBothFormsFromMap(lat, lng, name || "");
     markDirty();
-    elements.authStatus.textContent = `Haritadan seçim yapıldı: ${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+
+    if (name) {
+      elements.authStatus.textContent = `Haritadan seçim yapıldı: ${name}`;
+    } else {
+      elements.authStatus.textContent = `Haritadan seçim yapıldı: ${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+    }
   });
 }
 
