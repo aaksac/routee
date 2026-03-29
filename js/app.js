@@ -117,7 +117,8 @@ function formatKm(value) {
     return `${Math.round(num * 1000)} m`;
   }
 
-  return `${num.toFixed(2)} km`;
+  const formatted = Number(num.toFixed(2)).toString();
+  return `${formatted} km`;
 }
 
 function escapeHtml(value) {
