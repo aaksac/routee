@@ -111,7 +111,13 @@ function goToLogin() {
 }
 
 function formatKm(value) {
-  return `${Number(value).toFixed(2)} km`;
+  const num = Number(value) || 0;
+
+  if (num < 1) {
+    return `${Math.round(num * 1000)} m`;
+  }
+
+  return `${num.toFixed(2)} km`;
 }
 
 function escapeHtml(value) {
