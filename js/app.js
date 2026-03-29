@@ -113,6 +113,15 @@ function formatKm(value) {
   return `${Number(value).toFixed(2)} km`;
 }
 
+function escapeHtml(value) {
+  return String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
 function markDirty() {
   state.hasUnsavedChanges = true;
 }
@@ -339,7 +348,7 @@ function renderTripList() {
       <div class="trip-item start">
         <div class="trip-order">S</div>
         <div class="trip-content">
-          <strong>${state.startPoint.name}</strong>
+          <strong>${escapeHtml(state.startPoint.name)}</strong>
           <span>Önceki mesafe: —</span>
         </div>
         <div style="display:flex; gap:8px; align-items:center;">
@@ -365,7 +374,7 @@ function renderTripList() {
         <div class="trip-item">
           <div class="trip-order">${index + 1}</div>
           <div class="trip-content">
-            <strong>${point.name}</strong>
+            <strong>${escapeHtml(point.name)}</strong>
             <span>Önceki mesafe: ${formatKm(point.distanceFromPrevious || 0)}</span>
           </div>
           <div style="display:flex; gap:8px; align-items:center;">
@@ -864,7 +873,7 @@ async function loadUserMaps(uid, fullAccess) {
         (map) => `
           <div class="map-list-row">
             <button class="map-list-item ${state.selectedMapId === map.id ? "active" : ""}" type="button" data-map-id="${map.id}">
-              <strong>${map.name || "İsimsiz Harita"}</strong>
+              <strong>${escapeHtml(map.name || "İsimsiz Harita")}</strong>
               <span>Toplam mesafe: ${formatKm(map.totalDistance || 0)}</span>
             </button>
             <button class="tiny-btn danger-outline" type="button" data-action="delete-map" data-map-id="${map.id}">
