@@ -404,7 +404,7 @@ function drawRouteSegments(startPoint, orderedPoints) {
 const distanceLabel =
   point.distanceFromPrevious < 1
     ? `${Math.round(point.distanceFromPrevious * 1000)} m`
-    : `${point.distanceFromPrevious.toFixed(2)} km`;
+    : `${Number(point.distanceFromPrevious.toFixed(2)).toString()} km`;
 
 createDistanceOverlay(
   new google.maps.LatLng(midLat, midLng),
