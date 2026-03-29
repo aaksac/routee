@@ -203,6 +203,43 @@ function focusToLocation(lat, lng, zoom = 15) {
   map.setZoom(zoom);
 }
 
+function focusMapToPoints(startPoint, points = []) {
+  if (!map) return;
+
+  const validPoints = [];
+
+  if (startPoint && Number.isFinite(startPoint.lat) && Number.isFinite(startPoint.lng)) {
+    validPoints.push({
+      lat: Number(startPoint.lat),
+      lng: Number(startPoint.lng)
+    });
+  }
+
+  points.forEach((point) => {
+    if (Number.isFinite(point.lat) && Number.isFinite(point.lng)) {
+      validPoints.push({
+        lat: Number(point.lat),
+        lng: Number(point.lng)
+      });
+    }
+  });
+
+  if (!validPoints.length) return;
+
+  if (validPoints.length === 1) {
+    focusToLocation(validPoints[0].lat, validPoints[0].lng, 15);
+    return;
+  }
+
+  const bounds = new google.maps.LatLngBounds();
+
+  validPoints.forEach((point) => {
+    bounds.extend(point);
+  });
+
+  map.fitBounds(bounds, 60);
+}
+
 function showCurrentLocationMarker(lat, lng) {
   if (!map) return;
 
@@ -435,6 +472,7 @@ export {
   showStartMarker,
   clearStartMarker,
   focusToLocation,
+  focusMapToPoints,
   showCurrentLocationMarker,
   enableMapClickPicker,
   initPlaceSearch,
