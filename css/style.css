@@ -631,3 +631,51 @@ select:focus {
     opacity: 1;
   }
 }
+@media (min-width: 721px) {
+  .top-left {
+    top: 18px;
+    left: 18px;
+    max-width: none;
+  }
+
+  .top-center {
+    top: 18px;
+    left: 126px;
+    transform: none;
+    max-width: none;
+    z-index: 7;
+  }
+
+  .top-center .map-badges {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 10px;
+    align-items: center;
+  }
+
+  .top-center .badge {
+    white-space: nowrap;
+  }
+
+  .top-right {
+    top: 18px;
+    left: 500px;
+    right: 72px;
+    max-width: none;
+    z-index: 6;
+  }
+
+  .top-right .right-tools {
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+    width: 100%;
+  }
+
+  .map-search-input {
+    width: 100%;
+    min-width: 0;
+  }
+}
