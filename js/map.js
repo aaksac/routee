@@ -434,7 +434,30 @@ function initPlaceSearch(inputElement, onPlaceSelected) {
 
   autocomplete.bindTo("bounds", map);
 
+  let lastAcceptedValue = "";
+
+  inputElement.addEventListener("input", () => {
+    const value = inputElement.value.trim();
+
+    if (value.length < 3) {
+      lastAcceptedValue = "";
+      if (searchMarker) {
+        searchMarker.setMap(null);
+        searchMarker = null;
+      }
+      return;
+    }
+
+    lastAcceptedValue = value;
+  });
+
   autocomplete.addListener("place_changed", () => {
+    const rawValue = inputElement.value.trim();
+
+    if (rawValue.length < 3 || !lastAcceptedValue) {
+      return;
+    }
+
     const place = autocomplete.getPlace();
 
     if (!place.geometry || !place.geometry.location) return;
