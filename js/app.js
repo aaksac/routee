@@ -20,7 +20,8 @@ import {
   initPlaceSearch,
   clearDraftMarker,
   clearRouteLines,
-  drawRouteSegments
+  drawRouteSegments,
+  focusMapToPoints
 } from "./map.js";
 import { locateAndShowUser } from "./location.js";
 import { nearestNeighborRoute } from "./route.js";
@@ -751,6 +752,8 @@ async function handleMapListClick(event) {
 
     const applied = applyImportedData(startPoint, points);
     if (!applied) return;
+
+    focusMapToPoints(startPoint, points);
 
     markClean();
     elements.authStatus.textContent = `Harita yüklendi: ${mapData.name || "İsimsiz Harita"}`;
