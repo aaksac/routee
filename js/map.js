@@ -4,11 +4,21 @@ let currentLocationMarker = null;
 let mapClickListener = null;
 let draftMarker = null;
 let searchMarker = null;
-let autocomplete = null;
 let startMarker = null;
 let routePolylines = [];
 let distanceOverlays = [];
 let activeInfoWindow = null;
+
+let searchService = null;
+let placesService = null;
+let searchDropdown = null;
+let searchInputEl = null;
+let searchSelectHandlerBound = false;
+let searchInputHandlerBound = false;
+let searchBlurHandlerBound = false;
+let searchFocusHandlerBound = false;
+let lastPredictionRequestId = 0;
+let currentPredictions = [];
 
 function initMap() {
   const mapElement = document.getElementById("mapCanvas");
@@ -28,6 +38,8 @@ function initMap() {
   });
 
   activeInfoWindow = new google.maps.InfoWindow();
+  placesService = new google.maps.places.PlacesService(map);
+  searchService = new google.maps.places.AutocompleteService();
 
   return map;
 }
@@ -394,8 +406,11 @@ function enableMapClickPicker(callback) {
     if (event.placeId) {
       event.stop();
 
-      const service = new google.maps.places.PlacesService(map);
-      service.getDetails(
+      if (!placesService) {
+        placesService = new google.maps.places.PlacesService(map);
+      }
+
+      placesService.getDetails(
         {
           placeId: event.placeId,
           fields: ["name", "formatted_address"]
@@ -425,66 +440,240 @@ function enableMapClickPicker(callback) {
   });
 }
 
+function ensureSearchDropdown(inputElement) {
+  if (searchDropdown) return searchDropdown;
+
+  const dropdown = document.createElement("div");
+  dropdown.id = "customPlaceSearchDropdown";
+  dropdown.style.position = "absolute";
+  dropdown.style.top = "calc(100% + 8px)";
+  dropdown.style.left = "0";
+  dropdown.style.width = "100%";
+  dropdown.style.background = "rgba(255,255,255,0.98)";
+  dropdown.style.border = "1px solid rgba(219, 228, 240, 0.96)";
+  dropdown.style.borderRadius = "18px";
+  dropdown.style.boxShadow = "0 18px 36px rgba(15, 23, 42, 0.14)";
+  dropdown.style.backdropFilter = "blur(14px)";
+  dropdown.style.padding = "8px";
+  dropdown.style.display = "none";
+  dropdown.style.zIndex = "30";
+  dropdown.style.maxHeight = "280px";
+  dropdown.style.overflowY = "auto";
+
+  const parent = inputElement.parentElement;
+  if (parent) {
+    const currentPosition = window.getComputedStyle(parent).position;
+    if (currentPosition === "static") {
+      parent.style.position = "relative";
+    }
+    parent.appendChild(dropdown);
+  }
+
+  searchDropdown = dropdown;
+  return dropdown;
+}
+
+function hideSearchDropdown() {
+  if (!searchDropdown) return;
+  searchDropdown.style.display = "none";
+  searchDropdown.innerHTML = "";
+  currentPredictions = [];
+}
+
+function renderPredictions(predictions, onPlaceSelected) {
+  const dropdown = searchDropdown;
+  if (!dropdown) return;
+
+  dropdown.innerHTML = "";
+
+  if (!predictions.length) {
+    dropdown.style.display = "none";
+    return;
+  }
+
+  predictions.forEach((prediction, index) => {
+    const item = document.createElement("button");
+    item.type = "button";
+    item.dataset.placeId = prediction.place_id;
+    item.dataset.index = String(index);
+    item.style.width = "100%";
+    item.style.textAlign = "left";
+    item.style.padding = "10px 12px";
+    item.style.border = "1px solid transparent";
+    item.style.background = "#fff";
+    item.style.borderRadius = "12px";
+    item.style.display = "block";
+    item.style.marginBottom = index === predictions.length - 1 ? "0" : "6px";
+    item.style.cursor = "pointer";
+
+    const title = document.createElement("div");
+    title.textContent = prediction.structured_formatting?.main_text || prediction.description;
+    title.style.fontWeight = "600";
+    title.style.color = "#0f172a";
+    title.style.fontSize = "0.95rem";
+
+    const subtitle = document.createElement("div");
+    subtitle.textContent = prediction.structured_formatting?.secondary_text || "";
+    subtitle.style.color = "#64748b";
+    subtitle.style.fontSize = "0.84rem";
+    subtitle.style.marginTop = "4px";
+
+    item.appendChild(title);
+    if (subtitle.textContent) {
+      item.appendChild(subtitle);
+    }
+
+    item.addEventListener("mouseenter", () => {
+      item.style.background = "rgba(37, 99, 235, 0.06)";
+      item.style.borderColor = "rgba(37, 99, 235, 0.12)";
+    });
+
+    item.addEventListener("mouseleave", () => {
+      item.style.background = "#fff";
+      item.style.borderColor = "transparent";
+    });
+
+    item.addEventListener("click", () => {
+      if (!placesService) {
+        placesService = new google.maps.places.PlacesService(map);
+      }
+
+      placesService.getDetails(
+        {
+          placeId: prediction.place_id,
+          fields: ["name", "formatted_address", "geometry"]
+        },
+        (place, status) => {
+          if (
+            status !== google.maps.places.PlacesServiceStatus.OK ||
+            !place ||
+            !place.geometry ||
+            !place.geometry.location
+          ) {
+            return;
+          }
+
+          const lat = place.geometry.location.lat();
+          const lng = place.geometry.location.lng();
+
+          if (searchMarker) {
+            searchMarker.setMap(null);
+          }
+
+          searchMarker = new google.maps.Marker({
+            map,
+            position: { lat, lng },
+            title: place.name || "Arama Sonucu",
+            icon: createCircleSymbol("#facc15", "#92400e")
+          });
+
+          if (searchInputEl) {
+            searchInputEl.value = place.name || place.formatted_address || prediction.description || "";
+          }
+
+          focusToLocation(lat, lng, 15);
+          showDraftMarker(lat, lng);
+          hideSearchDropdown();
+
+          onPlaceSelected({
+            name: place.name || place.formatted_address || "Seçilen Yer",
+            lat,
+            lng
+          });
+        }
+      );
+    });
+
+    dropdown.appendChild(item);
+  });
+
+  dropdown.style.display = "block";
+}
+
 function initPlaceSearch(inputElement, onPlaceSelected) {
   if (!map || !inputElement) return;
 
-  autocomplete = new google.maps.places.Autocomplete(inputElement, {
-    fields: ["formatted_address", "geometry", "name"]
-  });
+  searchInputEl = inputElement;
+  ensureSearchDropdown(inputElement);
 
-  autocomplete.bindTo("bounds", map);
+  if (!searchService) {
+    searchService = new google.maps.places.AutocompleteService();
+  }
+  if (!placesService) {
+    placesService = new google.maps.places.PlacesService(map);
+  }
 
-  let lastAcceptedValue = "";
+  if (!searchInputHandlerBound) {
+    inputElement.addEventListener("input", () => {
+      const query = inputElement.value.trim();
+      const requestId = ++lastPredictionRequestId;
 
-  inputElement.addEventListener("input", () => {
-    const value = inputElement.value.trim();
-
-    if (value.length < 3) {
-      lastAcceptedValue = "";
-      if (searchMarker) {
-        searchMarker.setMap(null);
-        searchMarker = null;
+      if (query.length < 3) {
+        hideSearchDropdown();
+        return;
       }
-      return;
-    }
 
-    lastAcceptedValue = value;
-  });
+      searchService.getPlacePredictions(
+        {
+          input: query,
+          bounds: map.getBounds() || undefined
+        },
+        (predictions, status) => {
+          if (requestId !== lastPredictionRequestId) return;
 
-  autocomplete.addListener("place_changed", () => {
-    const rawValue = inputElement.value.trim();
+          if (
+            status !== google.maps.places.PlacesServiceStatus.OK ||
+            !Array.isArray(predictions) ||
+            !predictions.length
+          ) {
+            hideSearchDropdown();
+            return;
+          }
 
-    if (rawValue.length < 3 || !lastAcceptedValue) {
-      return;
-    }
-
-    const place = autocomplete.getPlace();
-
-    if (!place.geometry || !place.geometry.location) return;
-
-    const lat = place.geometry.location.lat();
-    const lng = place.geometry.location.lng();
-
-    if (searchMarker) {
-      searchMarker.setMap(null);
-    }
-
-    searchMarker = new google.maps.Marker({
-      map,
-      position: { lat, lng },
-      title: place.name || "Arama Sonucu",
-      icon: createCircleSymbol("#facc15", "#92400e")
+          currentPredictions = predictions;
+          renderPredictions(predictions, onPlaceSelected);
+        }
+      );
     });
 
-    focusToLocation(lat, lng, 15);
-    showDraftMarker(lat, lng);
+    searchInputHandlerBound = true;
+  }
 
-    onPlaceSelected({
-      name: place.name || place.formatted_address || "Seçilen Yer",
-      lat,
-      lng
+  if (!searchFocusHandlerBound) {
+    inputElement.addEventListener("focus", () => {
+      const query = inputElement.value.trim();
+      if (query.length >= 3 && currentPredictions.length) {
+        searchDropdown.style.display = "block";
+      }
     });
-  });
+
+    searchFocusHandlerBound = true;
+  }
+
+  if (!searchBlurHandlerBound) {
+    inputElement.addEventListener("blur", () => {
+      window.setTimeout(() => {
+        hideSearchDropdown();
+      }, 180);
+    });
+
+    searchBlurHandlerBound = true;
+  }
+
+  if (!searchSelectHandlerBound) {
+    document.addEventListener("click", (event) => {
+      if (!searchDropdown || !searchInputEl) return;
+
+      const clickedInsideDropdown = searchDropdown.contains(event.target);
+      const clickedInput = searchInputEl === event.target;
+
+      if (!clickedInsideDropdown && !clickedInput) {
+        hideSearchDropdown();
+      }
+    });
+
+    searchSelectHandlerBound = true;
+  }
 }
 
 export {
