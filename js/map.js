@@ -215,6 +215,26 @@ function focusToLocation(lat, lng, zoom = 15) {
   map.setZoom(zoom);
 }
 
+function resetPageZoomAfterSearch() {
+  if (!searchInputEl) return;
+
+  searchInputEl.blur();
+
+  const viewportMeta = document.querySelector('meta[name="viewport"]');
+  if (!viewportMeta) return;
+
+  const originalContent = viewportMeta.getAttribute("content") || "";
+
+  viewportMeta.setAttribute(
+    "content",
+    "width=device-width, initial-scale=1, maximum-scale=1"
+  );
+
+  window.setTimeout(() => {
+    viewportMeta.setAttribute("content", originalContent);
+  }, 250);
+}
+
 function focusMapToPoints(startPoint, points = []) {
   if (!map) return;
 
@@ -574,6 +594,7 @@ function renderPredictions(predictions, onPlaceSelected) {
           focusToLocation(lat, lng, 15);
           showDraftMarker(lat, lng);
           hideSearchDropdown();
+          resetPageZoomAfterSearch();
 
           onPlaceSelected({
             name: place.name || place.formatted_address || "Seçilen Yer",
