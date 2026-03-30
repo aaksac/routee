@@ -1065,6 +1065,7 @@ function bindEvents() {
     closeMapMenu();
     closeSavedMapsOverlay();
   });
+
   elements.mapList?.addEventListener("click", async (event) => {
     await handleMapListClick(event);
     const clickedMap = event.target.closest(".map-list-item");
