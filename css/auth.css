@@ -1,0 +1,127 @@
+:root {
+  --auth-bg: radial-gradient(circle at top left, rgba(37, 99, 235, 0.08), transparent 28%), linear-gradient(180deg, #f8fafc 0%, #eef2ff 100%);
+  --auth-panel: #ffffff;
+  --auth-text: #0f172a;
+  --auth-muted: #64748b;
+  --auth-border: #dbe4f0;
+  --auth-primary: #2563eb;
+  --auth-primary-dark: #1d4ed8;
+  --auth-shadow: 0 18px 48px rgba(15, 23, 42, 0.10);
+}
+
+.login-page {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: var(--auth-bg);
+}
+
+.login-card,
+.compact-login-card {
+  width: min(420px, 100%);
+  background: var(--auth-panel);
+  border: 1px solid var(--auth-border);
+  border-radius: 28px;
+  box-shadow: var(--auth-shadow);
+  padding: 28px;
+}
+
+.login-brand {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 22px;
+}
+
+.login-brand h1 {
+  margin: 0;
+  font-size: 1.35rem;
+  color: var(--auth-text);
+}
+
+.login-brand p {
+  margin: 4px 0 0;
+  color: var(--auth-muted);
+  font-size: 0.94rem;
+}
+
+.login-page .field-group {
+  margin-bottom: 14px;
+}
+
+.login-page .field-group label {
+  display: block;
+  font-size: 0.9rem;
+  color: var(--auth-muted);
+  margin-bottom: 6px;
+}
+
+.login-page input {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid var(--auth-border);
+  background: #fff;
+  color: var(--auth-text);
+  outline: none;
+}
+
+.login-page input:focus {
+  border-color: var(--auth-primary);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+
+.login-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+}
+
+.login-actions .small-btn {
+  min-height: 42px;
+  padding: 10px 14px;
+}
+
+.login-actions .primary {
+  background: var(--auth-primary);
+  color: #fff;
+  border-color: var(--auth-primary);
+}
+
+.login-actions .primary:hover {
+  background: var(--auth-primary-dark);
+}
+
+.login-page .auth-status {
+  margin: 16px 0 0;
+  color: var(--auth-muted);
+  line-height: 1.5;
+}
+
+@media (max-width: 640px) {
+  .login-page {
+    padding: 16px;
+  }
+
+  .login-card,
+  .compact-login-card {
+    width: 100%;
+    padding: 22px 18px;
+    border-radius: 22px;
+  }
+
+  .login-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .login-actions .small-btn {
+    width: 100%;
+  }
+
+  .login-brand h1 {
+    font-size: 1.1rem;
+  }
+}
