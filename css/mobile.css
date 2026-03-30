@@ -64,9 +64,9 @@
   .top-right {
     top: 8px;
     right: 8px;
-    width: calc(100% - 74px);
+    width: auto;
     max-width: calc(100% - 74px);
-    align-items: stretch;
+    align-items: flex-end;
   }
 
   .bottom-left {
@@ -109,21 +109,22 @@
 
   .right-tools {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-columns: minmax(0, 220px) auto;
     gap: 6px;
     align-items: start;
-    justify-content: stretch;
-    width: 100%;
+    justify-content: end;
+    width: auto;
+    max-width: 100%;
   }
 
   .map-search-input {
-    width: 100%;
-    min-width: 0;
-    max-width: none;
+    width: clamp(170px, 56vw, 220px);
+    min-width: 170px;
+    max-width: 220px;
     min-height: 44px;
     height: 44px;
-    padding: 10px 14px;
-    font-size: 0.83rem;
+    padding: 10px 12px;
+    font-size: 0.82rem;
     line-height: 1.1;
     border-radius: 16px;
   }
@@ -404,7 +405,7 @@
   .top-right {
     top: 6px;
     right: 6px;
-    width: calc(100% - 62px);
+    width: auto;
     max-width: calc(100% - 62px);
   }
 
@@ -440,13 +441,13 @@
   }
 
   .map-search-input {
-    width: 100%;
-    min-width: 0;
-    max-width: none;
+    width: clamp(156px, 54vw, 198px);
+    min-width: 156px;
+    max-width: 198px;
     min-height: 38px;
     height: 38px;
-    padding: 8px 12px;
-    font-size: 0.77rem;
+    padding: 8px 10px;
+    font-size: 0.76rem;
     border-radius: 14px;
   }
 
@@ -517,209 +518,259 @@
   #btnClosePointPanel,
   #btnCloseSavePanel,
   #btnCloseImportExportPanel {
-    width: 21px !important;
-    height: 21px !important;
-    min-width: 21px !important;
-    min-height: 21px !important;
+    width: 20px !important;
+    height: 20px !important;
+    min-width: 20px !important;
+    min-height: 20px !important;
     font-size: 0.72rem !important;
+    flex-basis: 20px !important;
+  }
+
+  .trip-panel {
+    padding: 11px;
+    border-radius: 18px;
+  }
+
+  .trip-item {
+    grid-template-columns: 34px minmax(0, 1fr);
+    gap: 9px;
+    padding: 9px;
+  }
+
+  .trip-order {
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    font-size: 0.76rem;
+  }
+
+  .trip-content strong {
+    font-size: 0.84rem;
+  }
+
+  .trip-content span {
+    font-size: 0.75rem;
+  }
+
+  .tiny-btn {
+    min-height: 26px;
+    padding: 3px 6px;
+    font-size: 0.66rem;
+  }
+
+  .screen-overlay-panel {
+    width: calc(100vw - 12px);
+    margin-top: 38px;
+    padding: 12px;
+    border-radius: 16px;
+  }
+}
+
+@media (max-width: 390px) {
+  .topbar {
+    gap: 8px;
+  }
+
+  .brand-area {
+    gap: 8px;
+  }
+
+  .brand-icon {
+    width: 34px;
+    height: 34px;
+    border-radius: 11px;
+    flex-basis: 34px;
+  }
+
+  .brand-text h1 {
+    font-size: 0.88rem;
+  }
+
+  .page-action-btn {
+    min-height: 32px;
+    padding: 4px 8px;
+    font-size: 0.74rem;
+  }
+
+  .app-layout {
+    padding: 8px 10px 12px;
+    gap: 10px;
+  }
+
+  .map-canvas {
+    min-height: 52vh;
+    height: 52vh;
+    border-radius: 18px;
+  }
+
+  .top-left {
+    top: 6px;
+    left: 6px;
+    max-width: 42px;
+  }
+
+  .top-right {
+    top: 5px;
+    right: 5px;
+    max-width: calc(100% - 54px);
+  }
+
+  .bottom-left {
+    left: 6px;
+    bottom: 6px;
+  }
+
+  .top-left .compact-buttons {
+    width: 34px;
+    gap: 5px;
+  }
+
+  #btnOpenStartPanel,
+  #btnOpenPointPanel,
+  #btnToggleMenu,
+  #btnCurrentLocation,
+  .icon-only-btn {
+    width: 34px !important;
+    min-width: 34px !important;
+    max-width: 34px !important;
+    height: 34px !important;
+    min-height: 34px !important;
+    border-radius: 12px !important;
+  }
+
+  #btnOpenStartPanel svg,
+  #btnOpenPointPanel svg,
+  #btnToggleMenu svg,
+  #btnCurrentLocation svg,
+  .icon-only-btn svg {
+    width: 16px !important;
+    height: 16px !important;
+  }
+
+  .right-tools {
+    grid-template-columns: minmax(0, 182px) auto;
+    gap: 5px;
+  }
+
+  .map-search-input {
+    width: clamp(138px, 52vw, 182px);
+    min-width: 138px;
+    max-width: 182px;
+    height: 34px;
+    min-height: 34px;
+    padding: 7px 9px;
+    font-size: 0.72rem;
+    border-radius: 12px;
+  }
+
+  .floating-menu {
+    width: 138px;
+    padding: 5px;
+    gap: 4px;
+    border-radius: 14px;
+  }
+
+  .menu-item {
+    min-height: 28px;
+    padding: 5px 6px;
+    font-size: 0.64rem;
+    border-radius: 10px;
+  }
+
+  #startPanel,
+  #pointPanel {
+    width: 152px !important;
+    min-width: 152px !important;
+  }
+
+  #savePanel,
+  #importExportPanel {
+    width: 170px !important;
+  }
+
+  #startPanel .card-title-row h2,
+  #pointPanel .card-title-row h2,
+  #savePanel .card-title-row h2,
+  #importExportPanel .card-title-row h2 {
+    font-size: 0.68rem !important;
+  }
+
+  #startPanel .field-group label,
+  #pointPanel .field-group label,
+  #savePanel .field-group label,
+  #importExportPanel .field-group label {
+    font-size: 0.6rem !important;
+  }
+
+  #startPanel input,
+  #pointPanel input,
+  #savePanel input,
+  #importExportPanel input,
+  #savePanel select,
+  #importExportPanel select {
+    height: 24px !important;
+    min-height: 24px !important;
+    padding: 3px 5px !important;
+    font-size: 0.62rem !important;
+  }
+
+  #startPanel .small-btn,
+  #pointPanel .small-btn,
+  #savePanel .small-btn,
+  #importExportPanel .small-btn {
+    min-height: 22px !important;
+    height: 22px !important;
+    padding: 2px 5px !important;
+    font-size: 0.58rem !important;
+  }
+
+  #btnCloseStartPanel,
+  #btnClosePointPanel,
+  #btnCloseSavePanel,
+  #btnCloseImportExportPanel {
+    width: 18px !important;
+    height: 18px !important;
+    min-width: 18px !important;
+    min-height: 18px !important;
+    font-size: 0.66rem !important;
+    flex-basis: 18px !important;
+  }
+
+  .trip-panel {
+    padding: 10px;
+    border-radius: 16px;
+  }
+
+  .trip-item {
+    grid-template-columns: 30px minmax(0, 1fr);
+    gap: 8px;
+    padding: 8px;
+  }
+
+  .trip-order {
+    width: 30px;
+    height: 30px;
+    border-radius: 9px;
+    font-size: 0.7rem;
+  }
+
+  .trip-content strong {
+    font-size: 0.8rem;
+  }
+
+  .trip-content span {
+    font-size: 0.7rem;
+  }
+
+  .tiny-btn {
+    min-height: 24px;
+    padding: 3px 5px;
+    font-size: 0.62rem;
   }
 
   .screen-overlay-panel {
     width: calc(100vw - 10px);
-    padding: 12px;
-    margin-top: 36px;
-  }
-}
-@media (max-width: 720px) {
-  /* Gezi listesi mobilde fazla küçülmesin */
-  .trip-panel {
-    padding: 14px !important;
-    border-radius: 22px !important;
-  }
-
-  .trip-panel-header h2 {
-    font-size: 1rem !important;
-    line-height: 1.2 !important;
-  }
-
-  .trip-list {
-    gap: 10px !important;
-  }
-
-  .trip-item {
-    grid-template-columns: 40px minmax(0, 1fr) auto !important;
-    gap: 10px !important;
-    padding: 11px !important;
-    border-radius: 16px !important;
-    align-items: center !important;
-  }
-
-  .trip-order {
-    width: 40px !important;
-    height: 40px !important;
-    border-radius: 12px !important;
-    font-size: 0.84rem !important;
-  }
-
-  .trip-content strong {
-    font-size: 0.92rem !important;
-    line-height: 1.15 !important;
-  }
-
-  .trip-content span {
-    font-size: 0.8rem !important;
-    line-height: 1.25 !important;
-  }
-
-  .tiny-btn {
-    min-height: 30px !important;
-    padding: 5px 9px !important;
-    font-size: 0.72rem !important;
-    border-radius: 999px !important;
-    white-space: nowrap !important;
-  }
-
-  /* Harita Listelerim daha klas görünsün */
-  .screen-overlay-panel {
-    width: calc(100vw - 16px) !important;
-    margin-top: 34px !important;
-    padding: 14px !important;
-    border-radius: 20px !important;
-  }
-
-  .screen-overlay-panel .card-title-row.large-gap {
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: stretch !important;
-    gap: 10px !important;
-    margin-bottom: 14px !important;
-  }
-
-  .screen-overlay-panel .card-title-row.large-gap .panel-actions {
-    display: flex !important;
-    flex-wrap: nowrap !important;
-    gap: 8px !important;
-    justify-content: flex-start !important;
-  }
-
-  .screen-overlay-panel .card-title-row.large-gap .small-btn {
-    min-height: 34px !important;
-    padding: 6px 10px !important;
-    font-size: 0.75rem !important;
-    border-radius: 999px !important;
-    white-space: nowrap !important;
-  }
-
-  /* Liste satırı: sil butonu alta kaymasın */
-  .map-list-row {
-    display: grid !important;
-    grid-template-columns: minmax(0, 1fr) auto !important;
-    gap: 8px !important;
-    align-items: center !important;
-  }
-
-  .map-list-item {
-    min-width: 0 !important;
-    padding: 12px 13px !important;
-    border-radius: 16px !important;
-    box-shadow: 0 8px 18px rgba(15, 23, 42, 0.06) !important;
-  }
-
-  .map-list-item strong,
-  .map-list-item b {
-    font-size: 0.9rem !important;
-    line-height: 1.15 !important;
-  }
-
-  .map-list-item span {
-    font-size: 0.76rem !important;
-    line-height: 1.3 !important;
-  }
-
-  .map-list-row .danger-outline,
-  .map-list-row .small-btn,
-  .map-list-row .tiny-btn {
-    min-height: 34px !important;
-    height: 34px !important;
-    padding: 0 10px !important;
-    font-size: 0.72rem !important;
-    border-radius: 999px !important;
-    white-space: nowrap !important;
-    align-self: center !important;
-    justify-self: end !important;
-  }
-
-  /* Çok uzun satırlar taşarsa içerik düzgün kırılsın */
-  .map-list-item,
-  .trip-content {
-    overflow-wrap: anywhere !important;
-  }
-}
-
-@media (max-width: 480px) {
-  .trip-panel {
-    padding: 13px !important;
-    border-radius: 20px !important;
-  }
-
-  .trip-item {
-    grid-template-columns: 38px minmax(0, 1fr) auto !important;
-    padding: 10px !important;
-  }
-
-  .trip-order {
-    width: 38px !important;
-    height: 38px !important;
-    font-size: 0.8rem !important;
-  }
-
-  .trip-content strong {
-    font-size: 0.88rem !important;
-  }
-
-  .trip-content span {
-    font-size: 0.77rem !important;
-  }
-
-  .tiny-btn {
-    min-height: 28px !important;
-    padding: 4px 8px !important;
-    font-size: 0.68rem !important;
-  }
-
-  .screen-overlay-panel {
-    width: calc(100vw - 12px) !important;
-    margin-top: 28px !important;
-    padding: 12px !important;
-    border-radius: 18px !important;
-  }
-
-  .screen-overlay-panel .card-title-row.large-gap .small-btn {
-    min-height: 32px !important;
-    padding: 5px 9px !important;
-    font-size: 0.71rem !important;
-  }
-
-  .map-list-row {
-    grid-template-columns: minmax(0, 1fr) auto !important;
-    gap: 7px !important;
-  }
-
-  .map-list-item {
-    padding: 11px 12px !important;
-    border-radius: 15px !important;
-  }
-
-  .map-list-item span {
-    font-size: 0.73rem !important;
-  }
-
-  .map-list-row .danger-outline,
-  .map-list-row .small-btn,
-  .map-list-row .tiny-btn {
-    min-height: 32px !important;
-    height: 32px !important;
-    padding: 0 9px !important;
-    font-size: 0.68rem !important;
+    padding: 10px;
+    border-radius: 14px;
   }
 }
