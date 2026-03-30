@@ -479,19 +479,21 @@ function ensureSearchDropdown(inputElement) {
   const dropdown = document.createElement("div");
   dropdown.id = "customPlaceSearchDropdown";
   dropdown.style.position = "absolute";
-  dropdown.style.top = "calc(100% + 8px)";
+  dropdown.style.top = "calc(100% + 4px)";
   dropdown.style.left = "0";
   dropdown.style.width = "100%";
   dropdown.style.background = "rgba(255,255,255,0.98)";
-  dropdown.style.border = "1px solid rgba(219, 228, 240, 0.96)";
-  dropdown.style.borderRadius = "18px";
-  dropdown.style.boxShadow = "0 18px 36px rgba(15, 23, 42, 0.14)";
-  dropdown.style.backdropFilter = "blur(14px)";
-  dropdown.style.padding = "8px";
+  dropdown.style.border = "1px solid rgba(226, 232, 240, 0.98)";
+  dropdown.style.borderRadius = "12px";
+  dropdown.style.boxShadow = "0 10px 22px rgba(15, 23, 42, 0.10)";
+  dropdown.style.backdropFilter = "blur(8px)";
+  dropdown.style.padding = "4px";
   dropdown.style.display = "none";
   dropdown.style.zIndex = "30";
-  dropdown.style.maxHeight = "280px";
+  dropdown.style.maxHeight = "196px";
   dropdown.style.overflowY = "auto";
+  dropdown.style.overflowX = "hidden";
+  dropdown.style.boxSizing = "border-box";
 
   const parent = inputElement.parentElement;
   if (parent) {
@@ -583,25 +585,37 @@ function renderPredictions(predictions, onPlaceSelected) {
     item.dataset.index = String(index);
     item.style.width = "100%";
     item.style.textAlign = "left";
-    item.style.padding = "10px 12px";
+    item.style.padding = "7px 9px";
     item.style.border = "1px solid transparent";
     item.style.background = "#fff";
-    item.style.borderRadius = "12px";
+    item.style.borderRadius = "9px";
     item.style.display = "block";
-    item.style.marginBottom = index === predictions.length - 1 ? "0" : "6px";
+    item.style.marginBottom = index === predictions.length - 1 ? "0" : "3px";
     item.style.cursor = "pointer";
+    item.style.boxSizing = "border-box";
+    item.style.minHeight = "unset";
+    item.style.overflow = "hidden";
 
     const title = document.createElement("div");
     title.textContent = prediction.structured_formatting?.main_text || prediction.description;
     title.style.fontWeight = "600";
     title.style.color = "#0f172a";
-    title.style.fontSize = "0.95rem";
+    title.style.fontSize = "0.88rem";
+    title.style.lineHeight = "1.15";
+    title.style.margin = "0";
+    title.style.whiteSpace = "nowrap";
+    title.style.overflow = "hidden";
+    title.style.textOverflow = "ellipsis";
 
     const subtitle = document.createElement("div");
     subtitle.textContent = prediction.structured_formatting?.secondary_text || "";
     subtitle.style.color = "#64748b";
-    subtitle.style.fontSize = "0.84rem";
-    subtitle.style.marginTop = "4px";
+    subtitle.style.fontSize = "0.76rem";
+    subtitle.style.lineHeight = "1.1";
+    subtitle.style.marginTop = "2px";
+    subtitle.style.whiteSpace = "nowrap";
+    subtitle.style.overflow = "hidden";
+    subtitle.style.textOverflow = "ellipsis";
 
     item.appendChild(title);
     if (subtitle.textContent) {
@@ -610,7 +624,7 @@ function renderPredictions(predictions, onPlaceSelected) {
 
     item.addEventListener("mouseenter", () => {
       item.style.background = "rgba(37, 99, 235, 0.06)";
-      item.style.borderColor = "rgba(37, 99, 235, 0.12)";
+      item.style.borderColor = "rgba(37, 99, 235, 0.10)";
     });
 
     item.addEventListener("mouseleave", () => {
