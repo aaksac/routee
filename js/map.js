@@ -20,6 +20,14 @@ let searchFocusHandlerBound = false;
 let lastPredictionRequestId = 0;
 let currentPredictions = [];
 
+let activeAutocompleteSessionToken = null;
+let searchDebounceTimer = null;
+const predictionCache = new Map();
+const MAX_CACHE_SIZE = 50;
+const MIN_SEARCH_LENGTH = 4;
+const SEARCH_DEBOUNCE_MS = 450;
+const MAX_PREDICTIONS = 5;
+
 function initMap() {
   const mapElement = document.getElementById("mapCanvas");
   if (!mapElement) return null;
@@ -401,15 +409,15 @@ function drawRouteSegments(startPoint, orderedPoints) {
     const midLat = (previous.lat + point.lat) / 2;
     const midLng = (previous.lng + point.lng) / 2;
 
-const distanceLabel =
-  point.distanceFromPrevious < 1
-    ? `${Math.round(point.distanceFromPrevious * 1000)} m`
-    : `${Number(point.distanceFromPrevious.toFixed(2)).toString()} km`;
+    const distanceLabel =
+      point.distanceFromPrevious < 1
+        ? `${Math.round(point.distanceFromPrevious * 1000)} m`
+        : `${Number(point.distanceFromPrevious.toFixed(2)).toString()} km`;
 
-createDistanceOverlay(
-  new google.maps.LatLng(midLat, midLng),
-  distanceLabel
-);
+    createDistanceOverlay(
+      new google.maps.LatLng(midLat, midLng),
+      distanceLabel
+    );
 
     previous = point;
   });
@@ -505,6 +513,58 @@ function hideSearchDropdown() {
   currentPredictions = [];
 }
 
+function getNormalizedSearchKey(query) {
+  const bounds = map?.getBounds?.();
+  const center = bounds?.getCenter?.();
+
+  if (!center) {
+    return query.trim().toLowerCase();
+  }
+
+  const lat = center.lat().toFixed(2);
+  const lng = center.lng().toFixed(2);
+
+  return `${query.trim().toLowerCase()}|${lat}|${lng}`;
+}
+
+function ensureAutocompleteSessionToken() {
+  if (!activeAutocompleteSessionToken) {
+    activeAutocompleteSessionToken = new google.maps.places.AutocompleteSessionToken();
+  }
+
+  return activeAutocompleteSessionToken;
+}
+
+function clearAutocompleteSession() {
+  activeAutocompleteSessionToken = null;
+}
+
+function setPredictionCache(cacheKey, predictions) {
+  if (!cacheKey) return;
+
+  if (predictionCache.has(cacheKey)) {
+    predictionCache.delete(cacheKey);
+  }
+
+  predictionCache.set(cacheKey, predictions);
+
+  if (predictionCache.size > MAX_CACHE_SIZE) {
+    const firstKey = predictionCache.keys().next().value;
+    predictionCache.delete(firstKey);
+  }
+}
+
+function getPredictionCache(cacheKey) {
+  if (!cacheKey || !predictionCache.has(cacheKey)) {
+    return null;
+  }
+
+  const cached = predictionCache.get(cacheKey);
+  predictionCache.delete(cacheKey);
+  predictionCache.set(cacheKey, cached);
+  return cached;
+}
+
 function renderPredictions(predictions, onPlaceSelected) {
   const dropdown = searchDropdown;
   if (!dropdown) return;
@@ -563,12 +623,17 @@ function renderPredictions(predictions, onPlaceSelected) {
         placesService = new google.maps.places.PlacesService(map);
       }
 
+      const sessionToken = ensureAutocompleteSessionToken();
+
       placesService.getDetails(
         {
           placeId: prediction.place_id,
-          fields: ["name", "formatted_address", "geometry"]
+          fields: ["name", "formatted_address", "geometry"],
+          sessionToken
         },
         (place, status) => {
+          clearAutocompleteSession();
+
           if (
             status !== google.maps.places.PlacesServiceStatus.OK ||
             !place ||
@@ -634,32 +699,62 @@ function initPlaceSearch(inputElement, onPlaceSelected) {
       const query = inputElement.value.trim();
       const requestId = ++lastPredictionRequestId;
 
-      if (query.length < 3) {
+      if (searchDebounceTimer) {
+        clearTimeout(searchDebounceTimer);
+      }
+
+      if (query.length < MIN_SEARCH_LENGTH) {
+        clearAutocompleteSession();
         hideSearchDropdown();
         return;
       }
 
-      searchService.getPlacePredictions(
-        {
-          input: query,
-          bounds: map.getBounds() || undefined
-        },
-        (predictions, status) => {
-          if (requestId !== lastPredictionRequestId) return;
+      searchDebounceTimer = window.setTimeout(() => {
+        const latestQuery = inputElement.value.trim();
 
-          if (
-            status !== google.maps.places.PlacesServiceStatus.OK ||
-            !Array.isArray(predictions) ||
-            !predictions.length
-          ) {
-            hideSearchDropdown();
-            return;
-          }
-
-          currentPredictions = predictions;
-          renderPredictions(predictions, onPlaceSelected);
+        if (latestQuery.length < MIN_SEARCH_LENGTH) {
+          clearAutocompleteSession();
+          hideSearchDropdown();
+          return;
         }
-      );
+
+        const cacheKey = getNormalizedSearchKey(latestQuery);
+        const cachedPredictions = getPredictionCache(cacheKey);
+
+        if (cachedPredictions && cachedPredictions.length) {
+          if (requestId !== lastPredictionRequestId) return;
+          currentPredictions = cachedPredictions;
+          renderPredictions(cachedPredictions, onPlaceSelected);
+          return;
+        }
+
+        const sessionToken = ensureAutocompleteSessionToken();
+
+        searchService.getPlacePredictions(
+          {
+            input: latestQuery,
+            bounds: map.getBounds() || undefined,
+            sessionToken
+          },
+          (predictions, status) => {
+            if (requestId !== lastPredictionRequestId) return;
+
+            if (
+              status !== google.maps.places.PlacesServiceStatus.OK ||
+              !Array.isArray(predictions) ||
+              !predictions.length
+            ) {
+              hideSearchDropdown();
+              return;
+            }
+
+            const limitedPredictions = predictions.slice(0, MAX_PREDICTIONS);
+            currentPredictions = limitedPredictions;
+            setPredictionCache(cacheKey, limitedPredictions);
+            renderPredictions(limitedPredictions, onPlaceSelected);
+          }
+        );
+      }, SEARCH_DEBOUNCE_MS);
     });
 
     searchInputHandlerBound = true;
@@ -668,7 +763,7 @@ function initPlaceSearch(inputElement, onPlaceSelected) {
   if (!searchFocusHandlerBound) {
     inputElement.addEventListener("focus", () => {
       const query = inputElement.value.trim();
-      if (query.length >= 3 && currentPredictions.length) {
+      if (query.length >= MIN_SEARCH_LENGTH && currentPredictions.length) {
         searchDropdown.style.display = "block";
       }
     });
