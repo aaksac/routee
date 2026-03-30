@@ -467,12 +467,12 @@ function createDistanceOverlay(position, text) {
       div.style.whiteSpace = "nowrap";
       div.style.backdropFilter = "blur(8px)";
       div.style.pointerEvents = "none";
-      div.style.zIndex = "1";
+      div.style.zIndex = "20";
       div.innerText = this.text;
       this.div = div;
 
       const panes = this.getPanes();
-      panes.overlayLayer.appendChild(div);
+      panes.floatPane.appendChild(div);
     }
 
     draw() {
@@ -600,13 +600,15 @@ function ensureSearchDropdown(inputElement) {
   const dropdown = document.createElement("div");
   dropdown.id = "customPlaceSearchDropdown";
   dropdown.style.position = "absolute";
-  dropdown.style.top = "calc(100% + 4px)";
+  dropdown.style.top = "calc(100% + 6px)";
   dropdown.style.left = "0";
   dropdown.style.width = "100%";
+  dropdown.style.minWidth = "100%";
+  dropdown.style.maxWidth = "100%";
   dropdown.style.background = "rgba(255,255,255,0.98)";
   dropdown.style.border = "1px solid rgba(226, 232, 240, 0.98)";
-  dropdown.style.borderRadius = "12px";
-  dropdown.style.boxShadow = "0 10px 22px rgba(15, 23, 42, 0.10)";
+  dropdown.style.borderRadius = "16px";
+  dropdown.style.boxShadow = "0 12px 24px rgba(15, 23, 42, 0.12)";
   dropdown.style.backdropFilter = "blur(8px)";
   dropdown.style.padding = "4px";
   dropdown.style.display = "none";
