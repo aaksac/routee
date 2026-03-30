@@ -65,6 +65,8 @@ const elements = {
   btnCurrentLocation: document.getElementById("btnCurrentLocation"),
   btnSaveMap: document.getElementById("btnSaveMap"),
   btnNewMap: document.getElementById("btnNewMap"),
+  btnNewMapInline: document.getElementById("btnNewMapInline"),
+  btnNewMapMobile: document.getElementById("btnNewMapMobile"),
   btnLogoutTop: document.getElementById("btnLogoutTop"),
   btnExport: document.getElementById("btnExport"),
   btnImport: document.getElementById("btnImport"),
@@ -436,6 +438,7 @@ function recomputeRoute() {
   }
 
   const result = nearestNeighborRoute(state.startPoint, state.points);
+
   state.points = result.orderedPoints;
   state.totalDistance = result.totalDistance;
 
@@ -1047,6 +1050,19 @@ function bindEvents() {
   });
   elements.btnNewMap?.addEventListener("click", async () => {
     await handleNewMap();
+    closeSavedMapsOverlay();
+  });
+
+  elements.btnNewMapInline?.addEventListener("click", async () => {
+    await handleNewMap();
+    closeFloatingPanels();
+    closeMapMenu();
+  });
+
+  elements.btnNewMapMobile?.addEventListener("click", async () => {
+    await handleNewMap();
+    closeFloatingPanels();
+    closeMapMenu();
     closeSavedMapsOverlay();
   });
   elements.mapList?.addEventListener("click", async (event) => {
