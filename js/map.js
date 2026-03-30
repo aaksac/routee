@@ -104,54 +104,48 @@ function getPointSubtitle(pointData) {
 
 function createInfoWindowContent(pointData) {
   const wrapper = document.createElement("div");
-  wrapper.style.width = "min(220px, calc(100vw - 64px))";
-  wrapper.style.maxWidth = "220px";
+  wrapper.style.width = "210px";
+  wrapper.style.maxWidth = "210px";
   wrapper.style.boxSizing = "border-box";
-  wrapper.style.padding = "0";
-  wrapper.style.borderRadius = "18px";
-  wrapper.style.overflow = "hidden";
-  wrapper.style.background = "linear-gradient(180deg, #ffffff 0%, #f8fafc 100%)";
-  wrapper.style.boxShadow = "0 18px 40px rgba(15, 23, 42, 0.20)";
+  wrapper.style.padding = "12px";
+  wrapper.style.borderRadius = "16px";
+  wrapper.style.background = "#ffffff";
   wrapper.style.border = "1px solid rgba(226, 232, 240, 0.95)";
+  wrapper.style.boxShadow = "0 14px 28px rgba(15, 23, 42, 0.16)";
   wrapper.style.fontFamily = "inherit";
   wrapper.style.position = "relative";
+  wrapper.style.overflow = "visible";
 
   const closeBtn = document.createElement("button");
   closeBtn.type = "button";
   closeBtn.setAttribute("aria-label", "Kapat");
   closeBtn.textContent = "×";
   closeBtn.style.position = "absolute";
-  closeBtn.style.top = "10px";
-  closeBtn.style.right = "10px";
-  closeBtn.style.width = "28px";
-  closeBtn.style.height = "28px";
+  closeBtn.style.top = "8px";
+  closeBtn.style.right = "8px";
+  closeBtn.style.width = "26px";
+  closeBtn.style.height = "26px";
   closeBtn.style.border = "none";
   closeBtn.style.borderRadius = "999px";
-  closeBtn.style.background = "rgba(255,255,255,0.96)";
+  closeBtn.style.background = "rgba(15, 23, 42, 0.06)";
   closeBtn.style.color = "#475569";
   closeBtn.style.fontSize = "18px";
   closeBtn.style.lineHeight = "1";
   closeBtn.style.display = "flex";
   closeBtn.style.alignItems = "center";
   closeBtn.style.justifyContent = "center";
-  closeBtn.style.boxShadow = "0 8px 18px rgba(15, 23, 42, 0.16)";
   closeBtn.style.cursor = "pointer";
   closeBtn.style.padding = "0";
-  closeBtn.style.zIndex = "2";
+  closeBtn.style.zIndex = "3";
 
   closeBtn.addEventListener("click", () => {
     activeInfoWindow?.close();
   });
 
-  const inner = document.createElement("div");
-  inner.style.padding = "12px";
-  inner.style.display = "flex";
-  inner.style.flexDirection = "column";
-  inner.style.gap = "8px";
-
   const badge = document.createElement("div");
   badge.textContent = pointData?.type === "start" ? "Başlangıç Noktası" : "Konum Bilgisi";
-  badge.style.alignSelf = "flex-start";
+  badge.style.display = "inline-flex";
+  badge.style.alignItems = "center";
   badge.style.fontSize = "10px";
   badge.style.fontWeight = "700";
   badge.style.letterSpacing = "0.04em";
@@ -160,6 +154,7 @@ function createInfoWindowContent(pointData) {
   badge.style.background = "rgba(37, 99, 235, 0.10)";
   badge.style.padding = "5px 8px";
   badge.style.borderRadius = "999px";
+  badge.style.marginBottom = "8px";
 
   const title = document.createElement("div");
   title.textContent = getPointDisplayTitle(pointData);
@@ -168,22 +163,23 @@ function createInfoWindowContent(pointData) {
   title.style.lineHeight = "1.25";
   title.style.color = "#0f172a";
   title.style.wordBreak = "break-word";
-  title.style.paddingRight = "34px";
+  title.style.paddingRight = "30px";
+  title.style.marginBottom = "8px";
+
+  wrapper.appendChild(closeBtn);
+  wrapper.appendChild(badge);
+  wrapper.appendChild(title);
 
   const subtitleText = getPointSubtitle(pointData);
-  let subtitle = null;
-
   if (subtitleText) {
-    subtitle = document.createElement("div");
+    const subtitle = document.createElement("div");
     subtitle.textContent = subtitleText;
     subtitle.style.fontSize = "11px";
     subtitle.style.lineHeight = "1.35";
     subtitle.style.color = "#64748b";
-    subtitle.style.display = "-webkit-box";
-    subtitle.style.webkitLineClamp = "2";
-    subtitle.style.webkitBoxOrient = "vertical";
-    subtitle.style.overflow = "hidden";
     subtitle.style.wordBreak = "break-word";
+    subtitle.style.marginBottom = "10px";
+    wrapper.appendChild(subtitle);
   }
 
   const button = document.createElement("button");
@@ -196,33 +192,15 @@ function createInfoWindowContent(pointData) {
   button.style.color = "#ffffff";
   button.style.fontSize = "12px";
   button.style.fontWeight = "700";
-  button.style.letterSpacing = "0.01em";
   button.style.cursor = "pointer";
-  button.style.boxShadow = "0 10px 22px rgba(37, 99, 235, 0.28)";
-  button.style.transition = "transform 0.15s ease, box-shadow 0.15s ease";
-
-  button.addEventListener("mouseenter", () => {
-    button.style.transform = "translateY(-1px)";
-    button.style.boxShadow = "0 14px 28px rgba(37, 99, 235, 0.32)";
-  });
-
-  button.addEventListener("mouseleave", () => {
-    button.style.transform = "translateY(0)";
-    button.style.boxShadow = "0 10px 22px rgba(37, 99, 235, 0.28)";
-  });
+  button.style.boxShadow = "0 8px 18px rgba(37, 99, 235, 0.24)";
 
   button.addEventListener("click", () => {
     const url = createGoogleMapsDirectionsUrl(pointData.lat, pointData.lng);
     window.location.href = url;
   });
 
-  inner.appendChild(badge);
-  inner.appendChild(title);
-  if (subtitle) inner.appendChild(subtitle);
-  inner.appendChild(button);
-  wrapper.appendChild(closeBtn);
-  wrapper.appendChild(inner);
-
+  wrapper.appendChild(button);
   return wrapper;
 }
 
@@ -230,24 +208,27 @@ function styleNativeInfoWindowShell() {
   const iwOuter = document.querySelector(".gm-style .gm-style-iw");
   if (iwOuter) {
     iwOuter.style.padding = "0";
-    iwOuter.style.borderRadius = "18px";
-    iwOuter.style.overflow = "hidden";
-    iwOuter.style.boxShadow = "0 20px 42px rgba(15, 23, 42, 0.24)";
+    iwOuter.style.maxWidth = "none";
+    iwOuter.style.maxHeight = "none";
   }
 
   const iwContainer = document.querySelector(".gm-style .gm-style-iw-c");
   if (iwContainer) {
     iwContainer.style.padding = "0";
-    iwContainer.style.borderRadius = "18px";
-    iwContainer.style.overflow = "hidden";
-    iwContainer.style.boxShadow = "0 20px 42px rgba(15, 23, 42, 0.24)";
+    iwContainer.style.maxWidth = "none";
+    iwContainer.style.maxHeight = "none";
+    iwContainer.style.borderRadius = "0";
+    iwContainer.style.boxShadow = "none";
+    iwContainer.style.overflow = "visible";
+    iwContainer.style.background = "transparent";
   }
 
   const iwContent = document.querySelector(".gm-style .gm-style-iw-d");
   if (iwContent) {
-    iwContent.style.overflow = "hidden";
-    iwContent.style.maxHeight = "none";
     iwContent.style.padding = "0";
+    iwContent.style.overflow = "visible";
+    iwContent.style.maxHeight = "none";
+    iwContent.style.maxWidth = "none";
   }
 
   const nativeCloseButtons = document.querySelectorAll(
@@ -269,8 +250,8 @@ function openMarkerInfo(marker, pointData) {
 
   activeInfoWindow.setContent(createInfoWindowContent(pointData));
   activeInfoWindow.setOptions({
-    maxWidth: 220,
-    pixelOffset: new google.maps.Size(0, -6),
+    maxWidth: 240,
+    pixelOffset: new google.maps.Size(0, -8),
     zIndex: 9999,
     disableAutoPan: false
   });
