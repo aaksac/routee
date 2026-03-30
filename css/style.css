@@ -631,6 +631,7 @@ select:focus {
     opacity: 1;
   }
 }
+
 @media (min-width: 721px) {
   .top-left {
     top: 18px;
@@ -660,9 +661,9 @@ select:focus {
   .top-right {
     top: 18px;
     left: auto;
-    right: 72px;
+    right: 18px;
     max-width: none;
-    z-index: 6;
+    z-index: 8;
     align-items: flex-end;
   }
 
@@ -680,7 +681,6 @@ select:focus {
     max-width: 250px;
   }
 }
-
 
 .new-map-btn-icon {
   display: inline-flex;
@@ -749,6 +749,7 @@ select:focus {
     display: none !important;
   }
 }
+
 .custom-info-card {
   position: relative;
   min-width: 220px;
