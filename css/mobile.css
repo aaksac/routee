@@ -64,9 +64,9 @@
   .top-right {
     top: 8px;
     right: 8px;
-    width: auto;
+    width: calc(100% - 74px);
     max-width: calc(100% - 74px);
-    align-items: flex-end;
+    align-items: stretch;
   }
 
   .bottom-left {
@@ -109,22 +109,21 @@
 
   .right-tools {
     display: grid;
-    grid-template-columns: minmax(0, 220px) auto;
+    grid-template-columns: minmax(0, 1fr) auto;
     gap: 6px;
     align-items: start;
-    justify-content: end;
-    width: auto;
-    max-width: 100%;
+    justify-content: stretch;
+    width: 100%;
   }
 
   .map-search-input {
-    width: clamp(170px, 56vw, 220px);
-    min-width: 170px;
-    max-width: 220px;
+    width: 100%;
+    min-width: 0;
+    max-width: none;
     min-height: 44px;
     height: 44px;
-    padding: 10px 12px;
-    font-size: 0.82rem;
+    padding: 10px 14px;
+    font-size: 0.83rem;
     line-height: 1.1;
     border-radius: 16px;
   }
@@ -405,7 +404,7 @@
   .top-right {
     top: 6px;
     right: 6px;
-    width: auto;
+    width: calc(100% - 62px);
     max-width: calc(100% - 62px);
   }
 
@@ -441,13 +440,13 @@
   }
 
   .map-search-input {
-    width: clamp(156px, 54vw, 198px);
-    min-width: 156px;
-    max-width: 198px;
+    width: 100%;
+    min-width: 0;
+    max-width: none;
     min-height: 38px;
     height: 38px;
-    padding: 8px 10px;
-    font-size: 0.76rem;
+    padding: 8px 12px;
+    font-size: 0.77rem;
     border-radius: 14px;
   }
 
@@ -648,17 +647,17 @@
   }
 
   .right-tools {
-    grid-template-columns: minmax(0, 182px) auto;
+    grid-template-columns: minmax(0, 1fr) auto;
     gap: 5px;
   }
 
   .map-search-input {
-    width: clamp(138px, 52vw, 182px);
-    min-width: 138px;
-    max-width: 182px;
+    width: 100%;
+    min-width: 0;
+    max-width: none;
     height: 34px;
     min-height: 34px;
-    padding: 7px 9px;
+    padding: 7px 10px;
     font-size: 0.72rem;
     border-radius: 12px;
   }
