@@ -41,7 +41,7 @@ function initMap() {
     zoom: 11,
     mapTypeControl: false,
     streetViewControl: false,
-    fullscreenControl: true,
+    fullscreenControl: false,
     gestureHandling: "greedy"
   });
 
@@ -114,6 +114,34 @@ function createInfoWindowContent(pointData) {
   wrapper.style.boxShadow = "0 18px 40px rgba(15, 23, 42, 0.20)";
   wrapper.style.border = "1px solid rgba(226, 232, 240, 0.95)";
   wrapper.style.fontFamily = "inherit";
+  wrapper.style.position = "relative";
+
+  const closeBtn = document.createElement("button");
+  closeBtn.type = "button";
+  closeBtn.setAttribute("aria-label", "Kapat");
+  closeBtn.textContent = "×";
+  closeBtn.style.position = "absolute";
+  closeBtn.style.top = "10px";
+  closeBtn.style.right = "10px";
+  closeBtn.style.width = "28px";
+  closeBtn.style.height = "28px";
+  closeBtn.style.border = "none";
+  closeBtn.style.borderRadius = "999px";
+  closeBtn.style.background = "rgba(255,255,255,0.96)";
+  closeBtn.style.color = "#475569";
+  closeBtn.style.fontSize = "18px";
+  closeBtn.style.lineHeight = "1";
+  closeBtn.style.display = "flex";
+  closeBtn.style.alignItems = "center";
+  closeBtn.style.justifyContent = "center";
+  closeBtn.style.boxShadow = "0 8px 18px rgba(15, 23, 42, 0.16)";
+  closeBtn.style.cursor = "pointer";
+  closeBtn.style.padding = "0";
+  closeBtn.style.zIndex = "2";
+
+  closeBtn.addEventListener("click", () => {
+    activeInfoWindow?.close();
+  });
 
   const inner = document.createElement("div");
   inner.style.padding = "12px";
@@ -140,6 +168,7 @@ function createInfoWindowContent(pointData) {
   title.style.lineHeight = "1.25";
   title.style.color = "#0f172a";
   title.style.wordBreak = "break-word";
+  title.style.paddingRight = "34px";
 
   const subtitleText = getPointSubtitle(pointData);
   let subtitle = null;
@@ -191,6 +220,7 @@ function createInfoWindowContent(pointData) {
   inner.appendChild(title);
   if (subtitle) inner.appendChild(subtitle);
   inner.appendChild(button);
+  wrapper.appendChild(closeBtn);
   wrapper.appendChild(inner);
 
   return wrapper;
@@ -220,16 +250,15 @@ function styleNativeInfoWindowShell() {
     iwContent.style.padding = "0";
   }
 
-  const closeBtn = document.querySelector(".gm-style button[aria-label='Close']");
-  if (closeBtn) {
-    closeBtn.style.top = "8px";
-    closeBtn.style.right = "8px";
-    closeBtn.style.width = "28px";
-    closeBtn.style.height = "28px";
-    closeBtn.style.borderRadius = "999px";
-    closeBtn.style.background = "rgba(255,255,255,0.96)";
-    closeBtn.style.boxShadow = "0 8px 18px rgba(15, 23, 42, 0.16)";
-  }
+  const nativeCloseButtons = document.querySelectorAll(
+    ".gm-style .gm-ui-hover-effect, .gm-style button[aria-label='Close']"
+  );
+
+  nativeCloseButtons.forEach((btn) => {
+    btn.style.display = "none";
+    btn.style.opacity = "0";
+    btn.style.pointerEvents = "none";
+  });
 }
 
 function openMarkerInfo(marker, pointData) {
@@ -769,13 +798,9 @@ function renderPredictions(predictions, onPlaceSelected) {
           sessionToken
         },
         (place, status) => {
-          clearAutocompleteSession();
-
           if (
             status !== google.maps.places.PlacesServiceStatus.OK ||
-            !place ||
-            !place.geometry ||
-            !place.geometry.location
+            !place?.geometry?.location
           ) {
             return;
           }
@@ -785,30 +810,34 @@ function renderPredictions(predictions, onPlaceSelected) {
 
           if (searchMarker) {
             searchMarker.setMap(null);
+            searchMarker = null;
           }
 
           searchMarker = new google.maps.Marker({
-            map,
             position: { lat, lng },
-            title: place.name || "Arama Sonucu",
-            icon: createCircleSymbol("#facc15", "#92400e")
+            map,
+            title: place.name || prediction.description,
+            icon: createCircleSymbol("#2563eb", "#ffffff", 9)
           });
 
-          if (searchInputEl) {
-            searchInputEl.value = place.name || place.formatted_address || prediction.description || "";
-          }
-
-          focusToLocation(lat, lng, 15);
-          showDraftMarker(lat, lng);
-          hideSearchDropdown();
+          focusToLocation(lat, lng, 16);
           resetPageZoomAfterSearch();
 
-          onPlaceSelected({
-            name: place.name || place.formatted_address || "Seçilen Yer",
-            lat,
-            lng,
-            address: place.formatted_address || ""
-          });
+          if (searchInputEl) {
+            searchInputEl.value = place.name || prediction.description;
+          }
+
+          hideSearchDropdown();
+          clearAutocompleteSession();
+
+          if (typeof onPlaceSelected === "function") {
+            onPlaceSelected({
+              name: place.name || prediction.description,
+              address: place.formatted_address || "",
+              lat,
+              lng
+            });
+          }
         }
       );
     });
@@ -820,57 +849,40 @@ function renderPredictions(predictions, onPlaceSelected) {
 }
 
 function initPlaceSearch(inputElement, onPlaceSelected) {
-  if (!map || !inputElement) return;
+  if (!inputElement || !map || !searchService) return;
 
   searchInputEl = inputElement;
   ensureSearchDropdown(inputElement);
 
-  if (!searchService) {
-    searchService = new google.maps.places.AutocompleteService();
-  }
-  if (!placesService) {
-    placesService = new google.maps.places.PlacesService(map);
-  }
-
   if (!searchInputHandlerBound) {
     inputElement.addEventListener("input", () => {
       const query = inputElement.value.trim();
-      const requestId = ++lastPredictionRequestId;
 
-      if (searchDebounceTimer) {
-        clearTimeout(searchDebounceTimer);
-      }
+      window.clearTimeout(searchDebounceTimer);
 
       if (query.length < MIN_SEARCH_LENGTH) {
-        clearAutocompleteSession();
         hideSearchDropdown();
+        clearAutocompleteSession();
+        return;
+      }
+
+      const cacheKey = getNormalizedSearchKey(query);
+      const cachedPredictions = getPredictionCache(cacheKey);
+
+      if (cachedPredictions) {
+        currentPredictions = cachedPredictions;
+        renderPredictions(cachedPredictions, onPlaceSelected);
         return;
       }
 
       searchDebounceTimer = window.setTimeout(() => {
-        const latestQuery = inputElement.value.trim();
-
-        if (latestQuery.length < MIN_SEARCH_LENGTH) {
-          clearAutocompleteSession();
-          hideSearchDropdown();
-          return;
-        }
-
-        const cacheKey = getNormalizedSearchKey(latestQuery);
-        const cachedPredictions = getPredictionCache(cacheKey);
-
-        if (cachedPredictions && cachedPredictions.length) {
-          if (requestId !== lastPredictionRequestId) return;
-          currentPredictions = cachedPredictions;
-          renderPredictions(cachedPredictions, onPlaceSelected);
-          return;
-        }
-
+        const requestId = ++lastPredictionRequestId;
         const sessionToken = ensureAutocompleteSessionToken();
 
         searchService.getPlacePredictions(
           {
-            input: latestQuery,
+            input: query,
+            componentRestrictions: { country: "tr" },
             bounds: map.getBounds() || undefined,
             sessionToken
           },
