@@ -45,7 +45,10 @@ function initMap() {
     gestureHandling: "greedy"
   });
 
-  activeInfoWindow = new google.maps.InfoWindow();
+  activeInfoWindow = new google.maps.InfoWindow({
+    ariaLabel: "Konum Bilgisi"
+  });
+
   placesService = new google.maps.places.PlacesService(map);
   searchService = new google.maps.places.AutocompleteService();
 
@@ -85,62 +88,176 @@ function getPointDisplayTitle(pointData) {
   return pointData.name || "Nokta";
 }
 
+function getPointSubtitle(pointData) {
+  if (!pointData) return "";
+
+  const raw =
+    pointData.address ||
+    pointData.formatted_address ||
+    pointData.description ||
+    "";
+
+  if (!raw) return "";
+
+  return String(raw).trim();
+}
+
 function createInfoWindowContent(pointData) {
   const wrapper = document.createElement("div");
-  wrapper.style.width = "auto";
-  wrapper.style.maxWidth = "120px";
+  wrapper.style.width = "min(220px, calc(100vw - 64px))";
+  wrapper.style.maxWidth = "220px";
+  wrapper.style.boxSizing = "border-box";
   wrapper.style.padding = "0";
-  wrapper.style.textAlign = "center";
-  wrapper.style.display = "flex";
-  wrapper.style.flexDirection = "column";
-  wrapper.style.alignItems = "center";
-  wrapper.style.gap = "6px";
+  wrapper.style.borderRadius = "18px";
+  wrapper.style.overflow = "hidden";
+  wrapper.style.background = "linear-gradient(180deg, #ffffff 0%, #f8fafc 100%)";
+  wrapper.style.boxShadow = "0 18px 40px rgba(15, 23, 42, 0.20)";
+  wrapper.style.border = "1px solid rgba(226, 232, 240, 0.95)";
+  wrapper.style.fontFamily = "inherit";
+
+  const inner = document.createElement("div");
+  inner.style.padding = "12px";
+  inner.style.display = "flex";
+  inner.style.flexDirection = "column";
+  inner.style.gap = "8px";
+
+  const badge = document.createElement("div");
+  badge.textContent = pointData?.type === "start" ? "Başlangıç Noktası" : "Konum Bilgisi";
+  badge.style.alignSelf = "flex-start";
+  badge.style.fontSize = "10px";
+  badge.style.fontWeight = "700";
+  badge.style.letterSpacing = "0.04em";
+  badge.style.textTransform = "uppercase";
+  badge.style.color = "#1d4ed8";
+  badge.style.background = "rgba(37, 99, 235, 0.10)";
+  badge.style.padding = "5px 8px";
+  badge.style.borderRadius = "999px";
 
   const title = document.createElement("div");
   title.textContent = getPointDisplayTitle(pointData);
-  title.style.fontSize = "12px";
-  title.style.fontWeight = "700";
-  title.style.lineHeight = "1.2";
+  title.style.fontSize = "14px";
+  title.style.fontWeight = "800";
+  title.style.lineHeight = "1.25";
   title.style.color = "#0f172a";
-  title.style.maxWidth = "110px";
   title.style.wordBreak = "break-word";
-  title.style.margin = "0 auto";
+
+  const subtitleText = getPointSubtitle(pointData);
+  let subtitle = null;
+
+  if (subtitleText) {
+    subtitle = document.createElement("div");
+    subtitle.textContent = subtitleText;
+    subtitle.style.fontSize = "11px";
+    subtitle.style.lineHeight = "1.35";
+    subtitle.style.color = "#64748b";
+    subtitle.style.display = "-webkit-box";
+    subtitle.style.webkitLineClamp = "2";
+    subtitle.style.webkitBoxOrient = "vertical";
+    subtitle.style.overflow = "hidden";
+    subtitle.style.wordBreak = "break-word";
+  }
 
   const button = document.createElement("button");
-  button.textContent = "Yol Tarifi";
-  button.style.background = "#2563eb";
-  button.style.color = "#ffffff";
+  button.textContent = "Yol Tarifi Al";
+  button.style.width = "100%";
+  button.style.height = "38px";
   button.style.border = "none";
-  button.style.borderRadius = "999px";
-  button.style.padding = "6px 10px";
-  button.style.fontSize = "11px";
-  button.style.fontWeight = "600";
+  button.style.borderRadius = "12px";
+  button.style.background = "linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)";
+  button.style.color = "#ffffff";
+  button.style.fontSize = "12px";
+  button.style.fontWeight = "700";
+  button.style.letterSpacing = "0.01em";
   button.style.cursor = "pointer";
-  button.style.minWidth = "88px";
-  button.style.height = "30px";
+  button.style.boxShadow = "0 10px 22px rgba(37, 99, 235, 0.28)";
+  button.style.transition = "transform 0.15s ease, box-shadow 0.15s ease";
+
+  button.addEventListener("mouseenter", () => {
+    button.style.transform = "translateY(-1px)";
+    button.style.boxShadow = "0 14px 28px rgba(37, 99, 235, 0.32)";
+  });
+
+  button.addEventListener("mouseleave", () => {
+    button.style.transform = "translateY(0)";
+    button.style.boxShadow = "0 10px 22px rgba(37, 99, 235, 0.28)";
+  });
 
   button.addEventListener("click", () => {
     const url = createGoogleMapsDirectionsUrl(pointData.lat, pointData.lng);
     window.location.href = url;
   });
 
-  wrapper.appendChild(title);
-  wrapper.appendChild(button);
+  inner.appendChild(badge);
+  inner.appendChild(title);
+  if (subtitle) inner.appendChild(subtitle);
+  inner.appendChild(button);
+  wrapper.appendChild(inner);
 
   return wrapper;
+}
+
+function styleNativeInfoWindowShell() {
+  const iwOuter = document.querySelector(".gm-style .gm-style-iw");
+  if (iwOuter) {
+    iwOuter.style.padding = "0";
+    iwOuter.style.borderRadius = "18px";
+    iwOuter.style.overflow = "hidden";
+    iwOuter.style.boxShadow = "0 20px 42px rgba(15, 23, 42, 0.24)";
+  }
+
+  const iwContainer = document.querySelector(".gm-style .gm-style-iw-c");
+  if (iwContainer) {
+    iwContainer.style.padding = "0";
+    iwContainer.style.borderRadius = "18px";
+    iwContainer.style.overflow = "hidden";
+    iwContainer.style.boxShadow = "0 20px 42px rgba(15, 23, 42, 0.24)";
+  }
+
+  const iwContent = document.querySelector(".gm-style .gm-style-iw-d");
+  if (iwContent) {
+    iwContent.style.overflow = "hidden";
+    iwContent.style.maxHeight = "none";
+    iwContent.style.padding = "0";
+  }
+
+  const closeBtn = document.querySelector(".gm-style button[aria-label='Close']");
+  if (closeBtn) {
+    closeBtn.style.top = "8px";
+    closeBtn.style.right = "8px";
+    closeBtn.style.width = "28px";
+    closeBtn.style.height = "28px";
+    closeBtn.style.borderRadius = "999px";
+    closeBtn.style.background = "rgba(255,255,255,0.96)";
+    closeBtn.style.boxShadow = "0 8px 18px rgba(15, 23, 42, 0.16)";
+  }
 }
 
 function openMarkerInfo(marker, pointData) {
   if (!map || !marker || !activeInfoWindow || !pointData) return;
 
+  activeInfoWindow.close();
+  google.maps.event.clearListeners(activeInfoWindow, "domready");
+
   activeInfoWindow.setContent(createInfoWindowContent(pointData));
   activeInfoWindow.setOptions({
-    maxWidth: 140
+    maxWidth: 220,
+    pixelOffset: new google.maps.Size(0, -6),
+    zIndex: 9999,
+    disableAutoPan: false
   });
 
   activeInfoWindow.open({
     anchor: marker,
-    map
+    map,
+    shouldFocus: false
+  });
+
+  if (typeof activeInfoWindow.setZIndex === "function") {
+    activeInfoWindow.setZIndex(9999);
+  }
+
+  google.maps.event.addListenerOnce(activeInfoWindow, "domready", () => {
+    styleNativeInfoWindowShell();
   });
 }
 
@@ -339,20 +456,23 @@ function createDistanceOverlay(position, text) {
     onAdd() {
       const div = document.createElement("div");
       div.style.position = "absolute";
-      div.style.background = "#ffffff";
-      div.style.border = "1px solid #cbd5e1";
+      div.style.background = "rgba(255,255,255,0.96)";
+      div.style.border = "1px solid rgba(203, 213, 225, 0.95)";
       div.style.borderRadius = "999px";
       div.style.padding = "4px 8px";
       div.style.fontSize = "12px";
-      div.style.fontWeight = "600";
+      div.style.fontWeight = "700";
       div.style.color = "#0f172a";
-      div.style.boxShadow = "0 4px 12px rgba(15,23,42,0.12)";
+      div.style.boxShadow = "0 8px 18px rgba(15,23,42,0.10)";
       div.style.whiteSpace = "nowrap";
+      div.style.backdropFilter = "blur(8px)";
+      div.style.pointerEvents = "none";
+      div.style.zIndex = "1";
       div.innerText = this.text;
       this.div = div;
 
       const panes = this.getPanes();
-      panes.floatPane.appendChild(div);
+      panes.overlayLayer.appendChild(div);
     }
 
     draw() {
@@ -457,7 +577,8 @@ function enableMapClickPicker(callback) {
           callback({
             lat,
             lng,
-            name: suggestedName
+            name: suggestedName,
+            address: place?.formatted_address || ""
           });
         }
       );
@@ -683,7 +804,8 @@ function renderPredictions(predictions, onPlaceSelected) {
           onPlaceSelected({
             name: place.name || place.formatted_address || "Seçilen Yer",
             lat,
-            lng
+            lng,
+            address: place.formatted_address || ""
           });
         }
       );
