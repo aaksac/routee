@@ -344,6 +344,10 @@
     display: inline-flex;
   }
 
+  .new-map-mobile-fab {
+    display: inline-flex !important;
+  }
+
   .screen-overlay-panel {
     width: calc(100vw - 14px);
     margin-top: 42px;
