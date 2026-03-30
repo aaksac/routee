@@ -534,8 +534,8 @@
     margin-top: 36px;
   }
 }
+
 @media (max-width: 720px) {
-  /* Gezi listesi mobilde fazla küçülmesin */
   .trip-panel {
     padding: 14px !important;
     border-radius: 22px !important;
@@ -583,7 +583,6 @@
     white-space: nowrap !important;
   }
 
-  /* Harita Listelerim daha klas görünsün */
   .screen-overlay-panel {
     width: calc(100vw - 16px) !important;
     margin-top: 34px !important;
@@ -614,7 +613,6 @@
     white-space: nowrap !important;
   }
 
-  /* Liste satırı: sil butonu alta kaymasın */
   .map-list-row {
     display: grid !important;
     grid-template-columns: minmax(0, 1fr) auto !important;
@@ -653,7 +651,6 @@
     justify-self: end !important;
   }
 
-  /* Çok uzun satırlar taşarsa içerik düzgün kırılsın */
   .map-list-item,
   .trip-content {
     overflow-wrap: anywhere !important;
