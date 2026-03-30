@@ -22,7 +22,7 @@ let currentPredictions = [];
 
 function initMap() {
   const mapElement = document.getElementById("mapCanvas");
-  if (!mapElement) return null;
+  if (!mapElement || !window.google || !google.maps) return null;
 
   mapElement.innerHTML = "";
 
@@ -34,12 +34,16 @@ function initMap() {
     mapTypeControl: false,
     streetViewControl: false,
     fullscreenControl: true,
-    gestureHandling: "greedy"
+    gestureHandling: "greedy",
   });
 
   activeInfoWindow = new google.maps.InfoWindow();
-  placesService = new google.maps.places.PlacesService(map);
-  searchService = new google.maps.places.AutocompleteService();
+
+  if (google.maps.places) {
+    placesService = new google.maps.places.PlacesService(map);
+    searchService = new google.maps.places.AutocompleteService();
+  }
+
   ensurePlacesLibrary().catch(() => null);
 
   return map;
@@ -56,7 +60,7 @@ function createCircleSymbol(fillColor, strokeColor = "#ffffff", scale = 10) {
     fillOpacity: 1,
     strokeColor,
     strokeWeight: 2,
-    scale
+    scale,
   };
 }
 
@@ -128,12 +132,12 @@ function openMarkerInfo(marker, pointData) {
 
   activeInfoWindow.setContent(createInfoWindowContent(pointData));
   activeInfoWindow.setOptions({
-    maxWidth: 140
+    maxWidth: 140,
   });
 
   activeInfoWindow.open({
     anchor: marker,
-    map
+    map,
   });
 }
 
@@ -148,10 +152,10 @@ function addMarker({ lat, lng, title, label, onClick, pointData }) {
       ? {
           text: String(label),
           color: "#ffffff",
-          fontWeight: "700"
+          fontWeight: "700",
         }
       : undefined,
-    icon: createCircleSymbol("#dc2626")
+    icon: createCircleSymbol("#dc2626"),
   });
 
   marker.__pointData = pointData || null;
@@ -186,9 +190,9 @@ function showStartMarker({ lat, lng, title, onClick, pointData }) {
     label: {
       text: "S",
       color: "#ffffff",
-      fontWeight: "700"
+      fontWeight: "700",
     },
-    icon: createCircleSymbol("#16a34a", "#ffffff", 12)
+    icon: createCircleSymbol("#16a34a", "#ffffff", 12),
   });
 
   startMarker.__pointData = pointData || null;
@@ -237,6 +241,10 @@ function resetPageZoomAfterSearch() {
 }
 
 async function ensurePlacesLibrary() {
+  if (!window.google || !google.maps || !google.maps.importLibrary) {
+    return null;
+  }
+
   if (placesLibrary) return placesLibrary;
 
   if (!placesLibraryPromise) {
@@ -266,12 +274,15 @@ function getMapBoundsLiteral() {
     west: southWest.lng(),
     south: southWest.lat(),
     east: northEast.lng(),
-    north: northEast.lat()
+    north: northEast.lat(),
   };
 }
 
 async function createAutocompleteSessionToken() {
-  const { AutocompleteSessionToken } = await ensurePlacesLibrary();
+  const library = await ensurePlacesLibrary();
+  if (!library || !library.AutocompleteSessionToken) return null;
+
+  const { AutocompleteSessionToken } = library;
   currentSearchSessionToken = new AutocompleteSessionToken();
   return currentSearchSessionToken;
 }
@@ -307,7 +318,7 @@ function setCachedPredictions(query, predictions) {
 
   searchCache.set(query, {
     timestamp: Date.now(),
-    predictions
+    predictions,
   });
 }
 
@@ -319,12 +330,19 @@ async function fetchPredictionSuggestions(query) {
   }
 
   try {
-    const { AutocompleteSuggestion } = await ensurePlacesLibrary();
+    const library = await ensurePlacesLibrary();
+
+    if (!library || !library.AutocompleteSuggestion) {
+      throw new Error("New Autocomplete not available");
+    }
+
+    const { AutocompleteSuggestion } = library;
+
     const request = {
       input: query,
       sessionToken: await getOrCreateAutocompleteSessionToken(),
       language: document.documentElement.lang || navigator.language || "tr",
-      region: "tr"
+      region: "tr",
     };
 
     const boundsLiteral = getMapBoundsLiteral();
@@ -345,34 +363,44 @@ async function fetchPredictionSuggestions(query) {
         place_id: prediction.placeId,
         description: prediction.text?.toString() || "",
         structured_formatting: {
-          main_text: prediction.mainText?.toString() || prediction.text?.toString() || "",
-          secondary_text: prediction.secondaryText?.toString() || ""
-        }
+          main_text:
+            prediction.mainText?.toString() ||
+            prediction.text?.toString() ||
+            "",
+          secondary_text: prediction.secondaryText?.toString() || "",
+        },
       }));
 
     setCachedPredictions(normalizedQuery, predictions);
     return predictions;
   } catch (error) {
-    if (!searchService) {
+    if (!searchService && google.maps.places) {
       searchService = new google.maps.places.AutocompleteService();
     }
+
+    if (!searchService) return [];
 
     return await new Promise((resolve) => {
       searchService.getPlacePredictions(
         {
           input: query,
-          bounds: map?.getBounds?.() || undefined
+          bounds: map?.getBounds?.() || undefined,
         },
         (predictions, status) => {
-          if (status !== google.maps.places.PlacesServiceStatus.OK || !Array.isArray(predictions)) {
+          if (
+            status !== google.maps.places.PlacesServiceStatus.OK ||
+            !Array.isArray(predictions)
+          ) {
             resolve([]);
             return;
           }
 
-          resolve(predictions.slice(0, 5).map((prediction) => ({
-            __source: "legacy",
-            ...prediction
-          })));
+          resolve(
+            predictions.slice(0, 5).map((prediction) => ({
+              __source: "legacy",
+              ...prediction,
+            }))
+          );
         }
       );
     });
@@ -381,23 +409,31 @@ async function fetchPredictionSuggestions(query) {
 
 async function getPlaceSummaryById(placeId) {
   try {
-    const { Place } = await ensurePlacesLibrary();
+    const library = await ensurePlacesLibrary();
+    if (!library || !library.Place) {
+      throw new Error("New Place class not available");
+    }
+
+    const { Place } = library;
     const place = new Place({ id: placeId });
+
     await place.fetchFields({
-      fields: ["displayName", "formattedAddress"]
+      fields: ["displayName", "formattedAddress"],
     });
 
     return place.displayName || place.formattedAddress || "";
   } catch (error) {
-    if (!placesService) {
+    if (!placesService && google.maps.places) {
       placesService = new google.maps.places.PlacesService(map);
     }
+
+    if (!placesService) return "";
 
     return await new Promise((resolve) => {
       placesService.getDetails(
         {
           placeId,
-          fields: ["name", "formatted_address"]
+          fields: ["name", "formatted_address"],
         },
         (place, status) => {
           const suggestedName =
@@ -416,34 +452,41 @@ async function resolvePredictionSelection(prediction) {
   if (!prediction) return null;
 
   if (prediction.__source === "new" && prediction.prediction) {
-    const place = prediction.prediction.toPlace();
-    await place.fetchFields({
-      fields: ["displayName", "formattedAddress", "location"]
-    });
+    try {
+      const place = prediction.prediction.toPlace();
 
-    resetAutocompleteSession();
+      await place.fetchFields({
+        fields: ["displayName", "formattedAddress", "location"],
+      });
 
-    const location = place.location;
-    if (!location) return null;
+      resetAutocompleteSession();
 
-    return {
-      placeId: place.id || prediction.place_id || null,
-      name: place.displayName || place.formattedAddress || prediction.description || "",
-      formattedAddress: place.formattedAddress || "",
-      lat: location.lat(),
-      lng: location.lng()
-    };
+      const location = place.location;
+      if (!location) return null;
+
+      return {
+        placeId: place.id || prediction.place_id || null,
+        name: place.displayName || place.formattedAddress || prediction.description || "",
+        formattedAddress: place.formattedAddress || "",
+        lat: location.lat(),
+        lng: location.lng(),
+      };
+    } catch (error) {
+      // fallback below
+    }
   }
 
-  if (!placesService) {
+  if (!placesService && google.maps.places) {
     placesService = new google.maps.places.PlacesService(map);
   }
+
+  if (!placesService) return null;
 
   return await new Promise((resolve) => {
     placesService.getDetails(
       {
         placeId: prediction.place_id,
-        fields: ["place_id", "name", "formatted_address", "geometry"]
+        fields: ["place_id", "name", "formatted_address", "geometry"],
       },
       (place, status) => {
         resetAutocompleteSession();
@@ -461,7 +504,7 @@ async function resolvePredictionSelection(prediction) {
           name: place.name || place.formatted_address || prediction.description || "",
           formattedAddress: place.formatted_address || "",
           lat: place.geometry.location.lat(),
-          lng: place.geometry.location.lng()
+          lng: place.geometry.location.lng(),
         });
       }
     );
@@ -551,10 +594,7 @@ function bindSearchDocumentClickHandler() {
     if (!dropdown || !searchInputEl) return;
 
     const target = event.target;
-    if (
-      target === searchInputEl ||
-      dropdown.contains(target)
-    ) {
+    if (target === searchInputEl || dropdown.contains(target)) {
       return;
     }
 
@@ -572,10 +612,7 @@ function bindSearchBlurHandler() {
       if (!dropdown) return;
 
       const activeEl = document.activeElement;
-      if (
-        activeEl === searchInputEl ||
-        dropdown.contains(activeEl)
-      ) {
+      if (activeEl === searchInputEl || dropdown.contains(activeEl)) {
         return;
       }
 
@@ -668,10 +705,11 @@ function drawRouteSegments(points = [], startPoint = null) {
   if (!map) return;
 
   const routePoints = [];
+
   if (startPoint?.lat != null && startPoint?.lng != null) {
     routePoints.push({
       lat: Number(startPoint.lat),
-      lng: Number(startPoint.lng)
+      lng: Number(startPoint.lng),
     });
   }
 
@@ -679,7 +717,7 @@ function drawRouteSegments(points = [], startPoint = null) {
     if (point?.lat != null && point?.lng != null) {
       routePoints.push({
         lat: Number(point.lat),
-        lng: Number(point.lng)
+        lng: Number(point.lng),
       });
     }
   });
@@ -693,7 +731,7 @@ function drawRouteSegments(points = [], startPoint = null) {
       strokeColor: "#2563eb",
       strokeOpacity: 0.95,
       strokeWeight: 3,
-      map
+      map,
     });
 
     routePolylines.push(line);
@@ -716,7 +754,7 @@ function showDraftMarker({ lat, lng, title = "Seçilen Konum" }) {
     position: { lat, lng },
     map,
     title,
-    icon: createCircleSymbol("#1d4ed8", "#ffffff", 9)
+    icon: createCircleSymbol("#1d4ed8", "#ffffff", 9),
   });
 
   return draftMarker;
@@ -726,7 +764,7 @@ function bindMapClickToInputs({
   latInput,
   lngInput,
   nameInput,
-  markerTitle = "Seçilen Konum"
+  markerTitle = "Seçilen Konum",
 } = {}) {
   if (!map) return;
 
@@ -766,7 +804,7 @@ function fitMapToPoints(points = [], startPoint = null) {
   if (startPoint?.lat != null && startPoint?.lng != null) {
     bounds.extend({
       lat: Number(startPoint.lat),
-      lng: Number(startPoint.lng)
+      lng: Number(startPoint.lng),
     });
     hasPoint = true;
   }
@@ -775,7 +813,7 @@ function fitMapToPoints(points = [], startPoint = null) {
     if (point?.lat != null && point?.lng != null) {
       bounds.extend({
         lat: Number(point.lat),
-        lng: Number(point.lng)
+        lng: Number(point.lng),
       });
       hasPoint = true;
     }
@@ -786,7 +824,7 @@ function fitMapToPoints(points = [], startPoint = null) {
   if (points.length === 0 && startPoint?.lat != null && startPoint?.lng != null) {
     map.setCenter({
       lat: Number(startPoint.lat),
-      lng: Number(startPoint.lng)
+      lng: Number(startPoint.lng),
     });
     map.setZoom(14);
     return;
@@ -808,5 +846,5 @@ export {
   initPlaceSearch,
   clearDraftMarker,
   clearRouteLines,
-  drawRouteSegments
+  drawRouteSegments,
 };
