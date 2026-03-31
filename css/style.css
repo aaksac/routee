@@ -806,3 +806,9 @@ select:focus {
   color: #fff;
   font-weight: 700;
 }
+@media (min-width: 1200px) {
+  .trip-column {
+    position: relative;
+    left: -10px;
+  }
+}
