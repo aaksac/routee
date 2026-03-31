@@ -808,12 +808,6 @@ select:focus {
 }
 @media (min-width: 1200px) {
   .trip-column {
-    position: relative;
-    left: -10px;
-  }
-}
-@media (min-width: 1200px) {
-  .trip-column {
     margin-left: -12px;
   }
 }
