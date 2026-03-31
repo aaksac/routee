@@ -1,0 +1,94 @@
+# =========================
+# Logs
+# =========================
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+firebase-debug.log*
+firestore-debug.log*
+
+# =========================
+# Runtime data
+# =========================
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# =========================
+# Dependency directories
+# =========================
+node_modules/
+
+# =========================
+# Firebase / Google Cloud
+# =========================
+.firebase/
+.firebaserc.local
+
+# Local credentials / secrets
+serviceAccountKey.json
+*.pem
+*.key
+
+# =========================
+# Environment files
+# =========================
+.env
+.env.*
+!.env.example
+
+# =========================
+# Build / test / cache
+# =========================
+dist/
+build/
+coverage/
+.cache/
+.parcel-cache/
+.tmp/
+.temp/
+.eslintcache
+
+# =========================
+# Framework / tooling outputs
+# =========================
+.next/
+.nuxt/
+.svelte-kit/
+vite.svg
+
+# =========================
+# OS files
+# =========================
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# =========================
+# Editor / IDE
+# =========================
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp
+*.swo
+
+# =========================
+# Local override files
+# =========================
+*.local
+
+# =========================
+# Optional archives
+# =========================
+*.zip
+*.tar
+*.gz
