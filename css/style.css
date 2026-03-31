@@ -808,6 +808,12 @@ select:focus {
 }
 @media (min-width: 1200px) {
   .trip-column {
-    margin-left: -12px;
+    width: 320px;
+    justify-self: start;
+  }
+
+  .trip-panel {
+    width: 320px;
+    max-width: 320px;
   }
 }
