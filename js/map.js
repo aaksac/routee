@@ -863,7 +863,6 @@ function initPlaceSearch(inputElement, onPlaceSelected) {
         searchService.getPlacePredictions(
           {
             input: query,
-            componentRestrictions: { country: "tr" },
             bounds: map.getBounds() || undefined,
             sessionToken
           },
