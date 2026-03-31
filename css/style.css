@@ -690,8 +690,8 @@ select:focus {
 }
 
 .new-map-btn-icon svg {
-  width: 20px;
-  height: 20px;
+  width: 18px;
+  height: 18px;
   display: block;
   stroke: currentColor;
   stroke-width: 1.8;
