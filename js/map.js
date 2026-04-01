@@ -584,7 +584,7 @@ function enableMapClickPicker(callback) {
     callback({
       lat,
       lng,
-      name: ""
+      name: "İşaretli konum"
     });
   });
 }
