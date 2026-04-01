@@ -910,7 +910,7 @@ if (!searchBlurHandlerBound) {
   });
 
   searchBlurHandlerBound = true;
-}
+  }
 }
 
 export {
