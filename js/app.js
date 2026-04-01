@@ -939,11 +939,32 @@ function closeMapMenu() {
   elements.mapMenu?.classList.add("hidden");
 }
 
+function resetPageZoomAfterPanelClose() {
+  const activeEl = document.activeElement;
+
+  if (activeEl && typeof activeEl.blur === "function") {
+    activeEl.blur();
+  }
+
+  const viewportMeta = document.querySelector('meta[name="viewport"]');
+  if (!viewportMeta) return;
+
+  const originalContent = viewportMeta.getAttribute("content") || "";
+
+  viewportMeta.setAttribute(
+    "content",
+    "width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
+  );
+
+  window.setTimeout(() => {
+    viewportMeta.setAttribute("content", originalContent);
+  }, 260);
+}
+
 function toggleMapMenu(forceValue) {
   state.mapMenuOpen = typeof forceValue === "boolean" ? forceValue : !state.mapMenuOpen;
   elements.mapMenu?.classList.toggle("hidden", !state.mapMenuOpen);
 }
-
 function closeFloatingPanels() {
   [elements.startPanel, elements.pointPanel, elements.savePanel, elements.importExportPanel].forEach((panel) => {
     panel?.classList.add("hidden");
