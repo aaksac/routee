@@ -367,7 +367,6 @@
     font-size: 0.73rem;
   }
 
-  /* Sadece istenen özellik: panel açılınca arka plan bulanık, panel ortada, üst butonlar gizli */
   body:has(#startPanel:not(.hidden))::before,
   body:has(#pointPanel:not(.hidden))::before,
   body:has(#savePanel:not(.hidden))::before,
@@ -375,18 +374,21 @@
     content: "";
     position: fixed;
     inset: 0;
-    background: rgba(15, 23, 42, 0.32);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    z-index: 1100;
+    background: rgba(15, 23, 42, 0.28);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    z-index: 1190;
+    pointer-events: none;
   }
 
-  body:has(#startPanel:not(.hidden)) .top-left .compact-buttons,
-  body:has(#pointPanel:not(.hidden)) .top-left .compact-buttons,
+  body:has(#startPanel:not(.hidden)) .top-left,
+  body:has(#pointPanel:not(.hidden)) .top-left,
   body:has(#savePanel:not(.hidden)) .top-left,
   body:has(#importExportPanel:not(.hidden)) .top-left,
-  body:has(#savePanel:not(.hidden)) .top-right .right-tools,
-  body:has(#importExportPanel:not(.hidden)) .top-right .right-tools,
+  body:has(#startPanel:not(.hidden)) .top-right,
+  body:has(#pointPanel:not(.hidden)) .top-right,
+  body:has(#savePanel:not(.hidden)) .top-right,
+  body:has(#importExportPanel:not(.hidden)) .top-right,
   body:has(#startPanel:not(.hidden)) .bottom-left,
   body:has(#pointPanel:not(.hidden)) .bottom-left,
   body:has(#savePanel:not(.hidden)) .bottom-left,
@@ -395,7 +397,9 @@
   body:has(#pointPanel:not(.hidden)) .floating-menu,
   body:has(#savePanel:not(.hidden)) .floating-menu,
   body:has(#importExportPanel:not(.hidden)) .floating-menu {
-    display: none !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
   }
 
   #startPanel:not(.hidden),
@@ -419,6 +423,10 @@
     border: 1px solid rgba(219, 228, 240, 0.98) !important;
     box-shadow: 0 24px 60px rgba(15, 23, 42, 0.18) !important;
     z-index: 1202 !important;
+    isolation: isolate !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    filter: none !important;
   }
 
   #startPanel .card-title-row,
@@ -539,6 +547,7 @@
     min-height: 38px;
     padding: 8px 10px;
     font-size: 0.76rem;
+    border-radius: 14px;
   }
 
   #startPanel,
