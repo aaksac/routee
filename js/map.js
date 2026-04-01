@@ -901,15 +901,21 @@ function initPlaceSearch(inputElement, onPlaceSelected) {
     searchFocusHandlerBound = true;
   }
 
-  if (!searchBlurHandlerBound) {
-    inputElement.addEventListener("blur", () => {
-      window.setTimeout(() => {
-        hideSearchDropdown();
-      }, 180);
-    });
+if (!searchBlurHandlerBound) {
+  inputElement.addEventListener("blur", () => {
+    const query = inputElement.value.trim();
 
-    searchBlurHandlerBound = true;
-  }
+    window.setTimeout(() => {
+      hideSearchDropdown();
+
+      if (!query) {
+        resetPageZoomAfterSearch();
+      }
+    }, 180);
+  });
+
+  searchBlurHandlerBound = true;
+}
 
   if (!searchSelectHandlerBound) {
     document.addEventListener("click", (event) => {
