@@ -367,13 +367,14 @@ body.has-mobile-floating-panel .bottom-left {
     justify-self: start;
   }
 
-  .tiny-btn {
-    min-height: 30px !important;
-    padding: 5px 9px !important;
-    font-size: 0.72rem !important;
-    border-radius: 999px !important;
-    white-space: nowrap !important;
-  }
+.tiny-btn {
+  min-height: 34px !important;
+  height: 34px !important;
+  padding: 6px 11px !important;
+  font-size: 0.78rem !important;
+  border-radius: 999px !important;
+  white-space: nowrap !important;
+}
 
   .desktop-only-inline {
     display: none !important;
