@@ -2,7 +2,7 @@
 <html lang="tr">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>Rota Planlayıcı</title>
   <meta name="theme-color" content="#0f172a" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -68,8 +68,7 @@
                   <label for="startName">İsim</label>
                   <input id="startName" type="text" placeholder="Başlangıç adı" />
                 </div>
-                <div class="location-selection-status" id="startSelectionStatus" aria-live="polite">Konum seçilmedi</div>
-                <div class="field-row coordinate-row">
+                <div class="field-row">
                   <div class="field-group">
                     <label for="startLat">Enlem</label>
                     <input id="startLat" type="number" step="any" placeholder="37.0000" />
@@ -93,8 +92,7 @@
                   <label for="pointName">Konum Adı</label>
                   <input id="pointName" type="text" placeholder="Örn. Müşteri A" />
                 </div>
-                <div class="location-selection-status" id="pointSelectionStatus" aria-live="polite">Konum seçilmedi</div>
-                <div class="field-row coordinate-row">
+                <div class="field-row">
                   <div class="field-group">
                     <label for="pointLat">Enlem</label>
                     <input id="pointLat" type="number" step="any" placeholder="37.0100" />
@@ -205,60 +203,70 @@
                       <path d="M4 6.5L8.5 4.5L15.5 6.5L20 4.5V17.5L15.5 19.5L8.5 17.5L4 19.5V6.5Z"></path>
                       <path d="M8.5 4.5V17.5"></path>
                       <path d="M15.5 6.5V19.5"></path>
+                      <path d="M18.25 8.25V14.25"></path>
+                      <path d="M15.25 11.25H21.25"></path>
                     </svg>
                   </span>
-                  <span class="new-map-btn-text">Yeni Harita</span>
+                  <span>Yeni harita</span>
                 </button>
               </div>
             </div>
           </div>
         </section>
 
-        <aside class="trip-panel" id="tripPanel">
-          <div class="trip-panel-header">
-            <div>
-              <h2>Gezi Listesi</h2>
-              <p>Rotandaki noktaları sırala, kaydet ve düzenle.</p>
+        <aside class="trip-column open" id="tripPanel">
+          <section class="trip-panel">
+            <div class="trip-panel-header">
+              <div>
+                <h2>Gezi Listesi</h2>
+              </div>
             </div>
-            <div class="trip-panel-actions">
-              <button class="ghost-btn mobile-close-btn" id="btnCloseTripPanel" type="button">Kapat</button>
+            <div id="tripList" class="trip-list">
+              <div class="trip-item start">
+                <div class="trip-order">S</div>
+                <div class="trip-content">
+                  <strong>Başlangıç</strong>
+                  <span>Henüz eklenmedi</span>
+                </div>
+                <button class="tiny-btn" type="button" disabled>Yol Tarifi Al</button>
+              </div>
             </div>
-          </div>
-
-          <div class="summary-grid">
-            <div class="summary-card">
-              <span>Toplam Nokta</span>
-              <strong id="totalPoints">0</strong>
-            </div>
-            <div class="summary-card">
-              <span>Toplam Mesafe</span>
-              <strong id="totalDistance">0.00 km</strong>
-            </div>
-          </div>
-
-          <section class="trip-list" id="tripList"></section>
+          </section>
         </aside>
       </main>
-    </div>
 
-    <div class="saved-maps-overlay hidden" id="savedMapsOverlay">
-      <div class="saved-maps-backdrop" id="savedMapsBackdrop"></div>
-      <div class="saved-maps-sheet">
-        <div class="saved-maps-header">
-          <div>
-            <h2>Harita Listelerim</h2>
-            <p>Kayıtlı haritalarınızı açın, silin veya yeni harita oluşturun.</p>
+      <div class="screen-overlay hidden" id="savedMapsOverlay">
+        <div class="screen-overlay-backdrop" id="savedMapsBackdrop"></div>
+        <section class="screen-overlay-panel">
+          <div class="card-title-row large-gap">
+            <div>
+              <h2>Harita Listelerim</h2>
+              <p>Kayıtlı haritalarınızı buradan seçebilirsiniz.</p>
+            </div>
+            <div class="panel-actions">
+              <button class="small-btn" id="btnNewMap" type="button">+ Yeni</button>
+              <button class="small-btn" id="btnCloseMapListPanel" type="button">Kapat</button>
+            </div>
           </div>
-          <div class="saved-maps-actions">
-            <button class="ghost-btn" id="btnNewMapMobile" type="button">Yeni Harita</button>
-            <button class="ghost-btn" id="btnCloseMapListPanel" type="button">Kapat</button>
-          </div>
-        </div>
-        <div class="map-list" id="mapList"></div>
+          <div id="mapList" class="map-list"></div>
+        </section>
       </div>
     </div>
 
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDGkLf87uoMqf2L8L3RKbS4Mk2eA4viVQs&libraries=places"></script>
+    <button class="new-map-mobile-fab" id="btnNewMapMobile" type="button" aria-label="Yeni harita oluştur" title="Yeni harita oluştur">
+      <span class="new-map-btn-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24">
+          <path d="M4 6.5L8.5 4.5L15.5 6.5L20 4.5V17.5L15.5 19.5L8.5 17.5L4 19.5V6.5Z"></path>
+          <path d="M8.5 4.5V17.5"></path>
+          <path d="M15.5 6.5V19.5"></path>
+          <path d="M18.25 8.25V14.25"></path>
+          <path d="M15.25 11.25H21.25"></path>
+        </svg>
+      </span>
+    </button>
+
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCtdGc1qLohM2cDIt2GGyGaT5tS4wF8hfM&libraries=places"></script>
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
     <script type="module" src="./js/app.js"></script>
   </body>
 </html>
