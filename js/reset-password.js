@@ -15,7 +15,8 @@ const elements = {
 const params = new URLSearchParams(window.location.search);
 const mode = params.get("mode");
 const actionCode = params.get("oobCode");
-const continueUrl = params.get("continueUrl") || "./index.html?reset=success";
+const DEFAULT_CONTINUE_URL = "./index.html?reset=success";
+const continueUrl = getSafeContinueUrl(params.get("continueUrl"));
 
 function setMessage(message, type = "info") {
   elements.resetInfo.textContent = message;
@@ -32,6 +33,22 @@ function setMessage(message, type = "info") {
 
 function isValidPassword(password) {
   return typeof password === "string" && password.length >= 6;
+}
+
+function getSafeContinueUrl(rawUrl) {
+  if (!rawUrl) return DEFAULT_CONTINUE_URL;
+
+  try {
+    const targetUrl = new URL(rawUrl, window.location.origin);
+
+    if (targetUrl.origin !== window.location.origin) {
+      return DEFAULT_CONTINUE_URL;
+    }
+
+    return `${targetUrl.pathname}${targetUrl.search}${targetUrl.hash}`;
+  } catch (error) {
+    return DEFAULT_CONTINUE_URL;
+  }
 }
 
 async function validateLink() {
