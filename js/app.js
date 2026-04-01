@@ -10,19 +10,23 @@ import {
   TRIAL_LOCATION_QUOTA,
   TRIAL_MAP_ID
 } from "./firestore.js";
-import {
+export {
   initMap,
+  getMap,
   addMarker,
   clearMarkers,
   showStartMarker,
   clearStartMarker,
+  focusToLocation,
+  focusMapToPoints,
+  showCurrentLocationMarker,
   enableMapClickPicker,
   initPlaceSearch,
   clearDraftMarker,
   clearRouteLines,
   drawRouteSegments,
-  focusMapToPoints
-} from "./map.js";
+  resetPageZoomAfterSearch
+};
 import { locateAndShowUser } from "./location.js";
 import { nearestNeighborRoute } from "./route.js";
 import {
