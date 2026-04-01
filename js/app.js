@@ -814,13 +814,13 @@ async function handleCsvFileChange(event) {
   if (!file) return;
 
   try {
-const rows = await importFromCsvFile(file);
-const { startPoint, points } = convertImportedRowsToState(rows);
-const applied = applyImportedData(startPoint, points);
-if (!applied) return;
-state.selectedMapId = null;
-focusMapToPoints(startPoint, points);
-elements.authStatus.textContent = "CSV içe aktarıldı.";
+    const rows = await importFromCsvFile(file);
+    const { startPoint, points } = convertImportedRowsToState(rows);
+    const applied = applyImportedData(startPoint, points);
+    if (!applied) return;
+    state.selectedMapId = null;
+    focusMapToPoints(startPoint, points);
+    elements.authStatus.textContent = "CSV içe aktarıldı.";
     closeFloatingPanels();
   } catch (error) {
     elements.authStatus.textContent = `CSV içe aktarma hatası: ${error.message}`;
@@ -834,13 +834,13 @@ async function handleXlsxFileChange(event) {
   if (!file) return;
 
   try {
-const rows = await importFromXlsxFile(file);
-const { startPoint, points } = convertImportedRowsToState(rows);
-const applied = applyImportedData(startPoint, points);
-if (!applied) return;
-state.selectedMapId = null;
-focusMapToPoints(startPoint, points);
-elements.authStatus.textContent = "XLSX içe aktarıldı.";
+    const rows = await importFromXlsxFile(file);
+    const { startPoint, points } = convertImportedRowsToState(rows);
+    const applied = applyImportedData(startPoint, points);
+    if (!applied) return;
+    state.selectedMapId = null;
+    focusMapToPoints(startPoint, points);
+    elements.authStatus.textContent = "XLSX içe aktarıldı.";
     closeFloatingPanels();
   } catch (error) {
     elements.authStatus.textContent = `XLSX içe aktarma hatası: ${error.message}`;
@@ -942,6 +942,16 @@ function handleTripListClick(event) {
 function closeMapMenu() {
   state.mapMenuOpen = false;
   elements.mapMenu?.classList.add("hidden");
+}
+
+function hasDraftCoordinates() {
+  const hasStartCoords =
+    elements.startLat?.value.trim() && elements.startLng?.value.trim();
+
+  const hasPointCoords =
+    elements.pointLat?.value.trim() && elements.pointLng?.value.trim();
+
+  return Boolean(hasStartCoords || hasPointCoords);
 }
 
 function syncMobilePanelState() {
@@ -1091,8 +1101,24 @@ function bindEvents() {
   });
   elements.btnLogoutTop?.addEventListener("click", handleLogout);
 
-  elements.btnOpenStartPanel?.addEventListener("click", () => openFloatingPanel("start"));
-  elements.btnOpenPointPanel?.addEventListener("click", () => openFloatingPanel("point"));
+  elements.btnOpenStartPanel?.addEventListener("click", () => {
+    if (window.innerWidth <= 720 && !hasDraftCoordinates()) {
+      alert("Önce konum seçiniz.");
+      return;
+    }
+
+    openFloatingPanel("start");
+  });
+
+  elements.btnOpenPointPanel?.addEventListener("click", () => {
+    if (window.innerWidth <= 720 && !hasDraftCoordinates()) {
+      alert("Önce konum seçiniz.");
+      return;
+    }
+
+    openFloatingPanel("point");
+  });
+
   elements.btnCloseStartPanel?.addEventListener("click", closeFloatingPanels);
   elements.btnClosePointPanel?.addEventListener("click", closeFloatingPanels);
   elements.btnToggleMenu?.addEventListener("click", () => toggleMapMenu());
