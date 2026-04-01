@@ -296,11 +296,15 @@ body.has-mobile-floating-panel .bottom-left {
     flex: 0 0 32px !important;
   }
 
-  .summary-grid,
-  .map-list-row {
-    grid-template-columns: 1fr;
-  }
+.summary-grid {
+  grid-template-columns: 1fr;
+}
 
+.map-list-row {
+  grid-template-columns: minmax(0, 1fr) auto !important;
+  align-items: center !important;
+  gap: 8px !important;
+}
   .summary-card {
     padding: 8px 9px;
     border-radius: 10px;
