@@ -283,6 +283,7 @@ function commitStartPoint() {
   recomputeRoute();
   markDirty();
   elements.authStatus.textContent = `Başlangıç eklendi: ${startPoint.name}`;
+  closeFloatingPanels();
 }
 
 function clearStartPoint() {
