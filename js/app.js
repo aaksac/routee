@@ -821,6 +821,7 @@ if (!applied) return;
 state.selectedMapId = null;
 focusMapToPoints(startPoint, points);
 elements.authStatus.textContent = "CSV içe aktarıldı.";
+    closeFloatingPanels();
   } catch (error) {
     elements.authStatus.textContent = `CSV içe aktarma hatası: ${error.message}`;
   } finally {
@@ -840,6 +841,7 @@ if (!applied) return;
 state.selectedMapId = null;
 focusMapToPoints(startPoint, points);
 elements.authStatus.textContent = "XLSX içe aktarıldı.";
+    closeFloatingPanels();
   } catch (error) {
     elements.authStatus.textContent = `XLSX içe aktarma hatası: ${error.message}`;
   } finally {
