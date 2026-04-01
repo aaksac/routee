@@ -556,6 +556,7 @@ function applyImportedData(startPoint, points) {
 
   clearPointForm();
   recomputeRoute();
+  focusMapToPoints(startPoint, points);
   markDirty();
   return true;
 }
