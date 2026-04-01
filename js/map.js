@@ -352,7 +352,22 @@ function focusToLocation(lat, lng, zoom = 15) {
 
 function resetPageZoomAfterSearch() {
   if (!searchInputEl) return;
+
   searchInputEl.blur();
+
+  const viewportMeta = document.querySelector('meta[name="viewport"]');
+  if (!viewportMeta) return;
+
+  const originalContent = viewportMeta.getAttribute("content") || "";
+
+  viewportMeta.setAttribute(
+    "content",
+    "width=device-width, initial-scale=1, maximum-scale=1"
+  );
+
+  window.setTimeout(() => {
+    viewportMeta.setAttribute("content", originalContent);
+  }, 250);
 }
 
 function focusMapToPoints(startPoint, points = []) {
@@ -584,7 +599,7 @@ function enableMapClickPicker(callback) {
     callback({
       lat,
       lng,
-      name: "İşaretli konum"
+      name: ""
     });
   });
 }
