@@ -893,7 +893,6 @@ function initPlaceSearch(inputElement, onPlaceSelected) {
   if (!searchFocusHandlerBound) {
     inputElement.addEventListener("focus", () => {
       const query = inputElement.value.trim();
-
       if (query.length >= MIN_SEARCH_LENGTH && currentPredictions.length) {
         searchDropdown.style.display = "block";
       }
@@ -904,14 +903,8 @@ function initPlaceSearch(inputElement, onPlaceSelected) {
 
   if (!searchBlurHandlerBound) {
     inputElement.addEventListener("blur", () => {
-      const query = inputElement.value.trim();
-
       window.setTimeout(() => {
         hideSearchDropdown();
-
-        if (!query) {
-          resetPageZoomAfterSearch();
-        }
       }, 180);
     });
 
@@ -927,10 +920,6 @@ function initPlaceSearch(inputElement, onPlaceSelected) {
 
       if (!clickedInsideDropdown && !clickedInput) {
         hideSearchDropdown();
-
-        if (!(searchInputEl.value || "").trim()) {
-          resetPageZoomAfterSearch();
-        }
       }
     });
 
@@ -952,6 +941,5 @@ export {
   initPlaceSearch,
   clearDraftMarker,
   clearRouteLines,
-  drawRouteSegments,
-  resetPageZoomAfterSearch
+  drawRouteSegments
 };
