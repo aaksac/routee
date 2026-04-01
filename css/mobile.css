@@ -166,13 +166,17 @@
   }
 
   /* Açık panel varken butonlar gizlensin */
-  body.has-mobile-floating-panel .top-left .compact-buttons,
-  body.has-mobile-floating-panel .menu-wrapper,
-  body.has-mobile-floating-panel #placeSearch {
-    opacity: 0;
-    pointer-events: none;
-  }
+body.has-mobile-floating-panel .top-left .compact-buttons,
+body.has-mobile-floating-panel .menu-wrapper,
+body.has-mobile-floating-panel #placeSearch {
+  opacity: 0;
+  pointer-events: none;
+}
 
+body.has-mobile-floating-panel .bottom-left {
+  opacity: 0;
+  pointer-events: none;
+}
   body[data-mobile-panel="start"] #startPanel,
   body[data-mobile-panel="point"] #pointPanel,
   body[data-mobile-panel="save"] #savePanel,
