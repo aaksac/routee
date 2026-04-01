@@ -376,7 +376,7 @@ function renderTripList() {
           <strong>Başlangıç</strong>
           <span>Henüz eklenmedi</span>
         </div>
-        <button class="tiny-btn" type="button" disabled>Yol Tarifi Al</button>
+        <button class="tiny-btn" type="button" disabled>Yol Tarifi</button>
       </div>
     `;
 
