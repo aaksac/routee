@@ -46,10 +46,22 @@ function exportToCsv(filename, startPoint, points) {
 }
 
 function escapeCsvValue(value) {
-  const str = String(value ?? "");
+  const str = sanitizeCsvCell(value);
+
   if (str.includes(",") || str.includes('"') || str.includes("\n")) {
     return `"${str.replace(/"/g, '""')}"`;
   }
+
+  return str;
+}
+
+function sanitizeCsvCell(value) {
+  const str = String(value ?? "");
+
+  if (/^[=+\-@]/.test(str)) {
+    return `'${str}`;
+  }
+
   return str;
 }
 
