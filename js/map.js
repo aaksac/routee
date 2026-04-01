@@ -901,30 +901,16 @@ function initPlaceSearch(inputElement, onPlaceSelected) {
     searchFocusHandlerBound = true;
   }
 
-  if (!searchBlurHandlerBound) {
-    inputElement.addEventListener("blur", () => {
-      window.setTimeout(() => {
-        hideSearchDropdown();
-      }, 180);
-    });
+if (!searchBlurHandlerBound) {
+  inputElement.addEventListener("blur", () => {
+    window.setTimeout(() => {
+      hideSearchDropdown();
+      resetPageZoomAfterSearch();
+    }, 180);
+  });
 
-    searchBlurHandlerBound = true;
-  }
-
-  if (!searchSelectHandlerBound) {
-    document.addEventListener("click", (event) => {
-      if (!searchDropdown || !searchInputEl) return;
-
-      const clickedInsideDropdown = searchDropdown.contains(event.target);
-      const clickedInput = searchInputEl === event.target;
-
-      if (!clickedInsideDropdown && !clickedInput) {
-        hideSearchDropdown();
-      }
-    });
-
-    searchSelectHandlerBound = true;
-  }
+  searchBlurHandlerBound = true;
+}
 }
 
 export {
