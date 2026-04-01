@@ -10,23 +10,20 @@ import {
   TRIAL_LOCATION_QUOTA,
   TRIAL_MAP_ID
 } from "./firestore.js";
-export {
+import {
   initMap,
-  getMap,
   addMarker,
   clearMarkers,
   showStartMarker,
   clearStartMarker,
-  focusToLocation,
-  focusMapToPoints,
-  showCurrentLocationMarker,
   enableMapClickPicker,
   initPlaceSearch,
   clearDraftMarker,
   clearRouteLines,
   drawRouteSegments,
+  focusMapToPoints,
   resetPageZoomAfterSearch
-};
+} from "./map.js";
 import { locateAndShowUser } from "./location.js";
 import { nearestNeighborRoute } from "./route.js";
 import {
@@ -1088,7 +1085,17 @@ function bindEvents() {
   elements.btnOpenSavePanel?.addEventListener("click", () => openFloatingPanel("save"));
   elements.btnOpenImportExportPanel?.addEventListener("click", () => openFloatingPanel("importExport"));
   elements.btnOpenMapListPanel?.addEventListener("click", openSavedMapsOverlay);
-  elements.btnCloseSavePanel?.addEventListener("click", closeFloatingPanels);
+
+  elements.btnCloseSavePanel?.addEventListener("click", () => {
+    const mapName = elements.mapName?.value.trim() || "";
+
+    closeFloatingPanels();
+
+    if (!mapName) {
+      resetPageZoomAfterSearch();
+    }
+  });
+
   elements.btnCloseImportExportPanel?.addEventListener("click", closeFloatingPanels);
   elements.btnCloseMapListPanel?.addEventListener("click", closeSavedMapsOverlay);
   elements.savedMapsBackdrop?.addEventListener("click", closeSavedMapsOverlay);
