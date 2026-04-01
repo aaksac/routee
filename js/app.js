@@ -21,8 +21,7 @@ import {
   clearDraftMarker,
   clearRouteLines,
   drawRouteSegments,
-  focusMapToPoints,
-  resetPageZoomAfterSearch
+  focusMapToPoints
 } from "./map.js";
 import { locateAndShowUser } from "./location.js";
 import { nearestNeighborRoute } from "./route.js";
@@ -557,7 +556,6 @@ function applyImportedData(startPoint, points) {
 
   clearPointForm();
   recomputeRoute();
-  focusMapToPoints(startPoint, points);
   markDirty();
   return true;
 }
@@ -1085,17 +1083,7 @@ function bindEvents() {
   elements.btnOpenSavePanel?.addEventListener("click", () => openFloatingPanel("save"));
   elements.btnOpenImportExportPanel?.addEventListener("click", () => openFloatingPanel("importExport"));
   elements.btnOpenMapListPanel?.addEventListener("click", openSavedMapsOverlay);
-
-  elements.btnCloseSavePanel?.addEventListener("click", () => {
-    const mapName = elements.mapName?.value.trim() || "";
-
-    closeFloatingPanels();
-
-    if (!mapName) {
-      resetPageZoomAfterSearch();
-    }
-  });
-
+  elements.btnCloseSavePanel?.addEventListener("click", closeFloatingPanels);
   elements.btnCloseImportExportPanel?.addEventListener("click", closeFloatingPanels);
   elements.btnCloseMapListPanel?.addEventListener("click", closeSavedMapsOverlay);
   elements.savedMapsBackdrop?.addEventListener("click", closeSavedMapsOverlay);
