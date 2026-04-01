@@ -970,6 +970,7 @@ function closeFloatingPanels() {
     panel?.classList.add("hidden");
   });
   state.activeFloatingPanel = null;
+  resetPageZoomAfterPanelClose();
 }
 
 function openFloatingPanel(panelName) {
