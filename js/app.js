@@ -105,7 +105,9 @@ const elements = {
   startPanel: document.getElementById("startPanel"),
   pointPanel: document.getElementById("pointPanel"),
   savePanel: document.getElementById("savePanel"),
-  importExportPanel: document.getElementById("importExportPanel")
+  importExportPanel: document.getElementById("importExportPanel"),
+  startSelectionStatus: document.getElementById("startSelectionStatus"),
+  pointSelectionStatus: document.getElementById("pointSelectionStatus")
 };
 
 function goToLogin() {
@@ -134,6 +136,24 @@ function escapeHtml(value) {
 
 function markDirty() {
   state.hasUnsavedChanges = true;
+}
+
+function setSelectionStatus(element, isSelected) {
+  if (!element) return;
+  element.textContent = isSelected ? "Konum seçildi" : "Konum seçilmedi";
+  element.classList.toggle("is-selected", isSelected);
+}
+
+function updateSelectionStatuses() {
+  const startSelected = Boolean(
+    elements.startLat?.value.trim() && elements.startLng?.value.trim()
+  );
+  const pointSelected = Boolean(
+    elements.pointLat?.value.trim() && elements.pointLng?.value.trim()
+  );
+
+  setSelectionStatus(elements.startSelectionStatus, startSelected);
+  setSelectionStatus(elements.pointSelectionStatus, pointSelected);
 }
 
 function markClean() {
@@ -240,12 +260,14 @@ function setStartForm(startPoint) {
     elements.startName.value = "";
     elements.startLat.value = "";
     elements.startLng.value = "";
+    updateSelectionStatuses();
     return;
   }
 
   elements.startName.value = startPoint.name || "";
   elements.startLat.value = Number(startPoint.lat).toFixed(6);
   elements.startLng.value = Number(startPoint.lng).toFixed(6);
+  updateSelectionStatuses();
 }
 
 function commitStartPoint() {
@@ -306,6 +328,8 @@ function fillStartFormFromMap(lat, lng, suggestedName = "") {
   } else if (!elements.startName.value.trim()) {
     elements.startName.value = "Başlangıç";
   }
+
+  updateSelectionStatuses();
 }
 
 function fillPointFormFromMap(lat, lng, suggestedName = "") {
@@ -314,12 +338,15 @@ function fillPointFormFromMap(lat, lng, suggestedName = "") {
 
   if (suggestedName) {
     elements.pointName.value = suggestedName;
+    updateSelectionStatuses();
     return;
   }
 
   if (!elements.pointName.value.trim()) {
     elements.pointName.value = `Nokta ${state.points.length + 1}`;
   }
+
+  updateSelectionStatuses();
 }
 
 function fillBothFormsFromMap(lat, lng, suggestedName = "") {
@@ -356,51 +383,106 @@ function renderSummary() {
 function renderTripList() {
   const startHtml = state.startPoint
     ? `
-      <div class="trip-item start">
-        <div class="trip-order">S</div>
-        <div class="trip-content">
-          <strong>${escapeHtml(state.startPoint.name)}</strong>
-          <span>Önceki mesafe: —</span>
-        </div>
-        <div style="display:flex; gap:8px; align-items:center;">
-          <button class="tiny-btn" type="button" data-action="directions-start">Yol Tarifi Al</button>
-          <button class="tiny-btn" type="button" data-action="delete-start">Sil</button>
+      <div class="trip-card start-card">
+        <div class="trip-card-head">
+          <div>
+            <div class="trip-badge">Başlangıç</div>
+            <h3>${escapeHtml(state.startPoint.name)}</h3>
+            <p>${Number(state.startPoint.lat).toFixed(6)}, ${Number(state.startPoint.lng).toFixed(6)}</p>
+          </div>
+          <div class="trip-card-actions">
+            <button class="tiny-btn" type="button" data-action="directions-start">Yol Tarifi</button>
+            <button class="tiny-btn danger-outline" type="button" data-action="delete-start">Sil</button>
+          </div>
         </div>
       </div>
     `
     : `
-      <div class="trip-item start">
-        <div class="trip-order">S</div>
-        <div class="trip-content">
-          <strong>Başlangıç</strong>
-          <span>Henüz eklenmedi</span>
-        </div>
-        <button class="tiny-btn" type="button" disabled>Yol Tarifi Al</button>
+      <div class="trip-card empty-card">
+        <h3>Başlangıç noktası yok</h3>
+        <p>Rota oluşturmadan önce başlangıç eklemelisin.</p>
       </div>
     `;
 
-  const pointHtml = state.points
-    .map((point, index) => {
-      return `
-        <div class="trip-item">
-          <div class="trip-order">${index + 1}</div>
-          <div class="trip-content">
-            <strong>${escapeHtml(point.name)}</strong>
-            <span>Önceki mesafe: ${formatKm(point.distanceFromPrevious || 0)}</span>
+  const pointsHtml = state.points.length
+    ? state.points
+        .map(
+          (point, index) => `
+          <div class="trip-card">
+            <div class="trip-card-head">
+              <div>
+                <div class="trip-badge">Durak ${index + 1}</div>
+                <h3>${escapeHtml(point.name)}</h3>
+                <p>${Number(point.lat).toFixed(6)}, ${Number(point.lng).toFixed(6)}</p>
+              </div>
+              <div class="trip-card-actions">
+                <button class="tiny-btn" type="button" data-action="directions-point" data-id="${point.id}">Yol Tarifi</button>
+                <button class="tiny-btn danger-outline" type="button" data-action="delete-point" data-id="${point.id}">Sil</button>
+              </div>
+            </div>
+            <div class="trip-distance-row">
+              <span>Önceki noktaya uzaklık</span>
+              <strong>${formatKm(point.distanceFromPrevious || 0)}</strong>
+            </div>
           </div>
-          <div style="display:flex; gap:8px; align-items:center;">
-            <button class="tiny-btn" type="button" data-action="directions-point" data-id="${point.id}">Yol Tarifi Al</button>
-            <button class="tiny-btn" type="button" data-action="delete-point" data-id="${point.id}">Sil</button>
-          </div>
-        </div>
-      `;
-    })
-    .join("");
+        `
+        )
+        .join("")
+    : `
+      <div class="trip-card empty-card">
+        <h3>Henüz durak eklenmedi</h3>
+        <p>Haritadan seçim yaparak gezi listeni oluşturmaya başlayabilirsin.</p>
+      </div>
+    `;
 
-  elements.tripList.innerHTML = startHtml + pointHtml;
+  elements.tripList.innerHTML = `${startHtml}${pointsHtml}`;
 }
 
-function redrawPointMarkers() {
+function recomputeRoute() {
+  clearRouteLines();
+
+  if (!state.startPoint || !state.points.length) {
+    state.totalDistance = 0;
+
+    clearMarkers();
+
+    state.points.forEach((point, index) => {
+      addMarker({
+        lat: point.lat,
+        lng: point.lng,
+        title: point.name,
+        label: String(index + 1),
+        pointData: point,
+        onClick: fillPointFormFromMarker
+      });
+    });
+
+    if (state.startPoint) {
+      showStartMarker({
+        lat: state.startPoint.lat,
+        lng: state.startPoint.lng,
+        title: state.startPoint.name,
+        pointData: {
+          ...state.startPoint,
+          orderLabel: "S"
+        },
+        onClick: fillPointFormFromMarker
+      });
+    }
+
+    renderSummary();
+    renderTripList();
+    return;
+  }
+
+  const route = nearestNeighborRoute(state.startPoint, state.points);
+
+  state.points = route.orderedPoints.map((point, index) => ({
+    ...point,
+    distanceFromPrevious: route.segmentDistances[index] || 0
+  }));
+  state.totalDistance = route.totalDistance;
+
   clearMarkers();
 
   state.points.forEach((point, index) => {
@@ -409,50 +491,27 @@ function redrawPointMarkers() {
       lng: point.lng,
       title: point.name,
       label: String(index + 1),
-      pointData: {
-        ...point,
-        orderLabel: String(index + 1)
-      },
+      pointData: point,
       onClick: fillPointFormFromMarker
     });
   });
-}
 
-function recomputeRoute() {
-  if (!state.startPoint) {
-    state.totalDistance = 0;
-    clearRouteLines();
-    renderSummary();
-    renderTripList();
-    redrawPointMarkers();
-    return;
+  if (state.startPoint) {
+    showStartMarker({
+      lat: state.startPoint.lat,
+      lng: state.startPoint.lng,
+      title: state.startPoint.name,
+      pointData: {
+        ...state.startPoint,
+        orderLabel: "S"
+      },
+      onClick: fillPointFormFromMarker
+    });
   }
 
-  if (!state.points.length) {
-    state.totalDistance = 0;
-    clearRouteLines();
-    renderSummary();
-    renderTripList();
-    redrawPointMarkers();
-    return;
-  }
-
-  const result = nearestNeighborRoute(state.startPoint, state.points);
-
-  state.points = result.orderedPoints;
-  state.totalDistance = result.totalDistance;
-
-  redrawPointMarkers();
   drawRouteSegments(state.startPoint, state.points);
   renderSummary();
   renderTripList();
-}
-
-function toggleTripPanel(forceValue) {
-  state.tripPanelOpen =
-    typeof forceValue === "boolean" ? forceValue : !state.tripPanelOpen;
-
-  elements.tripPanel.classList.toggle("hidden", !state.tripPanelOpen);
 }
 
 function clearPointForm() {
@@ -460,6 +519,7 @@ function clearPointForm() {
   elements.pointLat.value = "";
   elements.pointLng.value = "";
   state.editingPointId = null;
+  updateSelectionStatuses();
 }
 
 function addOrUpdatePoint() {
@@ -469,45 +529,47 @@ function addOrUpdatePoint() {
   }
 
   const name = elements.pointName.value.trim();
-  const lat = elements.pointLat.value.trim();
-  const lng = elements.pointLng.value.trim();
+  const lat = Number(elements.pointLat.value);
+  const lng = Number(elements.pointLng.value);
 
-  if (!name || !lat || !lng) {
+  if (!name || Number.isNaN(lat) || Number.isNaN(lng)) {
     alert("Lütfen nokta adı, enlem ve boylam gir.");
     return;
   }
 
   if (!state.startPoint) {
-    alert("Önce başlangıç noktasını doldur ve Başlangıç Ekle butonuna bas.");
+    alert("Önce başlangıç noktası belirlemelisin.");
     return;
   }
 
-  const isNewPoint = !state.editingPointId;
-  if (isNewPoint && !canAddMoreLocations(1)) {
+  const addingNewPoint = !state.editingPointId;
+  if (addingNewPoint && !canAddMoreLocations(1)) {
     alert(`Başlangıç dahil en fazla ${state.locationQuota} konum eklenebilir.`);
     return;
   }
 
   if (state.editingPointId) {
     state.points = state.points.map((point) =>
-      point.id === state.editingPointId
+      String(point.id) === String(state.editingPointId)
         ? {
             ...point,
             name,
-            lat: Number(lat),
-            lng: Number(lng)
+            lat,
+            lng
           }
         : point
     );
+    elements.authStatus.textContent = `Nokta güncellendi: ${name}`;
   } else {
     state.points.push({
-      id: Date.now() + Math.random(),
+      id: `${Date.now()}-${Math.random().toString(16).slice(2)}`,
       name,
-      lat: Number(lat),
-      lng: Number(lng),
+      lat,
+      lng,
       distanceFromPrevious: 0,
       type: "point"
     });
+    elements.authStatus.textContent = `Nokta eklendi: ${name}`;
   }
 
   clearDraftMarker();
@@ -604,6 +666,7 @@ function resetMapEditor() {
   renderSummary();
   renderTripList();
   markClean();
+  updateSelectionStatuses();
   elements.authStatus.textContent = `Yeni harita oluşturuluyor. ${getAccessStatusText()}`;
 }
 
@@ -969,6 +1032,7 @@ function openFloatingPanel(panelName) {
   if (!isOpen) {
     panel.classList.remove("hidden");
     state.activeFloatingPanel = panelName;
+    updateSelectionStatuses();
   }
 }
 
@@ -1091,11 +1155,28 @@ function bindEvents() {
 
   elements.mapName?.addEventListener("input", markDirty);
   elements.startName?.addEventListener("input", markDirty);
-  elements.startLat?.addEventListener("input", markDirty);
-  elements.startLng?.addEventListener("input", markDirty);
+  elements.startLat?.addEventListener("input", () => {
+    markDirty();
+    updateSelectionStatuses();
+  });
+  elements.startLng?.addEventListener("input", () => {
+    markDirty();
+    updateSelectionStatuses();
+  });
   elements.pointName?.addEventListener("input", markDirty);
-  elements.pointLat?.addEventListener("input", markDirty);
-  elements.pointLng?.addEventListener("input", markDirty);
+  elements.pointLat?.addEventListener("input", () => {
+    markDirty();
+    updateSelectionStatuses();
+  });
+  elements.pointLng?.addEventListener("input", () => {
+    markDirty();
+    updateSelectionStatuses();
+  });
+}
+
+function toggleTripPanel(forceValue) {
+  state.tripPanelOpen = typeof forceValue === "boolean" ? forceValue : !state.tripPanelOpen;
+  elements.tripPanel?.classList.toggle("hidden", !state.tripPanelOpen);
 }
 
 function initMapClickPicker() {
@@ -1152,6 +1233,7 @@ function init() {
   renderSummary();
   renderTripList();
   bindEvents();
+  updateSelectionStatuses();
   initMobileTopbarAutoHide();
   initAuthWatcher();
 }
