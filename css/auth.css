@@ -125,3 +125,40 @@
     font-size: 1.1rem;
   }
 }
+
+.auth-standalone-card {
+  max-width: 460px;
+}
+
+.auth-info-box {
+  margin-bottom: 16px;
+  padding: 12px 14px;
+  border: 1px solid var(--auth-border);
+  border-radius: 14px;
+  background: #f8fafc;
+  color: var(--auth-text);
+  line-height: 1.5;
+}
+
+.auth-info-box.is-error {
+  background: #fff1f2;
+  border-color: #fecdd3;
+  color: #9f1239;
+}
+
+.auth-info-box.is-success {
+  background: #ecfdf5;
+  border-color: #bbf7d0;
+  color: #166534;
+}
+
+.auth-link-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+}
+
+.reset-form[hidden] {
+  display: none;
+}
