@@ -939,15 +939,32 @@ function closeMapMenu() {
   elements.mapMenu?.classList.add("hidden");
 }
 
+function blurActiveInput() {
+  const activeEl = document.activeElement;
+
+  if (
+    activeEl &&
+    (activeEl.tagName === "INPUT" ||
+      activeEl.tagName === "TEXTAREA" ||
+      activeEl.tagName === "SELECT") &&
+    typeof activeEl.blur === "function"
+  ) {
+    activeEl.blur();
+  }
+}
+
 function toggleMapMenu(forceValue) {
   state.mapMenuOpen = typeof forceValue === "boolean" ? forceValue : !state.mapMenuOpen;
   elements.mapMenu?.classList.toggle("hidden", !state.mapMenuOpen);
 }
 
 function closeFloatingPanels() {
+  blurActiveInput();
+
   [elements.startPanel, elements.pointPanel, elements.savePanel, elements.importExportPanel].forEach((panel) => {
     panel?.classList.add("hidden");
   });
+
   state.activeFloatingPanel = null;
 }
 
@@ -979,6 +996,7 @@ function openSavedMapsOverlay() {
 }
 
 function closeSavedMapsOverlay() {
+  blurActiveInput();
   elements.savedMapsOverlay?.classList.add("hidden");
 }
 
@@ -1077,6 +1095,14 @@ function bindEvents() {
 
   elements.btnOpenStartPanel?.addEventListener("click", () => openFloatingPanel("start"));
   elements.btnOpenPointPanel?.addEventListener("click", () => openFloatingPanel("point"));
+
+  elements.btnCloseStartPanel?.addEventListener("pointerdown", blurActiveInput);
+  elements.btnClosePointPanel?.addEventListener("pointerdown", blurActiveInput);
+  elements.btnCloseSavePanel?.addEventListener("pointerdown", blurActiveInput);
+  elements.btnCloseImportExportPanel?.addEventListener("pointerdown", blurActiveInput);
+  elements.btnCloseMapListPanel?.addEventListener("pointerdown", blurActiveInput);
+  elements.savedMapsBackdrop?.addEventListener("pointerdown", blurActiveInput);
+
   elements.btnCloseStartPanel?.addEventListener("click", closeFloatingPanels);
   elements.btnClosePointPanel?.addEventListener("click", closeFloatingPanels);
   elements.btnToggleMenu?.addEventListener("click", () => toggleMapMenu());
