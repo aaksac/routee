@@ -678,12 +678,12 @@ body.has-mobile-floating-panel .bottom-left {
     font-size: 0.76rem !important;
   }
 
-  .tiny-btn {
-    min-height: 28px !important;
-    height: 28px !important;
-    padding: 4px 8px !important;
-    font-size: 0.68rem !important;
-  }
+.tiny-btn {
+  min-height: 32px !important;
+  height: 32px !important;
+  padding: 5px 10px !important;
+  font-size: 0.75rem !important;
+}
 
   .screen-overlay-panel {
     width: calc(100vw - 12px) !important;
