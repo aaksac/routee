@@ -615,15 +615,16 @@ body.has-mobile-floating-panel .bottom-left {
     border-radius: 11px !important;
   }
 
-  #startPanel .small-btn,
-  #pointPanel .small-btn,
-  #savePanel .small-btn,
-  #importExportPanel .small-btn {
-    min-height: 38px !important;
-    height: 38px !important;
-    padding: 8px 13px !important;
-    font-size: 0.82rem !important;
-  }
+#startPanel .small-btn,
+#pointPanel .small-btn,
+#savePanel .small-btn,
+#importExportPanel .small-btn {
+  min-height: 44px !important;
+  height: 44px !important;
+  padding: 10px 16px !important;
+  font-size: 0.9rem !important;
+  border-radius: 999px !important;
+}
 
   #btnCloseStartPanel,
   #btnClosePointPanel,
