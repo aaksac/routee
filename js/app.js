@@ -438,7 +438,6 @@ function recomputeRoute() {
   }
 
   const result = nearestNeighborRoute(state.startPoint, state.points);
-
   state.points = result.orderedPoints;
   state.totalDistance = result.totalDistance;
 
@@ -939,6 +938,14 @@ function closeMapMenu() {
   elements.mapMenu?.classList.add("hidden");
 }
 
+function syncMobilePanelState() {
+  const isMobile = window.innerWidth <= 720;
+  const panelName = state.activeFloatingPanel || "";
+
+  document.body.classList.toggle("has-mobile-floating-panel", isMobile && Boolean(panelName));
+  document.body.dataset.mobilePanel = isMobile ? panelName : "";
+}
+
 function toggleMapMenu(forceValue) {
   state.mapMenuOpen = typeof forceValue === "boolean" ? forceValue : !state.mapMenuOpen;
   elements.mapMenu?.classList.toggle("hidden", !state.mapMenuOpen);
@@ -949,6 +956,7 @@ function closeFloatingPanels() {
     panel?.classList.add("hidden");
   });
   state.activeFloatingPanel = null;
+  syncMobilePanelState();
 }
 
 function openFloatingPanel(panelName) {
@@ -970,6 +978,8 @@ function openFloatingPanel(panelName) {
     panel.classList.remove("hidden");
     state.activeFloatingPanel = panelName;
   }
+
+  syncMobilePanelState();
 }
 
 function openSavedMapsOverlay() {
@@ -1088,6 +1098,7 @@ function bindEvents() {
   elements.btnCloseMapListPanel?.addEventListener("click", closeSavedMapsOverlay);
   elements.savedMapsBackdrop?.addEventListener("click", closeSavedMapsOverlay);
   document.addEventListener("click", handleShellClick);
+  window.addEventListener("resize", syncMobilePanelState);
 
   elements.mapName?.addEventListener("input", markDirty);
   elements.startName?.addEventListener("input", markDirty);
