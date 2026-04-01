@@ -160,7 +160,6 @@
     border-radius: 14px !important;
   }
 
-  #savePanel,
   #importExportPanel {
     width: 198px !important;
     max-width: calc(100vw - 16px) !important;
@@ -366,6 +365,94 @@
     padding: 5px 8px;
     font-size: 0.73rem;
   }
+
+  /* Save panel centered and scaled on mobile */
+  #savePanel {
+    position: fixed !important;
+    top: 50% !important;
+    left: 50% !important;
+    right: auto !important;
+    transform: translate(-50%, -50%) !important;
+    width: min(300px, calc(100vw - 24px)) !important;
+    min-width: min(300px, calc(100vw - 24px)) !important;
+    max-width: calc(100vw - 24px) !important;
+    padding: 14px !important;
+    border-radius: 18px !important;
+    z-index: 1200 !important;
+  }
+
+  #savePanel .card-title-row {
+    margin-bottom: 10px !important;
+    gap: 10px !important;
+    align-items: center !important;
+  }
+
+  #savePanel .card-title-row h2 {
+    font-size: 0.94rem !important;
+    line-height: 1.2 !important;
+    margin: 0 !important;
+  }
+
+  #savePanel .field-group {
+    margin-bottom: 10px !important;
+  }
+
+  #savePanel .field-group label {
+    font-size: 0.8rem !important;
+    margin-bottom: 5px !important;
+    line-height: 1.15 !important;
+  }
+
+  #savePanel input {
+    min-height: 40px !important;
+    height: 40px !important;
+    padding: 8px 10px !important;
+    font-size: 0.82rem !important;
+    line-height: 1.15 !important;
+    border-radius: 10px !important;
+  }
+
+  #savePanel .summary-grid {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 8px !important;
+  }
+
+  #savePanel .summary-card {
+    padding: 10px !important;
+    border-radius: 12px !important;
+  }
+
+  #savePanel .summary-card span {
+    font-size: 0.72rem !important;
+    margin-bottom: 4px !important;
+  }
+
+  #savePanel .summary-card strong {
+    font-size: 0.9rem !important;
+  }
+
+  #savePanel .panel-actions {
+    display: flex !important;
+    justify-content: flex-end !important;
+    gap: 8px !important;
+    margin-top: 8px !important;
+  }
+
+  #savePanel .small-btn {
+    min-height: 40px !important;
+    height: 40px !important;
+    padding: 0 14px !important;
+    font-size: 0.82rem !important;
+    border-radius: 12px !important;
+  }
+
+  #btnCloseSavePanel {
+    width: 30px !important;
+    height: 30px !important;
+    min-width: 30px !important;
+    min-height: 30px !important;
+    font-size: 0.9rem !important;
+  }
 }
 
 @media (max-width: 480px) {
@@ -478,7 +565,6 @@
     padding: 7px !important;
   }
 
-  #savePanel,
   #importExportPanel {
     width: 182px !important;
     max-width: calc(100vw - 12px) !important;
@@ -537,6 +623,66 @@
     width: calc(100vw - 10px);
     padding: 12px;
     margin-top: 36px;
+  }
+
+  /* Save panel centered and scaled on small mobile */
+  #savePanel {
+    position: fixed !important;
+    top: 50% !important;
+    left: 50% !important;
+    right: auto !important;
+    transform: translate(-50%, -50%) !important;
+    width: min(280px, calc(100vw - 20px)) !important;
+    min-width: min(280px, calc(100vw - 20px)) !important;
+    max-width: calc(100vw - 20px) !important;
+    padding: 12px !important;
+    border-radius: 16px !important;
+    z-index: 1200 !important;
+  }
+
+  #savePanel .card-title-row h2 {
+    font-size: 0.88rem !important;
+  }
+
+  #savePanel .field-group label {
+    font-size: 0.76rem !important;
+  }
+
+  #savePanel input {
+    min-height: 38px !important;
+    height: 38px !important;
+    padding: 7px 9px !important;
+    font-size: 0.78rem !important;
+    border-radius: 9px !important;
+  }
+
+  #savePanel .summary-grid {
+    grid-template-columns: 1fr !important;
+    gap: 8px !important;
+  }
+
+  #savePanel .summary-card span {
+    font-size: 0.7rem !important;
+  }
+
+  #savePanel .summary-card strong {
+    font-size: 0.86rem !important;
+  }
+
+  #savePanel .small-btn {
+    min-height: 38px !important;
+    height: 38px !important;
+    padding: 0 12px !important;
+    font-size: 0.78rem !important;
+    border-radius: 11px !important;
+  }
+
+  #btnCloseSavePanel {
+    width: 28px !important;
+    height: 28px !important;
+    min-width: 28px !important;
+    min-height: 28px !important;
+    font-size: 0.86rem !important;
   }
 }
 
