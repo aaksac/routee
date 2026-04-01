@@ -364,7 +364,7 @@ function renderTripList() {
           <span>Önceki mesafe: —</span>
         </div>
         <div style="display:flex; gap:8px; align-items:center;">
-          <button class="tiny-btn" type="button" data-action="directions-start">Yol Tarifi Al</button>
+          <button class="tiny-btn" type="button" data-action="directions-start">Yol Tarifi</button>
           <button class="tiny-btn" type="button" data-action="delete-start">Sil</button>
         </div>
       </div>
@@ -390,7 +390,7 @@ function renderTripList() {
             <span>Önceki mesafe: ${formatKm(point.distanceFromPrevious || 0)}</span>
           </div>
           <div style="display:flex; gap:8px; align-items:center;">
-            <button class="tiny-btn" type="button" data-action="directions-point" data-id="${point.id}">Yol Tarifi Al</button>
+            <button class="tiny-btn" type="button" data-action="directions-point" data-id="${point.id}">Yol Tarifi</button>
             <button class="tiny-btn" type="button" data-action="delete-point" data-id="${point.id}">Sil</button>
           </div>
         </div>
