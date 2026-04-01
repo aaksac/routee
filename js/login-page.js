@@ -74,7 +74,7 @@ async function handleReset() {
 
   try {
     await sendReset(email);
-    elements.authStatus.textContent = "Şifre sıfırlama maili gönderildi.";
+    elements.authStatus.textContent = "Şifre sıfırlama maili gönderildi. Maildeki bağlantı yeni sıfırlama sayfasını açacak.";
   } catch (error) {
     elements.authStatus.textContent = `Şifre sıfırlama hatası: ${error.message}`;
   }
@@ -84,6 +84,15 @@ function bindEvents() {
   elements.btnLogin?.addEventListener("click", handleLogin);
   elements.btnRegister?.addEventListener("click", handleRegister);
   elements.btnResetPassword?.addEventListener("click", handleReset);
+}
+
+function applyQueryStatus() {
+  const params = new URLSearchParams(window.location.search);
+  const reset = params.get("reset");
+
+  if (reset === "success") {
+    elements.authStatus.textContent = "Şifren başarıyla değiştirildi. Yeni şifrenle giriş yapabilirsin.";
+  }
 }
 
 function initAuthWatcher() {
@@ -96,6 +105,7 @@ function initAuthWatcher() {
 
 function init() {
   bindEvents();
+  applyQueryStatus();
   initAuthWatcher();
 }
 
