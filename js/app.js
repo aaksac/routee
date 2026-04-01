@@ -814,12 +814,13 @@ async function handleCsvFileChange(event) {
   if (!file) return;
 
   try {
-    const rows = await importFromCsvFile(file);
-    const { startPoint, points } = convertImportedRowsToState(rows);
-    const applied = applyImportedData(startPoint, points);
-    if (!applied) return;
-    state.selectedMapId = null;
-    elements.authStatus.textContent = "CSV içe aktarıldı.";
+const rows = await importFromCsvFile(file);
+const { startPoint, points } = convertImportedRowsToState(rows);
+const applied = applyImportedData(startPoint, points);
+if (!applied) return;
+state.selectedMapId = null;
+focusMapToPoints(startPoint, points);
+elements.authStatus.textContent = "CSV içe aktarıldı.";
   } catch (error) {
     elements.authStatus.textContent = `CSV içe aktarma hatası: ${error.message}`;
   } finally {
@@ -832,12 +833,13 @@ async function handleXlsxFileChange(event) {
   if (!file) return;
 
   try {
-    const rows = await importFromXlsxFile(file);
-    const { startPoint, points } = convertImportedRowsToState(rows);
-    const applied = applyImportedData(startPoint, points);
-    if (!applied) return;
-    state.selectedMapId = null;
-    elements.authStatus.textContent = "XLSX içe aktarıldı.";
+const rows = await importFromXlsxFile(file);
+const { startPoint, points } = convertImportedRowsToState(rows);
+const applied = applyImportedData(startPoint, points);
+if (!applied) return;
+state.selectedMapId = null;
+focusMapToPoints(startPoint, points);
+elements.authStatus.textContent = "XLSX içe aktarıldı.";
   } catch (error) {
     elements.authStatus.textContent = `XLSX içe aktarma hatası: ${error.message}`;
   } finally {
