@@ -53,7 +53,10 @@ function getSafeContinueUrl(rawUrl) {
 
 async function validateLink() {
   if (mode !== "resetPassword" || !actionCode) {
-    setMessage("Bu şifre yenileme bağlantısı geçersiz görünüyor. Lütfen yeniden şifre sıfırlama maili iste.", "error");
+    setMessage(
+      "Bu şifre yenileme bağlantısı geçersiz görünüyor. Lütfen yeniden şifre sıfırlama maili iste.",
+      "error"
+    );
     return;
   }
 
@@ -62,7 +65,10 @@ async function validateLink() {
     setMessage("Bağlantı doğrulandı. Yeni şifreni girip işlemi tamamlayabilirsin.");
     elements.resetForm.hidden = false;
   } catch (error) {
-    setMessage("Bu bağlantının süresi dolmuş olabilir veya bağlantı daha önce kullanılmış olabilir. Lütfen uygulamadan yeni bir şifre sıfırlama maili iste.", "error");
+    setMessage(
+      "Bu bağlantının süresi dolmuş olabilir veya bağlantı daha önce kullanılmış olabilir. Lütfen uygulamadan yeni bir şifre sıfırlama maili iste.",
+      "error"
+    );
   }
 }
 
@@ -90,7 +96,10 @@ async function handleSubmit(event) {
       window.location.href = continueUrl;
     }, 1200);
   } catch (error) {
-    setMessage("Şifre güncellenemedi. Bağlantı süresi dolmuş olabilir. Lütfen yeniden şifre sıfırlama maili iste.", "error");
+    setMessage(
+      "Şifre güncellenemedi. Bağlantı süresi dolmuş olabilir. Lütfen yeniden şifre sıfırlama maili iste.",
+      "error"
+    );
   }
 }
 
