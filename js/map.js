@@ -947,5 +947,6 @@ export {
   initPlaceSearch,
   clearDraftMarker,
   clearRouteLines,
-  drawRouteSegments
+  drawRouteSegments,
+  resetPageZoomAfterSearch
 };
