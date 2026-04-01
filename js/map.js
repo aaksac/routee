@@ -267,7 +267,7 @@ function openMarkerInfo(marker, pointData) {
   });
 }
 
-function addMarker(pointData) {
+function addMarker(pointData, options = {}) {
   if (!map || !pointData) return null;
 
   const marker = new google.maps.Marker({
@@ -275,11 +275,25 @@ function addMarker(pointData) {
     position: { lat: Number(pointData.lat), lng: Number(pointData.lng) },
     title: pointData.name || "Nokta",
     optimized: true,
+    label: options.orderLabel
+      ? {
+          text: String(options.orderLabel),
+          color: "#ffffff",
+          fontWeight: "700",
+          fontSize: "12px"
+        }
+      : undefined,
     icon: createCircleSymbol("#2563eb")
   });
 
   marker.__pointData = pointData;
-  marker.addListener("click", () => openMarkerInfo(marker, marker.__pointData));
+
+  marker.addListener("click", () => {
+    openMarkerInfo(marker, marker.__pointData);
+    if (typeof options.onClick === "function") {
+      options.onClick(marker.__pointData);
+    }
+  });
 
   markers.push(marker);
   return marker;
@@ -290,46 +304,86 @@ function clearMarkers() {
   markers = [];
 }
 
-function showStartMarker(pointData) {
+function showStartMarker(pointData, options = {}) {
   if (!map || !pointData) return null;
 
-  removeStartMarker();
+  clearStartMarker();
 
   startMarker = new google.maps.Marker({
     map,
     position: { lat: Number(pointData.lat), lng: Number(pointData.lng) },
     title: pointData.name || "Başlangıç",
     optimized: true,
+    label: {
+      text: "S",
+      color: "#ffffff",
+      fontWeight: "700",
+      fontSize: "12px"
+    },
     icon: createCircleSymbol("#16a34a")
   });
 
   startMarker.__pointData = pointData;
-  startMarker.addListener("click", () => openMarkerInfo(startMarker, startMarker.__pointData));
+
+  startMarker.addListener("click", () => {
+    openMarkerInfo(startMarker, startMarker.__pointData);
+    if (typeof options.onClick === "function") {
+      options.onClick(startMarker.__pointData);
+    }
+  });
 
   return startMarker;
 }
 
-function removeStartMarker() {
+function clearStartMarker() {
   if (startMarker) {
     startMarker.setMap(null);
     startMarker = null;
   }
 }
 
-function showCurrentLocationMarker(location) {
-  if (!map || !location) return null;
+function focusToLocation(lat, lng, zoom = 15) {
+  if (!map) return;
+  map.setCenter({ lat, lng });
+  map.setZoom(zoom);
+}
 
-  clearCurrentLocationMarker();
+function resetPageZoomAfterSearch() {
+  if (!searchInputEl) return;
+  searchInputEl.blur();
+}
 
-  currentLocationMarker = new google.maps.Marker({
-    map,
-    position: { lat: Number(location.lat), lng: Number(location.lng) },
-    title: "Mevcut Konum",
-    optimized: true,
-    icon: createCircleSymbol("#f97316")
+function focusMapToPoints(startPoint, points = []) {
+  if (!map) return;
+
+  const validPoints = [];
+
+  if (startPoint && Number.isFinite(startPoint.lat) && Number.isFinite(startPoint.lng)) {
+    validPoints.push({
+      lat: Number(startPoint.lat),
+      lng: Number(startPoint.lng)
+    });
+  }
+
+  points.forEach((point) => {
+    if (Number.isFinite(point.lat) && Number.isFinite(point.lng)) {
+      validPoints.push({
+        lat: Number(point.lat),
+        lng: Number(point.lng)
+      });
+    }
   });
 
-  return currentLocationMarker;
+  if (!validPoints.length) return;
+
+  if (validPoints.length === 1) {
+    focusToLocation(validPoints[0].lat, validPoints[0].lng, 14);
+    return;
+  }
+
+  const bounds = new google.maps.LatLngBounds();
+  validPoints.forEach((point) => bounds.extend(point));
+  map.fitBounds(bounds, 80);
 }
 
 function clearCurrentLocationMarker() {
@@ -339,6 +393,21 @@ function clearCurrentLocationMarker() {
   }
 }
 
+function showCurrentLocationMarker(locationData) {
+  if (!map || !locationData) return null;
+
+  clearCurrentLocationMarker();
+
+  currentLocationMarker = new google.maps.Marker({
+    position: { lat: Number(locationData.lat), lng: Number(locationData.lng) },
+    map,
+    title: locationData.name || "Mevcut Konum",
+    icon: createCircleSymbol("#f97316", "#ffffff", 9)
+  });
+
+  return currentLocationMarker;
+}
+
 function clearDraftMarker() {
   if (draftMarker) {
     draftMarker.setMap(null);
@@ -346,126 +415,64 @@ function clearDraftMarker() {
   }
 }
 
-function showDraftMarker(point) {
-  if (!map || !point) return null;
-
+function showDraftMarker(lat, lng, title = "Seçilen Nokta") {
   clearDraftMarker();
 
   draftMarker = new google.maps.Marker({
+    position: { lat, lng },
     map,
-    position: { lat: Number(point.lat), lng: Number(point.lng) },
-    title: point.name || "Seçilen Konum",
-    optimized: true,
+    title,
     icon: createCircleSymbol("#0f172a", "#ffffff", 8)
   });
 
   return draftMarker;
 }
 
-function clearSearchMarker() {
-  if (searchMarker) {
-    searchMarker.setMap(null);
-    searchMarker = null;
-  }
-}
-
-function showSearchMarker(point) {
-  if (!map || !point) return null;
-
-  clearSearchMarker();
-
-  searchMarker = new google.maps.Marker({
-    map,
-    position: { lat: Number(point.lat), lng: Number(point.lng) },
-    title: point.name || "Arama Sonucu",
-    optimized: true,
-    icon: createCircleSymbol("#7c3aed", "#ffffff", 9)
-  });
-
-  return searchMarker;
-}
-
-function createSelectionFromLatLng(latLng) {
-  const lat = Number(latLng.lat());
-  const lng = Number(latLng.lng());
-
-  return {
-    name: "İşaretli konum",
-    address: "",
-    lat,
-    lng
-  };
-}
-
-function bindMapClickForSelection(onSelected) {
+function enableMapClickPicker(onMapPicked) {
   if (!map) return;
 
   if (mapClickListener) {
     google.maps.event.removeListener(mapClickListener);
-    mapClickListener = null;
   }
 
   mapClickListener = map.addListener("click", (event) => {
-    const selection = createSelectionFromLatLng(event.latLng);
-    showDraftMarker(selection);
-    onSelected?.(selection);
+    const lat = event.latLng.lat();
+    const lng = event.latLng.lng();
+
+    showDraftMarker(lat, lng, "İşaretli Konum");
+
+    if (typeof onMapPicked === "function") {
+      onMapPicked({
+        lat,
+        lng,
+        name: "İşaretli konum"
+      });
+    }
   });
-}
-
-function fitMapToPoints(startPoint, points = []) {
-  if (!map) return;
-
-  const bounds = new google.maps.LatLngBounds();
-
-  if (startPoint) {
-    bounds.extend({ lat: Number(startPoint.lat), lng: Number(startPoint.lng) });
-  }
-
-  points.forEach((point) => {
-    bounds.extend({ lat: Number(point.lat), lng: Number(point.lng) });
-  });
-
-  if (bounds.isEmpty()) return;
-
-  map.fitBounds(bounds, 60);
 }
 
 function clearRouteLines() {
-  routePolylines.forEach((line) => line.setMap(null));
+  routePolylines.forEach((polyline) => polyline.setMap(null));
   distanceOverlays.forEach((overlay) => overlay.setMap(null));
   routePolylines = [];
   distanceOverlays = [];
 }
 
-function createDistanceOverlay(mapInstance, position, text) {
+function createDistanceOverlay(position, text) {
   class DistanceOverlay extends google.maps.OverlayView {
-    constructor(pos, labelText) {
+    constructor() {
       super();
-      this.position = pos;
-      this.labelText = labelText;
       this.div = null;
     }
 
     onAdd() {
       const div = document.createElement("div");
       div.className = "distance-overlay";
-      div.style.position = "absolute";
-      div.style.transform = "translate(-50%, -50%)";
-      div.style.padding = "4px 8px";
-      div.style.borderRadius = "999px";
-      div.style.background = "rgba(15, 23, 42, 0.88)";
-      div.style.color = "#ffffff";
-      div.style.fontSize = "11px";
-      div.style.fontWeight = "700";
-      div.style.lineHeight = "1";
-      div.style.whiteSpace = "nowrap";
-      div.style.boxShadow = "0 8px 18px rgba(15, 23, 42, 0.18)";
-      div.style.pointerEvents = "none";
-      div.textContent = this.labelText;
+      div.textContent = text;
       this.div = div;
 
       const panes = this.getPanes();
-      panes?.overlayMouseTarget.appendChild(div);
+      panes?.overlayLayer.appendChild(div);
     }
 
     draw() {
@@ -473,7 +480,7 @@ function createDistanceOverlay(mapInstance, position, text) {
       const projection = this.getProjection();
       if (!projection) return;
 
-      const pixel = projection.fromLatLngToDivPixel(this.position);
+      const pixel = projection.fromLatLngToDivPixel(position);
       if (!pixel) return;
 
       this.div.style.left = `${pixel.x}px`;
@@ -488,133 +495,96 @@ function createDistanceOverlay(mapInstance, position, text) {
     }
   }
 
-  const overlay = new DistanceOverlay(position, text);
-  overlay.setMap(mapInstance);
-  return overlay;
+  const overlay = new DistanceOverlay();
+  overlay.setMap(map);
+  distanceOverlays.push(overlay);
 }
 
-function drawRouteSegments(startPoint, orderedPoints, routeLegs = []) {
-  if (!map) return;
+function drawRouteSegments(startPoint, points) {
   clearRouteLines();
 
-  if (!startPoint || !Array.isArray(orderedPoints) || !orderedPoints.length) return;
+  if (!map || !startPoint || !points.length) return;
 
-  let previous = startPoint;
+  let previous = {
+    lat: Number(startPoint.lat),
+    lng: Number(startPoint.lng)
+  };
 
-  orderedPoints.forEach((point, index) => {
-    const line = new google.maps.Polyline({
+  points.forEach((point) => {
+    const current = {
+      lat: Number(point.lat),
+      lng: Number(point.lng)
+    };
+
+    const polyline = new google.maps.Polyline({
       map,
-      path: [
-        { lat: Number(previous.lat), lng: Number(previous.lng) },
-        { lat: Number(point.lat), lng: Number(point.lng) }
-      ],
+      path: [previous, current],
       geodesic: true,
       strokeColor: "#2563eb",
-      strokeOpacity: 0.9,
+      strokeOpacity: 0.85,
       strokeWeight: 3
     });
 
-    routePolylines.push(line);
+    routePolylines.push(polyline);
 
-    const midLat = (Number(previous.lat) + Number(point.lat)) / 2;
-    const midLng = (Number(previous.lng) + Number(point.lng)) / 2;
-    const leg = routeLegs[index];
-    const overlay = createDistanceOverlay(
-      map,
-      new google.maps.LatLng(midLat, midLng),
-      leg ? `${formatDistance(leg.distanceKm)} km` : "—"
+    const midPoint = new google.maps.LatLng(
+      (previous.lat + current.lat) / 2,
+      (previous.lng + current.lng) / 2
     );
-    distanceOverlays.push(overlay);
 
-    previous = point;
+    if (Number(point.distanceFromPrevious || 0) > 0) {
+      createDistanceOverlay(midPoint, formatDistance(point.distanceFromPrevious));
+    }
+
+    previous = current;
   });
 }
 
 function formatDistance(distanceKm) {
-  if (distanceKm < 1) {
-    return `${Math.round(distanceKm * 1000)} m`;
+  const value = Number(distanceKm) || 0;
+
+  if (value < 1) {
+    return `${Math.round(value * 1000)} m`;
   }
 
-  const rounded = Number(distanceKm.toFixed(2));
-  if (Number.isInteger(rounded)) {
-    return String(rounded);
-  }
-
-  if (Math.abs(rounded * 10 - Math.round(rounded * 10)) < 0.000001) {
-    return rounded.toFixed(1);
-  }
-
-  return rounded.toFixed(2);
+  return `${Number(value.toFixed(2)).toString()} km`;
 }
 
-function getOrCreateSearchDropdown() {
+function ensureSearchDropdown(inputElement) {
   if (searchDropdown) return searchDropdown;
-  if (!searchInputEl || !searchInputEl.parentElement) return null;
 
   const dropdown = document.createElement("div");
   dropdown.className = "search-dropdown";
-  dropdown.style.position = "absolute";
-  dropdown.style.top = `${searchInputEl.offsetHeight + 8}px`;
-  dropdown.style.left = "0";
-  dropdown.style.right = "0";
-  dropdown.style.display = "none";
-  searchInputEl.parentElement.style.position = "relative";
-  searchInputEl.parentElement.appendChild(dropdown);
-
+  inputElement.parentElement?.appendChild(dropdown);
   searchDropdown = dropdown;
-  return searchDropdown;
+  return dropdown;
 }
 
 function hideSearchDropdown() {
   if (!searchDropdown) return;
-  searchDropdown.style.display = "none";
   searchDropdown.innerHTML = "";
+  searchDropdown.style.display = "none";
 }
 
-function renderPredictions(predictions, onSelect) {
-  const dropdown = getOrCreateSearchDropdown();
-  if (!dropdown) return;
+function getNormalizedSearchKey(query) {
+  return String(query || "").trim().toLowerCase();
+}
 
-  dropdown.innerHTML = "";
+function getPredictionCache(cacheKey) {
+  if (!predictionCache.has(cacheKey)) return null;
 
-  if (!predictions.length) {
-    hideSearchDropdown();
-    return;
+  const cachedValue = predictionCache.get(cacheKey);
+  predictionCache.delete(cacheKey);
+  predictionCache.set(cacheKey, cachedValue);
+  return cachedValue;
+}
+
+function setPredictionCache(cacheKey, predictions) {
+  if (predictionCache.has(cacheKey)) {
+    predictionCache.delete(cacheKey);
   }
 
-  predictions.forEach((prediction) => {
-    const item = document.createElement("button");
-    item.type = "button";
-    item.className = "search-dropdown-item";
-    item.textContent = prediction.description;
-    item.addEventListener("mousedown", (event) => {
-      event.preventDefault();
-      onSelect(prediction);
-    });
-    dropdown.appendChild(item);
-  });
-
-  dropdown.style.display = "block";
-}
-
-function normalizePrediction(prediction) {
-  return {
-    placeId: prediction.place_id,
-    description: prediction.description,
-    mainText: prediction.structured_formatting?.main_text || prediction.description,
-    secondaryText: prediction.structured_formatting?.secondary_text || ""
-  };
-}
-
-function createPredictionCacheKey(input) {
-  return input.trim().toLowerCase();
-}
-
-function setPredictionCache(key, value) {
-  if (predictionCache.has(key)) {
-    predictionCache.delete(key);
-  }
-  predictionCache.set(key, value);
+  predictionCache.set(cacheKey, predictions);
 
   if (predictionCache.size > MAX_CACHE_SIZE) {
     const oldestKey = predictionCache.keys().next().value;
@@ -622,139 +592,149 @@ function setPredictionCache(key, value) {
   }
 }
 
-function getPredictionCache(key) {
-  if (!predictionCache.has(key)) return null;
-  const value = predictionCache.get(key);
-  predictionCache.delete(key);
-  predictionCache.set(key, value);
-  return value;
-}
-
-function getAutocompleteToken() {
+function ensureAutocompleteSessionToken() {
   if (!activeAutocompleteSessionToken) {
     activeAutocompleteSessionToken = new google.maps.places.AutocompleteSessionToken();
   }
+
   return activeAutocompleteSessionToken;
 }
 
-function resetAutocompleteToken() {
+function clearAutocompleteSession() {
   activeAutocompleteSessionToken = null;
 }
 
-function fetchPredictions(input, callback) {
-  if (!searchService) {
-    callback([]);
-    return;
-  }
+function renderPredictions(predictions, onPlaceSelected) {
+  if (!searchDropdown) return;
 
-  const normalizedInput = input.trim();
-  if (normalizedInput.length < MIN_SEARCH_LENGTH) {
-    callback([]);
-    return;
-  }
+  const dropdown = searchDropdown;
+  dropdown.innerHTML = "";
 
-  const cacheKey = createPredictionCacheKey(normalizedInput);
-  const cached = getPredictionCache(cacheKey);
-  if (cached) {
-    callback(cached);
-    return;
-  }
+  predictions.forEach((prediction) => {
+    const item = document.createElement("button");
+    item.type = "button";
+    item.className = "search-dropdown-item";
+    item.innerHTML = `
+      <strong>${prediction.structured_formatting?.main_text || prediction.description}</strong>
+      <span>${prediction.structured_formatting?.secondary_text || ""}</span>
+    `;
 
-  const requestId = ++lastPredictionRequestId;
+    item.addEventListener("click", () => {
+      const placeId = prediction.place_id;
+      const sessionToken = ensureAutocompleteSessionToken();
 
-  searchService.getPlacePredictions(
-    {
-      input: normalizedInput,
-      sessionToken: getAutocompleteToken()
-    },
-    (predictions, status) => {
-      if (requestId !== lastPredictionRequestId) return;
+      placesService.getDetails(
+        {
+          placeId,
+          fields: ["name", "formatted_address", "geometry"],
+          sessionToken
+        },
+        (place, status) => {
+          if (
+            status !== google.maps.places.PlacesServiceStatus.OK ||
+            !place?.geometry?.location
+          ) {
+            return;
+          }
 
-      if (status !== google.maps.places.PlacesServiceStatus.OK || !Array.isArray(predictions)) {
-        callback([]);
-        return;
-      }
+          const lat = place.geometry.location.lat();
+          const lng = place.geometry.location.lng();
 
-      const normalized = predictions.slice(0, MAX_PREDICTIONS).map(normalizePrediction);
-      setPredictionCache(cacheKey, normalized);
-      callback(normalized);
-    }
-  );
+          if (searchMarker) {
+            searchMarker.setMap(null);
+            searchMarker = null;
+          }
+
+          searchMarker = new google.maps.Marker({
+            position: { lat, lng },
+            map,
+            title: place.name || prediction.description,
+            icon: createCircleSymbol("#2563eb", "#ffffff", 9)
+          });
+
+          focusToLocation(lat, lng, 16);
+          resetPageZoomAfterSearch();
+
+          if (searchInputEl) {
+            searchInputEl.value = place.name || prediction.description;
+          }
+
+          hideSearchDropdown();
+          clearAutocompleteSession();
+
+          if (typeof onPlaceSelected === "function") {
+            onPlaceSelected({
+              name: place.name || prediction.description,
+              address: place.formatted_address || "",
+              lat,
+              lng
+            });
+          }
+        }
+      );
+    });
+
+    dropdown.appendChild(item);
+  });
+
+  dropdown.style.display = "block";
 }
 
-function getPlaceDetails(placeId, callback) {
-  if (!placesService || !placeId) {
-    callback(null);
-    return;
-  }
+function initPlaceSearch(inputElement, onPlaceSelected) {
+  if (!inputElement || !map || !searchService) return;
 
-  placesService.getDetails(
-    {
-      placeId,
-      fields: ["name", "formatted_address", "geometry"],
-      sessionToken: getAutocompleteToken()
-    },
-    (place, status) => {
-      if (status !== google.maps.places.PlacesServiceStatus.OK || !place?.geometry?.location) {
-        callback(null);
-        return;
-      }
-
-      const lat = place.geometry.location.lat();
-      const lng = place.geometry.location.lng();
-      callback({
-        name: place.name || place.formatted_address || "Seçilen konum",
-        address: place.formatted_address || "",
-        lat,
-        lng
-      });
-    }
-  );
-}
-
-function focusMapOnSelection(selection) {
-  if (!map || !selection) return;
-
-  const target = { lat: Number(selection.lat), lng: Number(selection.lng) };
-  map.panTo(target);
-  map.setZoom(15);
-}
-
-function ensureSearchAutocomplete(inputElement, onSelected) {
   searchInputEl = inputElement;
-  if (!searchInputEl) return;
-
-  getOrCreateSearchDropdown();
+  ensureSearchDropdown(inputElement);
 
   if (!searchInputHandlerBound) {
-    searchInputEl.addEventListener("input", () => {
-      const query = searchInputEl.value.trim();
+    inputElement.addEventListener("input", () => {
+      const query = inputElement.value.trim();
 
       window.clearTimeout(searchDebounceTimer);
 
       if (query.length < MIN_SEARCH_LENGTH) {
-        currentPredictions = [];
         hideSearchDropdown();
+        clearAutocompleteSession();
+        return;
+      }
+
+      const cacheKey = getNormalizedSearchKey(query);
+      const cachedPredictions = getPredictionCache(cacheKey);
+
+      if (cachedPredictions) {
+        currentPredictions = cachedPredictions;
+        renderPredictions(cachedPredictions, onPlaceSelected);
         return;
       }
 
       searchDebounceTimer = window.setTimeout(() => {
-        fetchPredictions(query, (predictions) => {
-          currentPredictions = predictions;
-          renderPredictions(predictions, (prediction) => {
-            searchInputEl.value = prediction.description;
-            hideSearchDropdown();
+        const requestId = ++lastPredictionRequestId;
+        const sessionToken = ensureAutocompleteSessionToken();
 
-            getPlaceDetails(prediction.placeId, (selection) => {
-              if (!selection) return;
+        searchService.getPlacePredictions(
+          {
+            input: query,
+            bounds: map.getBounds() || undefined,
+            sessionToken
+          },
+          (predictions, status) => {
+            if (requestId !== lastPredictionRequestId) return;
 
-              resetAutocompleteToken();
-              showSearchMarker(selection);
-              focusMapOnSelection(selection);
-              onSelected?.(selection);
-            });
-          });
-        });
+            if (
+              status !== google.maps.places.PlacesServiceStatus.OK ||
+              !Array.isArray(predictions) ||
+              !predictions.length
+            ) {
+              hideSearchDropdown();
+              return;
+            }
+
+            const limitedPredictions = predictions.slice(0, MAX_PREDICTIONS);
+            currentPredictions = limitedPredictions;
+            setPredictionCache(cacheKey, limitedPredictions);
+            renderPredictions(limitedPredictions, onPlaceSelected);
+          }
+        );
       }, SEARCH_DEBOUNCE_MS);
     });
 
@@ -762,22 +742,10 @@ function ensureSearchAutocomplete(inputElement, onSelected) {
   }
 
   if (!searchFocusHandlerBound) {
-    searchInputEl.addEventListener("focus", () => {
-      const query = searchInputEl.value.trim();
+    inputElement.addEventListener("focus", () => {
+      const query = inputElement.value.trim();
       if (query.length >= MIN_SEARCH_LENGTH && currentPredictions.length) {
-        renderPredictions(currentPredictions, (prediction) => {
-          searchInputEl.value = prediction.description;
-          hideSearchDropdown();
-
-          getPlaceDetails(prediction.placeId, (selection) => {
-            if (!selection) return;
-
-            resetAutocompleteToken();
-            showSearchMarker(selection);
-            focusMapOnSelection(selection);
-            onSelected?.(selection);
-          });
-        });
+        searchDropdown.style.display = "block";
       }
     });
 
@@ -788,25 +756,11 @@ function ensureSearchAutocomplete(inputElement, onSelected) {
     inputElement.addEventListener("blur", () => {
       window.setTimeout(() => {
         hideSearchDropdown();
+        resetPageZoomAfterSearch();
       }, 180);
     });
 
     searchBlurHandlerBound = true;
-  }
-
-  if (!searchSelectHandlerBound) {
-    document.addEventListener("click", (event) => {
-      if (!searchDropdown || !searchInputEl) return;
-
-      const clickedInsideDropdown = searchDropdown.contains(event.target);
-      const clickedInput = searchInputEl === event.target;
-
-      if (!clickedInsideDropdown && !clickedInput) {
-        hideSearchDropdown();
-      }
-    });
-
-    searchSelectHandlerBound = true;
   }
 }
 
@@ -816,14 +770,13 @@ export {
   addMarker,
   clearMarkers,
   showStartMarker,
-  removeStartMarker,
-  bindMapClickForSelection,
+  clearStartMarker,
+  focusToLocation,
+  focusMapToPoints,
   showCurrentLocationMarker,
-  clearCurrentLocationMarker,
-  ensureSearchAutocomplete,
-  fitMapToPoints,
+  enableMapClickPicker,
+  initPlaceSearch,
   clearDraftMarker,
-  clearSearchMarker,
   clearRouteLines,
   drawRouteSegments
 };
