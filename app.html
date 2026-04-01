@@ -200,60 +200,167 @@
                 <span class="badge">Kuş uçuşu rota</span>
                 <span class="badge" id="badgeDistance">Toplam: 0.00 km</span>
                 <button class="badge new-map-inline-btn" id="btnNewMapInline" type="button" aria-label="Yeni harita oluştur" title="Yeni harita oluştur">
-                  + Yeni Harita
+                  <span class="new-map-btn-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24">
+                      <path d="M4 6.5L8.5 4.5L15.5 6.5L20 4.5V17.5L15.5 19.5L8.5 17.5L4 19.5V6.5Z"></path>
+                      <path d="M8.5 4.5V17.5"></path>
+                      <path d="M15.5 6.5V19.5"></path>
+                    </svg>
+                  </span>
+                  <span class="new-map-btn-text">Yeni Harita</span>
                 </button>
               </div>
             </div>
           </div>
         </section>
 
-        <aside class="sidebar">
-          <section class="panel summary-panel">
-            <div class="panel-heading">
-              <div>
-                <h2>Harita Özeti</h2>
-                <p>Başlangıç noktası ve ziyaret sırası burada görünür.</p>
-              </div>
+        <aside class="trip-panel" id="tripPanel">
+          <div class="trip-panel-header">
+            <div>
+              <h2>Harita Özeti</h2>
+              <p>Rota detaylarını ve kayıtlı haritaları buradan yönetin.</p>
             </div>
+            <button class="ghost-btn mobile-close-btn" id="btnCloseTripPanel" type="button">Kapat</button>
+          </div>
 
-            <div class="summary-grid">
-              <div class="summary-card">
-                <span>Başlangıç</span>
-                <strong id="summaryStartName">Belirlenmedi</strong>
-              </div>
-              <div class="summary-card">
-                <span>Toplam Nokta</span>
-                <strong id="summaryPointCount">0</strong>
-              </div>
-              <div class="summary-card">
-                <span>Toplam Mesafe</span>
-                <strong id="summaryDistance">0.00 km</strong>
-              </div>
-            </div>
-
-            <div class="route-actions">
-              <button class="large-btn primary" id="btnCreateRoute" type="button">Rota Oluştur</button>
-              <button class="large-btn ghost" id="btnResetMap" type="button">Haritayı Temizle</button>
-            </div>
-
-            <div class="route-list" id="routeList"></div>
+          <section class="summary-grid">
+            <article class="summary-card">
+              <span>Toplam Nokta</span>
+              <strong id="totalPoints">0</strong>
+            </article>
+            <article class="summary-card">
+              <span>Toplam Mesafe</span>
+              <strong id="totalDistance">0.00 km</strong>
+            </article>
           </section>
 
-          <section class="panel map-list-panel hidden" id="mapListPanel">
-            <div class="panel-heading">
-              <div>
-                <h2>Harita Listelerim</h2>
-                <p>Kayıtlı haritalarınızı görüntüleyin, silin veya açın.</p>
-              </div>
-              <button class="icon-close" id="btnCloseMapListPanel" type="button" aria-label="Kapat">×</button>
+          <section class="panel section-panel">
+            <div class="section-title-row">
+              <h3>Nokta İşlemleri</h3>
+              <button class="ghost-btn mobile-trip-list-btn" id="btnTripList" type="button">Liste</button>
             </div>
-            <div class="map-list" id="savedMapsList"></div>
+
+            <div class="field-group">
+              <label for="pointName">Konum Adı</label>
+              <input id="pointName" type="text" placeholder="Örn. Müşteri A" />
+            </div>
+
+            <div class="field-row">
+              <div class="field-group">
+                <label for="pointLat">Enlem</label>
+                <input id="pointLat" type="number" step="any" placeholder="37.0100" />
+              </div>
+              <div class="field-group">
+                <label for="pointLng">Boylam</label>
+                <input id="pointLng" type="number" step="any" placeholder="35.3300" />
+              </div>
+            </div>
+
+            <div class="action-row">
+              <button class="primary-btn" id="btnAddPoint" type="button">Konum Ekle / Güncelle</button>
+              <button class="ghost-btn" id="btnClearForm" type="button">Temizle</button>
+            </div>
+          </section>
+
+          <section class="panel section-panel">
+            <div class="section-title-row">
+              <h3>Başlangıç Noktası</h3>
+            </div>
+
+            <div class="field-group">
+              <label for="startName">İsim</label>
+              <input id="startName" type="text" placeholder="Başlangıç adı" />
+            </div>
+
+            <div class="field-row">
+              <div class="field-group">
+                <label for="startLat">Enlem</label>
+                <input id="startLat" type="number" step="any" placeholder="37.0000" />
+              </div>
+              <div class="field-group">
+                <label for="startLng">Boylam</label>
+                <input id="startLng" type="number" step="any" placeholder="35.3213" />
+              </div>
+            </div>
+
+            <div class="action-row">
+              <button class="primary-btn" id="btnAddStartPoint" type="button">Başlangıç Ekle</button>
+            </div>
+          </section>
+
+          <section class="panel section-panel">
+            <div class="section-title-row">
+              <h3>Harita İşlemleri</h3>
+            </div>
+
+            <div class="field-group">
+              <label for="mapName">Harita Adı</label>
+              <input id="mapName" type="text" placeholder="Örn. Pazartesi Rotası" />
+            </div>
+
+            <div class="action-row stacked">
+              <button class="primary-btn" id="btnSaveMap" type="button">Haritayı Kaydet</button>
+              <button class="ghost-btn" id="btnNewMap" type="button">Yeni Harita</button>
+            </div>
+          </section>
+
+          <section class="panel section-panel">
+            <div class="section-title-row">
+              <h3>İçe / Dışa Aktar</h3>
+            </div>
+
+            <div class="field-row">
+              <div class="field-group">
+                <label for="exportType">Dışa Aktar</label>
+                <select id="exportType">
+                  <option value="csv">CSV</option>
+                  <option value="xlsx">XLSX</option>
+                </select>
+              </div>
+              <div class="field-group">
+                <label for="importType">İçe Aktar</label>
+                <select id="importType">
+                  <option value="csv">CSV</option>
+                  <option value="xlsx">XLSX</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="action-row">
+              <button class="ghost-btn" id="btnExport" type="button">Dışa Aktar</button>
+              <button class="ghost-btn" id="btnImport" type="button">İçe Aktar</button>
+            </div>
+
+            <input id="csvFileInput" type="file" accept=".csv" hidden />
+            <input id="xlsxFileInput" type="file" accept=".xlsx,.xls" hidden />
+          </section>
+
+          <section class="panel section-panel">
+            <div class="section-title-row">
+              <h3>Rota Listesi</h3>
+            </div>
+            <div class="trip-list" id="tripList"></div>
           </section>
         </aside>
       </main>
     </div>
 
-    <div id="toast" class="toast hidden" role="status" aria-live="polite"></div>
+    <div class="saved-maps-overlay hidden" id="savedMapsOverlay">
+      <div class="saved-maps-backdrop" id="savedMapsBackdrop"></div>
+      <section class="saved-maps-panel">
+        <div class="saved-maps-header">
+          <div>
+            <h2>Harita Listelerim</h2>
+            <p>Kayıtlı haritalarınızı açın veya silin.</p>
+          </div>
+          <div class="saved-maps-actions">
+            <button class="ghost-btn" id="btnNewMapMobile" type="button">Yeni Harita</button>
+            <button class="ghost-btn" id="btnCloseMapListPanel" type="button">Kapat</button>
+          </div>
+        </div>
+        <div class="map-list" id="mapList"></div>
+      </section>
+    </div>
 
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDGkLf87uoMqf2L8L3RKbS4Mk2eA4viVQs&libraries=places"></script>
     <script type="module" src="./js/app.js"></script>
