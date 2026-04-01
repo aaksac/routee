@@ -132,6 +132,7 @@
     position: relative;
     justify-self: end;
     flex: 0 0 auto;
+    z-index: 22;
   }
 
   .floating-menu {
@@ -155,17 +156,16 @@
     overflow: hidden;
   }
 
-  body.has-mobile-floating-panel::before {
-    content: "";
-    position: fixed;
-    inset: 0;
-    z-index: 18;
-    background: rgba(15, 23, 42, 0.22);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    pointer-events: none;
+  /* Blur sadece arka plan etkisi için, içeriği tamamen yok etmez */
+  body.has-mobile-floating-panel .map-canvas,
+  body.has-mobile-floating-panel .trip-panel,
+  body.has-mobile-floating-panel .status-strip,
+  body.has-mobile-floating-panel .topbar {
+    filter: blur(4px);
+    transition: filter 0.18s ease;
   }
 
+  /* Açık panel varken butonlar gizlensin */
   body.has-mobile-floating-panel .top-left .compact-buttons,
   body.has-mobile-floating-panel .menu-wrapper,
   body.has-mobile-floating-panel #placeSearch {
@@ -181,7 +181,7 @@
     left: 50%;
     top: 50%;
     transform: translate(-50%, -50%);
-    z-index: 30;
+    z-index: 40;
     width: min(92vw, 360px) !important;
     min-width: min(92vw, 360px) !important;
     max-width: min(92vw, 360px) !important;
@@ -316,33 +316,42 @@
   }
 
   .trip-panel {
-    padding: 12px;
-    border-radius: 20px;
+    padding: 14px !important;
+    border-radius: 22px !important;
   }
 
   .trip-panel-header h2 {
-    font-size: 0.96rem;
+    font-size: 1rem !important;
+    line-height: 1.2 !important;
+  }
+
+  .trip-list {
+    gap: 10px !important;
   }
 
   .trip-item {
-    grid-template-columns: 38px minmax(0, 1fr);
-    gap: 10px;
-    padding: 10px;
+    grid-template-columns: 40px minmax(0, 1fr) auto !important;
+    gap: 10px !important;
+    padding: 11px !important;
+    border-radius: 16px !important;
+    align-items: center !important;
   }
 
   .trip-order {
-    width: 38px;
-    height: 38px;
-    border-radius: 12px;
-    font-size: 0.84rem;
+    width: 40px !important;
+    height: 40px !important;
+    border-radius: 12px !important;
+    font-size: 0.84rem !important;
   }
 
   .trip-content strong {
-    font-size: 0.9rem;
+    font-size: 0.92rem !important;
+    line-height: 1.15 !important;
   }
 
   .trip-content span {
-    font-size: 0.8rem;
+    font-size: 0.8rem !important;
+    line-height: 1.25 !important;
   }
 
   .trip-item > div:last-child,
@@ -352,9 +361,11 @@
   }
 
   .tiny-btn {
-    min-height: 28px;
-    padding: 4px 7px;
-    font-size: 0.7rem;
+    min-height: 30px !important;
+    padding: 5px 9px !important;
+    font-size: 0.72rem !important;
+    border-radius: 999px !important;
+    white-space: nowrap !important;
   }
 
   .desktop-only-inline {
@@ -370,10 +381,10 @@
   }
 
   .screen-overlay-panel {
-    width: calc(100vw - 14px);
-    margin-top: 42px;
-    padding: 14px;
-    border-radius: 18px;
+    width: calc(100vw - 16px) !important;
+    margin-top: 34px !important;
+    padding: 14px !important;
+    border-radius: 20px !important;
   }
 
   .screen-overlay-panel .panel-actions {
@@ -386,6 +397,72 @@
     min-height: 32px;
     padding: 5px 8px;
     font-size: 0.73rem;
+  }
+
+  .screen-overlay-panel .card-title-row.large-gap {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 10px !important;
+    margin-bottom: 14px !important;
+  }
+
+  .screen-overlay-panel .card-title-row.large-gap .panel-actions {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    gap: 8px !important;
+    justify-content: flex-start !important;
+  }
+
+  .screen-overlay-panel .card-title-row.large-gap .small-btn {
+    min-height: 34px !important;
+    padding: 6px 10px !important;
+    font-size: 0.75rem !important;
+    border-radius: 999px !important;
+    white-space: nowrap !important;
+  }
+
+  .map-list-row {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) auto !important;
+    gap: 8px !important;
+    align-items: center !important;
+  }
+
+  .map-list-item {
+    min-width: 0 !important;
+    padding: 12px 13px !important;
+    border-radius: 16px !important;
+    box-shadow: 0 8px 18px rgba(15, 23, 42, 0.06) !important;
+  }
+
+  .map-list-item strong,
+  .map-list-item b {
+    font-size: 0.9rem !important;
+    line-height: 1.15 !important;
+  }
+
+  .map-list-item span {
+    font-size: 0.76rem !important;
+    line-height: 1.3 !important;
+  }
+
+  .map-list-row .danger-outline,
+  .map-list-row .small-btn,
+  .map-list-row .tiny-btn {
+    min-height: 34px !important;
+    height: 34px !important;
+    padding: 0 10px !important;
+    font-size: 0.72rem !important;
+    border-radius: 999px !important;
+    white-space: nowrap !important;
+    align-self: center !important;
+    justify-self: end !important;
+  }
+
+  .map-list-item,
+  .trip-content {
+    overflow-wrap: anywhere !important;
   }
 }
 
@@ -552,151 +629,6 @@
     flex: 0 0 30px !important;
   }
 
-  padding: 3px 6px !important;
-  font-size: 0.61rem !important;
-}
-
-#btnCloseStartPanel,
-#btnClosePointPanel,
-#btnCloseSavePanel,
-#btnCloseImportExportPanel {
-  width: 21px !important;
-  height: 21px !important;
-  min-width: 21px !important;
-  min-height: 21px !important;
-  font-size: 0.72rem !important;
-}
-
-.screen-overlay-panel {
-  width: calc(100vw - 10px);
-  padding: 12px;
-  margin-top: 36px;
-}
-}
-
-@media (max-width: 720px) {
-  .trip-panel {
-    padding: 14px !important;
-    border-radius: 22px !important;
-  }
-
-  .trip-panel-header h2 {
-    font-size: 1rem !important;
-    line-height: 1.2 !important;
-  }
-
-  .trip-list {
-    gap: 10px !important;
-  }
-
-  .trip-item {
-    grid-template-columns: 40px minmax(0, 1fr) auto !important;
-    gap: 10px !important;
-    padding: 11px !important;
-    border-radius: 16px !important;
-    align-items: center !important;
-  }
-
-  .trip-order {
-    width: 40px !important;
-    height: 40px !important;
-    border-radius: 12px !important;
-    font-size: 0.84rem !important;
-  }
-
-  .trip-content strong {
-    font-size: 0.92rem !important;
-    line-height: 1.15 !important;
-  }
-
-  .trip-content span {
-    font-size: 0.8rem !important;
-    line-height: 1.25 !important;
-  }
-
-  .tiny-btn {
-    min-height: 30px !important;
-    padding: 5px 9px !important;
-    font-size: 0.72rem !important;
-    border-radius: 999px !important;
-    white-space: nowrap !important;
-  }
-
-  .screen-overlay-panel {
-    width: calc(100vw - 16px) !important;
-    margin-top: 34px !important;
-    padding: 14px !important;
-    border-radius: 20px !important;
-  }
-
-  .screen-overlay-panel .card-title-row.large-gap {
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: stretch !important;
-    gap: 10px !important;
-    margin-bottom: 14px !important;
-  }
-
-  .screen-overlay-panel .card-title-row.large-gap .panel-actions {
-    display: flex !important;
-    flex-wrap: nowrap !important;
-    gap: 8px !important;
-    justify-content: flex-start !important;
-  }
-
-  .screen-overlay-panel .card-title-row.large-gap .small-btn {
-    min-height: 34px !important;
-    padding: 6px 10px !important;
-    font-size: 0.75rem !important;
-    border-radius: 999px !important;
-    white-space: nowrap !important;
-  }
-
-  .map-list-row {
-    display: grid !important;
-    grid-template-columns: minmax(0, 1fr) auto !important;
-    gap: 8px !important;
-    align-items: center !important;
-  }
-
-  .map-list-item {
-    min-width: 0 !important;
-    padding: 12px 13px !important;
-    border-radius: 16px !important;
-    box-shadow: 0 8px 18px rgba(15, 23, 42, 0.06) !important;
-  }
-
-  .map-list-item strong,
-  .map-list-item b {
-    font-size: 0.9rem !important;
-    line-height: 1.15 !important;
-  }
-
-  .map-list-item span {
-    font-size: 0.76rem !important;
-    line-height: 1.3 !important;
-  }
-
-  .map-list-row .danger-outline,
-  .map-list-row .small-btn,
-  .map-list-row .tiny-btn {
-    min-height: 34px !important;
-    height: 34px !important;
-    padding: 0 10px !important;
-    font-size: 0.72rem !important;
-    border-radius: 999px !important;
-    white-space: nowrap !important;
-    align-self: center !important;
-    justify-self: end !important;
-  }
-
-  .map-list-item,
-  .trip-content {
-    overflow-wrap: anywhere !important;
-  }
-}
-
-@media (max-width: 480px) {
   .trip-panel {
     padding: 13px !important;
     border-radius: 20px !important;
