@@ -305,7 +305,7 @@ function fillStartFormFromMap(lat, lng, suggestedName = "") {
   if (suggestedName) {
     elements.startName.value = suggestedName;
   } else {
-    elements.startName.value = "Başlangıç";
+    elements.startName.value = "İşaretli Konum";
   }
 }
 
@@ -316,7 +316,7 @@ function fillPointFormFromMap(lat, lng, suggestedName = "") {
   if (suggestedName) {
     elements.pointName.value = suggestedName;
   } else {
-    elements.pointName.value = `Nokta ${state.points.length + 1}`;
+    elements.pointName.value = "İşaretli Konum";
   }
 }
 function fillBothFormsFromMap(lat, lng, suggestedName = "") {
