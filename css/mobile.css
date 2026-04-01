@@ -702,11 +702,11 @@ body.has-mobile-floating-panel .bottom-left {
     font-size: 0.72rem !important;
   }
 
-  .map-list-row {
-    grid-template-columns: 1fr !important;
-    gap: 7px !important;
-  }
-
+.map-list-row {
+  grid-template-columns: minmax(0, 1fr) auto !important;
+  gap: 7px !important;
+  align-items: center !important;
+}
   .map-list-row .danger-outline,
   .map-list-row .small-btn,
   .map-list-row .tiny-btn {
