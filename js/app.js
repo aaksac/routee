@@ -514,6 +514,7 @@ function addOrUpdatePoint() {
   clearPointForm();
   recomputeRoute();
   markDirty();
+  closeFloatingPanels();
 }
 
 function deletePoint(pointId) {
