@@ -135,20 +135,20 @@
   }
 
   .floating-menu {
-    top: calc(100% + 6px);
+    top: calc(100% + 8px);
     right: 0;
-    width: 170px;
+    width: 188px;
     max-width: calc(100vw - 16px);
-    padding: 6px;
-    gap: 5px;
-    border-radius: 16px;
+    padding: 8px;
+    gap: 7px;
+    border-radius: 18px;
   }
 
   .menu-item {
-    min-height: 34px;
-    padding: 7px 9px;
-    font-size: 0.74rem;
-    border-radius: 12px;
+    min-height: 42px;
+    padding: 9px 11px;
+    font-size: 0.82rem;
+    border-radius: 14px;
   }
 
   #startPanel,
@@ -460,14 +460,14 @@
   }
 
   .floating-menu {
-    width: 150px;
+    width: 172px;
     max-width: calc(100vw - 12px);
   }
 
   .menu-item {
-    min-height: 30px;
-    padding: 5px 7px;
-    font-size: 0.68rem;
+    min-height: 38px;
+    padding: 8px 10px;
+    font-size: 0.76rem;
   }
 
   #startPanel,
