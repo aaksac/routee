@@ -1,74 +1,464 @@
-html,
-body {
-  width: 100%;
-  max-width: 100%;
-  overflow-x: hidden;
-  -webkit-text-size-adjust: 100%;
-  touch-action: manipulation;
-}
-
-body {
-  position: relative;
-}
-
-input,
-textarea,
-select,
-button {
-  font-size: 16px;
-}
-
-.map-search-input,
-.field-group input,
-.field-group select,
-.field-group textarea {
-  font-size: 16px;
-}
-
-.location-selection-status {
-  display: none;
-  margin-top: 8px;
-  margin-bottom: 10px;
-  padding: 10px 12px;
-  border-radius: 12px;
-  background: #ecfdf5;
-  border: 1px solid #86efac;
-  color: #166534;
-  font-size: 13px;
-  font-weight: 700;
-  line-height: 1.35;
-}
-
-.location-selection-status.is-pending {
-  display: block;
-  background: #f8fafc;
-  border-color: #cbd5e1;
-  color: #475569;
-}
-
-.location-selection-status.is-selected {
-  display: block;
-  background: #ecfdf5;
-  border-color: #86efac;
-  color: #166534;
-}
-
-@media (max-width: 1100px) {
+@media (max-width: 1200px) {
   .app-layout {
-    grid-template-columns: 1fr;
-    padding: 18px;
+    grid-template-columns: minmax(0, 1fr);
+    height: auto;
   }
 
-  .sidebar {
-    order: 2;
+  .trip-panel {
+    position: fixed;
+    inset: auto 0 0 0;
+    height: min(74vh, 620px);
+    max-width: none;
+    width: 100%;
+    border-left: none;
+    border-top: 1px solid rgba(148, 163, 184, 0.28);
+    border-radius: 22px 22px 0 0;
+    transform: translateY(calc(100% - 88px));
+    transition: transform 0.3s ease;
+    z-index: 12;
+    box-shadow: 0 -20px 44px rgba(15, 23, 42, 0.22);
+    background: rgba(248, 250, 252, 0.98);
+    backdrop-filter: blur(18px);
   }
 
-  .map-area {
-    order: 1;
+  .trip-panel:not(.hidden) {
+    transform: translateY(0);
+  }
+
+  .trip-panel.hidden {
+    transform: translateY(calc(100% - 88px));
+    display: block !important;
+  }
+
+  .mobile-close-btn,
+  .mobile-trip-list-btn {
+    display: inline-flex;
   }
 
   .map-shell {
-    min-height: 520px;
+    min-height: calc(100vh - 180px);
+  }
+}
+
+@media (max-width: 900px) {
+  body {
+    overflow-x: hidden;
+  }
+
+  .topbar {
+    padding: calc(18px + env(safe-area-inset-top)) 16px 16px;
+  }
+
+  .status-strip {
+    margin: 12px 16px 0;
+  }
+
+  .app-layout {
+    padding: 12px 12px calc(24px + env(safe-area-inset-bottom));
+  }
+
+  .map-shell {
+    border-radius: 24px;
+    min-height: calc(100vh - 170px);
+  }
+
+  .map-overlay {
+    gap: 8px;
+  }
+
+  .top-left {
+    top: 10px;
+    left: 10px;
+    max-width: 52px;
+  }
+
+  .top-right {
+    top: 8px;
+    right: 8px;
+    width: calc(100% - 74px);
+    max-width: calc(100% - 74px);
+    align-items: stretch;
+  }
+
+  .bottom-left {
+    left: 10px;
+    bottom: 10px;
+  }
+
+  .top-left .compact-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    align-items: stretch;
+    width: 44px;
+  }
+
+  #btnOpenStartPanel,
+  #btnOpenPointPanel,
+  #btnToggleMenu,
+  #btnCurrentLocation,
+  .icon-only-btn {
+    width: 44px !important;
+    min-width: 44px !important;
+    max-width: 44px !important;
+    height: 44px !important;
+    min-height: 44px !important;
+    padding: 0 !important;
+    border-radius: 15px !important;
+    display: grid !important;
+    place-items: center !important;
+  }
+
+  #btnOpenStartPanel svg,
+  #btnOpenPointPanel svg,
+  #btnToggleMenu svg,
+  #btnCurrentLocation svg,
+  .icon-only-btn svg {
+    width: 20px !important;
+    height: 20px !important;
+  }
+
+  .right-tools {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 6px;
+    align-items: start;
+    justify-content: stretch;
+    width: 100%;
+  }
+
+  .map-search-input {
+    width: 100%;
+    min-width: 0;
+    max-width: none;
+    min-height: 44px;
+    height: 44px;
+    padding: 10px 14px;
+    font-size: 0.83rem;
+    line-height: 1.1;
+    border-radius: 16px;
+  }
+
+  .floating-menu {
+    width: 172px;
+    max-width: calc(100vw - 20px);
+    margin-top: 4px;
+  }
+
+  .floating-card,
+  .compact-card {
+    width: min(300px, calc(100vw - 20px));
+    max-width: min(300px, calc(100vw - 20px));
+    padding: 14px;
+    border-radius: 18px;
+    max-height: min(62vh, 460px);
+    overflow-y: auto;
+  }
+
+  .floating-card h2,
+  .compact-card h2 {
+    font-size: 0.96rem;
+  }
+
+  .card-title-row {
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+
+  .field-group label {
+    font-size: 0.78rem;
+    margin-bottom: 5px;
+  }
+
+  .field-group input,
+  .field-group select {
+    min-height: 40px;
+    padding: 9px 11px;
+    font-size: 0.84rem;
+    border-radius: 13px;
+  }
+
+  .field-row {
+    gap: 8px;
+  }
+
+  .panel-actions {
+    gap: 8px;
+  }
+
+  .small-btn {
+    min-height: 38px;
+    padding: 9px 11px;
+    font-size: 0.79rem;
+    border-radius: 12px;
+  }
+
+  .summary-grid.compact-summary-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .summary-card {
+    min-height: 68px;
+    padding: 12px;
+  }
+
+  .summary-card span {
+    font-size: 0.72rem;
+  }
+
+  .summary-card strong {
+    font-size: 1rem;
+  }
+
+  .trip-panel {
+    height: min(76vh, 680px);
+    padding: 14px 14px calc(18px + env(safe-area-inset-bottom));
+  }
+
+  .trip-panel-header {
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+
+  .trip-panel h2 {
+    font-size: 1.04rem;
+  }
+
+  .trip-panel p {
+    font-size: 0.83rem;
+  }
+
+  .section-panel {
+    padding: 14px;
+    border-radius: 18px;
+  }
+
+  .action-row {
+    gap: 8px;
+  }
+
+  .action-row .primary-btn,
+  .action-row .ghost-btn {
+    min-height: 40px;
+    font-size: 0.82rem;
+    border-radius: 13px;
+  }
+
+  .trip-item {
+    padding: 12px;
+    border-radius: 16px;
+  }
+
+  .trip-item-title {
+    font-size: 0.9rem;
+  }
+
+  .trip-item-meta {
+    font-size: 0.76rem;
+  }
+
+  .saved-maps-panel {
+    width: min(760px, calc(100vw - 20px));
+    max-height: min(80vh, 700px);
+    border-radius: 24px;
+    padding: 18px;
+  }
+
+  .saved-maps-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .saved-maps-actions {
+    width: 100%;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .map-list-item {
+    grid-template-columns: 1fr;
+    gap: 12px;
+    align-items: stretch;
+  }
+
+  .map-list-item-actions {
+    justify-content: flex-end;
+  }
+
+  .map-badges {
+    gap: 6px;
+  }
+
+  .badge {
+    min-height: 32px;
+    padding: 0 10px;
+    font-size: 0.75rem;
+  }
+
+  .new-map-inline-btn {
+    min-height: 36px;
+    padding: 0 12px;
+  }
+
+  .new-map-btn-text {
+    display: inline;
+  }
+}
+
+@media (max-width: 640px) {
+  .topbar {
+    padding: calc(14px + env(safe-area-inset-top)) 12px 12px;
+  }
+
+  .brand-area {
+    gap: 10px;
+  }
+
+  .brand-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 14px;
+    font-size: 1rem;
+  }
+
+  .brand-text h1 {
+    font-size: 1rem;
+  }
+
+  .brand-text p {
+    font-size: 0.75rem;
+  }
+
+  .page-action-btn {
+    min-height: 40px;
+    padding: 10px 12px;
+    font-size: 0.8rem;
+  }
+
+  .status-strip {
+    margin: 10px 12px 0;
+    padding: 10px 12px;
+  }
+
+  .app-layout {
+    padding: 10px 10px calc(16px + env(safe-area-inset-bottom));
+  }
+
+  .map-shell {
+    min-height: calc(100vh - 156px);
+    border-radius: 22px;
+  }
+
+  .top-left {
+    top: 8px;
+    left: 8px;
+    max-width: 46px;
+  }
+
+  .top-right {
+    top: 6px;
+    right: 6px;
+    width: calc(100% - 62px);
+    max-width: calc(100% - 62px);
+  }
+
+  .bottom-left {
+    left: 8px;
+    bottom: 8px;
+  }
+
+  .top-left .compact-buttons {
+    width: 38px;
+  }
+
+  #btnOpenStartPanel,
+  #btnOpenPointPanel,
+  #btnToggleMenu,
+  #btnCurrentLocation,
+  .icon-only-btn {
+    width: 38px !important;
+    min-width: 38px !important;
+    max-width: 38px !important;
+    height: 38px !important;
+    min-height: 38px !important;
+    border-radius: 13px !important;
+  }
+
+  #btnOpenStartPanel svg,
+  #btnOpenPointPanel svg,
+  #btnToggleMenu svg,
+  #btnCurrentLocation svg,
+  .icon-only-btn svg {
+    width: 18px !important;
+    height: 18px !important;
+  }
+
+  .map-search-input {
+    width: 100%;
+    min-width: 0;
+    max-width: none;
+    min-height: 38px;
+    height: 38px;
+    padding: 8px 12px;
+    font-size: 0.77rem;
+    border-radius: 14px;
+  }
+
+  .floating-menu {
+    width: 150px;
+    max-width: calc(100vw - 12px);
+  }
+
+  .floating-card,
+  .compact-card {
+    width: min(280px, calc(100vw - 16px));
+    max-width: min(280px, calc(100vw - 16px));
+    padding: 12px;
+    border-radius: 16px;
+  }
+
+  .field-group input,
+  .field-group select {
+    min-height: 38px;
+    font-size: 0.8rem;
+  }
+
+  .small-btn {
+    min-height: 36px;
+    font-size: 0.76rem;
+  }
+
+  .summary-card {
+    min-height: 64px;
+    padding: 10px;
+  }
+
+  .trip-panel {
+    height: min(78vh, 720px);
+    padding: 12px 12px calc(16px + env(safe-area-inset-bottom));
+    border-radius: 20px 20px 0 0;
+  }
+
+  .saved-maps-panel {
+    width: calc(100vw - 16px);
+    padding: 14px;
+    border-radius: 20px;
+  }
+
+  .saved-maps-actions .ghost-btn {
+    min-height: 38px;
+    font-size: 0.78rem;
+  }
+
+  .trip-list {
+    gap: 10px;
+  }
+
+  .trip-item {
+    padding: 10px;
   }
 
   .desktop-only-inline {
@@ -76,741 +466,129 @@ button {
   }
 }
 
-@media (max-width: 900px) {
-  body {
-    padding-bottom: calc(18px + env(safe-area-inset-bottom, 0px));
-  }
-
+@media (max-width: 480px) {
   .topbar {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 14px;
-    padding: 18px;
-  }
-
-  .brand-area {
-    align-items: center;
-  }
-
-  .topbar-actions {
-    justify-content: flex-end;
-  }
-
-  .status-strip {
-    margin: 0 18px;
-  }
-
-  .app-layout {
-    padding: 16px;
-    gap: 16px;
-  }
-
-  .map-shell {
-    border-radius: 24px;
-    min-height: 500px;
-  }
-
-  .sidebar {
-    gap: 16px;
-  }
-
-  .summary-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-
-  .route-actions {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
-@media (max-width: 760px) {
-  .topbar {
-    padding: 14px 14px 10px;
-    gap: 10px;
-    border-radius: 0 0 20px 20px;
-  }
-
-  .brand-area {
-    gap: 10px;
-  }
-
-  .brand-icon {
-    width: 42px;
-    height: 42px;
-    border-radius: 14px;
-    font-size: 20px;
-  }
-
-  .brand-text h1 {
-    font-size: 18px;
-    line-height: 1.2;
-  }
-
-  .brand-text p {
-    font-size: 12px;
-    line-height: 1.35;
-  }
-
-  .page-action-btn {
-    min-height: 42px;
-    padding: 10px 14px;
-    border-radius: 12px;
-    font-size: 13px;
-  }
-
-  .status-strip {
-    margin: 10px 14px 0;
-    padding: 10px 12px;
-    border-radius: 14px;
-  }
-
-  .auth-status {
-    font-size: 13px;
-    line-height: 1.35;
-  }
-
-  .app-layout {
-    padding: 12px;
-    gap: 14px;
-  }
-
-  .map-area {
-    min-width: 0;
-  }
-
-  .map-shell {
-    min-height: calc(100dvh - 220px);
-    border-radius: 22px;
-  }
-
-  .map-overlay.top-left {
-    top: calc(10px + env(safe-area-inset-top, 0px));
-    left: 10px;
-    right: auto;
-  }
-
-  .map-overlay.top-right {
-    top: calc(10px + env(safe-area-inset-top, 0px));
-    right: 10px;
-    left: auto;
-  }
-
-  .map-overlay.bottom-left {
-    left: 10px;
-    bottom: calc(10px + env(safe-area-inset-bottom, 0px));
-  }
-
-  .stack-row.compact-buttons {
-    gap: 10px;
-  }
-
-  .stack-row.right-tools {
-    align-items: flex-start;
-    gap: 10px;
-  }
-
-  .menu-wrapper {
-    flex-shrink: 0;
-  }
-
-  .overlay-btn,
-  .fab-btn {
-    width: 52px;
-    height: 52px;
-    min-width: 52px;
-    min-height: 52px;
-    border-radius: 18px;
-    padding: 0;
-    touch-action: manipulation;
-  }
-
-  .overlay-btn svg,
-  .fab-btn svg {
-    width: 23px;
-    height: 23px;
-    stroke-width: 2.2;
-  }
-
-  #btnOpenStartPanel.overlay-btn svg,
-  #btnOpenPointPanel.overlay-btn svg,
-  #btnToggleMenu.overlay-btn svg {
-    width: 24px;
-    height: 24px;
-  }
-
-  .map-search-input {
-    width: min(58vw, 220px);
-    min-width: 0;
-    height: 52px;
-    padding: 0 44px 0 16px;
-    border-radius: 18px;
-    font-size: 15px;
-    line-height: 1.2;
-    box-shadow: 0 14px 28px rgba(15, 23, 42, 0.18);
-  }
-
-  .search-dropdown {
-    width: min(58vw, 220px);
-    border-radius: 16px;
-    margin-top: 8px;
-  }
-
-  .floating-card,
-  .floating-card.compact-card {
-    width: min(calc(100vw - 24px), 340px);
-    max-width: calc(100vw - 24px);
-    border-radius: 18px;
-    padding: 14px;
-    box-shadow: 0 20px 40px rgba(15, 23, 42, 0.24);
-  }
-
-  .floating-card h2,
-  .compact-card h2 {
-    font-size: 15px;
-  }
-
-  .card-title-row {
-    margin-bottom: 12px;
-    gap: 10px;
-  }
-
-  .field-group label {
-    font-size: 12px;
-  }
-
-  .field-group input,
-  .field-group select,
-  .field-group textarea {
-    min-height: 44px;
-    border-radius: 12px;
-    padding: 10px 12px;
-    font-size: 15px;
-  }
-
-  .field-row {
-    gap: 10px;
-  }
-
-  .coordinate-row {
-    display: none;
-  }
-
-  #startSelectionStatus,
-  #pointSelectionStatus {
-    display: block;
-  }
-
-  .small-btn,
-  .large-btn {
-    min-height: 44px;
-    border-radius: 12px;
-    font-size: 14px;
-    padding: 10px 14px;
-  }
-
-  .icon-close {
-    width: 36px;
-    height: 36px;
-    border-radius: 12px;
-    font-size: 20px;
-  }
-
-  .floating-menu {
-    right: 0;
-    min-width: 210px;
-    border-radius: 16px;
-    padding: 8px;
-  }
-
-  .menu-item {
-    min-height: 42px;
-    border-radius: 12px;
-    padding: 10px 12px;
-    font-size: 14px;
-  }
-
-  .summary-grid {
-    grid-template-columns: 1fr;
-    gap: 10px;
-  }
-
-  .summary-card {
-    border-radius: 16px;
-    padding: 14px;
-  }
-
-  .summary-card span {
-    font-size: 12px;
-  }
-
-  .summary-card strong {
-    font-size: 16px;
-  }
-
-  .route-actions {
-    grid-template-columns: 1fr;
-    gap: 10px;
-  }
-
-  .panel {
-    border-radius: 20px;
-    padding: 16px;
-  }
-
-  .panel-heading {
-    gap: 12px;
-    margin-bottom: 14px;
-  }
-
-  .panel-heading h2 {
-    font-size: 17px;
-  }
-
-  .panel-heading p {
-    font-size: 12px;
-    line-height: 1.4;
-  }
-
-  .route-list {
-    gap: 10px;
-  }
-
-  .route-item {
-    border-radius: 16px;
-    padding: 12px;
-    gap: 10px;
-  }
-
-  .route-item-index {
-    width: 34px;
-    height: 34px;
-    border-radius: 12px;
-    font-size: 13px;
-  }
-
-  .route-item-title {
-    font-size: 14px;
-  }
-
-  .route-item-meta {
-    font-size: 12px;
-    line-height: 1.35;
-  }
-
-  .map-list {
-    gap: 10px;
-  }
-
-  .map-list-item {
-    grid-template-columns: 1fr;
-    gap: 10px;
-    align-items: stretch;
-    padding: 14px;
-    border-radius: 16px;
-  }
-
-  .map-list-actions {
-    justify-content: stretch;
-    gap: 8px;
-  }
-
-  .map-list-actions .small-btn {
-    flex: 1 1 auto;
-  }
-
-  .toast {
-    left: 12px;
-    right: 12px;
-    bottom: calc(12px + env(safe-area-inset-bottom, 0px));
-    width: auto;
-    max-width: none;
-    border-radius: 14px;
-    padding: 12px 14px;
-    font-size: 13px;
-    line-height: 1.35;
-  }
-}
-
-@media (max-width: 640px) {
-  .topbar {
-    padding: 12px 12px 10px;
-  }
-
-  .status-strip {
-    margin: 8px 12px 0;
-  }
-
-  .app-layout {
-    padding: 10px;
-    gap: 12px;
-  }
-
-  .map-shell {
-    min-height: calc(100dvh - 208px);
-    border-radius: 20px;
-  }
-
-  .map-overlay.top-left {
-    top: calc(8px + env(safe-area-inset-top, 0px));
-    left: 8px;
-  }
-
-  .map-overlay.top-right {
-    top: calc(8px + env(safe-area-inset-top, 0px));
-    right: 8px;
-  }
-
-  .map-overlay.bottom-left {
-    left: 8px;
-    bottom: calc(8px + env(safe-area-inset-bottom, 0px));
-  }
-
-  .stack-row.compact-buttons,
-  .stack-row.right-tools {
-    gap: 8px;
-  }
-
-  .overlay-btn,
-  .fab-btn {
-    width: 50px;
-    height: 50px;
-    min-width: 50px;
-    min-height: 50px;
-    border-radius: 17px;
-  }
-
-  .overlay-btn svg,
-  .fab-btn svg {
-    width: 22px;
-    height: 22px;
-  }
-
-  .map-search-input,
-  .search-dropdown {
-    width: min(60vw, 208px);
-  }
-
-  .map-search-input {
-    height: 50px;
-    border-radius: 17px;
-    padding-left: 14px;
-    padding-right: 42px;
-    font-size: 14px;
-  }
-
-  .floating-card,
-  .floating-card.compact-card {
-    width: min(calc(100vw - 20px), 320px);
-    max-width: calc(100vw - 20px);
-    padding: 13px;
-    border-radius: 17px;
-  }
-
-  .field-group input,
-  .field-group select,
-  .field-group textarea,
-  .small-btn,
-  .large-btn {
-    min-height: 42px;
-  }
-
-  .panel {
-    padding: 14px;
-    border-radius: 18px;
-  }
-}
-
-@media (max-width: 520px) {
-  .topbar {
-    padding: 10px 10px 8px;
-    gap: 8px;
-  }
-
-  .brand-text h1 {
-    font-size: 17px;
-  }
-
-  .brand-text p {
-    font-size: 11px;
-  }
-
-  .page-action-btn {
-    min-height: 40px;
-    padding: 9px 12px;
-    font-size: 12px;
+    padding: calc(12px + env(safe-area-inset-top)) 10px 10px;
   }
 
   .status-strip {
     margin: 8px 10px 0;
-    padding: 9px 10px;
-  }
-
-  .app-layout {
-    padding: 8px;
-    gap: 10px;
   }
 
   .map-shell {
-    min-height: calc(100dvh - 196px);
-    border-radius: 18px;
-  }
-
-  .overlay-btn,
-  .fab-btn {
-    width: 48px;
-    height: 48px;
-    min-width: 48px;
-    min-height: 48px;
-    border-radius: 16px;
-  }
-
-  .map-search-input,
-  .search-dropdown {
-    width: min(62vw, 196px);
-  }
-
-  .map-search-input {
-    height: 48px;
-    padding-left: 13px;
-    padding-right: 40px;
-    font-size: 14px;
+    min-height: calc(100vh - 148px);
   }
 
   .floating-card,
-  .floating-card.compact-card {
-    width: min(calc(100vw - 16px), 304px);
-    max-width: calc(100vw - 16px);
-    padding: 12px;
-    border-radius: 16px;
+  .compact-card {
+    width: min(264px, calc(100vw - 14px));
+    max-width: min(264px, calc(100vw - 14px));
   }
 
-  .summary-card,
-  .route-item,
-  .map-list-item {
-    padding: 12px;
+  .saved-maps-header h2,
+  .trip-panel h2 {
+    font-size: 0.98rem;
   }
 
-  .toast {
-    left: 10px;
-    right: 10px;
-    bottom: calc(10px + env(safe-area-inset-bottom, 0px));
+  .section-title-row h3 {
+    font-size: 0.9rem;
+  }
+
+  .map-list-item-body strong {
+    font-size: 0.9rem;
+  }
+
+  .map-list-item-body span {
+    font-size: 0.74rem;
+  }
+
+  .map-list-item-actions {
+    flex-wrap: wrap;
+  }
+
+  .map-list-item-actions .ghost-btn,
+  .map-list-item-actions .primary-btn {
+    flex: 1 1 auto;
   }
 }
 
-@media (max-width: 430px) {
-  .topbar {
-    border-radius: 0 0 18px 18px;
-  }
+/* Minimal mobile UI adjustments: keep original layout, only remove zoom need and simplify coordinate display */
+html,
+body {
+  touch-action: manipulation;
+}
 
-  .brand-area {
-    align-items: flex-start;
-  }
-
-  .brand-icon {
-    width: 40px;
-    height: 40px;
-    border-radius: 13px;
-    font-size: 18px;
-  }
-
-  .brand-text h1 {
+@media (max-width: 768px) {
+  input,
+  select,
+  textarea {
     font-size: 16px;
   }
 
-  .brand-text p {
-    font-size: 10.5px;
+  .location-selection-status {
+    display: block;
+    margin-top: 8px;
+    margin-bottom: 10px;
+    padding: 10px 12px;
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1.35;
+    background: #f8fafc;
+    border: 1px solid #cbd5e1;
+    color: #475569;
   }
 
-  .map-shell {
-    min-height: calc(100dvh - 188px);
+  .location-selection-status.is-selected {
+    background: #ecfdf5;
+    border-color: #86efac;
+    color: #166534;
   }
 
-  .overlay-btn,
-  .fab-btn {
-    width: 46px;
-    height: 46px;
-    min-width: 46px;
-    min-height: 46px;
-    border-radius: 15px;
+  .coordinate-row {
+    display: none !important;
   }
 
-  .overlay-btn svg,
-  .fab-btn svg {
-    width: 21px;
-    height: 21px;
+  .top-left {
+    max-width: 60px;
   }
 
-  .map-search-input,
-  .search-dropdown {
-    width: min(64vw, 186px);
+  .top-left .compact-buttons {
+    width: 52px;
+    gap: 8px;
+  }
+
+  #btnOpenStartPanel,
+  #btnOpenPointPanel,
+  #btnToggleMenu,
+  #btnCurrentLocation,
+  .icon-only-btn {
+    width: 52px !important;
+    min-width: 52px !important;
+    max-width: 52px !important;
+    height: 52px !important;
+    min-height: 52px !important;
+    border-radius: 18px !important;
+  }
+
+  #btnOpenStartPanel svg,
+  #btnOpenPointPanel svg,
+  #btnToggleMenu svg,
+  #btnCurrentLocation svg,
+  .icon-only-btn svg {
+    width: 23px !important;
+    height: 23px !important;
+  }
+
+  .top-right {
+    width: calc(100% - 84px);
+    max-width: calc(100% - 84px);
   }
 
   .map-search-input {
-    height: 46px;
-    font-size: 13.5px;
-  }
-
-  .floating-card,
-  .floating-card.compact-card {
-    width: min(calc(100vw - 14px), 292px);
-    max-width: calc(100vw - 14px);
-  }
-
-  .field-group input,
-  .field-group select,
-  .field-group textarea {
-    font-size: 14px;
-  }
-
-  .small-btn,
-  .large-btn {
-    font-size: 13px;
-  }
-
-  .panel-heading h2 {
+    min-height: 52px;
+    height: 52px;
     font-size: 16px;
-  }
-
-  .panel-heading p,
-  .route-item-meta,
-  .toast {
-    font-size: 12px;
-  }
-}
-
-@media (max-width: 380px) {
-  .topbar {
-    padding: 9px 9px 8px;
-  }
-
-  .status-strip {
-    margin: 7px 9px 0;
-  }
-
-  .app-layout {
-    padding: 7px;
-    gap: 9px;
-  }
-
-  .map-shell {
-    min-height: calc(100dvh - 182px);
-    border-radius: 16px;
-  }
-
-  .map-overlay.top-left {
-    left: 7px;
-    top: calc(7px + env(safe-area-inset-top, 0px));
-  }
-
-  .map-overlay.top-right {
-    right: 7px;
-    top: calc(7px + env(safe-area-inset-top, 0px));
-  }
-
-  .map-overlay.bottom-left {
-    left: 7px;
-    bottom: calc(7px + env(safe-area-inset-bottom, 0px));
-  }
-
-  .overlay-btn,
-  .fab-btn {
-    width: 44px;
-    height: 44px;
-    min-width: 44px;
-    min-height: 44px;
-    border-radius: 14px;
-  }
-
-  .overlay-btn svg,
-  .fab-btn svg {
-    width: 20px;
-    height: 20px;
-  }
-
-  .map-search-input,
-  .search-dropdown {
-    width: min(66vw, 176px);
-  }
-
-  .map-search-input {
-    height: 44px;
-    padding-left: 12px;
-    padding-right: 38px;
-    border-radius: 15px;
-    font-size: 13px;
-  }
-
-  .floating-card,
-  .floating-card.compact-card {
-    width: min(calc(100vw - 12px), 282px);
-    max-width: calc(100vw - 12px);
-    padding: 11px;
-    border-radius: 15px;
-  }
-
-  .icon-close {
-    width: 34px;
-    height: 34px;
-  }
-
-  .field-group input,
-  .field-group select,
-  .field-group textarea,
-  .small-btn,
-  .large-btn {
-    min-height: 40px;
-  }
-
-  .panel {
-    padding: 13px;
-    border-radius: 16px;
-  }
-
-  .summary-card strong {
-    font-size: 15px;
-  }
-
-  .route-item-title {
-    font-size: 13px;
-  }
-}
-
-@media (max-width: 340px) {
-  .map-search-input,
-  .search-dropdown {
-    width: min(68vw, 168px);
-  }
-
-  .floating-card,
-  .floating-card.compact-card {
-    width: min(calc(100vw - 10px), 270px);
-    max-width: calc(100vw - 10px);
-    padding: 10px;
-  }
-
-  .overlay-btn,
-  .fab-btn {
-    width: 42px;
-    height: 42px;
-    min-width: 42px;
-    min-height: 42px;
-    border-radius: 13px;
-  }
-
-  .overlay-btn svg,
-  .fab-btn svg {
-    width: 19px;
-    height: 19px;
-  }
-
-  .map-search-input {
-    height: 42px;
-    font-size: 12.5px;
-  }
-
-  .small-btn,
-  .large-btn {
-    font-size: 12.5px;
-    padding: 9px 11px;
+    padding: 10px 14px;
   }
 }
