@@ -1,10 +1,11 @@
+import { app } from "./firebase-config.js";
 import { logout, watchAuth, getUserClaims } from "./auth.js";
 import {
   getFunctions,
   httpsCallable
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-functions.js";
 
-const functions = getFunctions();
+const functions = getFunctions(app);
 
 const fnListUsers = httpsCallable(functions, "adminListUsers");
 const fnCreateUser = httpsCallable(functions, "adminCreateUser");
@@ -140,6 +141,11 @@ function applyUserFilter() {
 async function loadUsers() {
   try {
     elements.adminStatus.textContent = "Kullanıcılar yükleniyor...";
+
+    if (state.currentUser) {
+      await state.currentUser.getIdToken(true);
+    }
+
     const result = await fnListUsers();
     state.users = Array.isArray(result.data?.users) ? result.data.users : [];
     state.users.sort((a, b) => (a.email || "").localeCompare(b.email || "", "tr"));
@@ -166,6 +172,10 @@ async function handleCreateUser() {
   }
 
   try {
+    if (state.currentUser) {
+      await state.currentUser.getIdToken(true);
+    }
+
     await fnCreateUser({ email, password });
     elements.newUserEmail.value = "";
     elements.newUserPassword.value = "";
@@ -189,6 +199,10 @@ async function handleGrantAccess() {
   }
 
   try {
+    if (state.currentUser) {
+      await state.currentUser.getIdToken(true);
+    }
+
     await fnSetAccess({
       uid: state.selectedUser.uid,
       mode: "premium",
@@ -208,6 +222,10 @@ async function handleSetTrial() {
   }
 
   try {
+    if (state.currentUser) {
+      await state.currentUser.getIdToken(true);
+    }
+
     await fnSetAccess({
       uid: state.selectedUser.uid,
       mode: "trial"
@@ -229,6 +247,10 @@ async function handleDeleteUser() {
   if (!ok) return;
 
   try {
+    if (state.currentUser) {
+      await state.currentUser.getIdToken(true);
+    }
+
     await fnDeleteUser({ uid: state.selectedUser.uid });
     state.selectedUser = null;
     elements.adminStatus.textContent = "Kullanıcı silindi.";
@@ -276,6 +298,7 @@ function initAuthGuard() {
     }
 
     state.currentUser = user;
+    await user.getIdToken(true);
     state.claims = await getUserClaims(user);
 
     if (state.claims.adminPanel !== true) {
