@@ -68,6 +68,8 @@ async function routeAfterLogin(user) {
 }
 
 async function handleLogin() {
+  elements.authStatus.textContent = "TEST: butona basıldı";
+
   const email = elements.loginEmail.value.trim();
   const password = elements.loginPassword.value.trim();
 
