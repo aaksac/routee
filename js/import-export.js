@@ -25,30 +25,33 @@ function buildExportRows(startPoint, points) {
 function exportToCsv(filename, startPoint, points) {
   const rows = buildExportRows(startPoint, points);
   const headers = ["type", "name", "lat", "lng"];
+  const delimiter = ",";
 
   const csvLines = [
-    headers.join(","),
+    headers.join(delimiter),
     ...rows.map((row) =>
       [
-        escapeCsvValue(row.type),
-        escapeCsvValue(row.name),
-        escapeCsvValue(row.lat),
-        escapeCsvValue(row.lng)
-      ].join(",")
+        escapeCsvValue(row.type, delimiter),
+        escapeCsvValue(row.name, delimiter),
+        escapeCsvValue(row.lat, delimiter),
+        escapeCsvValue(row.lng, delimiter)
+      ].join(delimiter)
     )
   ];
 
-  const blob = new Blob([csvLines.join("\n")], {
+  const bom = "\uFEFF";
+  const csvContent = `${bom}${csvLines.join("\r\n")}`;
+  const blob = new Blob([csvContent], {
     type: "text/csv;charset=utf-8;"
   });
 
   downloadBlob(blob, filename.endsWith(".csv") ? filename : `${filename}.csv`);
 }
 
-function escapeCsvValue(value) {
+function escapeCsvValue(value, delimiter = ",") {
   const str = sanitizeCsvCell(value);
 
-  if (str.includes(",") || str.includes('"') || str.includes("\n")) {
+  if (str.includes(delimiter) || str.includes('"') || str.includes("\n") || str.includes("\r")) {
     return `"${str.replace(/"/g, '""')}"`;
   }
 
@@ -86,28 +89,111 @@ function downloadBlob(blob, filename) {
 }
 
 function parseCsvText(csvText) {
-  const lines = csvText
-    .split(/\r?\n/)
-    .map((line) => line.trim())
-    .filter(Boolean);
+  const normalizedText = String(csvText || "").replace(/^\uFEFF/, "").trim();
+  if (!normalizedText) return [];
+
+  const delimiter = detectCsvDelimiter(normalizedText);
+  const lines = splitCsvRecords(normalizedText);
 
   if (!lines.length) return [];
 
-  const headers = splitCsvLine(lines[0]).map((h) => h.trim().toLowerCase());
+  const headers = splitCsvLine(lines[0], delimiter).map((header) => normalizeHeader(header));
 
-  return lines.slice(1).map((line) => {
-    const values = splitCsvLine(line);
-    const obj = {};
+  return lines
+    .slice(1)
+    .map((line) => {
+      const values = splitCsvLine(line, delimiter);
+      const obj = {};
 
-    headers.forEach((header, index) => {
-      obj[header] = values[index] ?? "";
-    });
+      headers.forEach((header, index) => {
+        obj[header] = values[index] ?? "";
+      });
 
-    return normalizeImportedRow(obj);
-  });
+      return normalizeImportedRow(obj);
+    })
+    .filter(Boolean);
 }
 
-function splitCsvLine(line) {
+function splitCsvRecords(text) {
+  const records = [];
+  let current = "";
+  let insideQuotes = false;
+
+  for (let i = 0; i < text.length; i += 1) {
+    const char = text[i];
+    const next = text[i + 1];
+
+    if (char === '"') {
+      if (insideQuotes && next === '"') {
+        current += '""';
+        i += 1;
+        continue;
+      }
+
+      insideQuotes = !insideQuotes;
+      current += char;
+      continue;
+    }
+
+    if ((char === "\n" || char === "\r") && !insideQuotes) {
+      if (current.trim()) {
+        records.push(current);
+      }
+
+      current = "";
+
+      if (char === "\r" && next === "\n") {
+        i += 1;
+      }
+
+      continue;
+    }
+
+    current += char;
+  }
+
+  if (current.trim()) {
+    records.push(current);
+  }
+
+  return records;
+}
+
+function detectCsvDelimiter(text) {
+  const firstLine = splitCsvRecords(text)[0] || "";
+  const commaCount = countDelimiterOutsideQuotes(firstLine, ",");
+  const semicolonCount = countDelimiterOutsideQuotes(firstLine, ";");
+
+  return semicolonCount > commaCount ? ";" : ",";
+}
+
+function countDelimiterOutsideQuotes(line, delimiter) {
+  let count = 0;
+  let insideQuotes = false;
+
+  for (let i = 0; i < line.length; i += 1) {
+    const char = line[i];
+    const next = line[i + 1];
+
+    if (char === '"' && insideQuotes && next === '"') {
+      i += 1;
+      continue;
+    }
+
+    if (char === '"') {
+      insideQuotes = !insideQuotes;
+      continue;
+    }
+
+    if (char === delimiter && !insideQuotes) {
+      count += 1;
+    }
+  }
+
+  return count;
+}
+
+function splitCsvLine(line, delimiter = ",") {
   const result = [];
   let current = "";
   let insideQuotes = false;
@@ -127,7 +213,7 @@ function splitCsvLine(line) {
       continue;
     }
 
-    if (char === "," && !insideQuotes) {
+    if (char === delimiter && !insideQuotes) {
       result.push(current);
       current = "";
       continue;
@@ -137,15 +223,76 @@ function splitCsvLine(line) {
   }
 
   result.push(current);
-  return result;
+  return result.map((value) => value.trim());
+}
+
+function normalizeHeader(header) {
+  return String(header || "")
+    .trim()
+    .toLowerCase()
+    .replace(/^\uFEFF/, "")
+    .replace(/\s+/g, "");
+}
+
+function getRowValue(row, keys) {
+  for (const key of keys) {
+    if (row[key] !== undefined && row[key] !== null && String(row[key]).trim() !== "") {
+      return row[key];
+    }
+  }
+
+  return "";
+}
+
+function normalizeImportedType(value) {
+  const normalized = String(value || "")
+    .trim()
+    .toLowerCase()
+    .replace(/[ç]/g, "c")
+    .replace(/[ğ]/g, "g")
+    .replace(/[ı]/g, "i")
+    .replace(/[İ]/g, "i")
+    .replace(/[ö]/g, "o")
+    .replace(/[ş]/g, "s")
+    .replace(/[ü]/g, "u");
+
+  if (["start", "baslangic", "baslangicnoktasi", "startingpoint"].includes(normalized)) {
+    return "start";
+  }
+
+  if (["point", "konum", "nokta", "location", "place"].includes(normalized)) {
+    return "point";
+  }
+
+  return normalized;
+}
+
+function parseCoordinateValue(value) {
+  if (typeof value === "number") {
+    return Number.isFinite(value) ? value : NaN;
+  }
+
+  const normalized = String(value ?? "")
+    .trim()
+    .replace(/^\uFEFF/, "")
+    .replace(/\s+/g, "")
+    .replace(/,/g, ".");
+
+  const number = Number(normalized);
+  return Number.isFinite(number) ? number : NaN;
 }
 
 function normalizeImportedRow(row) {
+  const typeValue = getRowValue(row, ["type", "tur", "tür", "türü", "turu"]);
+  const nameValue = getRowValue(row, ["name", "ad", "isim", "yeradi", "yeradı", "placename"]);
+  const latValue = getRowValue(row, ["lat", "latitude", "enlem"]);
+  const lngValue = getRowValue(row, ["lng", "lon", "long", "longitude", "boylam"]);
+
   return {
-    type: String(row.type || "").trim().toLowerCase(),
-    name: String(row.name || "").trim(),
-    lat: Number(row.lat),
-    lng: Number(row.lng)
+    type: normalizeImportedType(typeValue),
+    name: String(nameValue || "").trim(),
+    lat: parseCoordinateValue(latValue),
+    lng: parseCoordinateValue(lngValue)
   };
 }
 
@@ -159,10 +306,31 @@ function validateImportedRows(rows) {
   );
 }
 
+async function decodeCsvFile(file) {
+  const buffer = await file.arrayBuffer();
+  const bytes = new Uint8Array(buffer);
+  const encodings = ["utf-8", "windows-1254", "iso-8859-9"];
+
+  for (const encoding of encodings) {
+    try {
+      const decoder = new TextDecoder(encoding, { fatal: false });
+      const text = decoder.decode(bytes);
+      const parsed = validateImportedRows(parseCsvText(text));
+
+      if (parsed.length) {
+        return parsed;
+      }
+    } catch (error) {
+      // Bir sonraki kodlamayı dene.
+    }
+  }
+
+  const fallbackText = await file.text();
+  return validateImportedRows(parseCsvText(fallbackText));
+}
+
 async function importFromCsvFile(file) {
-  const text = await file.text();
-  const parsed = parseCsvText(text);
-  return validateImportedRows(parsed);
+  return decodeCsvFile(file);
 }
 
 async function importFromXlsxFile(file) {
@@ -172,7 +340,16 @@ async function importFromXlsxFile(file) {
   const worksheet = workbook.Sheets[sheetName];
   const jsonRows = XLSX.utils.sheet_to_json(worksheet, { defval: "" });
 
-  const parsed = jsonRows.map(normalizeImportedRow);
+  const parsed = jsonRows.map((row) => {
+    const normalizedRow = {};
+
+    Object.keys(row).forEach((key) => {
+      normalizedRow[normalizeHeader(key)] = row[key];
+    });
+
+    return normalizeImportedRow(normalizedRow);
+  });
+
   return validateImportedRows(parsed);
 }
 
