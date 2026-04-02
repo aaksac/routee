@@ -10,21 +10,6 @@ const elements = {
   authStatus: document.getElementById("authStatus")
 };
 
-async function hasInternetConnection() {
-  if (!navigator.onLine) return false;
-
-  try {
-    const response = await fetch("./manifest.webmanifest?check=" + Date.now(), {
-      method: "GET",
-      cache: "no-store"
-    });
-
-    return response.ok;
-  } catch {
-    return false;
-  }
-}
-
 function ensureOfflineAlert() {
   let alertEl = document.getElementById("offlineAlert");
 
@@ -128,18 +113,26 @@ function hideOfflineAlert() {
   }
 }
 
-function isNetworkLikeError(error) {
-  const code = String(error?.code || "").toLowerCase();
-  const message = String(error?.message || "").toLowerCase();
+function markOffline() {
+  showOfflineAlert();
+  if (elements.authStatus) {
+    elements.authStatus.textContent = "Lütfen internet bağlantınızı kontrol edin.";
+  }
+}
 
-  return (
-    code.includes("network") ||
-    code.includes("unavailable") ||
-    message.includes("network") ||
-    message.includes("internet") ||
-    message.includes("failed to fetch") ||
-    message.includes("offline")
-  );
+async function hasInternetConnection() {
+  if (!navigator.onLine) return false;
+
+  try {
+    const response = await fetch("./manifest.webmanifest?check=" + Date.now(), {
+      method: "GET",
+      cache: "no-store"
+    });
+
+    return response.ok;
+  } catch {
+    return false;
+  }
 }
 
 async function routeAfterLogin(user) {
@@ -154,6 +147,8 @@ async function routeAfterLogin(user) {
 }
 
 async function handleLogin() {
+  console.log("Login button clicked");
+
   const email = elements.loginEmail.value.trim();
   const password = elements.loginPassword.value.trim();
 
@@ -163,9 +158,10 @@ async function handleLogin() {
   }
 
   const online = await hasInternetConnection();
+  console.log("Online check:", online);
+
   if (!online) {
-    showOfflineAlert();
-    elements.authStatus.textContent = "Lütfen internet bağlantınızı kontrol edin.";
+    markOffline();
     return;
   }
 
@@ -177,9 +173,11 @@ async function handleLogin() {
     elements.authStatus.textContent = "Giriş başarılı.";
     await routeAfterLogin(result.user);
   } catch (error) {
-    if (isNetworkLikeError(error) || !(await hasInternetConnection())) {
-      showOfflineAlert();
-      elements.authStatus.textContent = "Lütfen internet bağlantınızı kontrol edin.";
+    console.error("Login error:", error);
+
+    const stillOnline = await hasInternetConnection();
+    if (!stillOnline) {
+      markOffline();
       return;
     }
 
@@ -203,8 +201,7 @@ async function handleRegister() {
 
   const online = await hasInternetConnection();
   if (!online) {
-    showOfflineAlert();
-    elements.authStatus.textContent = "Lütfen internet bağlantınızı kontrol edin.";
+    markOffline();
     return;
   }
 
@@ -216,9 +213,9 @@ async function handleRegister() {
     elements.authStatus.textContent = "Kayıt başarılı. 7 günlük deneme hesabı oluşturuldu.";
     await routeAfterLogin(result.user);
   } catch (error) {
-    if (isNetworkLikeError(error) || !(await hasInternetConnection())) {
-      showOfflineAlert();
-      elements.authStatus.textContent = "Lütfen internet bağlantınızı kontrol edin.";
+    const stillOnline = await hasInternetConnection();
+    if (!stillOnline) {
+      markOffline();
       return;
     }
 
@@ -236,8 +233,7 @@ async function handleReset() {
 
   const online = await hasInternetConnection();
   if (!online) {
-    showOfflineAlert();
-    elements.authStatus.textContent = "Lütfen internet bağlantınızı kontrol edin.";
+    markOffline();
     return;
   }
 
@@ -247,9 +243,9 @@ async function handleReset() {
     await sendReset(email);
     elements.authStatus.textContent = "Şifre sıfırlama maili gönderildi. Maildeki bağlantı yeni sıfırlama sayfasını açacak.";
   } catch (error) {
-    if (isNetworkLikeError(error) || !(await hasInternetConnection())) {
-      showOfflineAlert();
-      elements.authStatus.textContent = "Lütfen internet bağlantınızı kontrol edin.";
+    const stillOnline = await hasInternetConnection();
+    if (!stillOnline) {
+      markOffline();
       return;
     }
 
@@ -274,7 +270,10 @@ function applyQueryStatus() {
 
 function initAuthWatcher() {
   watchAuth(async (user) => {
-    if (user && (await hasInternetConnection())) {
+    if (!user) return;
+
+    const online = await hasInternetConnection();
+    if (online) {
       await routeAfterLogin(user);
     }
   });
@@ -285,10 +284,8 @@ function init() {
   applyQueryStatus();
   initAuthWatcher();
   ensureOfflineAlert();
-  window.addEventListener("offline", () => {
-    showOfflineAlert();
-    elements.authStatus.textContent = "Lütfen internet bağlantınızı kontrol edin.";
-  });
+
+  window.addEventListener("offline", markOffline);
   window.addEventListener("online", hideOfflineAlert);
 }
 
