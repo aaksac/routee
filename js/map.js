@@ -730,7 +730,8 @@ function renderPredictions(predictions, onPlaceSelected) {
     item.style.overflow = "hidden";
 
     const title = document.createElement("div");
-    title.textContent = prediction.structured_formatting?.main_text || prediction.description;
+    title.textContent =
+      prediction.structured_formatting?.main_text || prediction.description;
     title.style.fontWeight = "600";
     title.style.color = "#0f172a";
     title.style.fontSize = "0.88rem";
@@ -771,11 +772,15 @@ function renderPredictions(predictions, onPlaceSelected) {
       }
 
       const sessionToken = ensureAutocompleteSessionToken();
+      const selectedName =
+        prediction.structured_formatting?.main_text ||
+        prediction.description ||
+        "";
 
       placesService.getDetails(
         {
           placeId: prediction.place_id,
-          fields: ["name", "formatted_address", "geometry"],
+          fields: ["formatted_address", "geometry"],
           sessionToken
         },
         (place, status) => {
@@ -797,7 +802,7 @@ function renderPredictions(predictions, onPlaceSelected) {
           searchMarker = new google.maps.Marker({
             position: { lat, lng },
             map,
-            title: place.name || prediction.description,
+            title: selectedName,
             icon: createCircleSymbol("#2563eb", "#ffffff", 9)
           });
 
@@ -805,7 +810,7 @@ function renderPredictions(predictions, onPlaceSelected) {
           resetPageZoomAfterSearch();
 
           if (searchInputEl) {
-            searchInputEl.value = place.name || prediction.description;
+            searchInputEl.value = selectedName;
           }
 
           hideSearchDropdown();
@@ -813,8 +818,8 @@ function renderPredictions(predictions, onPlaceSelected) {
 
           if (typeof onPlaceSelected === "function") {
             onPlaceSelected({
-              name: place.name || prediction.description,
-              address: place.formatted_address || "",
+              name: selectedName,
+              address: place?.formatted_address || "",
               lat,
               lng
             });
@@ -901,15 +906,15 @@ function initPlaceSearch(inputElement, onPlaceSelected) {
     searchFocusHandlerBound = true;
   }
 
-if (!searchBlurHandlerBound) {
-  inputElement.addEventListener("blur", () => {
-    window.setTimeout(() => {
-      hideSearchDropdown();
-      resetPageZoomAfterSearch();
-    }, 180);
-  });
+  if (!searchBlurHandlerBound) {
+    inputElement.addEventListener("blur", () => {
+      window.setTimeout(() => {
+        hideSearchDropdown();
+        resetPageZoomAfterSearch();
+      }, 180);
+    });
 
-  searchBlurHandlerBound = true;
+    searchBlurHandlerBound = true;
   }
 }
 
