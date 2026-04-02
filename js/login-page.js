@@ -121,6 +121,13 @@ function showOfflineAlert() {
   alertEl.style.display = "block";
 }
 
+function hideOfflineAlert() {
+  const alertEl = document.getElementById("offlineAlert");
+  if (alertEl) {
+    alertEl.style.display = "none";
+  }
+}
+
 async function routeAfterLogin(user) {
   const claims = await getUserClaims(user);
 
@@ -145,6 +152,8 @@ async function handleLogin() {
     showOfflineAlert();
     return;
   }
+
+  hideOfflineAlert();
 
   try {
     const result = await login(email, password);
@@ -175,6 +184,8 @@ async function handleRegister() {
     return;
   }
 
+  hideOfflineAlert();
+
   try {
     const result = await register(email, password);
     await ensureUserProfile(result.user.uid, result.user.email);
@@ -197,6 +208,8 @@ async function handleReset() {
     showOfflineAlert();
     return;
   }
+
+  hideOfflineAlert();
 
   try {
     await sendReset(email);
@@ -235,6 +248,7 @@ function init() {
   initAuthWatcher();
   ensureOfflineAlert();
   window.addEventListener("offline", showOfflineAlert);
+  window.addEventListener("online", hideOfflineAlert);
 }
 
 document.addEventListener("DOMContentLoaded", init);
