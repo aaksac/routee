@@ -1,6 +1,3 @@
-import { login, register, watchAuth, sendReset, getUserClaims } from "./auth.js";
-import { ensureUserProfile } from "./firestore.js";
-
 const elements = {
   loginEmail: document.getElementById("loginEmail"),
   loginPassword: document.getElementById("loginPassword"),
@@ -10,25 +7,27 @@ const elements = {
   authStatus: document.getElementById("authStatus")
 };
 
-async function hasInternetConnection() {
-  if (!navigator.onLine) return false;
+let authModulePromise = null;
+let firestoreModulePromise = null;
 
-  try {
-    const response = await fetch("./manifest.webmanifest?check=" + Date.now(), {
-      method: "GET",
-      cache: "no-store"
-    });
-    return response.ok;
-  } catch {
-    return false;
+function loadAuthModule() {
+  if (!authModulePromise) {
+    authModulePromise = import("./auth.js");
   }
+  return authModulePromise;
+}
+
+function loadFirestoreModule() {
+  if (!firestoreModulePromise) {
+    firestoreModulePromise = import("./firestore.js");
+  }
+  return firestoreModulePromise;
 }
 
 function setStatus(message, type = "normal") {
   if (!elements.authStatus) return;
 
   elements.authStatus.textContent = message;
-
   elements.authStatus.style.display = "block";
   elements.authStatus.style.width = "100%";
   elements.authStatus.style.boxSizing = "border-box";
@@ -57,6 +56,20 @@ function setOfflineStatus() {
   setStatus("Lütfen internet bağlantınızı kontrol edin.", "offline");
 }
 
+async function hasInternetConnection() {
+  if (!navigator.onLine) return false;
+
+  try {
+    const response = await fetch("./manifest.webmanifest?check=" + Date.now(), {
+      method: "GET",
+      cache: "no-store"
+    });
+    return response.ok;
+  } catch {
+    return false;
+  }
+}
+
 function isNetworkLikeError(error) {
   const code = String(error?.code || "").toLowerCase();
   const message = String(error?.message || "").toLowerCase();
@@ -73,6 +86,7 @@ function isNetworkLikeError(error) {
 }
 
 async function routeAfterLogin(user) {
+  const { getUserClaims } = await loadAuthModule();
   const claims = await getUserClaims(user);
 
   if (claims.adminPanel === true) {
@@ -92,13 +106,15 @@ async function handleLogin() {
     return;
   }
 
-  const online = await hasInternetConnection();
-  if (!online) {
+  if (!(await hasInternetConnection())) {
     setOfflineStatus();
     return;
   }
 
   try {
+    const { login } = await loadAuthModule();
+    const { ensureUserProfile } = await loadFirestoreModule();
+
     const result = await login(email, password);
     await ensureUserProfile(result.user.uid, result.user.email);
     setStatus("Giriş başarılı.", "success");
@@ -127,13 +143,15 @@ async function handleRegister() {
     return;
   }
 
-  const online = await hasInternetConnection();
-  if (!online) {
+  if (!(await hasInternetConnection())) {
     setOfflineStatus();
     return;
   }
 
   try {
+    const { register } = await loadAuthModule();
+    const { ensureUserProfile } = await loadFirestoreModule();
+
     const result = await register(email, password);
     await ensureUserProfile(result.user.uid, result.user.email);
     setStatus("Kayıt başarılı. 7 günlük deneme hesabı oluşturuldu.", "success");
@@ -156,13 +174,13 @@ async function handleReset() {
     return;
   }
 
-  const online = await hasInternetConnection();
-  if (!online) {
+  if (!(await hasInternetConnection())) {
     setOfflineStatus();
     return;
   }
 
   try {
+    const { sendReset } = await loadAuthModule();
     await sendReset(email);
     setStatus(
       "Şifre sıfırlama maili gönderildi. Maildeki bağlantı yeni sıfırlama sayfasını açacak.",
@@ -175,6 +193,26 @@ async function handleReset() {
     }
 
     setStatus(`Şifre sıfırlama hatası: ${error.message}`);
+  }
+}
+
+async function initAuthWatcher() {
+  if (!(await hasInternetConnection())) {
+    return;
+  }
+
+  try {
+    const { watchAuth } = await loadAuthModule();
+
+    watchAuth(async (user) => {
+      if (!user) return;
+
+      if (await hasInternetConnection()) {
+        await routeAfterLogin(user);
+      }
+    });
+  } catch {
+    // Offline ya da auth modülü yüklenemediğinde sessiz geç
   }
 }
 
@@ -193,16 +231,6 @@ function applyQueryStatus() {
   } else {
     setStatus("Henüz giriş yapılmadı.");
   }
-}
-
-function initAuthWatcher() {
-  watchAuth(async (user) => {
-    if (!user) return;
-
-    if (await hasInternetConnection()) {
-      await routeAfterLogin(user);
-    }
-  });
 }
 
 function init() {
