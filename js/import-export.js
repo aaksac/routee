@@ -163,6 +163,11 @@ function detectCsvDelimiter(text) {
   const firstLine = splitCsvRecords(text)[0] || "";
   const commaCount = countDelimiterOutsideQuotes(firstLine, ",");
   const semicolonCount = countDelimiterOutsideQuotes(firstLine, ";");
+  const tabCount = countDelimiterOutsideQuotes(firstLine, "\t");
+
+  if (tabCount > commaCount && tabCount > semicolonCount) {
+    return "\t";
+  }
 
   return semicolonCount > commaCount ? ";" : ",";
 }
@@ -245,16 +250,7 @@ function getRowValue(row, keys) {
 }
 
 function normalizeImportedType(value) {
-  const normalized = String(value || "")
-    .trim()
-    .toLowerCase()
-    .replace(/[ç]/g, "c")
-    .replace(/[ğ]/g, "g")
-    .replace(/[ı]/g, "i")
-    .replace(/[İ]/g, "i")
-    .replace(/[ö]/g, "o")
-    .replace(/[ş]/g, "s")
-    .replace(/[ü]/g, "u");
+  const normalized = toAsciiLower(value);
 
   if (["start", "baslangic", "baslangicnoktasi", "startingpoint"].includes(normalized)) {
     return "start";
@@ -265,6 +261,19 @@ function normalizeImportedType(value) {
   }
 
   return normalized;
+}
+
+function toAsciiLower(value) {
+  return String(value || "")
+    .trim()
+    .toLowerCase()
+    .replace(/[ç]/g, "c")
+    .replace(/[ğ]/g, "g")
+    .replace(/[ı]/g, "i")
+    .replace(/[İ]/g, "i")
+    .replace(/[ö]/g, "o")
+    .replace(/[ş]/g, "s")
+    .replace(/[ü]/g, "u");
 }
 
 function parseCoordinateValue(value) {
@@ -282,6 +291,40 @@ function parseCoordinateValue(value) {
   return Number.isFinite(number) ? number : NaN;
 }
 
+function repairCommonMojibake(text) {
+  let repaired = String(text ?? "");
+
+  const replacements = [
+    ["Ã§", "ç"],
+    ["Ã‡", "Ç"],
+    ["ÄŸ", "ğ"],
+    ["Äž", "Ğ"],
+    ["Ã¼", "ü"],
+    ["Ãœ", "Ü"],
+    ["ÅŸ", "ş"],
+    ["Åž", "Ş"],
+    ["Ä±", "ı"],
+    ["Ä°", "İ"],
+    ["Ã¶", "ö"],
+    ["Ã–", "Ö"],
+    ["â€™", "'"],
+    ["â€œ", '"'],
+    ["â€", '"'],
+    ["â€“", "-"],
+    ["â€”", "-"]
+  ];
+
+  replacements.forEach(([wrong, correct]) => {
+    repaired = repaired.split(wrong).join(correct);
+  });
+
+  return repaired;
+}
+
+function cleanImportedText(value) {
+  return repairCommonMojibake(String(value ?? "").trim());
+}
+
 function normalizeImportedRow(row) {
   const typeValue = getRowValue(row, ["type", "tur", "tür", "türü", "turu"]);
   const nameValue = getRowValue(row, ["name", "ad", "isim", "yeradi", "yeradı", "placename"]);
@@ -290,7 +333,7 @@ function normalizeImportedRow(row) {
 
   return {
     type: normalizeImportedType(typeValue),
-    name: String(nameValue || "").trim(),
+    name: cleanImportedText(nameValue),
     lat: parseCoordinateValue(latValue),
     lng: parseCoordinateValue(lngValue)
   };
@@ -306,27 +349,69 @@ function validateImportedRows(rows) {
   );
 }
 
+function countReplacementChars(text) {
+  return (String(text).match(/�/g) || []).length;
+}
+
+function countTurkishChars(text) {
+  return (String(text).match(/[çÇğĞıİöÖşŞüÜ]/g) || []).length;
+}
+
+function scoreDecodedText(text, parsedRows) {
+  const replacementCount = countReplacementChars(text);
+  const turkishCharCount = countTurkishChars(text);
+
+  let rowNameScore = 0;
+  parsedRows.forEach((row) => {
+    rowNameScore += countTurkishChars(row.name);
+    if (row.name.includes("�")) {
+      rowNameScore -= 5;
+    }
+  });
+
+  return (
+    parsedRows.length * 100 +
+    turkishCharCount * 2 +
+    rowNameScore * 5 -
+    replacementCount * 50
+  );
+}
+
+function decodeWithEncoding(bytes, encoding) {
+  const decoder = new TextDecoder(encoding, { fatal: false });
+  return decoder.decode(bytes);
+}
+
 async function decodeCsvFile(file) {
   const buffer = await file.arrayBuffer();
   const bytes = new Uint8Array(buffer);
   const encodings = ["utf-8", "windows-1254", "iso-8859-9"];
+  const candidates = [];
 
   for (const encoding of encodings) {
     try {
-      const decoder = new TextDecoder(encoding, { fatal: false });
-      const text = decoder.decode(bytes);
-      const parsed = validateImportedRows(parseCsvText(text));
+      const text = decodeWithEncoding(bytes, encoding);
+      const parsedRows = validateImportedRows(parseCsvText(text));
+      const score = scoreDecodedText(text, parsedRows);
 
-      if (parsed.length) {
-        return parsed;
-      }
+      candidates.push({
+        encoding,
+        text,
+        parsedRows,
+        score
+      });
     } catch (error) {
-      // Bir sonraki kodlamayı dene.
+      // Sonraki encoding denenecek.
     }
   }
 
-  const fallbackText = await file.text();
-  return validateImportedRows(parseCsvText(fallbackText));
+  if (!candidates.length) {
+    const fallbackText = await file.text();
+    return validateImportedRows(parseCsvText(fallbackText));
+  }
+
+  candidates.sort((a, b) => b.score - a.score);
+  return candidates[0].parsedRows;
 }
 
 async function importFromCsvFile(file) {
