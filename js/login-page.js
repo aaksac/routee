@@ -10,6 +10,101 @@ const elements = {
   authStatus: document.getElementById("authStatus")
 };
 
+function hasInternetConnection() {
+  return navigator.onLine;
+}
+
+function ensureOfflineAlert() {
+  let alertEl = document.getElementById("offlineAlert");
+
+  if (alertEl) return alertEl;
+
+  alertEl = document.createElement("div");
+  alertEl.id = "offlineAlert";
+  alertEl.innerHTML = `
+    <div class="offline-alert-card">
+      <div class="offline-alert-icon">📶</div>
+      <div class="offline-alert-content">
+        <strong>Bağlantı gerekli</strong>
+        <p>Lütfen internet bağlantınızı kontrol edin ve tekrar deneyin.</p>
+      </div>
+      <button type="button" class="offline-alert-close" aria-label="Kapat">×</button>
+    </div>
+  `;
+
+  Object.assign(alertEl.style, {
+    position: "fixed",
+    left: "16px",
+    right: "16px",
+    bottom: "20px",
+    zIndex: "9999",
+    display: "none"
+  });
+
+  const card = alertEl.querySelector(".offline-alert-card");
+  Object.assign(card.style, {
+    display: "flex",
+    alignItems: "center",
+    gap: "12px",
+    background: "rgba(15, 23, 42, 0.96)",
+    color: "#fff",
+    borderRadius: "16px",
+    padding: "14px 16px",
+    boxShadow: "0 14px 35px rgba(0,0,0,.22)",
+    backdropFilter: "blur(10px)"
+  });
+
+  const icon = alertEl.querySelector(".offline-alert-icon");
+  Object.assign(icon.style, {
+    fontSize: "24px",
+    flexShrink: "0"
+  });
+
+  const content = alertEl.querySelector(".offline-alert-content");
+  Object.assign(content.style, {
+    flex: "1"
+  });
+
+  const title = content.querySelector("strong");
+  Object.assign(title.style, {
+    display: "block",
+    fontSize: "15px",
+    marginBottom: "4px"
+  });
+
+  const text = content.querySelector("p");
+  Object.assign(text.style, {
+    margin: "0",
+    fontSize: "13px",
+    lineHeight: "1.4",
+    opacity: "0.92"
+  });
+
+  const closeBtn = alertEl.querySelector(".offline-alert-close");
+  Object.assign(closeBtn.style, {
+    border: "none",
+    background: "transparent",
+    color: "#fff",
+    fontSize: "26px",
+    cursor: "pointer",
+    lineHeight: "1",
+    padding: "0 4px",
+    flexShrink: "0"
+  });
+
+  closeBtn.addEventListener("click", () => {
+    alertEl.style.display = "none";
+  });
+
+  document.body.appendChild(alertEl);
+  return alertEl;
+}
+
+function showOfflineAlert() {
+  const alertEl = ensureOfflineAlert();
+  alertEl.style.display = "block";
+}
+
 async function routeAfterLogin(user) {
   const claims = await getUserClaims(user);
 
@@ -27,6 +122,11 @@ async function handleLogin() {
 
   if (!email || !password) {
     elements.authStatus.textContent = "E-posta ve şifre gerekli.";
+    return;
+  }
+
+  if (!hasInternetConnection()) {
+    showOfflineAlert();
     return;
   }
 
@@ -54,6 +154,11 @@ async function handleRegister() {
     return;
   }
 
+  if (!hasInternetConnection()) {
+    showOfflineAlert();
+    return;
+  }
+
   try {
     const result = await register(email, password);
     await ensureUserProfile(result.user.uid, result.user.email);
@@ -69,6 +174,11 @@ async function handleReset() {
 
   if (!email) {
     elements.authStatus.textContent = "Şifre sıfırlama için e-posta gir.";
+    return;
+  }
+
+  if (!hasInternetConnection()) {
+    showOfflineAlert();
     return;
   }
 
@@ -107,6 +217,8 @@ function init() {
   bindEvents();
   applyQueryStatus();
   initAuthWatcher();
+  ensureOfflineAlert();
+  window.addEventListener("offline", showOfflineAlert);
 }
 
 document.addEventListener("DOMContentLoaded", init);
