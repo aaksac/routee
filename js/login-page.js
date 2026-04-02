@@ -10,8 +10,19 @@ const elements = {
   authStatus: document.getElementById("authStatus")
 };
 
-function hasInternetConnection() {
-  return navigator.onLine;
+async function hasInternetConnection() {
+  if (!navigator.onLine) return false;
+
+  try {
+    const response = await fetch("./manifest.webmanifest?check=" + Date.now(), {
+      method: "GET",
+      cache: "no-store"
+    });
+
+    return response.ok;
+  } catch {
+    return false;
+  }
 }
 
 function ensureOfflineAlert() {
@@ -33,11 +44,9 @@ function ensureOfflineAlert() {
   `;
 
   Object.assign(alertEl.style, {
-    position: "fixed",
-    left: "16px",
-    right: "16px",
-    bottom: "20px",
-    zIndex: "9999",
+    width: "100%",
+    marginTop: "14px",
+    marginBottom: "12px",
     display: "none"
   });
 
@@ -50,13 +59,12 @@ function ensureOfflineAlert() {
     color: "#fff",
     borderRadius: "16px",
     padding: "14px 16px",
-    boxShadow: "0 14px 35px rgba(0,0,0,.22)",
-    backdropFilter: "blur(10px)"
+    boxShadow: "0 10px 24px rgba(0,0,0,.18)"
   });
 
   const icon = alertEl.querySelector(".offline-alert-icon");
   Object.assign(icon.style, {
-    fontSize: "24px",
+    fontSize: "22px",
     flexShrink: "0"
   });
 
@@ -96,7 +104,15 @@ function ensureOfflineAlert() {
     alertEl.style.display = "none";
   });
 
-  document.body.appendChild(alertEl);
+  const loginCard = document.querySelector(".login-card");
+  if (loginCard && elements.authStatus) {
+    loginCard.insertBefore(alertEl, elements.authStatus);
+  } else if (loginCard) {
+    loginCard.appendChild(alertEl);
+  } else {
+    document.body.appendChild(alertEl);
+  }
+
   return alertEl;
 }
 
@@ -125,7 +141,7 @@ async function handleLogin() {
     return;
   }
 
-  if (!hasInternetConnection()) {
+  if (!(await hasInternetConnection())) {
     showOfflineAlert();
     return;
   }
@@ -154,7 +170,7 @@ async function handleRegister() {
     return;
   }
 
-  if (!hasInternetConnection()) {
+  if (!(await hasInternetConnection())) {
     showOfflineAlert();
     return;
   }
@@ -177,7 +193,7 @@ async function handleReset() {
     return;
   }
 
-  if (!hasInternetConnection()) {
+  if (!(await hasInternetConnection())) {
     showOfflineAlert();
     return;
   }
@@ -207,13 +223,9 @@ function applyQueryStatus() {
 
 function initAuthWatcher() {
   watchAuth(async (user) => {
-function initAuthWatcher() {
-  watchAuth(async (user) => {
-    if (user && hasInternetConnection()) {
+    if (user && (await hasInternetConnection())) {
       await routeAfterLogin(user);
     }
-  });
-}
   });
 }
 
