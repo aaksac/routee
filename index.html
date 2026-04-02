@@ -48,52 +48,11 @@
           <button class="small-btn" id="btnResetPassword" type="button">Şifre Sıfırla</button>
         </div>
 
-        <div
-          id="offlineAlert"
-          style="
-            display:none;
-            width:100%;
-            margin-top:14px;
-            margin-bottom:12px;
-            background:rgba(15,23,42,0.96);
-            color:#fff;
-            border-radius:16px;
-            padding:14px 16px;
-            box-shadow:0 10px 24px rgba(0,0,0,.18);
-            box-sizing:border-box;
-          "
-        >
-          <div style="display:flex; align-items:center; gap:12px;">
-            <div style="font-size:22px; flex-shrink:0;">📶</div>
-            <div style="flex:1;">
-              <strong style="display:block; font-size:15px; margin-bottom:4px;">Bağlantı gerekli</strong>
-              <p style="margin:0; font-size:13px; line-height:1.4; opacity:.92;">
-                Lütfen internet bağlantınızı kontrol edin ve tekrar deneyin.
-              </p>
-            </div>
-            <button
-              id="offlineAlertClose"
-              type="button"
-              aria-label="Kapat"
-              style="
-                border:none;
-                background:transparent;
-                color:#fff;
-                font-size:26px;
-                cursor:pointer;
-                line-height:1;
-                padding:0 4px;
-                flex-shrink:0;
-              "
-            >×</button>
-          </div>
-        </div>
-
         <p id="authStatus" class="auth-status">Henüz giriş yapılmadı.</p>
       </div>
     </div>
 
-    <script type="module" src="./js/login-page.js?v=99"></script>
+    <script type="module" src="./js/login-page.js?v=100"></script>
 
     <script>
       async function requestPersistentStorage() {
