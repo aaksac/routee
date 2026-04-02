@@ -1,4 +1,4 @@
-const CACHE_NAME = "routee-shell-v5";
+const CACHE_NAME = "routee-shell-v99";
 const APP_SHELL = [
   "./",
   "./index.html",
