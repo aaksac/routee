@@ -1,4 +1,4 @@
-const CACHE_NAME = "routee-shell-v2";
+const CACHE_NAME = "routee-shell-v3";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -45,6 +45,15 @@ self.addEventListener("fetch", (event) => {
   const url = new URL(request.url);
 
   if (url.origin !== self.location.origin) return;
+
+  if (url.searchParams.has("check")) {
+    event.respondWith(
+      fetch(request, { cache: "no-store" }).catch(
+        () => new Response("", { status: 503, statusText: "Offline" })
+      )
+    );
+    return;
+  }
 
   event.respondWith(
     caches.match(request).then((cached) => {
