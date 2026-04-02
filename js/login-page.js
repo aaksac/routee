@@ -7,117 +7,39 @@ const elements = {
   btnLogin: document.getElementById("btnLogin"),
   btnRegister: document.getElementById("btnRegister"),
   btnResetPassword: document.getElementById("btnResetPassword"),
-  authStatus: document.getElementById("authStatus")
+  authStatus: document.getElementById("authStatus"),
+  offlineAlert: document.getElementById("offlineAlert"),
+  offlineAlertClose: document.getElementById("offlineAlertClose")
 };
 
-function ensureOfflineAlert() {
-  let alertEl = document.getElementById("offlineAlert");
-
-  if (alertEl) return alertEl;
-
-  alertEl = document.createElement("div");
-  alertEl.id = "offlineAlert";
-  alertEl.innerHTML = `
-    <div class="offline-alert-card">
-      <div class="offline-alert-icon">📶</div>
-      <div class="offline-alert-content">
-        <strong>Bağlantı gerekli</strong>
-        <p>Lütfen internet bağlantınızı kontrol edin ve tekrar deneyin.</p>
-      </div>
-      <button type="button" class="offline-alert-close" aria-label="Kapat">×</button>
-    </div>
-  `;
-
-  Object.assign(alertEl.style, {
-    width: "100%",
-    marginTop: "14px",
-    marginBottom: "12px",
-    display: "none"
-  });
-
-  const card = alertEl.querySelector(".offline-alert-card");
-  Object.assign(card.style, {
-    display: "flex",
-    alignItems: "center",
-    gap: "12px",
-    background: "rgba(15, 23, 42, 0.96)",
-    color: "#fff",
-    borderRadius: "16px",
-    padding: "14px 16px",
-    boxShadow: "0 10px 24px rgba(0,0,0,.18)"
-  });
-
-  const icon = alertEl.querySelector(".offline-alert-icon");
-  Object.assign(icon.style, {
-    fontSize: "22px",
-    flexShrink: "0"
-  });
-
-  const content = alertEl.querySelector(".offline-alert-content");
-  Object.assign(content.style, {
-    flex: "1"
-  });
-
-  const title = content.querySelector("strong");
-  Object.assign(title.style, {
-    display: "block",
-    fontSize: "15px",
-    marginBottom: "4px"
-  });
-
-  const text = content.querySelector("p");
-  Object.assign(text.style, {
-    margin: "0",
-    fontSize: "13px",
-    lineHeight: "1.4",
-    opacity: "0.92"
-  });
-
-  const closeBtn = alertEl.querySelector(".offline-alert-close");
-  Object.assign(closeBtn.style, {
-    border: "none",
-    background: "transparent",
-    color: "#fff",
-    fontSize: "26px",
-    cursor: "pointer",
-    lineHeight: "1",
-    padding: "0 4px",
-    flexShrink: "0"
-  });
-
-  closeBtn.addEventListener("click", () => {
-    alertEl.style.display = "none";
-  });
-
-  const loginCard = document.querySelector(".login-card");
-  if (loginCard && elements.authStatus) {
-    loginCard.insertBefore(alertEl, elements.authStatus);
-  } else if (loginCard) {
-    loginCard.appendChild(alertEl);
-  } else {
-    document.body.appendChild(alertEl);
-  }
-
-  return alertEl;
-}
-
 function showOfflineAlert() {
-  const alertEl = ensureOfflineAlert();
-  alertEl.style.display = "block";
-}
-
-function hideOfflineAlert() {
-  const alertEl = document.getElementById("offlineAlert");
-  if (alertEl) {
-    alertEl.style.display = "none";
+  if (elements.offlineAlert) {
+    elements.offlineAlert.style.display = "block";
   }
-}
-
-function markOffline() {
-  showOfflineAlert();
   if (elements.authStatus) {
     elements.authStatus.textContent = "Lütfen internet bağlantınızı kontrol edin.";
   }
+}
+
+function hideOfflineAlert() {
+  if (elements.offlineAlert) {
+    elements.offlineAlert.style.display = "none";
+  }
+}
+
+function isNetworkLikeError(error) {
+  const code = String(error?.code || "").toLowerCase();
+  const message = String(error?.message || "").toLowerCase();
+
+  return (
+    code.includes("network") ||
+    code.includes("unavailable") ||
+    code.includes("timeout") ||
+    message.includes("network") ||
+    message.includes("internet") ||
+    message.includes("offline") ||
+    message.includes("failed to fetch")
+  );
 }
 
 async function hasInternetConnection() {
@@ -128,7 +50,6 @@ async function hasInternetConnection() {
       method: "GET",
       cache: "no-store"
     });
-
     return response.ok;
   } catch {
     return false;
@@ -147,8 +68,6 @@ async function routeAfterLogin(user) {
 }
 
 async function handleLogin() {
-  console.log("Login button clicked");
-
   const email = elements.loginEmail.value.trim();
   const password = elements.loginPassword.value.trim();
 
@@ -158,10 +77,8 @@ async function handleLogin() {
   }
 
   const online = await hasInternetConnection();
-  console.log("Online check:", online);
-
   if (!online) {
-    markOffline();
+    showOfflineAlert();
     return;
   }
 
@@ -173,11 +90,8 @@ async function handleLogin() {
     elements.authStatus.textContent = "Giriş başarılı.";
     await routeAfterLogin(result.user);
   } catch (error) {
-    console.error("Login error:", error);
-
-    const stillOnline = await hasInternetConnection();
-    if (!stillOnline) {
-      markOffline();
+    if (isNetworkLikeError(error) || !(await hasInternetConnection())) {
+      showOfflineAlert();
       return;
     }
 
@@ -201,7 +115,7 @@ async function handleRegister() {
 
   const online = await hasInternetConnection();
   if (!online) {
-    markOffline();
+    showOfflineAlert();
     return;
   }
 
@@ -213,9 +127,8 @@ async function handleRegister() {
     elements.authStatus.textContent = "Kayıt başarılı. 7 günlük deneme hesabı oluşturuldu.";
     await routeAfterLogin(result.user);
   } catch (error) {
-    const stillOnline = await hasInternetConnection();
-    if (!stillOnline) {
-      markOffline();
+    if (isNetworkLikeError(error) || !(await hasInternetConnection())) {
+      showOfflineAlert();
       return;
     }
 
@@ -233,7 +146,7 @@ async function handleReset() {
 
   const online = await hasInternetConnection();
   if (!online) {
-    markOffline();
+    showOfflineAlert();
     return;
   }
 
@@ -241,11 +154,11 @@ async function handleReset() {
 
   try {
     await sendReset(email);
-    elements.authStatus.textContent = "Şifre sıfırlama maili gönderildi. Maildeki bağlantı yeni sıfırlama sayfasını açacak.";
+    elements.authStatus.textContent =
+      "Şifre sıfırlama maili gönderildi. Maildeki bağlantı yeni sıfırlama sayfasını açacak.";
   } catch (error) {
-    const stillOnline = await hasInternetConnection();
-    if (!stillOnline) {
-      markOffline();
+    if (isNetworkLikeError(error) || !(await hasInternetConnection())) {
+      showOfflineAlert();
       return;
     }
 
@@ -257,6 +170,7 @@ function bindEvents() {
   elements.btnLogin?.addEventListener("click", handleLogin);
   elements.btnRegister?.addEventListener("click", handleRegister);
   elements.btnResetPassword?.addEventListener("click", handleReset);
+  elements.offlineAlertClose?.addEventListener("click", hideOfflineAlert);
 }
 
 function applyQueryStatus() {
@@ -272,8 +186,7 @@ function initAuthWatcher() {
   watchAuth(async (user) => {
     if (!user) return;
 
-    const online = await hasInternetConnection();
-    if (online) {
+    if (await hasInternetConnection()) {
       await routeAfterLogin(user);
     }
   });
@@ -283,9 +196,8 @@ function init() {
   bindEvents();
   applyQueryStatus();
   initAuthWatcher();
-  ensureOfflineAlert();
 
-  window.addEventListener("offline", markOffline);
+  window.addEventListener("offline", showOfflineAlert);
   window.addEventListener("online", hideOfflineAlert);
 }
 
