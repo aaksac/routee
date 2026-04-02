@@ -50,5 +50,15 @@
     </div>
 
     <script type="module" src="./js/login-page.js"></script>
+
+    <script>
+      if ("serviceWorker" in navigator) {
+        window.addEventListener("load", () => {
+          navigator.serviceWorker.register("./sw.js").catch((error) => {
+            console.error("Service Worker kayıt hatası:", error);
+          });
+        });
+      }
+    </script>
   </body>
 </html>
