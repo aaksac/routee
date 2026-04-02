@@ -1,17 +1,25 @@
-const CACHE_NAME = "routee-shell-v1";
+const CACHE_NAME = "routee-shell-v2";
 const APP_SHELL = [
   "./",
   "./index.html",
-  "./style.css",
+  "./manifest.webmanifest",
+  "./css/style.css",
+  "./css/auth.css",
   "./js/firebase-config.js",
   "./js/auth.js",
   "./js/firestore.js",
-  "./js/login-page.js"
+  "./js/login-page.js",
+  "./icons/favicon-32.png",
+  "./icons/icon-192.png",
+  "./icons/icon-512.png",
+  "./icons/apple-touch-icon.png"
 ];
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(APP_SHELL))
+    caches.open(CACHE_NAME).then(async (cache) => {
+      await cache.addAll(APP_SHELL);
+    })
   );
   self.skipWaiting();
 });
@@ -44,6 +52,10 @@ self.addEventListener("fetch", (event) => {
 
       return fetch(request)
         .then((response) => {
+          if (!response || response.status !== 200) {
+            return response;
+          }
+
           const clone = response.clone();
           caches.open(CACHE_NAME).then((cache) => cache.put(request, clone));
           return response;
