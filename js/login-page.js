@@ -128,6 +128,20 @@ function hideOfflineAlert() {
   }
 }
 
+function isNetworkLikeError(error) {
+  const code = String(error?.code || "").toLowerCase();
+  const message = String(error?.message || "").toLowerCase();
+
+  return (
+    code.includes("network") ||
+    code.includes("unavailable") ||
+    message.includes("network") ||
+    message.includes("internet") ||
+    message.includes("failed to fetch") ||
+    message.includes("offline")
+  );
+}
+
 async function routeAfterLogin(user) {
   const claims = await getUserClaims(user);
 
@@ -148,8 +162,10 @@ async function handleLogin() {
     return;
   }
 
-  if (!(await hasInternetConnection())) {
+  const online = await hasInternetConnection();
+  if (!online) {
     showOfflineAlert();
+    elements.authStatus.textContent = "Lütfen internet bağlantınızı kontrol edin.";
     return;
   }
 
@@ -161,6 +177,12 @@ async function handleLogin() {
     elements.authStatus.textContent = "Giriş başarılı.";
     await routeAfterLogin(result.user);
   } catch (error) {
+    if (isNetworkLikeError(error) || !(await hasInternetConnection())) {
+      showOfflineAlert();
+      elements.authStatus.textContent = "Lütfen internet bağlantınızı kontrol edin.";
+      return;
+    }
+
     elements.authStatus.textContent = `Giriş hatası: ${error.message}`;
   }
 }
@@ -179,8 +201,10 @@ async function handleRegister() {
     return;
   }
 
-  if (!(await hasInternetConnection())) {
+  const online = await hasInternetConnection();
+  if (!online) {
     showOfflineAlert();
+    elements.authStatus.textContent = "Lütfen internet bağlantınızı kontrol edin.";
     return;
   }
 
@@ -192,6 +216,12 @@ async function handleRegister() {
     elements.authStatus.textContent = "Kayıt başarılı. 7 günlük deneme hesabı oluşturuldu.";
     await routeAfterLogin(result.user);
   } catch (error) {
+    if (isNetworkLikeError(error) || !(await hasInternetConnection())) {
+      showOfflineAlert();
+      elements.authStatus.textContent = "Lütfen internet bağlantınızı kontrol edin.";
+      return;
+    }
+
     elements.authStatus.textContent = `Kayıt hatası: ${error.message}`;
   }
 }
@@ -204,8 +234,10 @@ async function handleReset() {
     return;
   }
 
-  if (!(await hasInternetConnection())) {
+  const online = await hasInternetConnection();
+  if (!online) {
     showOfflineAlert();
+    elements.authStatus.textContent = "Lütfen internet bağlantınızı kontrol edin.";
     return;
   }
 
@@ -215,6 +247,12 @@ async function handleReset() {
     await sendReset(email);
     elements.authStatus.textContent = "Şifre sıfırlama maili gönderildi. Maildeki bağlantı yeni sıfırlama sayfasını açacak.";
   } catch (error) {
+    if (isNetworkLikeError(error) || !(await hasInternetConnection())) {
+      showOfflineAlert();
+      elements.authStatus.textContent = "Lütfen internet bağlantınızı kontrol edin.";
+      return;
+    }
+
     elements.authStatus.textContent = `Şifre sıfırlama hatası: ${error.message}`;
   }
 }
@@ -247,7 +285,10 @@ function init() {
   applyQueryStatus();
   initAuthWatcher();
   ensureOfflineAlert();
-  window.addEventListener("offline", showOfflineAlert);
+  window.addEventListener("offline", () => {
+    showOfflineAlert();
+    elements.authStatus.textContent = "Lütfen internet bağlantınızı kontrol edin.";
+  });
   window.addEventListener("online", hideOfflineAlert);
 }
 
