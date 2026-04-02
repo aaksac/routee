@@ -207,9 +207,13 @@ function applyQueryStatus() {
 
 function initAuthWatcher() {
   watchAuth(async (user) => {
-    if (user) {
+function initAuthWatcher() {
+  watchAuth(async (user) => {
+    if (user && hasInternetConnection()) {
       await routeAfterLogin(user);
     }
+  });
+}
   });
 }
 
