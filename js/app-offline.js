@@ -123,13 +123,13 @@ function renderMapList() {
   elements.mapList.innerHTML = maps
     .map(
       (map) => `
-    <div class="map-list-row">
-      <button class="map-list-item ${selectedMapId === map.id ? "active" : ""}" type="button" data-map-id="${escapeHtml(map.id)}">
-        <strong>${escapeHtml(map.name || "İsimsiz Harita")}</strong>
-        <span>Toplam mesafe: ${formatKm(map.totalDistance || 0)}</span>
-      </button>
-    </div>
-  `
+        <div class="map-list-row">
+          <button class="map-list-item ${selectedMapId === map.id ? "active" : ""}" type="button" data-map-id="${escapeHtml(map.id)}">
+            <strong>${escapeHtml(map.name || "İsimsiz Harita")}</strong>
+            <span>Toplam mesafe: ${formatKm(map.totalDistance || 0)}</span>
+          </button>
+        </div>
+      `
     )
     .join("");
 }
@@ -163,15 +163,15 @@ function renderTripList(mapData) {
   const pointHtml = points
     .map(
       (point, index) => `
-    <div class="trip-item">
-      <div class="trip-order">${index + 1}</div>
-      <div class="trip-content">
-        <strong>${escapeHtml(point.name)}</strong>
-        <span>${Number(point.lat).toFixed(6)}, ${Number(point.lng).toFixed(6)}</span>
-      </div>
-      <button class="tiny-btn" type="button" disabled>Çevrimdışı</button>
-    </div>
-  `
+        <div class="trip-item">
+          <div class="trip-order">${index + 1}</div>
+          <div class="trip-content">
+            <strong>${escapeHtml(point.name)}</strong>
+            <span>${Number(point.lat).toFixed(6)}, ${Number(point.lng).toFixed(6)}</span>
+          </div>
+          <button class="tiny-btn" type="button" disabled>Çevrimdışı</button>
+        </div>
+      `
     )
     .join("");
 
@@ -213,6 +213,7 @@ function loadMap(mapId) {
 
 function bindEvents() {
   elements.btnToggleMenu?.addEventListener("click", (event) => {
+    event.preventDefault();
     event.stopPropagation();
     toggleMapMenu();
   });
