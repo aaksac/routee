@@ -33,7 +33,13 @@ import {
   convertImportedRowsToState
 } from "./import-export.js";
 import { saveLocalSession, clearLocalSession } from "./local-session.js";
-import { getLocalMaps, getLocalMapById, saveLocalMap, replaceLocalMaps, deleteLocalMap } from "./local-maps.js";
+import {
+  getLocalMaps,
+  getLocalMapById,
+  saveLocalMap,
+  replaceLocalMaps,
+  deleteLocalMap
+} from "./local-maps.js";
 
 const state = {
   tripPanelOpen: true,
