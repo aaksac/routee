@@ -724,7 +724,9 @@ function renderPredictions(predictions, onPlaceSelected) {
       item.style.borderColor = "transparent";
     });
 
-    item.addEventListener("click", () => {
+    item.addEventListener("mousedown", (event) => {
+      event.preventDefault();
+
       if (!placesService) {
         placesService = new google.maps.places.PlacesService(map);
       }
@@ -885,7 +887,7 @@ function initPlaceSearch(inputElement, onPlaceSelected) {
       window.setTimeout(() => {
         hideSearchDropdown();
         resetPageZoomAfterSearch();
-      }, 180);
+      }, 300);
     });
 
     searchBlurHandlerBound = true;
