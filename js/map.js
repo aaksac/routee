@@ -22,8 +22,6 @@ let currentPredictions = [];
 
 let activeAutocompleteSessionToken = null;
 let searchDebounceTimer = null;
-const predictionCache = new Map();
-const MAX_CACHE_SIZE = 50;
 const MIN_SEARCH_LENGTH = 4;
 const SEARCH_DEBOUNCE_MS = 450;
 const MAX_PREDICTIONS = 5;
@@ -648,20 +646,6 @@ function hideSearchDropdown() {
   currentPredictions = [];
 }
 
-function getNormalizedSearchKey(query) {
-  const bounds = map?.getBounds?.();
-  const center = bounds?.getCenter?.();
-
-  if (!center) {
-    return query.trim().toLowerCase();
-  }
-
-  const lat = center.lat().toFixed(2);
-  const lng = center.lng().toFixed(2);
-
-  return `${query.trim().toLowerCase()}|${lat}|${lng}`;
-}
-
 function ensureAutocompleteSessionToken() {
   if (!activeAutocompleteSessionToken) {
     activeAutocompleteSessionToken = new google.maps.places.AutocompleteSessionToken();
@@ -672,32 +656,6 @@ function ensureAutocompleteSessionToken() {
 
 function clearAutocompleteSession() {
   activeAutocompleteSessionToken = null;
-}
-
-function setPredictionCache(cacheKey, predictions) {
-  if (!cacheKey) return;
-
-  if (predictionCache.has(cacheKey)) {
-    predictionCache.delete(cacheKey);
-  }
-
-  predictionCache.set(cacheKey, predictions);
-
-  if (predictionCache.size > MAX_CACHE_SIZE) {
-    const firstKey = predictionCache.keys().next().value;
-    predictionCache.delete(firstKey);
-  }
-}
-
-function getPredictionCache(cacheKey) {
-  if (!cacheKey || !predictionCache.has(cacheKey)) {
-    return null;
-  }
-
-  const cached = predictionCache.get(cacheKey);
-  predictionCache.delete(cacheKey);
-  predictionCache.set(cacheKey, cached);
-  return cached;
 }
 
 function renderPredictions(predictions, onPlaceSelected) {
@@ -821,6 +779,8 @@ function renderPredictions(predictions, onPlaceSelected) {
           sessionToken
         },
         (place, status) => {
+          console.log("getDetails status:", status, place);
+
           if (
             status === google.maps.places.PlacesServiceStatus.OK &&
             place?.geometry?.location
@@ -833,6 +793,8 @@ function renderPredictions(predictions, onPlaceSelected) {
 
           const geocoder = new google.maps.Geocoder();
           geocoder.geocode({ placeId }, (results, geoStatus) => {
+            console.log("geocode status:", geoStatus, results);
+
             if (
               geoStatus === "OK" &&
               Array.isArray(results) &&
@@ -844,11 +806,7 @@ function renderPredictions(predictions, onPlaceSelected) {
               return;
             }
 
-            console.warn("Seçilen yer haritada işaretlenemedi:", {
-              placeId,
-              detailsStatus: status,
-              geocodeStatus: geoStatus
-            });
+            alert("Seçilen yer haritada işaretlenemedi. API ayarlarını kontrol edin.");
           });
         }
       );
@@ -878,15 +836,6 @@ function initPlaceSearch(inputElement, onPlaceSelected) {
         return;
       }
 
-      const cacheKey = getNormalizedSearchKey(query);
-      const cachedPredictions = getPredictionCache(cacheKey);
-
-      if (cachedPredictions) {
-        currentPredictions = cachedPredictions;
-        renderPredictions(cachedPredictions, onPlaceSelected);
-        return;
-      }
-
       searchDebounceTimer = window.setTimeout(() => {
         const requestId = ++lastPredictionRequestId;
         const sessionToken = ensureAutocompleteSessionToken();
@@ -911,7 +860,6 @@ function initPlaceSearch(inputElement, onPlaceSelected) {
 
             const limitedPredictions = predictions.slice(0, MAX_PREDICTIONS);
             currentPredictions = limitedPredictions;
-            setPredictionCache(cacheKey, limitedPredictions);
             renderPredictions(limitedPredictions, onPlaceSelected);
           }
         );
