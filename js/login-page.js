@@ -1,3 +1,5 @@
+import { getLocalSession, saveLocalSession } from "./local-session.js";
+
 const elements = {
   loginEmail: document.getElementById("loginEmail"),
   loginPassword: document.getElementById("loginPassword"),
@@ -85,6 +87,10 @@ function isNetworkLikeError(error) {
   );
 }
 
+function goToApp(offline = false) {
+  window.location.href = offline ? "./app.html?offline=1" : "./app.html";
+}
+
 async function routeAfterLogin(user) {
   const { getUserClaims } = await loadAuthModule();
   const claims = await getUserClaims(user);
@@ -94,7 +100,22 @@ async function routeAfterLogin(user) {
     return;
   }
 
-  window.location.href = "./app.html";
+  goToApp(false);
+}
+
+function canUseOfflineMode() {
+  return Boolean(getLocalSession());
+}
+
+function continueOffline() {
+  const session = getLocalSession();
+  if (!session) {
+    setOfflineStatus();
+    return;
+  }
+
+  setStatus(`Çevrimdışı mod açılıyor: ${session.email}`, "success");
+  goToApp(true);
 }
 
 async function handleLogin() {
@@ -107,6 +128,10 @@ async function handleLogin() {
   }
 
   if (!(await hasInternetConnection())) {
+    if (canUseOfflineMode()) {
+      continueOffline();
+      return;
+    }
     setOfflineStatus();
     return;
   }
@@ -117,10 +142,15 @@ async function handleLogin() {
 
     const result = await login(email, password);
     await ensureUserProfile(result.user.uid, result.user.email);
+    saveLocalSession({ uid: result.user.uid, email: result.user.email });
     setStatus("Giriş başarılı.", "success");
     await routeAfterLogin(result.user);
   } catch (error) {
     if (isNetworkLikeError(error) || !(await hasInternetConnection())) {
+      if (canUseOfflineMode()) {
+        continueOffline();
+        return;
+      }
       setOfflineStatus();
       return;
     }
@@ -154,6 +184,7 @@ async function handleRegister() {
 
     const result = await register(email, password);
     await ensureUserProfile(result.user.uid, result.user.email);
+    saveLocalSession({ uid: result.user.uid, email: result.user.email });
     setStatus("Kayıt başarılı. 7 günlük deneme hesabı oluşturuldu.", "success");
     await routeAfterLogin(result.user);
   } catch (error) {
@@ -198,6 +229,9 @@ async function handleReset() {
 
 async function initAuthWatcher() {
   if (!(await hasInternetConnection())) {
+    if (canUseOfflineMode()) {
+      setStatus("Daha önce giriş yapılan cihaz algılandı. Çevrimdışı mod kullanılabilir.", "success");
+    }
     return;
   }
 
@@ -206,13 +240,13 @@ async function initAuthWatcher() {
 
     watchAuth(async (user) => {
       if (!user) return;
-
+      saveLocalSession({ uid: user.uid, email: user.email });
       if (await hasInternetConnection()) {
         await routeAfterLogin(user);
       }
     });
   } catch {
-    // Offline ya da auth modülü yüklenemediğinde sessiz geç
+    // Sessiz geç
   }
 }
 
@@ -228,9 +262,16 @@ function applyQueryStatus() {
 
   if (reset === "success") {
     setStatus("Şifren başarıyla değiştirildi. Yeni şifrenle giriş yapabilirsin.", "success");
-  } else {
-    setStatus("Henüz giriş yapılmadı.");
+    return;
   }
+
+  if (!navigator.onLine && canUseOfflineMode()) {
+    const session = getLocalSession();
+    setStatus(`Çevrimdışı mod hazır: ${session.email}`, "success");
+    return;
+  }
+
+  setStatus("Henüz giriş yapılmadı.");
 }
 
 function init() {
@@ -238,7 +279,15 @@ function init() {
   applyQueryStatus();
   initAuthWatcher();
 
-  window.addEventListener("offline", setOfflineStatus);
+  window.addEventListener("offline", () => {
+    if (canUseOfflineMode()) {
+      const session = getLocalSession();
+      setStatus(`İnternet yok. Çevrimdışı mod kullanılabilir: ${session.email}`, "success");
+      return;
+    }
+    setOfflineStatus();
+  });
+
   window.addEventListener("online", () => {
     setStatus("Bağlantı yeniden kuruldu.");
   });
