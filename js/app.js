@@ -32,6 +32,8 @@ import {
   importFromXlsxFile,
   convertImportedRowsToState
 } from "./import-export.js";
+import { saveLocalSession, clearLocalSession } from "./local-session.js";
+import { getLocalMaps, getLocalMapById, saveLocalMap, replaceLocalMaps, deleteLocalMap } from "./local-maps.js";
 
 const state = {
   tripPanelOpen: true,
@@ -110,6 +112,14 @@ const elements = {
 
 function goToLogin() {
   window.location.href = "./index.html";
+}
+
+function buildLocalMapRecord(mapId, payload) {
+  return {
+    id: mapId,
+    ...payload,
+    updatedAtMs: Date.now()
+  };
 }
 
 function formatKm(value) {
@@ -319,6 +329,7 @@ function fillPointFormFromMap(lat, lng, suggestedName = "") {
     elements.pointName.value = "İşaretli Konum";
   }
 }
+
 function fillBothFormsFromMap(lat, lng, suggestedName = "") {
   fillPointFormFromMap(lat, lng, suggestedName);
   fillStartFormFromMap(lat, lng, suggestedName);
@@ -642,6 +653,7 @@ async function handleSaveMap() {
     if (isPremiumAccessActive()) {
       if (state.selectedMapId) {
         await updateMap(state.currentUser.uid, state.selectedMapId, payload);
+        saveLocalMap(state.currentUser.uid, buildLocalMapRecord(state.selectedMapId, payload));
         elements.authStatus.textContent = "Harita güncellendi.";
         markClean();
         await refreshMapList();
@@ -649,7 +661,8 @@ async function handleSaveMap() {
         return;
       }
 
-      await saveMap(state.currentUser.uid, payload, { fullAccess: true });
+      const createdRef = await saveMap(state.currentUser.uid, payload, { fullAccess: true });
+      saveLocalMap(state.currentUser.uid, buildLocalMapRecord(createdRef.id, payload));
       await refreshMapList();
       markClean();
       closeFloatingPanels();
@@ -662,8 +675,10 @@ async function handleSaveMap() {
 
     if (state.selectedMapId) {
       await updateMap(state.currentUser.uid, trialMapId, payload);
+      saveLocalMap(state.currentUser.uid, buildLocalMapRecord(trialMapId, payload));
     } else {
       await saveMap(state.currentUser.uid, payload, { fullAccess: false });
+      saveLocalMap(state.currentUser.uid, buildLocalMapRecord(trialMapId, payload));
     }
 
     await refreshMapList();
@@ -696,6 +711,7 @@ async function handleDeleteMap(mapId) {
 
   try {
     await removeMap(state.currentUser.uid, mapId);
+    deleteLocalMap(state.currentUser.uid, mapId);
 
     if (state.selectedMapId === mapId) {
       resetMapEditor();
@@ -728,9 +744,20 @@ async function handleMapListClick(event) {
   }
 
   try {
-    const mapData = await getMapById(state.currentUser.uid, mapId, {
-      fullAccess: isPremiumAccessActive()
-    });
+    let mapData = getLocalMapById(state.currentUser.uid, mapId);
+
+    try {
+      const remoteMap = await getMapById(state.currentUser.uid, mapId, {
+        fullAccess: isPremiumAccessActive()
+      });
+      if (remoteMap) {
+        mapData = remoteMap;
+        saveLocalMap(state.currentUser.uid, buildLocalMapRecord(remoteMap.id, remoteMap));
+      }
+    } catch {
+      // Yerel kopya ile devam et
+    }
+
     if (!mapData) return;
 
     state.selectedMapId = mapData.id;
@@ -856,6 +883,7 @@ async function handleCurrentLocationClick() {
 
 async function handleLogout() {
   try {
+    clearLocalSession();
     await logout();
     goToLogin();
   } catch (error) {
@@ -868,10 +896,17 @@ function loadEmptyMapListMessage() {
 }
 
 async function loadUserMaps(uid, fullAccess) {
+  const localMaps = getLocalMaps(uid);
+
   try {
     const maps = await getMaps(uid, { fullAccess });
+    if (maps.length) {
+      replaceLocalMaps(uid, maps.map((map) => buildLocalMapRecord(map.id, map)));
+    }
 
-    if (!maps.length) {
+    const displayMaps = maps.length ? maps : localMaps;
+
+    if (!displayMaps.length) {
       if (!fullAccess && state.selectedMapId && state.selectedMapId !== TRIAL_MAP_ID) {
         resetMapEditor();
       }
@@ -883,7 +918,7 @@ async function loadUserMaps(uid, fullAccess) {
       resetMapEditor();
     }
 
-    elements.mapList.innerHTML = maps
+    elements.mapList.innerHTML = displayMaps
       .map(
         (map) => `
           <div class="map-list-row">
@@ -899,7 +934,26 @@ async function loadUserMaps(uid, fullAccess) {
       )
       .join("");
   } catch {
-    elements.mapList.innerHTML = `<div class="map-list-item"><strong>Haritalar yüklenemedi</strong></div>`;
+    if (!localMaps.length) {
+      elements.mapList.innerHTML = `<div class="map-list-item"><strong>Haritalar yüklenemedi</strong></div>`;
+      return;
+    }
+
+    elements.mapList.innerHTML = localMaps
+      .map(
+        (map) => `
+          <div class="map-list-row">
+            <button class="map-list-item ${state.selectedMapId === map.id ? "active" : ""}" type="button" data-map-id="${map.id}">
+              <strong>${escapeHtml(map.name || "İsimsiz Harita")}</strong>
+              <span>Toplam mesafe: ${formatKm(map.totalDistance || 0)}</span>
+            </button>
+            <button class="tiny-btn danger-outline" type="button" data-action="delete-map" data-map-id="${map.id}">
+              Sil
+            </button>
+          </div>
+        `
+      )
+      .join("");
   }
 }
 
@@ -1176,9 +1230,18 @@ function initAuthWatcher() {
     if (user) {
       await ensureUserProfile(user.uid, user.email);
       await loadAccessModel(user);
+      saveLocalSession({
+        uid: user.uid,
+        email: user.email,
+        fullAccess: state.fullAccess,
+        accessActive: state.accessActive,
+        locationQuota: state.locationQuota,
+        mapQuota: state.mapQuota
+      });
       elements.authStatus.textContent = `Aktif kullanıcı: ${user.email} · ${getAccessStatusText()}`;
       await loadUserMaps(user.uid, isPremiumAccessActive());
     } else {
+      clearLocalSession();
       goToLogin();
     }
   });
