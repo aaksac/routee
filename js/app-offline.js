@@ -25,10 +25,13 @@ const elements = {
   btnAddPoint: document.getElementById("btnAddPoint"),
   btnAddStartPoint: document.getElementById("btnAddStartPoint"),
   btnCurrentLocation: document.getElementById("btnCurrentLocation"),
-  btnLogoutTop: document.getElementById("btnLogoutTop")
+  btnLogoutTop: document.getElementById("btnLogoutTop"),
+  btnToggleMenu: document.getElementById("btnToggleMenu"),
+  mapMenu: document.getElementById("mapMenu")
 };
 
 let selectedMapId = null;
+let mapMenuOpen = false;
 
 function formatKm(value) {
   const num = Number(value) || 0;
@@ -84,11 +87,22 @@ function disableOnlineOnlyButtons() {
 }
 
 function openSavedMapsOverlay() {
+  closeMapMenu();
   elements.savedMapsOverlay?.classList.remove("hidden");
 }
 
 function closeSavedMapsOverlay() {
   elements.savedMapsOverlay?.classList.add("hidden");
+}
+
+function toggleMapMenu(forceValue) {
+  mapMenuOpen = typeof forceValue === "boolean" ? forceValue : !mapMenuOpen;
+  elements.mapMenu?.classList.toggle("hidden", !mapMenuOpen);
+}
+
+function closeMapMenu() {
+  mapMenuOpen = false;
+  elements.mapMenu?.classList.add("hidden");
 }
 
 function getMaps() {
@@ -101,18 +115,23 @@ function renderMapList() {
   if (!elements.mapList) return;
 
   if (!maps.length) {
-    elements.mapList.innerHTML = '<div class="map-list-item"><strong>Çevrimdışı kayıt bulunamadı</strong><span>İnternet varken kaydedilmiş haritalar burada görünür.</span></div>';
+    elements.mapList.innerHTML =
+      '<div class="map-list-item"><strong>Çevrimdışı kayıt bulunamadı</strong><span>İnternet varken kaydedilmiş haritalar burada görünür.</span></div>';
     return;
   }
 
-  elements.mapList.innerHTML = maps.map((map) => `
+  elements.mapList.innerHTML = maps
+    .map(
+      (map) => `
     <div class="map-list-row">
       <button class="map-list-item ${selectedMapId === map.id ? "active" : ""}" type="button" data-map-id="${escapeHtml(map.id)}">
         <strong>${escapeHtml(map.name || "İsimsiz Harita")}</strong>
         <span>Toplam mesafe: ${formatKm(map.totalDistance || 0)}</span>
       </button>
     </div>
-  `).join("");
+  `
+    )
+    .join("");
 }
 
 function renderTripList(mapData) {
@@ -141,7 +160,9 @@ function renderTripList(mapData) {
     `;
 
   const points = Array.isArray(mapData?.points) ? mapData.points : [];
-  const pointHtml = points.map((point, index) => `
+  const pointHtml = points
+    .map(
+      (point, index) => `
     <div class="trip-item">
       <div class="trip-order">${index + 1}</div>
       <div class="trip-content">
@@ -150,13 +171,17 @@ function renderTripList(mapData) {
       </div>
       <button class="tiny-btn" type="button" disabled>Çevrimdışı</button>
     </div>
-  `).join("");
+  `
+    )
+    .join("");
 
   elements.tripList.innerHTML = startHtml + pointHtml;
 }
 
 function renderSummary(mapData) {
-  const pointCount = Number(mapData?.locationCount) || ((mapData?.points?.length || 0) + (mapData?.startPoint ? 1 : 0));
+  const pointCount =
+    Number(mapData?.locationCount) ||
+    ((mapData?.points?.length || 0) + (mapData?.startPoint ? 1 : 0));
   const totalDistance = Number(mapData?.totalDistance) || 0;
 
   if (elements.totalPoints) elements.totalPoints.textContent = String(pointCount);
@@ -187,17 +212,35 @@ function loadMap(mapId) {
 }
 
 function bindEvents() {
-  elements.btnOpenMapListPanel?.addEventListener("click", openSavedMapsOverlay);
+  elements.btnToggleMenu?.addEventListener("click", (event) => {
+    event.stopPropagation();
+    toggleMapMenu();
+  });
+
+  elements.btnOpenMapListPanel?.addEventListener("click", () => {
+    closeMapMenu();
+    openSavedMapsOverlay();
+  });
+
   elements.btnCloseMapListPanel?.addEventListener("click", closeSavedMapsOverlay);
   elements.savedMapsBackdrop?.addEventListener("click", closeSavedMapsOverlay);
+
   elements.mapList?.addEventListener("click", (event) => {
     const button = event.target.closest(".map-list-item");
     if (!button) return;
     loadMap(button.dataset.mapId);
     closeSavedMapsOverlay();
   });
+
   elements.btnLogoutTop?.addEventListener("click", () => {
     window.location.href = "./index.html";
+  });
+
+  document.addEventListener("click", (event) => {
+    const insideMenu = event.target.closest(".menu-wrapper");
+    if (!insideMenu) {
+      closeMapMenu();
+    }
   });
 }
 
