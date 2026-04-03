@@ -776,54 +776,80 @@ function renderPredictions(predictions, onPlaceSelected) {
         prediction.structured_formatting?.main_text ||
         prediction.description ||
         "";
+      const placeId = prediction.place_id;
+
+      const placeMarker = (lat, lng, addressText = "") => {
+        if (!map) return;
+
+        if (searchMarker) {
+          searchMarker.setMap(null);
+          searchMarker = null;
+        }
+
+        searchMarker = new google.maps.Marker({
+          position: { lat, lng },
+          map,
+          title: selectedName,
+          icon: createCircleSymbol("#2563eb", "#ffffff", 9)
+        });
+
+        map.panTo({ lat, lng });
+        map.setZoom(16);
+        resetPageZoomAfterSearch();
+
+        if (searchInputEl) {
+          searchInputEl.value = selectedName;
+        }
+
+        hideSearchDropdown();
+        clearAutocompleteSession();
+
+        if (typeof onPlaceSelected === "function") {
+          onPlaceSelected({
+            name: selectedName,
+            address: addressText,
+            lat,
+            lng
+          });
+        }
+      };
 
       placesService.getDetails(
         {
-          placeId: prediction.place_id,
-          fields: ["formatted_address", "geometry"],
+          placeId,
+          fields: ["name", "formatted_address", "geometry", "place_id"],
           sessionToken
         },
         (place, status) => {
           if (
-            status !== google.maps.places.PlacesServiceStatus.OK ||
-            !place?.geometry?.location
+            status === google.maps.places.PlacesServiceStatus.OK &&
+            place?.geometry?.location
           ) {
+            const lat = place.geometry.location.lat();
+            const lng = place.geometry.location.lng();
+            placeMarker(lat, lng, place?.formatted_address || "");
             return;
           }
 
-          const lat = place.geometry.location.lat();
-          const lng = place.geometry.location.lng();
+          const geocoder = new google.maps.Geocoder();
+          geocoder.geocode({ placeId }, (results, geoStatus) => {
+            if (
+              geoStatus === "OK" &&
+              Array.isArray(results) &&
+              results[0]?.geometry?.location
+            ) {
+              const lat = results[0].geometry.location.lat();
+              const lng = results[0].geometry.location.lng();
+              placeMarker(lat, lng, results[0].formatted_address || "");
+              return;
+            }
 
-          if (searchMarker) {
-            searchMarker.setMap(null);
-            searchMarker = null;
-          }
-
-          searchMarker = new google.maps.Marker({
-            position: { lat, lng },
-            map,
-            title: selectedName,
-            icon: createCircleSymbol("#2563eb", "#ffffff", 9)
-          });
-
-          focusToLocation(lat, lng, 16);
-          resetPageZoomAfterSearch();
-
-          if (searchInputEl) {
-            searchInputEl.value = selectedName;
-          }
-
-          hideSearchDropdown();
-          clearAutocompleteSession();
-
-          if (typeof onPlaceSelected === "function") {
-            onPlaceSelected({
-              name: selectedName,
-              address: place?.formatted_address || "",
-              lat,
-              lng
+            console.warn("Seçilen yer haritada işaretlenemedi:", {
+              placeId,
+              detailsStatus: status,
+              geocodeStatus: geoStatus
             });
-          }
+          });
         }
       );
     });
