@@ -32,6 +32,19 @@ import {
   importFromXlsxFile,
   convertImportedRowsToState
 } from "./import-export.js";
+import {
+  OFFLINE_TRIAL_MAP_ID,
+  isLocalMapId,
+  persistOfflineSession,
+  getOfflineSession,
+  clearOfflineSession,
+  getOfflineMaps,
+  setOfflineMaps,
+  getOfflineMapById,
+  saveOfflineMap,
+  removeOfflineMap,
+  toMillis
+} from "./offline-storage.js";
 
 const state = {
   tripPanelOpen: true,
@@ -50,7 +63,8 @@ const state = {
   accessActive: false,
   locationQuota: TRIAL_LOCATION_QUOTA,
   mapQuota: 1,
-  lastScrollY: 0
+  lastScrollY: 0,
+  offlineMode: false
 };
 
 const elements = {
@@ -132,6 +146,104 @@ function escapeHtml(value) {
     .replace(/'/g, "&#39;");
 }
 
+function normalizeStoredTime(value) {
+  const millis = toMillis(value);
+  return Number.isFinite(millis) ? millis : 0;
+}
+
+function isOfflineRuntime() {
+  return state.offlineMode || !navigator.onLine;
+}
+
+function getOfflineStatusLabel() {
+  return "Çevrimdışı mod · Haritalar cihazda saklanır";
+}
+
+function buildStatusText(prefix) {
+  if (!prefix) return getOfflineStatusLabel();
+  return isOfflineRuntime() ? `${prefix} · ${getOfflineStatusLabel()}` : prefix;
+}
+
+function mergeMapsForList(remoteMaps = [], localMaps = []) {
+  const merged = new Map();
+
+  remoteMaps.forEach((map) => {
+    merged.set(String(map.id), {
+      ...map,
+      storage: "cloud"
+    });
+  });
+
+  localMaps.forEach((map) => {
+    if (map?.storage === "offline" || isLocalMapId(map?.id)) {
+      merged.set(String(map.id), {
+        ...map,
+        storage: "offline"
+      });
+      return;
+    }
+
+    if (!merged.has(String(map.id))) {
+      merged.set(String(map.id), {
+        ...map,
+        storage: map?.storage === "offline" ? "offline" : "cloud"
+      });
+    }
+  });
+
+  return Array.from(merged.values()).sort(
+    (a, b) =>
+      Number(b.updatedAt?.toMillis?.() || b.updatedAt || 0) -
+      Number(a.updatedAt?.toMillis?.() || a.updatedAt || 0)
+  );
+}
+
+function syncMapsToOfflineCache(uid, remoteMaps = []) {
+  if (!uid) return;
+
+  const localMaps = getOfflineMaps(uid);
+  const localOnlyMaps = localMaps.filter(
+    (map) => map?.storage === "offline" || isLocalMapId(map?.id)
+  );
+
+  const normalizedRemote = remoteMaps.map((map) => ({
+    ...map,
+    storage: "cloud",
+    createdAt: map?.createdAt?.toMillis?.() || map?.createdAt || Date.now(),
+    updatedAt: map?.updatedAt?.toMillis?.() || map?.updatedAt || Date.now()
+  }));
+
+  setOfflineMaps(uid, [...normalizedRemote, ...localOnlyMaps]);
+}
+
+function persistCurrentOfflineSnapshot() {
+  if (!state.currentUser?.uid || !state.currentUser?.email) return;
+
+  persistOfflineSession(state.currentUser, {
+    claims: state.claims,
+    profile: state.profile,
+    fullAccess: state.fullAccess
+  });
+}
+
+function applyOfflineUserSession(session) {
+  if (!session?.uid) return false;
+
+  state.offlineMode = true;
+  state.currentUser = {
+    uid: session.uid,
+    email: session.email
+  };
+  state.claims = session.claims || {};
+  state.profile = session.profile || null;
+  state.fullAccess = session.fullAccess === true || session?.claims?.fullAccess === true;
+  state.locationQuota =
+    Number(session?.profile?.locationQuota ?? TRIAL_LOCATION_QUOTA) || TRIAL_LOCATION_QUOTA;
+  state.mapQuota = Number(session?.profile?.mapQuota ?? 1) || 1;
+  state.accessActive = hasActiveAccess();
+  return true;
+}
+
 function markDirty() {
   state.hasUnsavedChanges = true;
 }
@@ -159,11 +271,11 @@ function getCurrentLocationCount() {
 }
 
 function getTrialEndsAtMs() {
-  return state.profile?.trialEndsAt?.toMillis?.() || 0;
+  return normalizeStoredTime(state.profile?.trialEndsAt);
 }
 
 function getAccessUntilMs() {
-  return state.profile?.accessUntil?.toMillis?.() || 0;
+  return normalizeStoredTime(state.profile?.accessUntil);
 }
 
 function isTrialActive() {
@@ -182,8 +294,9 @@ function hasActiveAccess() {
 }
 
 function canReadMapId(mapId) {
+  if (isLocalMapId(mapId)) return true;
   if (isPremiumAccessActive()) return true;
-  return mapId === TRIAL_MAP_ID;
+  return mapId === TRIAL_MAP_ID || mapId === OFFLINE_TRIAL_MAP_ID;
 }
 
 function canAddMoreLocations(extraCount = 1) {
@@ -200,7 +313,7 @@ function canSaveAnotherMap() {
     return true;
   }
 
-  return state.selectedMapId === TRIAL_MAP_ID;
+  return state.selectedMapId === TRIAL_MAP_ID || state.selectedMapId === OFFLINE_TRIAL_MAP_ID;
 }
 
 function getAccessStatusText() {
@@ -319,6 +432,7 @@ function fillPointFormFromMap(lat, lng, suggestedName = "") {
     elements.pointName.value = "İşaretli Konum";
   }
 }
+
 function fillBothFormsFromMap(lat, lng, suggestedName = "") {
   fillPointFormFromMap(lat, lng, suggestedName);
   fillStartFormFromMap(lat, lng, suggestedName);
@@ -601,7 +715,9 @@ function resetMapEditor() {
   renderSummary();
   renderTripList();
   markClean();
-  elements.authStatus.textContent = `Yeni harita oluşturuluyor. ${getAccessStatusText()}`;
+  elements.authStatus.textContent = buildStatusText(
+    `Yeni harita oluşturuluyor. ${getAccessStatusText()}`
+  );
 }
 
 async function handleSaveMap() {
@@ -637,12 +753,28 @@ async function handleSaveMap() {
   }
 
   const payload = getMapPayload();
+  const shouldUseLocalSave = isOfflineRuntime() || isLocalMapId(state.selectedMapId);
 
   try {
+    if (shouldUseLocalSave) {
+      const result = saveOfflineMap(state.currentUser.uid, payload, {
+        mapId: state.selectedMapId || null,
+        fullAccess: isPremiumAccessActive()
+      });
+
+      state.selectedMapId = result?.id || state.selectedMapId || OFFLINE_TRIAL_MAP_ID;
+      await refreshMapList();
+      markClean();
+      closeFloatingPanels();
+      alert("Harita cihazda çevrimdışı kullanım için kaydedildi.");
+      resetMapEditor();
+      return;
+    }
+
     if (isPremiumAccessActive()) {
       if (state.selectedMapId) {
         await updateMap(state.currentUser.uid, state.selectedMapId, payload);
-        elements.authStatus.textContent = "Harita güncellendi.";
+        elements.authStatus.textContent = buildStatusText("Harita güncellendi.");
         markClean();
         await refreshMapList();
         closeFloatingPanels();
@@ -672,7 +804,22 @@ async function handleSaveMap() {
     alert("Haritanız kaydedilmiştir. Harita Listelerim kısmından ulaşabilirsiniz.");
     resetMapEditor();
   } catch (error) {
-    elements.authStatus.textContent = `Kaydetme hatası: ${error.message}`;
+    if (state.currentUser?.uid) {
+      const result = saveOfflineMap(state.currentUser.uid, payload, {
+        mapId: state.selectedMapId || null,
+        fullAccess: isPremiumAccessActive()
+      });
+      state.selectedMapId = result?.id || state.selectedMapId || OFFLINE_TRIAL_MAP_ID;
+      await refreshMapList();
+      markClean();
+      closeFloatingPanels();
+      elements.authStatus.textContent = buildStatusText(
+        "Bağlantı olmadığı için harita cihazda kaydedildi."
+      );
+      return;
+    }
+
+    elements.authStatus.textContent = buildStatusText(`Kaydetme hatası: ${error.message}`);
   }
 }
 
@@ -695,16 +842,24 @@ async function handleDeleteMap(mapId) {
   if (!confirmed) return;
 
   try {
-    await removeMap(state.currentUser.uid, mapId);
+    if (isLocalMapId(mapId) || isOfflineRuntime()) {
+      removeOfflineMap(state.currentUser.uid, mapId);
+    } else {
+      await removeMap(state.currentUser.uid, mapId);
+      const cachedMaps = getOfflineMaps(state.currentUser.uid).filter(
+        (item) => item.id !== String(mapId)
+      );
+      setOfflineMaps(state.currentUser.uid, cachedMaps);
+    }
 
     if (state.selectedMapId === mapId) {
       resetMapEditor();
     }
 
     await refreshMapList();
-    elements.authStatus.textContent = "Harita silindi.";
+    elements.authStatus.textContent = buildStatusText("Harita silindi.");
   } catch (error) {
-    elements.authStatus.textContent = `Silme hatası: ${error.message}`;
+    elements.authStatus.textContent = buildStatusText(`Silme hatası: ${error.message}`);
   }
 }
 
@@ -723,14 +878,27 @@ async function handleMapListClick(event) {
   if (!mapId || !state.currentUser) return;
 
   if (!canReadMapId(mapId)) {
-    elements.authStatus.textContent = "Bu harita yalnızca premium erişimde görüntülenebilir.";
+    elements.authStatus.textContent = buildStatusText(
+      "Bu harita yalnızca premium erişimde görüntülenebilir."
+    );
     return;
   }
 
   try {
-    const mapData = await getMapById(state.currentUser.uid, mapId, {
-      fullAccess: isPremiumAccessActive()
-    });
+    let mapData = null;
+
+    if (isLocalMapId(mapId) || isOfflineRuntime()) {
+      mapData = getOfflineMapById(state.currentUser.uid, mapId);
+    } else {
+      try {
+        mapData = await getMapById(state.currentUser.uid, mapId, {
+          fullAccess: isPremiumAccessActive()
+        });
+      } catch {
+        mapData = getOfflineMapById(state.currentUser.uid, mapId);
+      }
+    }
+
     if (!mapData) return;
 
     state.selectedMapId = mapData.id;
@@ -763,10 +931,14 @@ async function handleMapListClick(event) {
     focusMapToPoints(startPoint, points);
 
     markClean();
-    elements.authStatus.textContent = `Harita yüklendi: ${mapData.name || "İsimsiz Harita"}`;
+    elements.authStatus.textContent = buildStatusText(
+      `Harita yüklendi: ${mapData.name || "İsimsiz Harita"}`
+    );
     highlightSelectedMap(mapId);
   } catch (error) {
-    elements.authStatus.textContent = `Harita yükleme hatası: ${error.message}`;
+    elements.authStatus.textContent = buildStatusText(
+      `Harita yükleme hatası: ${error.message}`
+    );
   }
 }
 
@@ -848,38 +1020,69 @@ async function handleXlsxFileChange(event) {
 async function handleCurrentLocationClick() {
   try {
     await locateAndShowUser();
-    elements.authStatus.textContent = "Mevcut konum haritada gösterildi.";
+    elements.authStatus.textContent = buildStatusText(
+      "Mevcut konum haritada gösterildi."
+    );
   } catch (error) {
-    elements.authStatus.textContent = `Konum alınamadı: ${error.message}`;
+    elements.authStatus.textContent = buildStatusText(
+      `Konum alınamadı: ${error.message}`
+    );
   }
 }
 
 async function handleLogout() {
   try {
+    clearOfflineSession();
+
+    if (isOfflineRuntime()) {
+      goToLogin();
+      return;
+    }
+
     await logout();
     goToLogin();
   } catch (error) {
-    elements.authStatus.textContent = `Çıkış hatası: ${error.message}`;
+    elements.authStatus.textContent = buildStatusText(`Çıkış hatası: ${error.message}`);
   }
 }
 
 function loadEmptyMapListMessage() {
-  elements.mapList.innerHTML = `<div class="map-list-item"><strong>Henüz kayıtlı harita yok</strong></div>`;
+  elements.mapList.innerHTML =
+    `<div class="map-list-item"><strong>Henüz kayıtlı harita yok</strong></div>`;
 }
 
 async function loadUserMaps(uid, fullAccess) {
   try {
-    const maps = await getMaps(uid, { fullAccess });
+    let maps = [];
+
+    if (isOfflineRuntime()) {
+      maps = getOfflineMaps(uid);
+    } else {
+      const remoteMaps = await getMaps(uid, { fullAccess });
+      syncMapsToOfflineCache(uid, remoteMaps);
+      maps = mergeMapsForList(remoteMaps, getOfflineMaps(uid));
+    }
 
     if (!maps.length) {
-      if (!fullAccess && state.selectedMapId && state.selectedMapId !== TRIAL_MAP_ID) {
+      if (
+        !fullAccess &&
+        state.selectedMapId &&
+        state.selectedMapId !== TRIAL_MAP_ID &&
+        state.selectedMapId !== OFFLINE_TRIAL_MAP_ID
+      ) {
         resetMapEditor();
       }
       loadEmptyMapListMessage();
       return;
     }
 
-    if (!fullAccess && state.selectedMapId && state.selectedMapId !== TRIAL_MAP_ID) {
+    if (
+      !fullAccess &&
+      state.selectedMapId &&
+      state.selectedMapId !== TRIAL_MAP_ID &&
+      state.selectedMapId !== OFFLINE_TRIAL_MAP_ID &&
+      !isLocalMapId(state.selectedMapId)
+    ) {
       resetMapEditor();
     }
 
@@ -890,6 +1093,7 @@ async function loadUserMaps(uid, fullAccess) {
             <button class="map-list-item ${state.selectedMapId === map.id ? "active" : ""}" type="button" data-map-id="${map.id}">
               <strong>${escapeHtml(map.name || "İsimsiz Harita")}</strong>
               <span>Toplam mesafe: ${formatKm(map.totalDistance || 0)}</span>
+              <span>${map.storage === "offline" ? "Cihazda kayıtlı" : "Bulutta kayıtlı"}</span>
             </button>
             <button class="tiny-btn danger-outline" type="button" data-action="delete-map" data-map-id="${map.id}">
               Sil
@@ -899,7 +1103,30 @@ async function loadUserMaps(uid, fullAccess) {
       )
       .join("");
   } catch {
-    elements.mapList.innerHTML = `<div class="map-list-item"><strong>Haritalar yüklenemedi</strong></div>`;
+    const fallbackMaps = getOfflineMaps(uid);
+
+    if (!fallbackMaps.length) {
+      elements.mapList.innerHTML =
+        `<div class="map-list-item"><strong>Haritalar yüklenemedi</strong></div>`;
+      return;
+    }
+
+    elements.mapList.innerHTML = fallbackMaps
+      .map(
+        (map) => `
+          <div class="map-list-row">
+            <button class="map-list-item ${state.selectedMapId === map.id ? "active" : ""}" type="button" data-map-id="${map.id}">
+              <strong>${escapeHtml(map.name || "İsimsiz Harita")}</strong>
+              <span>Toplam mesafe: ${formatKm(map.totalDistance || 0)}</span>
+              <span>Cihazda kayıtlı</span>
+            </button>
+            <button class="tiny-btn danger-outline" type="button" data-action="delete-map" data-map-id="${map.id}">
+              Sil
+            </button>
+          </div>
+        `
+      )
+      .join("");
   }
 }
 
@@ -928,7 +1155,9 @@ function handleTripListClick(event) {
   }
 
   if (action === "directions-point") {
-    const point = state.points.find((item) => String(item.id) === String(target.dataset.id));
+    const point = state.points.find(
+      (item) => String(item.id) === String(target.dataset.id)
+    );
     if (!point) return;
     const url = `https://www.google.com/maps/dir/?api=1&destination=${point.lat},${point.lng}`;
     window.location.href = url;
@@ -954,17 +1183,26 @@ function syncMobilePanelState() {
   const isMobile = window.innerWidth <= 720;
   const panelName = state.activeFloatingPanel || "";
 
-  document.body.classList.toggle("has-mobile-floating-panel", isMobile && Boolean(panelName));
+  document.body.classList.toggle(
+    "has-mobile-floating-panel",
+    isMobile && Boolean(panelName)
+  );
   document.body.dataset.mobilePanel = isMobile ? panelName : "";
 }
 
 function toggleMapMenu(forceValue) {
-  state.mapMenuOpen = typeof forceValue === "boolean" ? forceValue : !state.mapMenuOpen;
+  state.mapMenuOpen =
+    typeof forceValue === "boolean" ? forceValue : !state.mapMenuOpen;
   elements.mapMenu?.classList.toggle("hidden", !state.mapMenuOpen);
 }
 
 function closeFloatingPanels() {
-  [elements.startPanel, elements.pointPanel, elements.savePanel, elements.importExportPanel].forEach((panel) => {
+  [
+    elements.startPanel,
+    elements.pointPanel,
+    elements.savePanel,
+    elements.importExportPanel
+  ].forEach((panel) => {
     panel?.classList.add("hidden");
   });
   state.activeFloatingPanel = null;
@@ -1070,6 +1308,7 @@ function bindEvents() {
   elements.btnSaveMap?.addEventListener("click", async () => {
     await handleSaveMap();
   });
+
   elements.btnNewMap?.addEventListener("click", async () => {
     await handleNewMap();
     closeSavedMapsOverlay();
@@ -1095,6 +1334,7 @@ function bindEvents() {
       closeSavedMapsOverlay();
     }
   });
+
   elements.btnLogoutTop?.addEventListener("click", handleLogout);
 
   elements.btnOpenStartPanel?.addEventListener("click", () => {
@@ -1119,7 +1359,9 @@ function bindEvents() {
   elements.btnClosePointPanel?.addEventListener("click", closeFloatingPanels);
   elements.btnToggleMenu?.addEventListener("click", () => toggleMapMenu());
   elements.btnOpenSavePanel?.addEventListener("click", () => openFloatingPanel("save"));
-  elements.btnOpenImportExportPanel?.addEventListener("click", () => openFloatingPanel("importExport"));
+  elements.btnOpenImportExportPanel?.addEventListener("click", () =>
+    openFloatingPanel("importExport")
+  );
   elements.btnOpenMapListPanel?.addEventListener("click", openSavedMapsOverlay);
   elements.btnCloseSavePanel?.addEventListener("click", closeFloatingPanels);
   elements.btnCloseImportExportPanel?.addEventListener("click", closeFloatingPanels);
@@ -1144,9 +1386,13 @@ function initMapClickPicker() {
     markDirty();
 
     if (name) {
-      elements.authStatus.textContent = `Haritadan seçim yapıldı: ${name}`;
+      elements.authStatus.textContent = buildStatusText(
+        `Haritadan seçim yapıldı: ${name}`
+      );
     } else {
-      elements.authStatus.textContent = `Haritadan seçim yapıldı: ${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+      elements.authStatus.textContent = buildStatusText(
+        `Haritadan seçim yapıldı: ${lat.toFixed(6)}, ${lng.toFixed(6)}`
+      );
     }
   });
 }
@@ -1156,7 +1402,9 @@ function initSearchBox() {
     if (!hasActiveAccess()) return;
     fillBothFormsFromMap(lat, lng, name);
     markDirty();
-    elements.authStatus.textContent = `Arama ile yer seçildi: ${name}`;
+    elements.authStatus.textContent = buildStatusText(
+      `Arama ile yer seçildi: ${name}`
+    );
   });
 }
 
@@ -1167,11 +1415,53 @@ async function loadAccessModel(user) {
   state.locationQuota = state.profile?.locationQuota || TRIAL_LOCATION_QUOTA;
   state.mapQuota = state.profile?.mapQuota || 1;
   state.accessActive = hasActiveAccess();
+  persistCurrentOfflineSnapshot();
+}
+
+async function bootstrapOfflineMode() {
+  const offlineSession = getOfflineSession();
+  if (!applyOfflineUserSession(offlineSession)) {
+    goToLogin();
+    return;
+  }
+
+  elements.authStatus.textContent = buildStatusText(
+    `Aktif kullanıcı: ${state.currentUser.email} · ${getAccessStatusText()}`
+  );
+  await loadUserMaps(state.currentUser.uid, isPremiumAccessActive());
+}
+
+function initConnectionWatcher() {
+  window.addEventListener("offline", async () => {
+    state.offlineMode = true;
+
+    if (state.currentUser?.uid) {
+      elements.authStatus.textContent = buildStatusText(
+        `Aktif kullanıcı: ${state.currentUser.email} · ${getAccessStatusText()}`
+      );
+      await loadUserMaps(state.currentUser.uid, isPremiumAccessActive());
+    }
+  });
+
+  window.addEventListener("online", async () => {
+    state.offlineMode = false;
+
+    if (state.currentUser?.uid) {
+      elements.authStatus.textContent = `Aktif kullanıcı: ${state.currentUser.email} · ${getAccessStatusText()}`;
+      await loadUserMaps(state.currentUser.uid, isPremiumAccessActive());
+    }
+  });
 }
 
 function initAuthWatcher() {
+  if (!navigator.onLine) {
+    bootstrapOfflineMode();
+    return;
+  }
+
   watchAuth(async (user) => {
     state.currentUser = user;
+    state.offlineMode = false;
 
     if (user) {
       await ensureUserProfile(user.uid, user.email);
@@ -1179,6 +1469,13 @@ function initAuthWatcher() {
       elements.authStatus.textContent = `Aktif kullanıcı: ${user.email} · ${getAccessStatusText()}`;
       await loadUserMaps(user.uid, isPremiumAccessActive());
     } else {
+      const offlineSession = getOfflineSession();
+
+      if (!navigator.onLine && offlineSession?.uid) {
+        await bootstrapOfflineMode();
+        return;
+      }
+
       goToLogin();
     }
   });
@@ -1192,6 +1489,7 @@ function init() {
   renderTripList();
   bindEvents();
   initMobileTopbarAutoHide();
+  initConnectionWatcher();
   initAuthWatcher();
 }
 
