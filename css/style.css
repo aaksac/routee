@@ -624,7 +624,21 @@ select:focus {
     height: 64vh;
   }
 }
+@media (min-width: 1101px) {
+  .trip-panel {
+    display: flex;
+    flex-direction: column;
+    height: 78vh;
+  }
 
+  .trip-list {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    padding-right: 6px;
+    scrollbar-gutter: stable;
+  }
+}
 @media (min-width: 721px) {
   .topbar.is-hidden-on-scroll {
     transform: none;
