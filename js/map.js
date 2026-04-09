@@ -1,3 +1,4 @@
+// js/map.js
 let map;
 let markers = [];
 let currentLocationMarker = null;
@@ -9,8 +10,10 @@ let routePolylines = [];
 let distanceOverlays = [];
 let activeInfoWindow = null;
 
-let searchService = null;
-let placesService = null;
+let PlaceCtor = null;
+let PlacesServiceCtor = null;
+let AutocompleteSessionTokenCtor = null;
+let AutocompleteSuggestionClass = null;
 let searchDropdown = null;
 let searchInputEl = null;
 let searchSelectHandlerBound = false;
@@ -21,16 +24,47 @@ let lastPredictionRequestId = 0;
 let currentPredictions = [];
 
 let activeAutocompleteSessionToken = null;
+let activePlaceSearchCallback = null;
 let searchDebounceTimer = null;
+let poiNameCache = new Map();
+let searchLocationCache = new Map();
+
 const MIN_SEARCH_LENGTH = 4;
 const SEARCH_DEBOUNCE_MS = 450;
 const MAX_PREDICTIONS = 5;
 
-function initMap() {
+async function loadGoogleLibraries() {
+  const { Map, InfoWindow, Marker, SymbolPath, Size } =
+    await google.maps.importLibrary("maps");
+  const {
+    Place,
+    AutocompleteSessionToken,
+    AutocompleteSuggestion
+  } = await google.maps.importLibrary("places");
+
+  return {
+    Map,
+    InfoWindow,
+    Marker,
+    SymbolPath,
+    Size,
+    Place,
+    AutocompleteSessionToken,
+    AutocompleteSuggestion
+  };
+}
+
+async function initMap() {
   const mapElement = document.getElementById("mapCanvas");
   if (!mapElement) return null;
 
   mapElement.innerHTML = "";
+
+  const libs = await loadGoogleLibraries();
+  PlaceCtor = libs.Place;
+  PlacesServiceCtor = libs.Place;
+  AutocompleteSessionTokenCtor = libs.AutocompleteSessionToken;
+  AutocompleteSuggestionClass = libs.AutocompleteSuggestion;
 
   const defaultCenter = { lat: 37.0, lng: 35.3213 };
 
@@ -46,9 +80,6 @@ function initMap() {
   activeInfoWindow = new google.maps.InfoWindow({
     ariaLabel: "Konum Bilgisi"
   });
-
-  placesService = new google.maps.places.PlacesService(map);
-  searchService = new google.maps.places.AutocompleteService();
 
   return map;
 }
@@ -342,71 +373,8 @@ function clearStartMarker() {
   }
 }
 
-function focusToLocation(lat, lng, zoom = 15) {
-  if (!map) return;
-  map.setCenter({ lat, lng });
-  map.setZoom(zoom);
-}
-
-function resetPageZoomAfterSearch() {
-  if (!searchInputEl) return;
-
-  searchInputEl.blur();
-
-  const viewportMeta = document.querySelector('meta[name="viewport"]');
-  if (!viewportMeta) return;
-
-  const originalContent = viewportMeta.getAttribute("content") || "";
-
-  viewportMeta.setAttribute(
-    "content",
-    "width=device-width, initial-scale=1, maximum-scale=1"
-  );
-
-  window.setTimeout(() => {
-    viewportMeta.setAttribute("content", originalContent);
-  }, 250);
-}
-
-function focusMapToPoints(startPoint, points = []) {
-  if (!map) return;
-
-  const validPoints = [];
-
-  if (startPoint && Number.isFinite(startPoint.lat) && Number.isFinite(startPoint.lng)) {
-    validPoints.push({
-      lat: Number(startPoint.lat),
-      lng: Number(startPoint.lng)
-    });
-  }
-
-  points.forEach((point) => {
-    if (Number.isFinite(point.lat) && Number.isFinite(point.lng)) {
-      validPoints.push({
-        lat: Number(point.lat),
-        lng: Number(point.lng)
-      });
-    }
-  });
-
-  if (!validPoints.length) return;
-
-  if (validPoints.length === 1) {
-    focusToLocation(validPoints[0].lat, validPoints[0].lng, 15);
-    return;
-  }
-
-  const bounds = new google.maps.LatLngBounds();
-
-  validPoints.forEach((point) => {
-    bounds.extend(point);
-  });
-
-  map.fitBounds(bounds, 60);
-}
-
-function showCurrentLocationMarker(lat, lng) {
-  if (!map) return;
+function showCurrentLocationMarker({ lat, lng, title = "Bulunduğum Konum" }) {
+  if (!map) return null;
 
   if (currentLocationMarker) {
     currentLocationMarker.setMap(null);
@@ -415,15 +383,32 @@ function showCurrentLocationMarker(lat, lng) {
   currentLocationMarker = new google.maps.Marker({
     position: { lat, lng },
     map,
-    title: "Mevcut Konumum",
-    icon: createCircleSymbol("#2563eb")
+    title,
+    icon: {
+      path: google.maps.SymbolPath.CIRCLE,
+      fillColor: "#2563eb",
+      fillOpacity: 1,
+      strokeColor: "#ffffff",
+      strokeWeight: 3,
+      scale: 9
+    }
   });
 
-  focusToLocation(lat, lng, 15);
+  map.panTo({ lat, lng });
+  map.setZoom(14);
+
+  return currentLocationMarker;
+}
+
+function clearCurrentLocationMarker() {
+  if (currentLocationMarker) {
+    currentLocationMarker.setMap(null);
+    currentLocationMarker = null;
+  }
 }
 
 function showDraftMarker(lat, lng) {
-  if (!map) return;
+  if (!map) return null;
 
   if (draftMarker) {
     draftMarker.setMap(null);
@@ -432,9 +417,19 @@ function showDraftMarker(lat, lng) {
   draftMarker = new google.maps.Marker({
     position: { lat, lng },
     map,
-    title: "Seçilen Nokta",
-    icon: createCircleSymbol("#facc15", "#92400e")
+    draggable: false,
+    title: "Seçilen Konum",
+    icon: {
+      path: google.maps.SymbolPath.CIRCLE,
+      fillColor: "#f59e0b",
+      fillOpacity: 1,
+      strokeColor: "#ffffff",
+      strokeWeight: 3,
+      scale: 8
+    }
   });
+
+  return draftMarker;
 }
 
 function clearDraftMarker() {
@@ -444,55 +439,89 @@ function clearDraftMarker() {
   }
 }
 
-function clearRouteLines() {
-  routePolylines.forEach((line) => line.setMap(null));
-  routePolylines = [];
+function setSearchMarker(lat, lng, title = "Arama Sonucu") {
+  if (!map) return null;
 
+  if (searchMarker) {
+    searchMarker.setMap(null);
+  }
+
+  searchMarker = new google.maps.Marker({
+    position: { lat, lng },
+    map,
+    title,
+    icon: {
+      path: google.maps.SymbolPath.CIRCLE,
+      fillColor: "#7c3aed",
+      fillOpacity: 1,
+      strokeColor: "#ffffff",
+      strokeWeight: 3,
+      scale: 8
+    }
+  });
+
+  map.panTo({ lat, lng });
+  map.setZoom(15);
+
+  return searchMarker;
+}
+
+function clearSearchMarker() {
+  if (searchMarker) {
+    searchMarker.setMap(null);
+    searchMarker = null;
+  }
+}
+
+function clearRouteLines() {
+  routePolylines.forEach((polyline) => polyline.setMap(null));
   distanceOverlays.forEach((overlay) => overlay.setMap(null));
+  routePolylines = [];
   distanceOverlays = [];
 }
 
-function createDistanceOverlay(position, text) {
+function createDistanceOverlay(position, distanceLabel) {
+  if (!map) return null;
+
   class DistanceOverlay extends google.maps.OverlayView {
-    constructor(pos, labelText) {
+    constructor(pos, label) {
       super();
       this.position = pos;
-      this.text = labelText;
+      this.label = label;
       this.div = null;
     }
 
     onAdd() {
       const div = document.createElement("div");
-      div.style.position = "absolute";
-      div.style.background = "rgba(255,255,255,0.96)";
-      div.style.border = "1px solid rgba(203, 213, 225, 0.95)";
-      div.style.borderRadius = "999px";
-      div.style.padding = "4px 8px";
-      div.style.fontSize = "12px";
-      div.style.fontWeight = "700";
-      div.style.color = "#0f172a";
-      div.style.boxShadow = "0 8px 18px rgba(15,23,42,0.10)";
-      div.style.whiteSpace = "nowrap";
-      div.style.backdropFilter = "blur(8px)";
-      div.style.pointerEvents = "none";
-      div.style.zIndex = "20";
-      div.innerText = this.text;
+      div.className = "distance-overlay";
+      div.textContent = this.label;
       this.div = div;
 
       const panes = this.getPanes();
-      panes.floatPane.appendChild(div);
+      panes.overlayMouseTarget.appendChild(div);
     }
 
     draw() {
       if (!this.div) return;
 
       const projection = this.getProjection();
-      const pixel = projection.fromLatLngToDivPixel(this.position);
+      const point = projection.fromLatLngToDivPixel(this.position);
+      if (!point) return;
 
-      if (!pixel) return;
-
-      this.div.style.left = `${pixel.x - 24}px`;
-      this.div.style.top = `${pixel.y - 14}px`;
+      this.div.style.position = "absolute";
+      this.div.style.left = `${point.x}px`;
+      this.div.style.top = `${point.y}px`;
+      this.div.style.transform = "translate(-50%, -50%)";
+      this.div.style.padding = "4px 8px";
+      this.div.style.background = "rgba(15, 23, 42, 0.85)";
+      this.div.style.color = "#ffffff";
+      this.div.style.fontSize = "11px";
+      this.div.style.fontWeight = "600";
+      this.div.style.borderRadius = "999px";
+      this.div.style.boxShadow = "0 8px 18px rgba(15, 23, 42, 0.18)";
+      this.div.style.whiteSpace = "nowrap";
+      this.div.style.pointerEvents = "none";
+      this.div.style.zIndex = "2";
     }
 
     onRemove() {
@@ -503,340 +532,313 @@ function createDistanceOverlay(position, text) {
     }
   }
 
-  const overlay = new DistanceOverlay(position, text);
-  overlay.setMap(map);
-  distanceOverlays.push(overlay);
+  return new DistanceOverlay(position, distanceLabel);
 }
 
-function drawRouteSegments(startPoint, orderedPoints) {
-  if (!map) return;
+function drawRouteSegments(points) {
+  if (!map || !Array.isArray(points) || points.length < 2) {
+    clearRouteLines();
+    return;
+  }
 
   clearRouteLines();
 
-  if (!startPoint || !orderedPoints.length) return;
-
-  let previous = startPoint;
-
-  orderedPoints.forEach((point) => {
-    const path = [
-      { lat: previous.lat, lng: previous.lng },
-      { lat: point.lat, lng: point.lng }
-    ];
+  for (let index = 1; index < points.length; index += 1) {
+    const previous = points[index - 1];
+    const current = points[index];
 
     const polyline = new google.maps.Polyline({
-      path,
+      path: [
+        { lat: previous.lat, lng: previous.lng },
+        { lat: current.lat, lng: current.lng }
+      ],
       geodesic: true,
       strokeColor: "#2563eb",
-      strokeOpacity: 0.95,
+      strokeOpacity: 0.9,
       strokeWeight: 3,
-      map
+      icons: [
+        {
+          icon: {
+            path: "M 0,-1 0,1",
+            strokeOpacity: 1,
+            scale: 3
+          },
+          offset: "0",
+          repeat: "12px"
+        }
+      ]
     });
 
+    polyline.setMap(map);
     routePolylines.push(polyline);
 
-    const midLat = (previous.lat + point.lat) / 2;
-    const midLng = (previous.lng + point.lng) / 2;
+    const midpoint = {
+      lat: (previous.lat + current.lat) / 2,
+      lng: (previous.lng + current.lng) / 2
+    };
 
-    const distanceLabel =
-      point.distanceFromPrevious < 1
-        ? `${Math.round(point.distanceFromPrevious * 1000)} m`
-        : `${Number(point.distanceFromPrevious.toFixed(2)).toString()} km`;
-
-    createDistanceOverlay(
-      new google.maps.LatLng(midLat, midLng),
-      distanceLabel
+    const distance = haversineDistance(
+      previous.lat,
+      previous.lng,
+      current.lat,
+      current.lng
     );
 
-    previous = point;
-  });
+    const overlay = createDistanceOverlay(
+      new google.maps.LatLng(midpoint.lat, midpoint.lng),
+      distance < 1 ? `${Math.round(distance * 1000)} m` : `${distance.toFixed(2)} km`
+    );
+
+    overlay.setMap(map);
+    distanceOverlays.push(overlay);
+  }
 }
 
-function enableMapClickPicker(callback) {
-  if (!map) return;
+function focusMapToPoints(points) {
+  if (!map || !Array.isArray(points) || !points.length) return;
 
-  if (mapClickListener) {
-    google.maps.event.removeListener(mapClickListener);
+  if (points.length === 1) {
+    map.panTo({ lat: points[0].lat, lng: points[0].lng });
+    map.setZoom(14);
+    return;
   }
 
-  mapClickListener = map.addListener("click", (event) => {
-    const lat = event.latLng.lat();
-    const lng = event.latLng.lng();
+  const bounds = new google.maps.LatLngBounds();
+  points.forEach((point) => {
+    bounds.extend({ lat: point.lat, lng: point.lng });
+  });
 
-    showDraftMarker(lat, lng);
+  map.fitBounds(bounds, 64);
+}
 
-    if (event.placeId) {
-      event.stop();
+function haversineDistance(lat1, lng1, lat2, lng2) {
+  const R = 6371;
+  const toRad = (value) => (value * Math.PI) / 180;
 
-      if (!placesService) {
-        placesService = new google.maps.places.PlacesService(map);
-      }
+  const dLat = toRad(lat2 - lat1);
+  const dLng = toRad(lng2 - lng1);
 
-      placesService.getDetails(
-        {
-          placeId: event.placeId,
-          fields: ["name", "formatted_address"]
-        },
-        (place, status) => {
-          const suggestedName =
-            status === google.maps.places.PlacesServiceStatus.OK
-              ? place?.name || place?.formatted_address || ""
-              : "";
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(toRad(lat1)) *
+      Math.cos(toRad(lat2)) *
+      Math.sin(dLng / 2) *
+      Math.sin(dLng / 2);
 
-          callback({
-            lat,
-            lng,
-            name: suggestedName,
-            address: place?.formatted_address || ""
-          });
-        }
-      );
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c;
+}
 
-      return;
-    }
+async function fetchPlaceLocationById(placeId, sessionToken) {
+  if (!placeId || !PlaceCtor) return null;
 
-    callback({
-      lat,
-      lng,
-      name: ""
+  if (searchLocationCache.has(placeId)) {
+    return searchLocationCache.get(placeId);
+  }
+
+  try {
+    const place = new PlaceCtor({
+      id: placeId,
+      requestedLanguage: "tr",
+      requestedRegion: "TR"
     });
-  });
+
+    await place.fetchFields({
+      fields: ["location"],
+      sessionToken
+    });
+
+    const location = place.location;
+    if (!location) return null;
+
+    const result = {
+      lat: location.lat(),
+      lng: location.lng()
+    };
+
+    searchLocationCache.set(placeId, result);
+    return result;
+  } catch (error) {
+    console.error("Konum bilgisi alınamadı:", error);
+    return null;
+  }
 }
 
-function ensureSearchDropdown(inputElement) {
-  if (searchDropdown) return searchDropdown;
+async function fetchPoiNameById(placeId) {
+  if (!placeId || !PlaceCtor) return "";
 
-  const dropdown = document.createElement("div");
-  dropdown.id = "customPlaceSearchDropdown";
-  dropdown.style.position = "absolute";
-  dropdown.style.top = "calc(100% + 6px)";
-  dropdown.style.left = "0";
-  dropdown.style.width = "100%";
-  dropdown.style.minWidth = "100%";
-  dropdown.style.maxWidth = "100%";
-  dropdown.style.background = "rgba(255,255,255,0.98)";
-  dropdown.style.border = "1px solid rgba(226, 232, 240, 0.98)";
-  dropdown.style.borderRadius = "16px";
-  dropdown.style.boxShadow = "0 12px 24px rgba(15, 23, 42, 0.12)";
-  dropdown.style.backdropFilter = "blur(8px)";
-  dropdown.style.padding = "4px";
-  dropdown.style.display = "none";
-  dropdown.style.zIndex = "30";
-  dropdown.style.maxHeight = "196px";
-  dropdown.style.overflowY = "auto";
-  dropdown.style.overflowX = "hidden";
-  dropdown.style.boxSizing = "border-box";
-
-  const parent = inputElement.parentElement;
-  if (parent) {
-    const currentPosition = window.getComputedStyle(parent).position;
-    if (currentPosition === "static") {
-      parent.style.position = "relative";
-    }
-    parent.appendChild(dropdown);
+  if (poiNameCache.has(placeId)) {
+    return poiNameCache.get(placeId);
   }
 
-  searchDropdown = dropdown;
-  return dropdown;
+  try {
+    const place = new PlaceCtor({
+      id: placeId,
+      requestedLanguage: "tr",
+      requestedRegion: "TR"
+    });
+
+    await place.fetchFields({
+      fields: ["displayName"]
+    });
+
+    const displayName = place.displayName?.text || "";
+    if (displayName) {
+      poiNameCache.set(placeId, displayName);
+    }
+    return displayName;
+  } catch (error) {
+    console.error("POI adı alınamadı:", error);
+    return "";
+  }
+}
+
+function endAutocompleteSession() {
+  activeAutocompleteSessionToken = null;
+}
+
+function ensureAutocompleteSession() {
+  if (!AutocompleteSessionTokenCtor) return null;
+  if (!activeAutocompleteSessionToken) {
+    activeAutocompleteSessionToken = new AutocompleteSessionTokenCtor();
+  }
+  return activeAutocompleteSessionToken;
 }
 
 function hideSearchDropdown() {
   if (!searchDropdown) return;
-  searchDropdown.style.display = "none";
+  searchDropdown.hidden = true;
   searchDropdown.innerHTML = "";
-  currentPredictions = [];
 }
 
-function ensureAutocompleteSessionToken() {
-  if (!activeAutocompleteSessionToken) {
-    activeAutocompleteSessionToken = new google.maps.places.AutocompleteSessionToken();
-  }
+function renderSearchDropdown(predictions, onSelect) {
+  if (!searchDropdown) return;
 
-  return activeAutocompleteSessionToken;
-}
+  currentPredictions = Array.isArray(predictions) ? predictions : [];
 
-function clearAutocompleteSession() {
-  activeAutocompleteSessionToken = null;
-}
-
-function renderPredictions(predictions, onPlaceSelected) {
-  const dropdown = searchDropdown;
-  if (!dropdown) return;
-
-  dropdown.innerHTML = "";
-
-  if (!predictions.length) {
-    dropdown.style.display = "none";
+  if (!currentPredictions.length) {
+    hideSearchDropdown();
     return;
   }
 
-  predictions.forEach((prediction, index) => {
-    const item = document.createElement("button");
-    item.type = "button";
-    item.dataset.placeId = prediction.place_id;
-    item.dataset.index = String(index);
-    item.style.width = "100%";
-    item.style.textAlign = "left";
-    item.style.padding = "7px 9px";
-    item.style.border = "1px solid transparent";
-    item.style.background = "#fff";
-    item.style.borderRadius = "9px";
-    item.style.display = "block";
-    item.style.marginBottom = index === predictions.length - 1 ? "0" : "3px";
-    item.style.cursor = "pointer";
-    item.style.boxSizing = "border-box";
-    item.style.minHeight = "unset";
-    item.style.overflow = "hidden";
+  searchDropdown.innerHTML = "";
+  searchDropdown.hidden = false;
 
-    const title = document.createElement("div");
-    title.textContent =
-      prediction.structured_formatting?.main_text || prediction.description;
-    title.style.fontWeight = "600";
-    title.style.color = "#0f172a";
-    title.style.fontSize = "0.88rem";
-    title.style.lineHeight = "1.15";
-    title.style.margin = "0";
-    title.style.whiteSpace = "nowrap";
-    title.style.overflow = "hidden";
-    title.style.textOverflow = "ellipsis";
+  currentPredictions.forEach((prediction, index) => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "search-dropdown-item";
+    button.dataset.predictionIndex = String(index);
 
-    const subtitle = document.createElement("div");
-    subtitle.textContent = prediction.structured_formatting?.secondary_text || "";
-    subtitle.style.color = "#64748b";
-    subtitle.style.fontSize = "0.76rem";
-    subtitle.style.lineHeight = "1.1";
-    subtitle.style.marginTop = "2px";
-    subtitle.style.whiteSpace = "nowrap";
-    subtitle.style.overflow = "hidden";
-    subtitle.style.textOverflow = "ellipsis";
+    const mainText =
+      prediction.structuredFormat?.mainText?.text ||
+      prediction.text?.text ||
+      prediction.mainText?.text ||
+      "";
 
-    item.appendChild(title);
-    if (subtitle.textContent) {
-      item.appendChild(subtitle);
-    }
+    const secondaryText =
+      prediction.structuredFormat?.secondaryText?.text ||
+      prediction.secondaryText?.text ||
+      "";
 
-    item.addEventListener("mouseenter", () => {
-      item.style.background = "rgba(37, 99, 235, 0.06)";
-      item.style.borderColor = "rgba(37, 99, 235, 0.10)";
+    button.innerHTML = `
+      <span class="search-item-main">${mainText}</span>
+      ${secondaryText ? `<span class="search-item-secondary">${secondaryText}</span>` : ""}
+    `;
+
+    button.addEventListener("click", async () => {
+      await onSelect(prediction);
     });
 
-    item.addEventListener("mouseleave", () => {
-      item.style.background = "#fff";
-      item.style.borderColor = "transparent";
-    });
-
-    item.addEventListener("click", () => {
-      if (!placesService) {
-        placesService = new google.maps.places.PlacesService(map);
-      }
-
-      const sessionToken = ensureAutocompleteSessionToken();
-      const selectedName =
-        prediction.structured_formatting?.main_text ||
-        prediction.description ||
-        "";
-
-      placesService.getDetails(
-        {
-          placeId: prediction.place_id,
-          fields: ["formatted_address", "geometry"],
-          sessionToken
-        },
-        (place, status) => {
-          if (
-            status !== google.maps.places.PlacesServiceStatus.OK ||
-            !place?.geometry?.location
-          ) {
-            return;
-          }
-
-          const lat = place.geometry.location.lat();
-          const lng = place.geometry.location.lng();
-
-          if (searchMarker) {
-            searchMarker.setMap(null);
-            searchMarker = null;
-          }
-
-          searchMarker = new google.maps.Marker({
-            position: { lat, lng },
-            map,
-            title: selectedName,
-            icon: createCircleSymbol("#2563eb", "#ffffff", 9)
-          });
-
-          focusToLocation(lat, lng, 16);
-          resetPageZoomAfterSearch();
-
-          if (searchInputEl) {
-            searchInputEl.value = selectedName;
-          }
-
-          hideSearchDropdown();
-          clearAutocompleteSession();
-
-          if (typeof onPlaceSelected === "function") {
-            onPlaceSelected({
-              name: selectedName,
-              address: place?.formatted_address || "",
-              lat,
-              lng
-            });
-          }
-        }
-      );
-    });
-
-    dropdown.appendChild(item);
+    searchDropdown.appendChild(button);
   });
-
-  dropdown.style.display = "block";
 }
 
-function initPlaceSearch(inputElement, onPlaceSelected) {
-  if (!inputElement || !map || !searchService) return;
+async function getAutocompletePredictions(query) {
+  if (!AutocompleteSuggestionClass) return [];
 
-  searchInputEl = inputElement;
-  ensureSearchDropdown(inputElement);
+  const sessionToken = ensureAutocompleteSession();
+
+  try {
+    const { suggestions } =
+      await AutocompleteSuggestionClass.fetchAutocompleteSuggestions({
+        input: query,
+        sessionToken,
+        language: "tr",
+        region: "TR",
+        includedRegionCodes: ["tr"],
+        origin: map?.getCenter() || undefined
+      });
+
+    return (suggestions || [])
+      .slice(0, MAX_PREDICTIONS)
+      .map((item) => item.placePrediction)
+      .filter(Boolean);
+  } catch (error) {
+    console.error("Autocomplete hatası:", error);
+    return [];
+  }
+}
+
+function initPlaceSearch({ inputElement, dropdownElement, onPlaceSelected }) {
+  searchInputEl = inputElement || null;
+  searchDropdown = dropdownElement || null;
+  activePlaceSearchCallback = onPlaceSelected;
+
+  if (!searchInputEl || !searchDropdown) return;
+
+  const handlePredictionSelection = async (prediction) => {
+    const placeId = prediction?.placeId;
+    if (!placeId) return;
+
+    const selectedName =
+      prediction.structuredFormat?.mainText?.text ||
+      prediction.text?.text ||
+      "";
+
+    const locationData = await fetchPlaceLocationById(
+      placeId,
+      activeAutocompleteSessionToken
+    );
+
+    endAutocompleteSession();
+    hideSearchDropdown();
+
+    if (!locationData) return;
+
+    setSearchMarker(locationData.lat, locationData.lng, selectedName || "Arama Sonucu");
+
+    if (typeof activePlaceSearchCallback === "function") {
+      activePlaceSearchCallback({
+        name: selectedName || "İşaretli konum",
+        lat: locationData.lat,
+        lng: locationData.lng,
+        placeId
+      });
+    }
+  };
 
   if (!searchInputHandlerBound) {
-    inputElement.addEventListener("input", () => {
-      const query = inputElement.value.trim();
+    searchInputEl.addEventListener("input", () => {
+      const query = searchInputEl.value.trim();
 
-      window.clearTimeout(searchDebounceTimer);
+      if (searchDebounceTimer) {
+        window.clearTimeout(searchDebounceTimer);
+      }
 
       if (query.length < MIN_SEARCH_LENGTH) {
         hideSearchDropdown();
-        clearAutocompleteSession();
+        endAutocompleteSession();
         return;
       }
 
-      searchDebounceTimer = window.setTimeout(() => {
+      searchDebounceTimer = window.setTimeout(async () => {
         const requestId = ++lastPredictionRequestId;
-        const sessionToken = ensureAutocompleteSessionToken();
+        const predictions = await getAutocompletePredictions(query);
 
-        searchService.getPlacePredictions(
-          {
-            input: query,
-            bounds: map.getBounds() || undefined,
-            sessionToken
-          },
-          (predictions, status) => {
-            if (requestId !== lastPredictionRequestId) return;
+        if (requestId !== lastPredictionRequestId) return;
 
-            if (
-              status !== google.maps.places.PlacesServiceStatus.OK ||
-              !Array.isArray(predictions) ||
-              !predictions.length
-            ) {
-              hideSearchDropdown();
-              return;
-            }
-
-            const limitedPredictions = predictions.slice(0, MAX_PREDICTIONS);
-            currentPredictions = limitedPredictions;
-            renderPredictions(limitedPredictions, onPlaceSelected);
-          }
-        );
+        renderSearchDropdown(predictions, handlePredictionSelection);
       }, SEARCH_DEBOUNCE_MS);
     });
 
@@ -844,26 +846,82 @@ function initPlaceSearch(inputElement, onPlaceSelected) {
   }
 
   if (!searchFocusHandlerBound) {
-    inputElement.addEventListener("focus", () => {
-      const query = inputElement.value.trim();
-      if (query.length >= MIN_SEARCH_LENGTH && currentPredictions.length) {
-        searchDropdown.style.display = "block";
-      }
+    searchInputEl.addEventListener("focus", async () => {
+      const query = searchInputEl.value.trim();
+      if (query.length < MIN_SEARCH_LENGTH) return;
+
+      const requestId = ++lastPredictionRequestId;
+      const predictions = await getAutocompletePredictions(query);
+
+      if (requestId !== lastPredictionRequestId) return;
+
+      renderSearchDropdown(predictions, handlePredictionSelection);
     });
 
     searchFocusHandlerBound = true;
   }
 
   if (!searchBlurHandlerBound) {
-    inputElement.addEventListener("blur", () => {
+    searchInputEl.addEventListener("blur", () => {
       window.setTimeout(() => {
         hideSearchDropdown();
-        resetPageZoomAfterSearch();
       }, 180);
     });
 
     searchBlurHandlerBound = true;
   }
+
+  if (!searchSelectHandlerBound) {
+    document.addEventListener("click", (event) => {
+      if (!searchDropdown || !searchInputEl) return;
+
+      const clickedInsideDropdown = searchDropdown.contains(event.target);
+      const clickedInput = searchInputEl === event.target;
+
+      if (!clickedInsideDropdown && !clickedInput) {
+        hideSearchDropdown();
+      }
+    });
+
+    searchSelectHandlerBound = true;
+  }
+}
+
+function enableMapClickPicker(callback) {
+  if (!map) return;
+
+  if (mapClickListener) {
+    google.maps.event.removeListener(mapClickListener);
+    mapClickListener = null;
+  }
+
+  mapClickListener = map.addListener("click", async (event) => {
+    const lat = event.latLng?.lat();
+    const lng = event.latLng?.lng();
+
+    if (!Number.isFinite(lat) || !Number.isFinite(lng)) return;
+
+    showDraftMarker(lat, lng);
+
+    let suggestedName = "";
+
+    if (event.placeId) {
+      if (typeof event.stop === "function") {
+        event.stop();
+      }
+
+      suggestedName = await fetchPoiNameById(event.placeId);
+    }
+
+    const fallbackName = suggestedName || "İşaretli konum";
+
+    callback({
+      lat,
+      lng,
+      name: fallbackName,
+      placeId: event.placeId || null
+    });
+  });
 }
 
 export {
@@ -873,12 +931,15 @@ export {
   clearMarkers,
   showStartMarker,
   clearStartMarker,
-  focusToLocation,
-  focusMapToPoints,
   showCurrentLocationMarker,
+  clearCurrentLocationMarker,
+  showDraftMarker,
+  clearDraftMarker,
+  setSearchMarker,
+  clearSearchMarker,
   enableMapClickPicker,
   initPlaceSearch,
-  clearDraftMarker,
   clearRouteLines,
-  drawRouteSegments
+  drawRouteSegments,
+  focusMapToPoints
 };
