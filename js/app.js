@@ -663,7 +663,14 @@ async function handleSaveMap() {
     if (state.selectedMapId) {
       await updateMap(state.currentUser.uid, trialMapId, payload);
     } else {
-      await saveMap(state.currentUser.uid, payload, { fullAccess: false });
+await saveMap(
+  state.currentUser.uid,
+  {
+    id: TRIAL_MAP_ID,
+    ...payload
+  },
+  { fullAccess: false }
+);
     }
 
     await refreshMapList();
