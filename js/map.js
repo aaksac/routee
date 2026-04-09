@@ -89,11 +89,7 @@ function getPointDisplayTitle(pointData) {
 function getPointSubtitle(pointData) {
   if (!pointData) return "";
 
-  const raw =
-    pointData.address ||
-    pointData.formatted_address ||
-    pointData.description ||
-    "";
+  const raw = pointData.description || "";
 
   if (!raw) return "";
 
@@ -579,14 +575,13 @@ function enableMapClickPicker(callback) {
         (place, status) => {
           const suggestedName =
             status === google.maps.places.PlacesServiceStatus.OK
-              ? place?.name || place?.formatted_address || ""
+              ? place?.name || ""
               : "";
 
           callback({
             lat,
             lng,
-            name: suggestedName,
-            address: place?.formatted_address || ""
+            name: suggestedName
           });
         }
       );
@@ -777,7 +772,6 @@ function renderPredictions(predictions, onPlaceSelected) {
           if (typeof onPlaceSelected === "function") {
             onPlaceSelected({
               name: selectedName,
-              address: place?.formatted_address || "",
               lat,
               lng
             });
