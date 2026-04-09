@@ -10,7 +10,7 @@ let distanceOverlays = [];
 let activeInfoWindow = null;
 
 let searchService = null;
-let placesService = null;
+let geocoder = null;
 let searchDropdown = null;
 let searchInputEl = null;
 let searchSelectHandlerBound = false;
@@ -40,14 +40,15 @@ function initMap() {
     mapTypeControl: false,
     streetViewControl: false,
     fullscreenControl: false,
-    gestureHandling: "greedy"
+    gestureHandling: "greedy",
+    clickableIcons: false
   });
 
   activeInfoWindow = new google.maps.InfoWindow({
     ariaLabel: "Konum Bilgisi"
   });
 
-  placesService = new google.maps.places.PlacesService(map);
+  geocoder = new google.maps.Geocoder();
   searchService = new google.maps.places.AutocompleteService();
 
   return map;
@@ -560,39 +561,10 @@ function enableMapClickPicker(callback) {
 
     showDraftMarker(lat, lng);
 
-    if (event.placeId) {
-      event.stop();
-
-      if (!placesService) {
-        placesService = new google.maps.places.PlacesService(map);
-      }
-
-      placesService.getDetails(
-        {
-          placeId: event.placeId,
-          fields: ["name"]
-        },
-        (place, status) => {
-          const suggestedName =
-            status === google.maps.places.PlacesServiceStatus.OK
-              ? place?.name || ""
-              : "";
-
-          callback({
-            lat,
-            lng,
-            name: suggestedName
-          });
-        }
-      );
-
-      return;
-    }
-
     callback({
       lat,
       lng,
-      name: ""
+      name: "İşaretli Konum"
     });
   });
 }
@@ -720,64 +692,59 @@ function renderPredictions(predictions, onPlaceSelected) {
     });
 
     item.addEventListener("click", () => {
-      if (!placesService) {
-        placesService = new google.maps.places.PlacesService(map);
+      if (!geocoder) {
+        geocoder = new google.maps.Geocoder();
       }
 
-      const sessionToken = ensureAutocompleteSessionToken();
       const selectedName =
         prediction.structured_formatting?.main_text ||
         prediction.description ||
         "";
 
-      placesService.getDetails(
-        {
-          placeId: prediction.place_id,
-          fields: ["geometry"],
-          sessionToken
-        },
-        (place, status) => {
-          if (
-            status !== google.maps.places.PlacesServiceStatus.OK ||
-            !place?.geometry?.location
-          ) {
-            return;
-          }
-
-          const lat = place.geometry.location.lat();
-          const lng = place.geometry.location.lng();
-
-          if (searchMarker) {
-            searchMarker.setMap(null);
-            searchMarker = null;
-          }
-
-          searchMarker = new google.maps.Marker({
-            position: { lat, lng },
-            map,
-            title: selectedName,
-            icon: createCircleSymbol("#2563eb", "#ffffff", 9)
-          });
-
-          focusToLocation(lat, lng, 16);
-          resetPageZoomAfterSearch();
-
-          if (searchInputEl) {
-            searchInputEl.value = selectedName;
-          }
-
-          hideSearchDropdown();
-          clearAutocompleteSession();
-
-          if (typeof onPlaceSelected === "function") {
-            onPlaceSelected({
-              name: selectedName,
-              lat,
-              lng
-            });
-          }
+      geocoder.geocode({ placeId: prediction.place_id }, (results, status) => {
+        if (
+          status !== google.maps.GeocoderStatus.OK ||
+          !Array.isArray(results) ||
+          !results.length ||
+          !results[0]?.geometry?.location
+        ) {
+          return;
         }
-      );
+
+        const location = results[0].geometry.location;
+        const lat = location.lat();
+        const lng = location.lng();
+
+        if (searchMarker) {
+          searchMarker.setMap(null);
+          searchMarker = null;
+        }
+
+        searchMarker = new google.maps.Marker({
+          position: { lat, lng },
+          map,
+          title: selectedName,
+          icon: createCircleSymbol("#2563eb", "#ffffff", 9)
+        });
+
+        focusToLocation(lat, lng, 16);
+        resetPageZoomAfterSearch();
+
+        if (searchInputEl) {
+          searchInputEl.value = selectedName;
+        }
+
+        hideSearchDropdown();
+        clearAutocompleteSession();
+
+        if (typeof onPlaceSelected === "function") {
+          onPlaceSelected({
+            name: selectedName,
+            lat,
+            lng
+          });
+        }
+      });
     });
 
     dropdown.appendChild(item);
