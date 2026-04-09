@@ -738,7 +738,7 @@ function renderPredictions(predictions, onPlaceSelected) {
       placesService.getDetails(
         {
           placeId: prediction.place_id,
-          fields: ["formatted_address", "geometry"],
+          fields: ["geometry"],
           sessionToken
         },
         (place, status) => {
