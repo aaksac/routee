@@ -574,7 +574,7 @@ function enableMapClickPicker(callback) {
       placesService.getDetails(
         {
           placeId: event.placeId,
-          fields: ["name", "formatted_address"]
+          fields: ["name"]
         },
         (place, status) => {
           const suggestedName =
