@@ -21,16 +21,22 @@
     <link rel="stylesheet" href="./css/style.css" />
     <link rel="stylesheet" href="./css/auth.css" />
   </head>
-  <body>
-    <div class="startup-splash" id="startupSplash" aria-hidden="true">
+  <body class="auth-booting">
+    <div class="startup-splash is-visible" id="startupSplash" aria-hidden="false">
       <div class="startup-splash-card">
         <div class="startup-splash-orb" aria-hidden="true"></div>
         <div class="startup-splash-logo">
-          <img src="./icons/icon-192.png" alt="Rota Planlayıcı logosu" width="74" height="74" decoding="async" />
+          <img
+            src="./icons/icon-192.png"
+            alt="Rota Planlayıcı logosu"
+            width="74"
+            height="74"
+            decoding="async"
+          />
         </div>
         <div class="startup-splash-copy">
           <strong id="startupSplashTitle">Rota Planlayıcı</strong>
-          <span id="startupSplashText">Oturumunuz hazırlanıyor...</span>
+          <span id="startupSplashText">Oturumunuz kontrol ediliyor...</span>
         </div>
         <div class="startup-splash-loader" aria-hidden="true">
           <span></span><span></span><span></span>
@@ -38,7 +44,7 @@
       </div>
     </div>
 
-    <div class="login-page">
+    <div class="login-page login-page--hidden" id="loginPage" aria-hidden="true">
       <div class="login-card compact-login-card">
         <div class="login-brand">
           <div class="brand-icon">R</div>
@@ -68,7 +74,7 @@
       </div>
     </div>
 
-    <script type="module" src="./js/login-page.js?v=103"></script>
+    <script type="module" src="./js/login-page.js?v=104"></script>
 
     <script>
       async function requestPersistentStorage() {
