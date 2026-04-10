@@ -17,8 +17,61 @@
   <link rel="stylesheet" href="./css/style.css" />
   <link rel="stylesheet" href="./css/mobile.css" />
   <link rel="stylesheet" href="./css/auth.css" />
+  <script>
+    (function () {
+      try {
+        if (sessionStorage.getItem("routeeStartupSplash") === "1") {
+          document.documentElement.classList.add("show-app-startup-splash");
+        }
+      } catch (error) {
+        console.warn("Startup splash session kontrolü başarısız:", error);
+      }
+    })();
+  </script>
 </head>
   <body>
+    <div class="startup-splash app-startup-splash" id="appStartupSplash" aria-hidden="true">
+      <div class="startup-splash-card">
+        <div class="startup-splash-orb" aria-hidden="true"></div>
+        <div class="startup-splash-logo">
+          <img src="./icons/icon-192.png" alt="Rota Planlayıcı logosu" width="74" height="74" decoding="async" />
+        </div>
+        <div class="startup-splash-copy">
+          <strong>Rota Planlayıcı</strong>
+          <span id="appStartupSplashText">Haritanız hazırlanıyor...</span>
+        </div>
+        <div class="startup-splash-loader" aria-hidden="true">
+          <span></span><span></span><span></span>
+        </div>
+      </div>
+    </div>
+    <script>
+      document.addEventListener(
+        "DOMContentLoaded",
+        () => {
+          try {
+            if (sessionStorage.getItem("routeeStartupSplash") !== "1") return;
+
+            window.setTimeout(() => {
+              const splash = document.getElementById("appStartupSplash");
+              document.documentElement.classList.remove("show-app-startup-splash");
+
+              if (splash) {
+                splash.classList.remove("is-visible");
+                splash.setAttribute("aria-hidden", "true");
+              }
+
+              sessionStorage.removeItem("routeeStartupSplash");
+              sessionStorage.removeItem("routeeStartupSplashText");
+              sessionStorage.removeItem("routeeStartupSplashAt");
+            }, 4500);
+          } catch (error) {
+            console.warn("Startup splash güvenli kapanış başarısız:", error);
+          }
+        },
+        { once: true }
+      );
+    </script>
     <div id="app">
       <header class="topbar">
         <div class="brand-area">
