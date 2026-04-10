@@ -50,7 +50,8 @@ const state = {
   accessActive: false,
   locationQuota: TRIAL_LOCATION_QUOTA,
   mapQuota: 1,
-  lastScrollY: 0
+  lastScrollY: 0,
+  appStartupSplash: null
 };
 
 const elements = {
@@ -105,11 +106,69 @@ const elements = {
   startPanel: document.getElementById("startPanel"),
   pointPanel: document.getElementById("pointPanel"),
   savePanel: document.getElementById("savePanel"),
-  importExportPanel: document.getElementById("importExportPanel")
+  importExportPanel: document.getElementById("importExportPanel"),
+  appStartupSplash: document.getElementById("appStartupSplash"),
+  appStartupSplashText: document.getElementById("appStartupSplashText")
 };
 
 function goToLogin() {
   window.location.href = "./index.html";
+}
+
+function wait(ms) {
+  return new Promise((resolve) => window.setTimeout(resolve, ms));
+}
+
+function hydrateAppStartupSplash() {
+  if (!elements.appStartupSplash) return null;
+
+  try {
+    if (sessionStorage.getItem("routeeStartupSplash") !== "1") {
+      return null;
+    }
+
+    const message = sessionStorage.getItem("routeeStartupSplashText");
+    const startedAt = Number(sessionStorage.getItem("routeeStartupSplashAt")) || Date.now();
+
+    if (message && elements.appStartupSplashText) {
+      elements.appStartupSplashText.textContent = message;
+    }
+
+    elements.appStartupSplash.setAttribute("aria-hidden", "false");
+    return { startedAt };
+  } catch (error) {
+    console.warn("Startup splash verisi okunamadı:", error);
+    return { startedAt: Date.now() };
+  }
+}
+
+function clearAppStartupSplashSession() {
+  try {
+    sessionStorage.removeItem("routeeStartupSplash");
+    sessionStorage.removeItem("routeeStartupSplashText");
+    sessionStorage.removeItem("routeeStartupSplashAt");
+  } catch (error) {
+    console.warn("Startup splash session temizliği başarısız:", error);
+  }
+}
+
+async function closeAppStartupSplash(splashState) {
+  if (!splashState || !elements.appStartupSplash) {
+    clearAppStartupSplashSession();
+    return;
+  }
+
+  const elapsed = Date.now() - (splashState.startedAt || Date.now());
+  const remaining = Math.max(0, 900 - elapsed);
+
+  if (remaining > 0) {
+    await wait(remaining);
+  }
+
+  elements.appStartupSplash.classList.remove("is-visible");
+  elements.appStartupSplash.setAttribute("aria-hidden", "true");
+  document.documentElement.classList.remove("show-app-startup-splash");
+  clearAppStartupSplashSession();
 }
 
 function formatKm(value) {
@@ -1180,18 +1239,29 @@ function initAuthWatcher() {
   watchAuth(async (user) => {
     state.currentUser = user;
 
-    if (user) {
-      await ensureUserProfile(user.uid, user.email);
-      await loadAccessModel(user);
-      elements.authStatus.textContent = `Aktif kullanıcı: ${user.email} · ${getAccessStatusText()}`;
-      await loadUserMaps(user.uid, isPremiumAccessActive());
-    } else {
-      goToLogin();
+    try {
+      if (user) {
+        await ensureUserProfile(user.uid, user.email);
+        await loadAccessModel(user);
+        elements.authStatus.textContent = `Aktif kullanıcı: ${user.email} · ${getAccessStatusText()}`;
+        await loadUserMaps(user.uid, isPremiumAccessActive());
+        await closeAppStartupSplash(state.appStartupSplash);
+        state.appStartupSplash = null;
+      } else {
+        await closeAppStartupSplash(state.appStartupSplash);
+        state.appStartupSplash = null;
+        goToLogin();
+      }
+    } catch (error) {
+      await closeAppStartupSplash(state.appStartupSplash);
+      state.appStartupSplash = null;
+      elements.authStatus.textContent = `Oturum başlatılamadı: ${error.message}`;
     }
   });
 }
 
 function init() {
+  state.appStartupSplash = hydrateAppStartupSplash();
   initMap();
   initMapClickPicker();
   initSearchBox();
