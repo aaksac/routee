@@ -9,12 +9,23 @@
   --auth-shadow: 0 18px 48px rgba(15, 23, 42, 0.10);
 }
 
+body.auth-booting {
+  overflow: hidden;
+}
+
 .login-page {
   min-height: 100vh;
   display: grid;
   place-items: center;
   padding: 24px;
   background: var(--auth-bg);
+  transition: opacity 0.22s ease, visibility 0.22s ease;
+}
+
+.login-page--hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
 }
 
 .login-card,
@@ -162,7 +173,6 @@
 .reset-form[hidden] {
   display: none;
 }
-
 
 .startup-splash {
   position: fixed;
