@@ -1,4 +1,5 @@
 const elements = {
+  loginPage: document.getElementById("loginPage"),
   loginEmail: document.getElementById("loginEmail"),
   loginPassword: document.getElementById("loginPassword"),
   btnLogin: document.getElementById("btnLogin"),
@@ -13,8 +14,16 @@ const elements = {
 let authModulePromise = null;
 let firestoreModulePromise = null;
 let isRouting = false;
+let bootResolved = false;
+let bootFallbackTimer = null;
+
+let initialStatus = {
+  message: "Henüz giriş yapılmadı.",
+  type: "normal"
+};
 
 const STARTUP_SPLASH_MIN_MS = 850;
+const AUTH_BOOT_TIMEOUT_MS = 2600;
 
 function loadAuthModule() {
   if (!authModulePromise) {
@@ -41,7 +50,7 @@ function setButtonsDisabled(disabled) {
   });
 }
 
-function showStartupSplash(title = "Rota Planlayıcı", message = "Oturumunuz hazırlanıyor...") {
+function showStartupSplash(title = "Rota Planlayıcı", message = "Oturumunuz kontrol ediliyor...") {
   if (!elements.startupSplash) return;
 
   if (elements.startupSplashTitle) {
@@ -52,6 +61,7 @@ function showStartupSplash(title = "Rota Planlayıcı", message = "Oturumunuz ha
     elements.startupSplashText.textContent = message;
   }
 
+  document.body.classList.add("auth-booting");
   elements.startupSplash.classList.add("is-visible");
   elements.startupSplash.setAttribute("aria-hidden", "false");
 }
@@ -60,6 +70,22 @@ function hideStartupSplash() {
   if (!elements.startupSplash) return;
   elements.startupSplash.classList.remove("is-visible");
   elements.startupSplash.setAttribute("aria-hidden", "true");
+}
+
+function revealLoginScreen() {
+  if (bootResolved || isRouting) return;
+
+  bootResolved = true;
+  window.clearTimeout(bootFallbackTimer);
+
+  if (elements.loginPage) {
+    elements.loginPage.classList.remove("login-page--hidden");
+    elements.loginPage.setAttribute("aria-hidden", "false");
+  }
+
+  document.body.classList.remove("auth-booting");
+  hideStartupSplash();
+  setStatus(initialStatus.message, initialStatus.type);
 }
 
 function setAppStartupSplash(message = "Haritanız hazırlanıyor...") {
@@ -145,7 +171,10 @@ function isNetworkLikeError(error) {
 
 async function routeAfterLogin(user, options = {}) {
   if (isRouting) return;
+
   isRouting = true;
+  bootResolved = true;
+  window.clearTimeout(bootFallbackTimer);
   setButtonsDisabled(true);
 
   try {
@@ -154,29 +183,26 @@ async function routeAfterLogin(user, options = {}) {
     const isAdmin = claims.adminPanel === true;
     const targetUrl = isAdmin ? "./chooser.html" : "./app.html";
 
-    if (options.showSplash === true) {
-      const splashTitle = isAdmin ? "Yönetim paneli açılıyor" : "Rota Planlayıcı açılıyor";
-      const splashMessage = isAdmin
-        ? "Yetkileriniz doğrulanıyor..."
-        : options.message || "Haritanız hazırlanıyor...";
+    const splashTitle = isAdmin ? "Yönetim paneli açılıyor" : "Rota Planlayıcı";
+    const splashMessage = isAdmin
+      ? "Yetkileriniz doğrulanıyor..."
+      : options.message || "Oturumunuz açılıyor...";
 
-      showStartupSplash(splashTitle, splashMessage);
+    showStartupSplash(splashTitle, splashMessage);
 
-      if (!isAdmin) {
-        setAppStartupSplash(splashMessage);
-      } else {
-        clearAppStartupSplash();
-      }
-
-      await wait(STARTUP_SPLASH_MIN_MS);
+    if (!isAdmin) {
+      setAppStartupSplash("Haritanız hazırlanıyor...");
+    } else {
+      clearAppStartupSplash();
     }
 
+    await wait(STARTUP_SPLASH_MIN_MS);
     window.location.href = targetUrl;
   } catch (error) {
     isRouting = false;
     setButtonsDisabled(false);
-    hideStartupSplash();
     clearAppStartupSplash();
+    revealLoginScreen();
     throw error;
   }
 }
@@ -203,7 +229,6 @@ async function handleLogin() {
     await ensureUserProfile(result.user.uid, result.user.email);
     setStatus("Giriş başarılı.", "success");
     await routeAfterLogin(result.user, {
-      showSplash: true,
       message: "Girişiniz doğrulanıyor..."
     });
   } catch (error) {
@@ -243,7 +268,6 @@ async function handleRegister() {
     await ensureUserProfile(result.user.uid, result.user.email);
     setStatus("Kayıt başarılı. 7 günlük deneme hesabı oluşturuldu.", "success");
     await routeAfterLogin(result.user, {
-      showSplash: true,
       message: "Hesabınız hazırlanıyor..."
     });
   } catch (error) {
@@ -287,25 +311,21 @@ async function handleReset() {
 }
 
 async function initAuthWatcher() {
-  if (!(await hasInternetConnection())) {
-    return;
-  }
-
   try {
     const { watchAuth } = await loadAuthModule();
 
     watchAuth(async (user) => {
-      if (!user || isRouting) return;
-
-      if (await hasInternetConnection()) {
+      if (user) {
         await routeAfterLogin(user, {
-          showSplash: true,
-          message: "Oturumunuz geri yükleniyor..."
+          message: "Oturumunuz açılıyor..."
         });
+        return;
       }
+
+      revealLoginScreen();
     });
   } catch {
-    // Offline ya da auth modülü yüklenemediğinde sessiz geç
+    revealLoginScreen();
   }
 }
 
@@ -320,20 +340,40 @@ function applyQueryStatus() {
   const reset = params.get("reset");
 
   if (reset === "success") {
-    setStatus("Şifren başarıyla değiştirildi. Yeni şifrenle giriş yapabilirsin.", "success");
-  } else {
-    setStatus("Henüz giriş yapılmadı.");
+    initialStatus = {
+      message: "Şifren başarıyla değiştirildi. Yeni şifrenle giriş yapabilirsin.",
+      type: "success"
+    };
+    return;
   }
+
+  initialStatus = {
+    message: "Henüz giriş yapılmadı.",
+    type: "normal"
+  };
 }
 
 function init() {
   bindEvents();
   applyQueryStatus();
+  showStartupSplash("Rota Planlayıcı", "Oturumunuz kontrol ediliyor...");
   initAuthWatcher();
 
-  window.addEventListener("offline", setOfflineStatus);
+  bootFallbackTimer = window.setTimeout(() => {
+    revealLoginScreen();
+  }, AUTH_BOOT_TIMEOUT_MS);
+
+  window.addEventListener("offline", () => {
+    if (!bootResolved && !isRouting) {
+      revealLoginScreen();
+    }
+    setOfflineStatus();
+  });
+
   window.addEventListener("online", () => {
-    setStatus("Bağlantı yeniden kuruldu.");
+    if (bootResolved && !isRouting) {
+      setStatus("Bağlantı yeniden kuruldu.");
+    }
   });
 }
 
