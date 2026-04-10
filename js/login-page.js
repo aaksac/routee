@@ -4,11 +4,17 @@ const elements = {
   btnLogin: document.getElementById("btnLogin"),
   btnRegister: document.getElementById("btnRegister"),
   btnResetPassword: document.getElementById("btnResetPassword"),
-  authStatus: document.getElementById("authStatus")
+  authStatus: document.getElementById("authStatus"),
+  startupSplash: document.getElementById("startupSplash"),
+  startupSplashTitle: document.getElementById("startupSplashTitle"),
+  startupSplashText: document.getElementById("startupSplashText")
 };
 
 let authModulePromise = null;
 let firestoreModulePromise = null;
+let isRouting = false;
+
+const STARTUP_SPLASH_MIN_MS = 850;
 
 function loadAuthModule() {
   if (!authModulePromise) {
@@ -22,6 +28,58 @@ function loadFirestoreModule() {
     firestoreModulePromise = import("./firestore.js");
   }
   return firestoreModulePromise;
+}
+
+function wait(ms) {
+  return new Promise((resolve) => window.setTimeout(resolve, ms));
+}
+
+function setButtonsDisabled(disabled) {
+  [elements.btnLogin, elements.btnRegister, elements.btnResetPassword].forEach((button) => {
+    if (!button) return;
+    button.disabled = disabled;
+  });
+}
+
+function showStartupSplash(title = "Rota Planlayıcı", message = "Oturumunuz hazırlanıyor...") {
+  if (!elements.startupSplash) return;
+
+  if (elements.startupSplashTitle) {
+    elements.startupSplashTitle.textContent = title;
+  }
+
+  if (elements.startupSplashText) {
+    elements.startupSplashText.textContent = message;
+  }
+
+  elements.startupSplash.classList.add("is-visible");
+  elements.startupSplash.setAttribute("aria-hidden", "false");
+}
+
+function hideStartupSplash() {
+  if (!elements.startupSplash) return;
+  elements.startupSplash.classList.remove("is-visible");
+  elements.startupSplash.setAttribute("aria-hidden", "true");
+}
+
+function setAppStartupSplash(message = "Haritanız hazırlanıyor...") {
+  try {
+    sessionStorage.setItem("routeeStartupSplash", "1");
+    sessionStorage.setItem("routeeStartupSplashText", message);
+    sessionStorage.setItem("routeeStartupSplashAt", String(Date.now()));
+  } catch (error) {
+    console.warn("Startup splash session yazımı başarısız:", error);
+  }
+}
+
+function clearAppStartupSplash() {
+  try {
+    sessionStorage.removeItem("routeeStartupSplash");
+    sessionStorage.removeItem("routeeStartupSplashText");
+    sessionStorage.removeItem("routeeStartupSplashAt");
+  } catch (error) {
+    console.warn("Startup splash session temizliği başarısız:", error);
+  }
 }
 
 function setStatus(message, type = "normal") {
@@ -85,16 +143,42 @@ function isNetworkLikeError(error) {
   );
 }
 
-async function routeAfterLogin(user) {
-  const { getUserClaims } = await loadAuthModule();
-  const claims = await getUserClaims(user);
+async function routeAfterLogin(user, options = {}) {
+  if (isRouting) return;
+  isRouting = true;
+  setButtonsDisabled(true);
 
-  if (claims.adminPanel === true) {
-    window.location.href = "./chooser.html";
-    return;
+  try {
+    const { getUserClaims } = await loadAuthModule();
+    const claims = await getUserClaims(user);
+    const isAdmin = claims.adminPanel === true;
+    const targetUrl = isAdmin ? "./chooser.html" : "./app.html";
+
+    if (options.showSplash === true) {
+      const splashTitle = isAdmin ? "Yönetim paneli açılıyor" : "Rota Planlayıcı açılıyor";
+      const splashMessage = isAdmin
+        ? "Yetkileriniz doğrulanıyor..."
+        : options.message || "Haritanız hazırlanıyor...";
+
+      showStartupSplash(splashTitle, splashMessage);
+
+      if (!isAdmin) {
+        setAppStartupSplash(splashMessage);
+      } else {
+        clearAppStartupSplash();
+      }
+
+      await wait(STARTUP_SPLASH_MIN_MS);
+    }
+
+    window.location.href = targetUrl;
+  } catch (error) {
+    isRouting = false;
+    setButtonsDisabled(false);
+    hideStartupSplash();
+    clearAppStartupSplash();
+    throw error;
   }
-
-  window.location.href = "./app.html";
 }
 
 async function handleLogin() {
@@ -118,7 +202,10 @@ async function handleLogin() {
     const result = await login(email, password);
     await ensureUserProfile(result.user.uid, result.user.email);
     setStatus("Giriş başarılı.", "success");
-    await routeAfterLogin(result.user);
+    await routeAfterLogin(result.user, {
+      showSplash: true,
+      message: "Girişiniz doğrulanıyor..."
+    });
   } catch (error) {
     if (isNetworkLikeError(error) || !(await hasInternetConnection())) {
       setOfflineStatus();
@@ -155,7 +242,10 @@ async function handleRegister() {
     const result = await register(email, password);
     await ensureUserProfile(result.user.uid, result.user.email);
     setStatus("Kayıt başarılı. 7 günlük deneme hesabı oluşturuldu.", "success");
-    await routeAfterLogin(result.user);
+    await routeAfterLogin(result.user, {
+      showSplash: true,
+      message: "Hesabınız hazırlanıyor..."
+    });
   } catch (error) {
     if (isNetworkLikeError(error) || !(await hasInternetConnection())) {
       setOfflineStatus();
@@ -205,10 +295,13 @@ async function initAuthWatcher() {
     const { watchAuth } = await loadAuthModule();
 
     watchAuth(async (user) => {
-      if (!user) return;
+      if (!user || isRouting) return;
 
       if (await hasInternetConnection()) {
-        await routeAfterLogin(user);
+        await routeAfterLogin(user, {
+          showSplash: true,
+          message: "Oturumunuz geri yükleniyor..."
+        });
       }
     });
   } catch {
