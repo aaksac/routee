@@ -378,6 +378,7 @@ function fillPointFormFromMap(lat, lng, suggestedName = "") {
     elements.pointName.value = "İşaretli Konum";
   }
 }
+
 function fillBothFormsFromMap(lat, lng, suggestedName = "") {
   fillPointFormFromMap(lat, lng, suggestedName);
   fillStartFormFromMap(lat, lng, suggestedName);
