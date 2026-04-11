@@ -341,12 +341,176 @@ function commitStartPoint() {
 
   recomputeRoute();
   markDirty();
-  elements.authStatus.textContent = `Başlangıç noktası güncellendi: ${startPoint.name}`;
+  elements.authStatus.textContent = `Başlangıç eklendi: ${startPoint.name}`;
   closeFloatingPanels();
 }
 
-function generatePointId() {
-  return `point-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
+function clearStartPoint() {
+  state.startPoint = null;
+  clearStartMarker();
+  clearRouteLines();
+  setStartForm(null);
+  renderSummary();
+  renderTripList();
+  recomputeRoute();
+  markDirty();
+  elements.authStatus.textContent = "Başlangıç kaldırıldı.";
+}
+
+function fillStartFormFromMap(lat, lng, suggestedName = "") {
+  elements.startLat.value = lat.toFixed(6);
+  elements.startLng.value = lng.toFixed(6);
+
+  if (suggestedName) {
+    elements.startName.value = suggestedName;
+  } else {
+    elements.startName.value = "İşaretli Konum";
+  }
+}
+
+function fillPointFormFromMap(lat, lng, suggestedName = "") {
+  elements.pointLat.value = lat.toFixed(6);
+  elements.pointLng.value = lng.toFixed(6);
+
+  if (suggestedName) {
+    elements.pointName.value = suggestedName;
+  } else {
+    elements.pointName.value = "İşaretli Konum";
+  }
+
+  state.editingPointId = null;
+}
+
+function fillBothFormsFromMap(lat, lng, suggestedName = "") {
+  fillPointFormFromMap(lat, lng, suggestedName);
+  fillStartFormFromMap(lat, lng, suggestedName);
+}
+
+function fillPointFormFromMarker(pointData) {
+  if (!pointData) return;
+
+  fillBothFormsFromMap(
+    Number(pointData.lat),
+    Number(pointData.lng),
+    pointData.name || ""
+  );
+
+  if (pointData.type === "start") {
+    state.editingPointId = null;
+    elements.authStatus.textContent = `Başlangıç bilgisi yüklendi: ${pointData.name}`;
+    return;
+  }
+
+  state.editingPointId = pointData.id;
+  elements.authStatus.textContent = `Nokta düzenleme için yüklendi: ${pointData.name}`;
+}
+
+function renderSummary() {
+  const pointCount = getCurrentLocationCount();
+  elements.totalPoints.textContent = String(pointCount);
+  elements.totalDistance.textContent = formatKm(state.totalDistance);
+  elements.badgeDistance.textContent = `Toplam: ${formatKm(state.totalDistance)}`;
+}
+
+function renderTripList() {
+  const startHtml = state.startPoint
+    ? `
+      <div class="trip-item start">
+        <div class="trip-order">S</div>
+        <div class="trip-content">
+          <strong>${escapeHtml(state.startPoint.name)}</strong>
+          <span>Önceki mesafe: —</span>
+        </div>
+        <div style="display:flex; gap:8px; align-items:center;">
+          <button class="tiny-btn" type="button" data-action="directions-start">Yol Tarifi</button>
+          <button class="tiny-btn" type="button" data-action="delete-start">Sil</button>
+        </div>
+      </div>
+    `
+    : `
+      <div class="trip-item start">
+        <div class="trip-order">S</div>
+        <div class="trip-content">
+          <strong>Başlangıç</strong>
+          <span>Henüz eklenmedi</span>
+        </div>
+        <button class="tiny-btn" type="button" disabled>Yol Tarifi</button>
+      </div>
+    `;
+
+  const pointHtml = state.points
+    .map((point, index) => {
+      return `
+        <div class="trip-item">
+          <div class="trip-order">${index + 1}</div>
+          <div class="trip-content">
+            <strong>${escapeHtml(point.name)}</strong>
+            <span>Önceki mesafe: ${formatKm(point.distanceFromPrevious || 0)}</span>
+          </div>
+          <div style="display:flex; gap:8px; align-items:center;">
+            <button class="tiny-btn" type="button" data-action="directions-point" data-id="${point.id}">Yol Tarifi</button>
+            <button class="tiny-btn" type="button" data-action="delete-point" data-id="${point.id}">Sil</button>
+          </div>
+        </div>
+      `;
+    })
+    .join("");
+
+  elements.tripList.innerHTML = startHtml + pointHtml;
+}
+
+function redrawPointMarkers() {
+  clearMarkers();
+
+  state.points.forEach((point, index) => {
+    addMarker({
+      lat: point.lat,
+      lng: point.lng,
+      title: point.name,
+      label: String(index + 1),
+      pointData: {
+        ...point,
+        orderLabel: String(index + 1)
+      },
+      onClick: fillPointFormFromMarker
+    });
+  });
+}
+
+function recomputeRoute() {
+  if (!state.startPoint) {
+    state.totalDistance = 0;
+    clearRouteLines();
+    renderSummary();
+    renderTripList();
+    redrawPointMarkers();
+    return;
+  }
+
+  if (!state.points.length) {
+    state.totalDistance = 0;
+    clearRouteLines();
+    renderSummary();
+    renderTripList();
+    redrawPointMarkers();
+    return;
+  }
+
+  const result = nearestNeighborRoute(state.startPoint, state.points);
+  state.points = result.orderedPoints;
+  state.totalDistance = result.totalDistance;
+
+  redrawPointMarkers();
+  drawRouteSegments(state.startPoint, state.points);
+  renderSummary();
+  renderTripList();
+}
+
+function toggleTripPanel(forceValue) {
+  state.tripPanelOpen =
+    typeof forceValue === "boolean" ? forceValue : !state.tripPanelOpen;
+
+  elements.tripPanel.classList.toggle("hidden", !state.tripPanelOpen);
 }
 
 function clearPointForm() {
@@ -354,19 +518,6 @@ function clearPointForm() {
   elements.pointLat.value = "";
   elements.pointLng.value = "";
   state.editingPointId = null;
-  elements.btnAddPoint.textContent = "Ekle";
-  clearDraftMarker();
-}
-
-function setPointForm(point) {
-  if (!point) {
-    clearPointForm();
-    return;
-  }
-
-  elements.pointName.value = point.name || "";
-  elements.pointLat.value = Number(point.lat).toFixed(6);
-  elements.pointLng.value = Number(point.lng).toFixed(6);
 }
 
 function buildPointFromForm() {
@@ -384,262 +535,108 @@ function buildPointFromForm() {
   }
 
   return {
-    id: state.editingPointId || generatePointId(),
+    id: state.editingPointId || Date.now() + Math.random(),
     name,
     lat,
     lng,
+    distanceFromPrevious: 0,
     type: "point"
   };
 }
 
-function blurActiveInputSafely() {
-  const active = document.activeElement;
-  if (active && typeof active.blur === "function") {
-    active.blur();
-  }
-}
-
 function addOrUpdatePoint() {
-  try {
-    if (!hasActiveAccess()) {
-      alert("Erişim süreniz dolmuş.");
-      return;
-    }
-
-    blurActiveInputSafely();
-
-    const point = buildPointFromForm();
-
-    if (!point) {
-      alert("Lütfen konum adı, enlem ve boylamı geçerli şekilde gir.");
-      return;
-    }
-
-    const existingIndex = state.points.findIndex((item) => item.id === point.id);
-    const isNewPoint = existingIndex === -1;
-
-    if (isNewPoint && !canAddMoreLocations(1)) {
-      alert(`En fazla ${state.locationQuota} konum ekleyebilirsiniz.`);
-      return;
-    }
-
-    if (existingIndex >= 0) {
-      state.points[existingIndex] = point;
-    } else {
-      state.points.push(point);
-    }
-
-    recomputeRoute();
-    markDirty();
-
-    elements.authStatus.textContent =
-      existingIndex >= 0
-        ? `Konum güncellendi: ${point.name}`
-        : `Konum eklendi: ${point.name}`;
-
-    clearPointForm();
-    closeFloatingPanels();
-  } catch (error) {
-    console.error("Konum ekleme hatası:", error);
-    alert("Konum eklenirken bir hata oluştu.");
+  if (!hasActiveAccess()) {
+    alert("Erişim süreniz dolmuş.");
+    return;
   }
+
+  const point = buildPointFromForm();
+
+  if (!point) {
+    alert("Lütfen nokta adı, enlem ve boylam gir.");
+    return;
+  }
+
+  if (!state.startPoint) {
+    alert("Önce başlangıç noktasını doldur ve Başlangıç Ekle butonuna bas.");
+    return;
+  }
+
+  const isNewPoint = !state.editingPointId;
+  if (isNewPoint && !canAddMoreLocations(1)) {
+    alert(`Başlangıç dahil en fazla ${state.locationQuota} konum eklenebilir.`);
+    return;
+  }
+
+  if (state.editingPointId) {
+    state.points = state.points.map((existingPoint) =>
+      existingPoint.id === state.editingPointId
+        ? {
+            ...existingPoint,
+            name: point.name,
+            lat: point.lat,
+            lng: point.lng
+          }
+        : existingPoint
+    );
+  } else {
+    state.points.push(point);
+  }
+
+  clearDraftMarker();
+  clearPointForm();
+  recomputeRoute();
+  markDirty();
+  closeFloatingPanels();
 }
 
-function syncMarkersFromState() {
-  clearMarkers();
-  clearRouteLines();
-  clearStartMarker();
+function deletePoint(pointId) {
+  state.points = state.points.filter((point) => String(point.id) !== String(pointId));
+  if (state.editingPointId && String(state.editingPointId) === String(pointId)) {
+    clearPointForm();
+  }
+  recomputeRoute();
+  markDirty();
+  elements.authStatus.textContent = "Nokta silindi.";
+}
 
-  if (state.startPoint) {
+function applyImportedData(startPoint, points) {
+  const importedCount = points.length + (startPoint ? 1 : 0);
+  if (!isPremiumAccessActive() && importedCount > state.locationQuota) {
+    alert(`İçe aktarılan veride başlangıç dahil en fazla ${state.locationQuota} konum olabilir.`);
+    return false;
+  }
+
+  state.startPoint = startPoint;
+  state.points = points;
+  state.editingPointId = null;
+
+  setStartForm(startPoint);
+
+  if (startPoint) {
     showStartMarker({
-      lat: state.startPoint.lat,
-      lng: state.startPoint.lng,
-      title: state.startPoint.name,
+      lat: startPoint.lat,
+      lng: startPoint.lng,
+      title: startPoint.name,
       pointData: {
-        ...state.startPoint,
+        ...startPoint,
         orderLabel: "S"
       },
       onClick: fillPointFormFromMarker
     });
+  } else {
+    clearStartMarker();
   }
 
-  state.points.forEach((point, index) => {
-    addMarker({
-      lat: point.lat,
-      lng: point.lng,
-      title: point.name,
-      pointData: {
-        ...point,
-        orderLabel: String(index + 1)
-      },
-      onClick: fillPointFormFromMarker
-    });
-  });
-}
-
-function recomputeRoute() {
-  syncMarkersFromState();
-
-  if (!state.startPoint || !state.points.length) {
-    state.totalDistance = 0;
-    renderSummary();
-    renderTripList();
-    return;
-  }
-
-  const { orderedPoints, totalDistance } = nearestNeighborRoute(
-    state.startPoint,
-    state.points
-  );
-
-  state.points = orderedPoints.map((point) => ({
-    id: point.id,
-    name: point.name,
-    lat: point.lat,
-    lng: point.lng,
-    type: "point"
-  }));
-
-  state.totalDistance = totalDistance;
-
-  syncMarkersFromState();
-
-  const routePoints = [state.startPoint, ...state.points];
-  drawRouteSegments(routePoints);
-
-  renderSummary();
-  renderTripList();
-}
-
-function renderSummary() {
-  elements.totalPoints.textContent = String(state.points.length + (state.startPoint ? 1 : 0));
-  const distanceText = formatKm(state.totalDistance);
-  elements.totalDistance.textContent = distanceText;
-  elements.badgeDistance.textContent = distanceText;
-}
-
-function createTripListItem(point, index, isStart = false) {
-  const label = isStart ? "S" : String(index + 1);
-  const actions = isStart
-    ? `
-      <button class="trip-action ghost" data-action="directions-start">Yol Tarifi</button>
-      <button class="trip-action danger" data-action="delete-start">Sil</button>
-    `
-    : `
-      <button class="trip-action ghost" data-action="directions-point" data-id="${escapeHtml(point.id)}">Yol Tarifi</button>
-      <button class="trip-action danger" data-action="delete-point" data-id="${escapeHtml(point.id)}">Sil</button>
-    `;
-
-  return `
-    <article class="trip-item ${isStart ? "is-start" : ""}">
-      <div class="trip-item-order">${label}</div>
-      <div class="trip-item-body">
-        <strong>${escapeHtml(point.name)}</strong>
-        <span>${Number(point.lat).toFixed(6)}, ${Number(point.lng).toFixed(6)}</span>
-      </div>
-      <div class="trip-item-actions">
-        ${actions}
-      </div>
-    </article>
-  `;
-}
-
-function renderTripList() {
-  const items = [];
-
-  if (state.startPoint) {
-    items.push(createTripListItem(state.startPoint, 0, true));
-  }
-
-  state.points.forEach((point, index) => {
-    items.push(createTripListItem(point, index, false));
-  });
-
-  elements.tripList.innerHTML = items.length
-    ? items.join("")
-    : `<div class="empty-state">Henüz konum eklenmedi.</div>`;
-}
-
-function fillPointFormFromMarker(pointData) {
-  if (!pointData) return;
-
-  if (pointData.type === "start") {
-    setStartForm(pointData);
-    elements.authStatus.textContent = `Başlangıç seçildi: ${pointData.name}`;
-    openFloatingPanel("start");
-    return;
-  }
-
-  state.editingPointId = pointData.id;
-  setPointForm(pointData);
-  elements.btnAddPoint.textContent = "Güncelle";
-  elements.authStatus.textContent = `Konum seçildi: ${pointData.name}`;
-  openFloatingPanel("point");
-}
-
-function fillBothFormsFromMap(lat, lng, name = "") {
-  const safeName = String(name || "").trim();
-
-  elements.startName.value = safeName;
-  elements.startLat.value = Number(lat).toFixed(6);
-  elements.startLng.value = Number(lng).toFixed(6);
-
-  elements.pointName.value = safeName;
-  elements.pointLat.value = Number(lat).toFixed(6);
-  elements.pointLng.value = Number(lng).toFixed(6);
-
-  state.editingPointId = null;
-  elements.btnAddPoint.textContent = "Ekle";
-}
-
-function deletePoint(pointId) {
-  state.points = state.points.filter((item) => String(item.id) !== String(pointId));
+  clearPointForm();
   recomputeRoute();
   markDirty();
-  elements.authStatus.textContent = "Konum silindi.";
+  return true;
 }
 
-function clearStartPoint() {
-  state.startPoint = null;
-  setStartForm(null);
-  recomputeRoute();
-  markDirty();
-  elements.authStatus.textContent = "Başlangıç noktası temizlendi.";
-}
-
-async function focusCurrentMap() {
-  const points = [];
-  if (state.startPoint) points.push(state.startPoint);
-  if (state.points.length) points.push(...state.points);
-
-  focusMapToPoints(points);
-}
-
-async function handleCurrentLocationClick() {
-  try {
-    if (!hasActiveAccess()) {
-      alert("Erişim süreniz dolmuş.");
-      return;
-    }
-
-    const location = await locateAndShowUser();
-    if (!location) {
-      alert("Konum alınamadı.");
-      return;
-    }
-
-    fillBothFormsFromMap(location.lat, location.lng, location.name || "Mevcut Konum");
-    markDirty();
-    elements.authStatus.textContent = "Mevcut konum forma dolduruldu.";
-  } catch (error) {
-    console.error("Mevcut konum hatası:", error);
-    alert("Mevcut konum alınırken hata oluştu.");
-  }
-}
-
-function createMapPayload() {
+function getMapPayload() {
   return {
-    name: elements.mapName.value.trim() || "Adsız Harita",
+    name: elements.mapName.value.trim() || "İsimsiz Harita",
     startPoint: state.startPoint
       ? {
           name: state.startPoint.name,
@@ -650,192 +647,173 @@ function createMapPayload() {
     points: state.points.map((point) => ({
       name: point.name,
       lat: point.lat,
-      lng: point.lng
+      lng: point.lng,
+      type: "point"
     })),
-    totalDistance: state.totalDistance
+    totalDistance: state.totalDistance,
+    locationCount: getCurrentLocationCount()
   };
 }
 
-async function handleSaveMap() {
-  try {
-    if (!state.currentUser) return;
-
-    if (!hasActiveAccess()) {
-      alert("Erişim süreniz dolmuş.");
-      return;
-    }
-
-    if (!canSaveAnotherMap()) {
-      alert("Deneme hesabında yalnızca tek kayıtlı harita tutulabilir.");
-      return;
-    }
-
-    const payload = createMapPayload();
-
-    if (state.selectedMapId) {
-      if (!canReadMapId(state.selectedMapId)) {
-        alert("Bu haritayı güncelleme yetkiniz yok.");
-        return;
-      }
-
-      await updateMap(state.currentUser.uid, state.selectedMapId, payload);
-      elements.authStatus.textContent = `Harita güncellendi: ${payload.name}`;
-    } else {
-      const createdId = await saveMap(state.currentUser.uid, payload, {
-        forceTrialMapId: !isPremiumAccessActive() ? TRIAL_MAP_ID : undefined
-      });
-      state.selectedMapId = createdId;
-      elements.authStatus.textContent = `Harita kaydedildi: ${payload.name}`;
-    }
-
-    markClean();
-    await loadUserMaps(state.currentUser.uid, isPremiumAccessActive());
-    closeFloatingPanels();
-    closeSavedMapsOverlay();
-  } catch (error) {
-    console.error("Harita kaydetme hatası:", error);
-    alert("Harita kaydedilirken hata oluştu.");
-  }
+async function refreshMapList() {
+  if (!state.currentUser) return;
+  await loadUserMaps(state.currentUser.uid, isPremiumAccessActive());
 }
 
-async function confirmDiscardChanges() {
-  if (!state.hasUnsavedChanges && !hasMapContent()) {
-    return true;
-  }
-
-  return window.confirm("Kaydedilmemiş değişiklikler silinecek. Devam edilsin mi?");
-}
-
-async function resetWorkspace() {
+function resetMapEditor() {
+  state.selectedMapId = null;
+  state.startPoint = null;
   state.points = [];
   state.totalDistance = 0;
-  state.startPoint = null;
   state.editingPointId = null;
-  state.selectedMapId = null;
 
   elements.mapName.value = "";
   setStartForm(null);
   clearPointForm();
+  clearStartMarker();
+  clearMarkers();
+  clearDraftMarker();
+  clearRouteLines();
 
-  recomputeRoute();
+  renderSummary();
+  renderTripList();
   markClean();
-  await focusCurrentMap();
+  elements.authStatus.textContent = `Yeni harita oluşturuluyor. ${getAccessStatusText()}`;
 }
 
-async function handleNewMap() {
-  const confirmed = await confirmDiscardChanges();
-  if (!confirmed) return;
-
-  await resetWorkspace();
-  elements.authStatus.textContent = "Yeni harita hazır.";
-}
-
-function applyMapData(mapData) {
-  state.selectedMapId = mapData.id;
-  elements.mapName.value = mapData.name || "";
-
-  state.startPoint = mapData.startPoint
-    ? {
-        id: "start-point",
-        name: mapData.startPoint.name,
-        lat: Number(mapData.startPoint.lat),
-        lng: Number(mapData.startPoint.lng),
-        type: "start"
-      }
-    : null;
-
-  state.points = Array.isArray(mapData.points)
-    ? mapData.points.map((point, index) => ({
-        id: point.id || `loaded-${index}-${Date.now()}`,
-        name: point.name,
-        lat: Number(point.lat),
-        lng: Number(point.lng),
-        type: "point"
-      }))
-    : [];
-
-  state.totalDistance = Number(mapData.totalDistance) || 0;
-
-  setStartForm(state.startPoint);
-  clearPointForm();
-  recomputeRoute();
-  markClean();
-}
-
-function renderMapList(maps) {
-  if (!elements.mapList) return;
-
-  if (!maps.length) {
-    elements.mapList.innerHTML = `<div class="empty-state">Kayıtlı harita bulunamadı.</div>`;
+async function handleSaveMap() {
+  if (!state.currentUser) {
+    alert("Önce giriş yapmalısın.");
     return;
   }
 
-  elements.mapList.innerHTML = maps
-    .map((map) => {
-      const locked = !canReadMapId(map.id);
-      return `
-        <article class="map-list-item ${locked ? "is-locked" : ""}" data-id="${escapeHtml(map.id)}">
-          <div class="map-list-content">
-            <strong>${escapeHtml(map.name || "Adsız Harita")}</strong>
-            <span>${(map.points?.length || 0) + (map.startPoint ? 1 : 0)} konum</span>
-          </div>
-          <div class="map-list-actions">
-            ${
-              locked
-                ? `<span class="map-lock-label">Kilitli</span>`
-                : `<button class="trip-action danger" data-action="delete-map" data-id="${escapeHtml(map.id)}">Sil</button>`
-            }
-          </div>
-        </article>
-      `;
-    })
-    .join("");
+  if (!hasActiveAccess()) {
+    alert("Deneme süreniz dolmuş ya da erişim süreniz sona ermiş.");
+    return;
+  }
+
+  const mapName = elements.mapName.value.trim();
+  if (!mapName) {
+    alert("Lütfen harita adı gir.");
+    return;
+  }
+
+  if (!state.startPoint) {
+    alert("Kaydetmeden önce başlangıç noktası ekle.");
+    return;
+  }
+
+  if (!canSaveAnotherMap()) {
+    alert("Deneme hesabında yalnızca 1 kayıtlı harita hakkı vardır.");
+    return;
+  }
+
+  if (!isPremiumAccessActive() && getCurrentLocationCount() > state.locationQuota) {
+    alert(`Deneme hesabında başlangıç dahil en fazla ${state.locationQuota} konum kaydedilebilir.`);
+    return;
+  }
+
+  const payload = getMapPayload();
+
+  try {
+    if (isPremiumAccessActive()) {
+      if (state.selectedMapId) {
+        await updateMap(state.currentUser.uid, state.selectedMapId, payload);
+        elements.authStatus.textContent = "Harita güncellendi.";
+        markClean();
+        await refreshMapList();
+        closeFloatingPanels();
+        return;
+      }
+
+      await saveMap(state.currentUser.uid, payload, { fullAccess: true });
+      await refreshMapList();
+      markClean();
+      closeFloatingPanels();
+      alert("Haritanız kaydedilmiştir. Harita Listelerim kısmından ulaşabilirsiniz.");
+      resetMapEditor();
+      return;
+    }
+
+    const trialMapId = state.selectedMapId || TRIAL_MAP_ID;
+
+    if (state.selectedMapId) {
+      await updateMap(state.currentUser.uid, trialMapId, payload);
+    } else {
+      await saveMap(
+        state.currentUser.uid,
+        {
+          id: TRIAL_MAP_ID,
+          ...payload
+        },
+        { fullAccess: false }
+      );
+    }
+
+    await refreshMapList();
+    markClean();
+    closeFloatingPanels();
+    alert("Haritanız kaydedilmiştir. Harita Listelerim kısmından ulaşabilirsiniz.");
+    resetMapEditor();
+  } catch (error) {
+    elements.authStatus.textContent = `Kaydetme hatası: ${error.message}`;
+  }
 }
 
-async function loadUserMaps(uid, premiumMode = false) {
+async function handleNewMap() {
+  if (state.hasUnsavedChanges && hasMapContent()) {
+    const confirmed = window.confirm(
+      "Kaydedilmemiş değişiklikler silinecektir. Devam etmek istiyor musunuz?"
+    );
+
+    if (!confirmed) return;
+  }
+
+  resetMapEditor();
+}
+
+async function handleDeleteMap(mapId) {
+  if (!state.currentUser || !mapId) return;
+
+  const confirmed = window.confirm("Silmek istiyor musunuz?");
+  if (!confirmed) return;
+
   try {
-    const maps = await getMaps(uid, { includeAll: premiumMode });
-    renderMapList(maps);
+    await removeMap(state.currentUser.uid, mapId);
+
+    if (state.selectedMapId === mapId) {
+      resetMapEditor();
+    }
+
+    await refreshMapList();
+    elements.authStatus.textContent = "Harita silindi.";
   } catch (error) {
-    console.error("Haritalar yüklenemedi:", error);
-    elements.authStatus.textContent = "Haritalar yüklenemedi.";
+    elements.authStatus.textContent = `Silme hatası: ${error.message}`;
   }
 }
 
 async function handleMapListClick(event) {
-  const deleteButton = event.target.closest("[data-action='delete-map']");
-  if (deleteButton) {
-    const mapId = deleteButton.dataset.id;
-    if (!mapId || !state.currentUser) return;
-
-    const confirmed = window.confirm("Harita silinsin mi?");
-    if (!confirmed) return;
-
-    await removeMap(state.currentUser.uid, mapId);
-
-    if (state.selectedMapId === mapId) {
-      await resetWorkspace();
-    }
-
-    await loadUserMaps(state.currentUser.uid, isPremiumAccessActive());
-    elements.authStatus.textContent = "Harita silindi.";
+  const deleteBtn = event.target.closest("[data-action='delete-map']");
+  if (deleteBtn) {
+    const mapId = deleteBtn.dataset.mapId;
+    await handleDeleteMap(mapId);
     return;
   }
 
-  const mapItem = event.target.closest(".map-list-item");
-  if (!mapItem || !state.currentUser) return;
+  const loadBtn = event.target.closest("[data-action='load-map']");
+  if (!loadBtn) return;
 
-  const mapId = mapItem.dataset.id;
-  if (!mapId) return;
+  const mapId = loadBtn.dataset.mapId;
+  if (!mapId || !state.currentUser) return;
 
   if (!canReadMapId(mapId)) {
-    alert("Bu haritayı açmak için premium erişim gerekiyor.");
+    alert("Bu haritayı açmak için premium erişim gerekir.");
     return;
   }
 
-  if (state.hasUnsavedChanges) {
+  if (state.hasUnsavedChanges && hasMapContent()) {
     const confirmed = window.confirm(
-      "Kaydedilmemiş değişiklikler kaybolacak. Seçili harita açılsın mı?"
+      "Mevcut kaydedilmemiş değişiklikler silinecektir. Haritayı açmak istiyor musunuz?"
     );
     if (!confirmed) return;
   }
@@ -843,466 +821,578 @@ async function handleMapListClick(event) {
   try {
     const mapData = await getMapById(state.currentUser.uid, mapId);
     if (!mapData) {
-      alert("Harita bulunamadı.");
+      elements.authStatus.textContent = "Harita bulunamadı.";
       return;
     }
 
-    applyMapData(mapData);
-    elements.authStatus.textContent = `Harita açıldı: ${mapData.name || "Adsız Harita"}`;
-    closeFloatingPanels();
-  } catch (error) {
-    console.error("Harita açma hatası:", error);
-    alert("Harita açılırken hata oluştu.");
-  }
-}
+    state.selectedMapId = mapData.id || mapId;
+    elements.mapName.value = mapData.name || "";
 
-async function handleExport() {
-  try {
-    const type = elements.exportType?.value || "csv";
-    const rows = [
-      ...(state.startPoint
-        ? [
-            {
-              type: "start",
-              name: state.startPoint.name,
-              lat: state.startPoint.lat,
-              lng: state.startPoint.lng
-            }
-          ]
-        : []),
-      ...state.points.map((point) => ({
-        type: "point",
-        name: point.name,
-        lat: point.lat,
-        lng: point.lng
-      }))
-    ];
+    const rawStartPoint = mapData.startPoint
+      ? {
+          id: "start-point",
+          name: mapData.startPoint.name,
+          lat: Number(mapData.startPoint.lat),
+          lng: Number(mapData.startPoint.lng),
+          type: "start"
+        }
+      : null;
 
-    if (!rows.length) {
-      alert("Dışa aktarmak için önce konum ekleyin.");
-      return;
-    }
+    const rawPoints = Array.isArray(mapData.points)
+      ? mapData.points.map((point, index) => ({
+          id: point.id || `loaded-${Date.now()}-${index}`,
+          name: point.name,
+          lat: Number(point.lat),
+          lng: Number(point.lng),
+          distanceFromPrevious: Number(point.distanceFromPrevious || 0),
+          type: "point"
+        }))
+      : [];
 
-    const fileName = (elements.mapName.value.trim() || "rota-planim").replace(/[^\p{L}\p{N}\-_ ]/gu, "_");
+    state.startPoint = rawStartPoint;
+    state.points = rawPoints;
+    state.editingPointId = null;
+    setStartForm(rawStartPoint);
 
-    if (type === "xlsx") {
-      exportToXlsx(rows, fileName);
+    if (rawStartPoint) {
+      showStartMarker({
+        lat: rawStartPoint.lat,
+        lng: rawStartPoint.lng,
+        title: rawStartPoint.name,
+        pointData: {
+          ...rawStartPoint,
+          orderLabel: "S"
+        },
+        onClick: fillPointFormFromMarker
+      });
     } else {
-      exportToCsv(rows, fileName);
+      clearStartMarker();
     }
 
-    elements.authStatus.textContent = "Veriler dışa aktarıldı.";
+    clearPointForm();
+    recomputeRoute();
+    markClean();
+    closeSavedMapsOverlay();
+    closeFloatingPanels();
+    elements.authStatus.textContent = `Harita açıldı: ${mapData.name || "İsimsiz Harita"}`;
   } catch (error) {
-    console.error("Dışa aktarma hatası:", error);
-    alert("Dışa aktarma sırasında hata oluştu.");
+    elements.authStatus.textContent = `Harita açma hatası: ${error.message}`;
   }
 }
 
-function triggerFilePickerByType(type) {
-  if (type === "xlsx") {
-    elements.xlsxFileInput?.click();
-  } else {
-    elements.csvFileInput?.click();
-  }
-}
-
-async function handleImport() {
-  const type = elements.importType?.value || "csv";
-  triggerFilePickerByType(type);
-}
-
-async function applyImportedState(nextState) {
-  if (!nextState) return;
-
-  state.startPoint = nextState.startPoint
-    ? {
-        id: "start-point",
-        name: nextState.startPoint.name,
-        lat: Number(nextState.startPoint.lat),
-        lng: Number(nextState.startPoint.lng),
-        type: "start"
-      }
-    : null;
-
-  state.points = Array.isArray(nextState.points)
-    ? nextState.points.map((point, index) => ({
-        id: point.id || `imported-${index}-${Date.now()}`,
-        name: point.name,
-        lat: Number(point.lat),
-        lng: Number(point.lng),
-        type: "point"
-      }))
-    : [];
-
-  if (!canAddMoreLocations(0)) {
-    alert("İçe aktarılan veri mevcut kota ile uyumlu değil.");
+function renderMapList(items) {
+  if (!items?.length) {
+    elements.mapList.innerHTML = `
+      <div class="empty-state">
+        Henüz kayıtlı harita yok.
+      </div>
+    `;
     return;
   }
 
-  setStartForm(state.startPoint);
-  clearPointForm();
-  recomputeRoute();
-  markDirty();
-  elements.authStatus.textContent = "Dosya içe aktarıldı.";
+  elements.mapList.innerHTML = items
+    .map((mapItem) => {
+      const locked = !canReadMapId(mapItem.id);
+      const locationCount = Number(mapItem.locationCount || 0);
+
+      return `
+        <div class="saved-map-card">
+          <div class="saved-map-head">
+            <div>
+              <strong>${escapeHtml(mapItem.name || "İsimsiz Harita")}</strong>
+              <p>${locationCount} konum</p>
+            </div>
+            ${locked ? `<span class="saved-map-badge">Kilitli</span>` : ""}
+          </div>
+          <div class="saved-map-actions">
+            <button class="tiny-btn" type="button" data-action="load-map" data-map-id="${mapItem.id}" ${
+              locked ? "disabled" : ""
+            }>Aç</button>
+            <button class="tiny-btn danger" type="button" data-action="delete-map" data-map-id="${mapItem.id}" ${
+              locked ? "disabled" : ""
+            }>Sil</button>
+          </div>
+        </div>
+      `;
+    })
+    .join("");
 }
 
-async function handleCsvFileChange(event) {
-  const file = event.target.files?.[0];
-  event.target.value = "";
-  if (!file) return;
+async function loadUserMaps(userId, includeAll = false) {
+  if (!userId) return;
 
   try {
-    const rows = await importFromCsvFile(file);
-    const nextState = convertImportedRowsToState(rows);
-    await applyImportedState(nextState);
+    const maps = await getMaps(userId, { includeAll });
+    renderMapList(maps);
   } catch (error) {
-    console.error("CSV içe aktarma hatası:", error);
-    alert("CSV dosyası okunamadı.");
+    elements.authStatus.textContent = `Harita listesi yüklenemedi: ${error.message}`;
   }
-}
-
-async function handleXlsxFileChange(event) {
-  const file = event.target.files?.[0];
-  event.target.value = "";
-  if (!file) return;
-
-  try {
-    const rows = await importFromXlsxFile(file);
-    const nextState = convertImportedRowsToState(rows);
-    await applyImportedState(nextState);
-  } catch (error) {
-    console.error("Excel içe aktarma hatası:", error);
-    alert("Excel dosyası okunamadı.");
-  }
-}
-
-async function handleLogout() {
-  try {
-    await logout();
-    goToLogin();
-  } catch (error) {
-    console.error("Çıkış hatası:", error);
-    alert("Çıkış yapılamadı.");
-  }
-}
-
-function toggleTripPanel(forceValue) {
-  state.tripPanelOpen =
-    typeof forceValue === "boolean" ? forceValue : !state.tripPanelOpen;
-
-  elements.tripPanel?.classList.toggle("is-collapsed", !state.tripPanelOpen);
-}
-
-function handleTripListClick(event) {
-  const target = event.target.closest("[data-action]");
-  if (!target) return;
-
-  const action = target.dataset.action;
-  if (!action) return;
-
-  if (action === "delete-point") {
-    deletePoint(target.dataset.id);
-    return;
-  }
-
-  if (action === "delete-start") {
-    clearStartPoint();
-    return;
-  }
-
-  if (action === "directions-start") {
-    if (!state.startPoint) return;
-    const url = `https://www.google.com/maps/dir/?api=1&destination=${state.startPoint.lat},${state.startPoint.lng}`;
-    window.location.href = url;
-    return;
-  }
-
-  if (action === "directions-point") {
-    const point = state.points.find((item) => String(item.id) === String(target.dataset.id));
-    if (!point) return;
-    const url = `https://www.google.com/maps/dir/?api=1&destination=${point.lat},${point.lng}`;
-    window.location.href = url;
-  }
-}
-
-function closeMapMenu() {
-  state.mapMenuOpen = false;
-  elements.mapMenu?.classList.add("hidden");
-}
-
-function hasDraftCoordinates() {
-  const hasStartCoords =
-    elements.startLat?.value.trim() && elements.startLng?.value.trim();
-
-  const hasPointCoords =
-    elements.pointLat?.value.trim() && elements.pointLng?.value.trim();
-
-  return Boolean(hasStartCoords || hasPointCoords);
-}
-
-function syncMobilePanelState() {
-  const isMobile = window.innerWidth <= 720;
-  const panelName = state.activeFloatingPanel || "";
-
-  document.body.classList.toggle("has-mobile-floating-panel", isMobile && Boolean(panelName));
-  document.body.dataset.mobilePanel = isMobile ? panelName : "";
-}
-
-function toggleMapMenu(forceValue) {
-  state.mapMenuOpen = typeof forceValue === "boolean" ? forceValue : !state.mapMenuOpen;
-  elements.mapMenu?.classList.toggle("hidden", !state.mapMenuOpen);
-}
-
-function closeFloatingPanels() {
-  [elements.startPanel, elements.pointPanel, elements.savePanel, elements.importExportPanel].forEach((panel) => {
-    panel?.classList.add("hidden");
-  });
-  state.activeFloatingPanel = null;
-  syncMobilePanelState();
-}
-
-function openFloatingPanel(panelName) {
-  const panelMap = {
-    start: elements.startPanel,
-    point: elements.pointPanel,
-    save: elements.savePanel,
-    importExport: elements.importExportPanel
-  };
-
-  const panel = panelMap[panelName];
-  if (!panel) return;
-
-  const isOpen = !panel.classList.contains("hidden");
-  closeFloatingPanels();
-  closeMapMenu();
-
-  if (!isOpen) {
-    panel.classList.remove("hidden");
-    state.activeFloatingPanel = panelName;
-  }
-
-  syncMobilePanelState();
 }
 
 function openSavedMapsOverlay() {
-  closeFloatingPanels();
-  closeMapMenu();
   elements.savedMapsOverlay?.classList.remove("hidden");
+  document.body.classList.add("overlay-open");
 }
 
 function closeSavedMapsOverlay() {
   elements.savedMapsOverlay?.classList.add("hidden");
+  document.body.classList.remove("overlay-open");
 }
 
-function handleShellClick(event) {
-  const insideMenu = event.target.closest(".menu-wrapper");
-  const insideFloatingCard = event.target.closest(".floating-card");
-  const startTrigger = event.target.closest("#btnOpenStartPanel");
-  const pointTrigger = event.target.closest("#btnOpenPointPanel");
-
-  if (!insideMenu && !insideFloatingCard && !startTrigger && !pointTrigger) {
-    closeMapMenu();
+function closeFloatingPanels() {
+  state.activeFloatingPanel = null;
+  elements.startPanel?.classList.add("hidden");
+  elements.pointPanel?.classList.add("hidden");
+  elements.savePanel?.classList.add("hidden");
+  elements.importExportPanel?.classList.add("hidden");
+  document.body.classList.remove("menu-open");
+  if (elements.mapMenu) {
+    elements.mapMenu.classList.add("hidden");
+    state.mapMenuOpen = false;
   }
 }
 
-function initMobileTopbarAutoHide() {
-  if (!elements.topbar) return;
+function openFloatingPanel(type) {
+  closeFloatingPanels();
 
-  state.lastScrollY = window.scrollY || 0;
+  state.activeFloatingPanel = type;
+
+  if (type === "start") {
+    elements.startPanel?.classList.remove("hidden");
+  }
+
+  if (type === "point") {
+    elements.pointPanel?.classList.remove("hidden");
+  }
+
+  if (type === "save") {
+    elements.savePanel?.classList.remove("hidden");
+  }
+
+  if (type === "import-export") {
+    elements.importExportPanel?.classList.remove("hidden");
+  }
+}
+
+function toggleMapMenu(forceValue) {
+  state.mapMenuOpen =
+    typeof forceValue === "boolean" ? forceValue : !state.mapMenuOpen;
+
+  if (state.mapMenuOpen) {
+    document.body.classList.add("menu-open");
+    elements.mapMenu?.classList.remove("hidden");
+  } else {
+    document.body.classList.remove("menu-open");
+    elements.mapMenu?.classList.add("hidden");
+  }
+}
+
+function syncMobilePanelState() {
+  const isMobile = window.innerWidth <= 768;
+  document.body.classList.toggle("mobile-floating-open", isMobile && !!state.activeFloatingPanel);
+}
+
+function initPanelButtons() {
+  elements.btnOpenStartPanel?.addEventListener("click", () => {
+    openFloatingPanel("start");
+    syncMobilePanelState();
+  });
+
+  elements.btnOpenPointPanel?.addEventListener("click", () => {
+    openFloatingPanel("point");
+    syncMobilePanelState();
+  });
+
+  elements.btnOpenSavePanel?.addEventListener("click", () => {
+    openFloatingPanel("save");
+    syncMobilePanelState();
+  });
+
+  elements.btnOpenImportExportPanel?.addEventListener("click", () => {
+    openFloatingPanel("import-export");
+    syncMobilePanelState();
+  });
+
+  elements.btnOpenMapListPanel?.addEventListener("click", () => {
+    openSavedMapsOverlay();
+  });
+
+  elements.btnCloseStartPanel?.addEventListener("click", () => {
+    closeFloatingPanels();
+    syncMobilePanelState();
+  });
+
+  elements.btnClosePointPanel?.addEventListener("click", () => {
+    closeFloatingPanels();
+    syncMobilePanelState();
+  });
+
+  elements.btnCloseSavePanel?.addEventListener("click", () => {
+    closeFloatingPanels();
+    syncMobilePanelState();
+  });
+
+  elements.btnCloseImportExportPanel?.addEventListener("click", () => {
+    closeFloatingPanels();
+    syncMobilePanelState();
+  });
+
+  elements.btnCloseMapListPanel?.addEventListener("click", () => {
+    closeSavedMapsOverlay();
+  });
+
+  elements.savedMapsBackdrop?.addEventListener("click", () => {
+    closeSavedMapsOverlay();
+  });
+
+  elements.btnToggleMenu?.addEventListener("click", () => {
+    toggleMapMenu();
+  });
+
+  document.addEventListener("click", (event) => {
+    const menuWrapper = event.target.closest(".menu-wrapper");
+    const menuButton = event.target.closest("#btnToggleMenu");
+
+    if (!menuWrapper && !menuButton && state.mapMenuOpen) {
+      toggleMapMenu(false);
+    }
+  });
+}
+
+async function handleExport() {
+  const exportType = elements.exportType?.value || "csv";
+
+  const exportRows = [];
+
+  if (state.startPoint) {
+    exportRows.push({
+      type: "start",
+      name: state.startPoint.name,
+      lat: state.startPoint.lat,
+      lng: state.startPoint.lng
+    });
+  }
+
+  state.points.forEach((point) => {
+    exportRows.push({
+      type: "point",
+      name: point.name,
+      lat: point.lat,
+      lng: point.lng
+    });
+  });
+
+  if (!exportRows.length) {
+    alert("Dışa aktarım için veri bulunamadı.");
+    return;
+  }
+
+  const filenameBase = (elements.mapName.value.trim() || "harita").replace(/[^\p{L}\p{N}_-]+/gu, "_");
+
+  if (exportType === "xlsx") {
+    exportToXlsx(exportRows, filenameBase);
+  } else {
+    exportToCsv(exportRows, filenameBase);
+  }
+
+  elements.authStatus.textContent = "Dışa aktarma tamamlandı.";
+  closeFloatingPanels();
+}
+
+function getImportedStartAndPoints(rows) {
+  const normalized = convertImportedRowsToState(rows);
+
+  const startPoint = normalized.startPoint
+    ? {
+        id: "start-point",
+        name: normalized.startPoint.name,
+        lat: Number(normalized.startPoint.lat),
+        lng: Number(normalized.startPoint.lng),
+        type: "start"
+      }
+    : null;
+
+  const points = normalized.points.map((point, index) => ({
+    id: point.id || `imported-${Date.now()}-${index}`,
+    name: point.name,
+    lat: Number(point.lat),
+    lng: Number(point.lng),
+    distanceFromPrevious: Number(point.distanceFromPrevious || 0),
+    type: "point"
+  }));
+
+  return { startPoint, points };
+}
+
+async function handleImportFile(file, type) {
+  if (!file) return;
+
+  try {
+    const rows =
+      type === "xlsx" ? await importFromXlsxFile(file) : await importFromCsvFile(file);
+
+    const { startPoint, points } = getImportedStartAndPoints(rows);
+    const applied = applyImportedData(startPoint, points);
+
+    if (applied) {
+      elements.authStatus.textContent = "İçe aktarma tamamlandı.";
+      closeFloatingPanels();
+    }
+  } catch (error) {
+    alert(`İçe aktarma hatası: ${error.message}`);
+  }
+}
+
+function bindImportExportEvents() {
+  elements.btnExport?.addEventListener("click", handleExport);
+
+  elements.btnImport?.addEventListener("click", () => {
+    const importType = elements.importType?.value || "csv";
+    if (importType === "xlsx") {
+      elements.xlsxFileInput?.click();
+    } else {
+      elements.csvFileInput?.click();
+    }
+  });
+
+  elements.csvFileInput?.addEventListener("change", async (event) => {
+    const file = event.target.files?.[0];
+    event.target.value = "";
+    await handleImportFile(file, "csv");
+  });
+
+  elements.xlsxFileInput?.addEventListener("change", async (event) => {
+    const file = event.target.files?.[0];
+    event.target.value = "";
+    await handleImportFile(file, "xlsx");
+  });
+}
+
+function hasDraftCoordinates() {
+  const lat = elements.pointLat.value.trim();
+  const lng = elements.pointLng.value.trim();
+  return Boolean(lat && lng);
+}
+
+function initMapInteractions() {
+  initMap();
+
+  enableMapClickPicker(({ lat, lng, label }) => {
+    state.editingPointId = null;
+    elements.pointLat.value = Number(lat).toFixed(6);
+    elements.pointLng.value = Number(lng).toFixed(6);
+
+    if (!elements.pointName.value.trim()) {
+      elements.pointName.value = label || "Seçili Konum";
+    }
+
+    elements.authStatus.textContent = "Haritadan konum seçildi.";
+    if (window.innerWidth <= 768) {
+      syncMobilePanelState();
+    }
+  });
+
+  initPlaceSearch(elements.placeSearch, ({ name, lat, lng }) => {
+    state.editingPointId = null;
+    elements.pointName.value = name || "Seçili Konum";
+    elements.pointLat.value = Number(lat).toFixed(6);
+    elements.pointLng.value = Number(lng).toFixed(6);
+    elements.authStatus.textContent = "Konum araması tamamlandı.";
+  });
+
+  elements.btnCurrentLocation?.addEventListener("click", async () => {
+    try {
+      const location = await locateAndShowUser();
+      if (!location) return;
+
+      elements.startName.value = location.name || "Mevcut Konum";
+      elements.startLat.value = Number(location.lat).toFixed(6);
+      elements.startLng.value = Number(location.lng).toFixed(6);
+      elements.authStatus.textContent = "Mevcut konum başlangıç alanına eklendi.";
+    } catch (error) {
+      alert(`Konum alınamadı: ${error.message}`);
+    }
+  });
+}
+
+function initTopbarAutoHide() {
+  if (!elements.topbar) return;
 
   window.addEventListener(
     "scroll",
     () => {
-      const isMobile = window.innerWidth <= 720;
+      const currentScrollY = window.scrollY || window.pageYOffset || 0;
+      const isMobile = window.innerWidth <= 768;
 
       if (!isMobile) {
-        elements.topbar.classList.remove("is-hidden-on-scroll");
-        state.lastScrollY = window.scrollY || 0;
+        elements.topbar.classList.remove("topbar-hidden");
+        state.lastScrollY = currentScrollY;
         return;
       }
 
-      const currentY = window.scrollY || 0;
-      const delta = currentY - state.lastScrollY;
-
-      if (currentY <= 8) {
-        elements.topbar.classList.remove("is-hidden-on-scroll");
-        state.lastScrollY = currentY;
+      if (currentScrollY <= 0) {
+        elements.topbar.classList.remove("topbar-hidden");
+        state.lastScrollY = 0;
         return;
       }
 
-      if (delta > 8) {
-        elements.topbar.classList.add("is-hidden-on-scroll");
-      } else if (delta < -8) {
-        elements.topbar.classList.remove("is-hidden-on-scroll");
+      if (currentScrollY > state.lastScrollY && currentScrollY > 80) {
+        elements.topbar.classList.add("topbar-hidden");
+      } else if (currentScrollY < state.lastScrollY) {
+        elements.topbar.classList.remove("topbar-hidden");
       }
 
-      state.lastScrollY = currentY;
+      state.lastScrollY = currentScrollY;
     },
     { passive: true }
   );
 }
 
-function bindEvents() {
+function bindMainEvents() {
   elements.btnToggleTripPanel?.addEventListener("click", () => toggleTripPanel());
   elements.btnCloseTripPanel?.addEventListener("click", () => toggleTripPanel(false));
   elements.btnTripList?.addEventListener("click", () => toggleTripPanel());
+
   elements.btnAddPoint?.addEventListener("click", addOrUpdatePoint);
-  elements.btnAddPoint?.addEventListener("touchend", (event) => {
-    event.preventDefault();
-    addOrUpdatePoint();
-  }, { passive: false });
-
   elements.btnAddStartPoint?.addEventListener("click", commitStartPoint);
-  elements.btnAddStartPoint?.addEventListener("touchend", (event) => {
-    event.preventDefault();
-    commitStartPoint();
-  }, { passive: false });
-  elements.btnClearForm?.addEventListener("click", clearPointForm);
-  elements.btnCurrentLocation?.addEventListener("click", handleCurrentLocationClick);
-  elements.tripList?.addEventListener("click", handleTripListClick);
-
-  elements.btnExport?.addEventListener("click", handleExport);
-  elements.btnImport?.addEventListener("click", handleImport);
-  elements.csvFileInput?.addEventListener("change", handleCsvFileChange);
-  elements.xlsxFileInput?.addEventListener("change", handleXlsxFileChange);
-
-  elements.btnSaveMap?.addEventListener("click", async () => {
-    await handleSaveMap();
-  });
-  elements.btnNewMap?.addEventListener("click", async () => {
-    await handleNewMap();
-    closeSavedMapsOverlay();
+  elements.btnClearForm?.addEventListener("click", () => {
+    clearPointForm();
+    clearDraftMarker();
   });
 
-  elements.btnNewMapInline?.addEventListener("click", async () => {
-    await handleNewMap();
-    closeFloatingPanels();
-    closeMapMenu();
-  });
+  elements.tripList?.addEventListener("click", (event) => {
+    const actionBtn = event.target.closest("[data-action]");
+    if (!actionBtn) return;
 
-  elements.btnNewMapMobile?.addEventListener("click", async () => {
-    await handleNewMap();
-    closeFloatingPanels();
-    closeMapMenu();
-    closeSavedMapsOverlay();
-  });
+    const action = actionBtn.dataset.action;
+    const pointId = actionBtn.dataset.id;
 
-  elements.mapList?.addEventListener("click", async (event) => {
-    await handleMapListClick(event);
-    const clickedMap = event.target.closest(".map-list-item");
-    if (clickedMap && !event.target.closest("[data-action='delete-map']")) {
-      closeSavedMapsOverlay();
-    }
-  });
-  elements.btnLogoutTop?.addEventListener("click", handleLogout);
-
-  elements.btnOpenStartPanel?.addEventListener("click", () => {
-    if (window.innerWidth <= 720 && !hasDraftCoordinates()) {
-      alert("Önce konum seçiniz.");
+    if (action === "delete-point") {
+      deletePoint(pointId);
       return;
     }
 
-    openFloatingPanel("start");
-  });
-
-  elements.btnOpenPointPanel?.addEventListener("click", () => {
-    if (window.innerWidth <= 720 && !hasDraftCoordinates()) {
-      alert("Önce konum seçiniz.");
+    if (action === "delete-start") {
+      state.startPoint = null;
+      clearStartMarker();
+      recomputeRoute();
+      markDirty();
+      elements.authStatus.textContent = "Başlangıç noktası silindi.";
       return;
     }
 
-    openFloatingPanel("point");
-  });
+    if (action === "directions-start") {
+      if (!state.startPoint) return;
+      const url = `https://www.google.com/maps/dir/?api=1&destination=${state.startPoint.lat},${state.startPoint.lng}`;
+      window.open(url, "_blank");
+      return;
+    }
 
-  elements.btnCloseStartPanel?.addEventListener("click", closeFloatingPanels);
-  elements.btnClosePointPanel?.addEventListener("click", closeFloatingPanels);
-  elements.btnToggleMenu?.addEventListener("click", () => toggleMapMenu());
-  elements.btnOpenSavePanel?.addEventListener("click", () => openFloatingPanel("save"));
-  elements.btnOpenImportExportPanel?.addEventListener("click", () => openFloatingPanel("importExport"));
-  elements.btnOpenMapListPanel?.addEventListener("click", openSavedMapsOverlay);
-  elements.btnCloseSavePanel?.addEventListener("click", closeFloatingPanels);
-  elements.btnCloseImportExportPanel?.addEventListener("click", closeFloatingPanels);
-  elements.btnCloseMapListPanel?.addEventListener("click", closeSavedMapsOverlay);
-  elements.savedMapsBackdrop?.addEventListener("click", closeSavedMapsOverlay);
-  document.addEventListener("click", handleShellClick);
-  window.addEventListener("resize", syncMobilePanelState);
-
-  elements.mapName?.addEventListener("input", markDirty);
-  elements.startName?.addEventListener("input", markDirty);
-  elements.startLat?.addEventListener("input", markDirty);
-  elements.startLng?.addEventListener("input", markDirty);
-  elements.pointName?.addEventListener("input", markDirty);
-  elements.pointLat?.addEventListener("input", markDirty);
-  elements.pointLng?.addEventListener("input", markDirty);
-}
-
-function initMapClickPicker() {
-  enableMapClickPicker(({ lat, lng, name }) => {
-    if (!hasActiveAccess()) return;
-    fillBothFormsFromMap(lat, lng, name || "");
-    markDirty();
-
-    if (name) {
-      elements.authStatus.textContent = `Haritadan seçim yapıldı: ${name}`;
-    } else {
-      elements.authStatus.textContent = `Haritadan seçim yapıldı: ${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+    if (action === "directions-point") {
+      const point = state.points.find((item) => String(item.id) === String(pointId));
+      if (!point) return;
+      const url = `https://www.google.com/maps/dir/?api=1&destination=${point.lat},${point.lng}`;
+      window.open(url, "_blank");
     }
   });
-}
 
-function initSearchBox() {
-  initPlaceSearch(elements.placeSearch, ({ name, lat, lng }) => {
-    if (!hasActiveAccess()) return;
-    fillBothFormsFromMap(lat, lng, name);
-    markDirty();
-    elements.authStatus.textContent = `Arama ile yer seçildi: ${name}`;
-  });
-}
+  elements.btnSaveMap?.addEventListener("click", handleSaveMap);
+  elements.btnNewMap?.addEventListener("click", handleNewMap);
+  elements.btnNewMapInline?.addEventListener("click", handleNewMap);
+  elements.btnNewMapMobile?.addEventListener("click", handleNewMap);
 
-async function loadAccessModel(user) {
-  state.claims = await getUserClaims(user);
-  state.profile = await getUserProfile(user.uid);
-  state.fullAccess = state.claims.fullAccess === true;
-  state.locationQuota = state.profile?.locationQuota || TRIAL_LOCATION_QUOTA;
-  state.mapQuota = state.profile?.mapQuota || 1;
-  state.accessActive = hasActiveAccess();
-}
-
-function initAuthWatcher() {
-  watchAuth(async (user) => {
-    state.currentUser = user;
-
+  elements.mapList?.addEventListener("click", handleMapListClick);
+  elements.btnLogoutTop?.addEventListener("click", async () => {
     try {
-      if (user) {
-        await ensureUserProfile(user.uid, user.email);
-        await loadAccessModel(user);
-        elements.authStatus.textContent = `Aktif kullanıcı: ${user.email} · ${getAccessStatusText()}`;
-        await loadUserMaps(user.uid, isPremiumAccessActive());
-        await closeAppStartupSplash(state.appStartupSplash);
-        state.appStartupSplash = null;
-      } else {
-        await closeAppStartupSplash(state.appStartupSplash);
-        state.appStartupSplash = null;
-        goToLogin();
-      }
+      await logout();
+      goToLogin();
     } catch (error) {
-      await closeAppStartupSplash(state.appStartupSplash);
-      state.appStartupSplash = null;
-      elements.authStatus.textContent = `Oturum başlatılamadı: ${error.message}`;
+      alert(`Çıkış yapılamadı: ${error.message}`);
     }
+  });
+
+  window.addEventListener("resize", () => {
+    syncMobilePanelState();
   });
 }
 
-function init() {
+function attachDirtyWatchers() {
+  [
+    elements.mapName,
+    elements.startName,
+    elements.startLat,
+    elements.startLng,
+    elements.pointName,
+    elements.pointLat,
+    elements.pointLng
+  ].forEach((input) => {
+    input?.addEventListener("input", markDirty);
+  });
+}
+
+async function initializeUser(user) {
+  state.currentUser = user;
+
+  if (!user) {
+    await closeAppStartupSplash(state.appStartupSplash);
+    goToLogin();
+    return;
+  }
+
+  try {
+    await ensureUserProfile(user.uid, user.email);
+    state.claims = await getUserClaims();
+    state.profile = await getUserProfile(user.uid);
+    state.fullAccess = Boolean(state.claims?.fullAccess);
+
+    if (!state.profile?.locationQuota) {
+      state.locationQuota = TRIAL_LOCATION_QUOTA;
+    } else {
+      state.locationQuota = Number(state.profile.locationQuota) || TRIAL_LOCATION_QUOTA;
+    }
+
+    if (!state.profile?.mapQuota) {
+      state.mapQuota = 1;
+    } else {
+      state.mapQuota = Number(state.profile.mapQuota) || 1;
+    }
+
+    state.accessActive = hasActiveAccess();
+
+    elements.authStatus.textContent = `${user.email} · ${getAccessStatusText()}`;
+
+    await loadUserMaps(user.uid, isPremiumAccessActive());
+    await closeAppStartupSplash(state.appStartupSplash);
+  } catch (error) {
+    elements.authStatus.textContent = `Kullanıcı başlatma hatası: ${error.message}`;
+    await closeAppStartupSplash(state.appStartupSplash);
+  }
+}
+
+function initAuth() {
+  watchAuth(async (user) => {
+    await initializeUser(user);
+  });
+}
+
+function initializeApp() {
   state.appStartupSplash = hydrateAppStartupSplash();
-  initMap();
-  initMapClickPicker();
-  initSearchBox();
+
   renderSummary();
   renderTripList();
-  bindEvents();
-  initMobileTopbarAutoHide();
-  initAuthWatcher();
+  initMapInteractions();
+  initPanelButtons();
+  bindImportExportEvents();
+  bindMainEvents();
+  attachDirtyWatchers();
+  initTopbarAutoHide();
+  initAuth();
+  syncMobilePanelState();
+
+  if (state.appStartupSplash && elements.appStartupSplash) {
+    elements.appStartupSplash.classList.add("is-visible");
+    document.documentElement.classList.add("show-app-startup-splash");
+  }
 }
 
-document.addEventListener("DOMContentLoaded", init);
+document.addEventListener("DOMContentLoaded", initializeApp);
