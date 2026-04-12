@@ -1,4 +1,5 @@
-const CACHE_NAME = "routee-shell-v102";
+const SW_VERSION = new URL(self.location.href).searchParams.get("v") || "dev";
+const CACHE_NAME = `routee-shell-${SW_VERSION}`;
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -9,6 +10,7 @@ const APP_SHELL = [
   "./js/auth.js",
   "./js/firestore.js",
   "./js/login-page.js",
+  "./js/version-guard.js",
   "./icons/favicon-32.png",
   "./icons/icon-192.png",
   "./icons/icon-512.png",
@@ -21,21 +23,73 @@ self.addEventListener("install", (event) => {
       await cache.addAll(APP_SHELL);
     })
   );
+
   self.skipWaiting();
 });
 
 self.addEventListener("activate", (event) => {
   event.waitUntil(
-    caches.keys().then((keys) =>
-      Promise.all(
-        keys
-          .filter((key) => key !== CACHE_NAME)
-          .map((key) => caches.delete(key))
-      )
-    )
+    (async () => {
+      const cacheKeys = await caches.keys();
+      await Promise.all(
+        cacheKeys
+          .filter((cacheKey) => cacheKey !== CACHE_NAME)
+          .map((cacheKey) => caches.delete(cacheKey))
+      );
+
+      await self.clients.claim();
+
+      const clients = await self.clients.matchAll({
+        type: "window",
+        includeUncontrolled: true
+      });
+
+      await Promise.all(
+        clients.map(async (client) => {
+          if (typeof client.navigate === "function") {
+            try {
+              await client.navigate(client.url);
+            } catch (error) {
+              console.warn("İstemci yeniden yönlendirilemedi:", error);
+            }
+          }
+        })
+      );
+    })()
   );
-  self.clients.claim();
 });
+
+async function networkFirst(request) {
+  const cache = await caches.open(CACHE_NAME);
+
+  try {
+    const response = await fetch(request, {
+      cache: "no-store"
+    });
+
+    if (response && response.status === 200) {
+      await cache.put(request, response.clone());
+    }
+
+    return response;
+  } catch (error) {
+    const cachedResponse = await cache.match(request);
+    if (cachedResponse) return cachedResponse;
+    throw error;
+  }
+}
+
+async function cacheFirst(request) {
+  const cache = await caches.open(CACHE_NAME);
+  const cachedResponse = await cache.match(request);
+  if (cachedResponse) return cachedResponse;
+
+  const response = await fetch(request);
+  if (response && response.status === 200) {
+    await cache.put(request, response.clone());
+  }
+  return response;
+}
 
 self.addEventListener("fetch", (event) => {
   const request = event.request;
@@ -46,30 +100,57 @@ self.addEventListener("fetch", (event) => {
 
   if (url.origin !== self.location.origin) return;
 
-  if (url.searchParams.has("check")) {
+  const pathname = url.pathname;
+  const isNavigationRequest = request.mode === "navigate";
+  const isVersionFile = pathname.endsWith("/version.json") || pathname.endsWith("version.json");
+  const isServiceWorkerFile = pathname.endsWith("/sw.js") || pathname.endsWith("sw.js");
+  const isAppDocument = pathname.endsWith(".html") || isNavigationRequest;
+  const isCodeAsset = pathname.endsWith(".js") || pathname.endsWith(".css") || pathname.endsWith(".webmanifest");
+  const isStaticAsset =
+    pathname.endsWith(".png") ||
+    pathname.endsWith(".jpg") ||
+    pathname.endsWith(".jpeg") ||
+    pathname.endsWith(".svg") ||
+    pathname.endsWith(".webp") ||
+    pathname.endsWith(".gif") ||
+    pathname.endsWith(".ico");
+
+  if (isVersionFile || isServiceWorkerFile || url.searchParams.has("check")) {
     event.respondWith(
-      fetch(request, { cache: "no-store" }).catch(
-        () => new Response("", { status: 503, statusText: "Offline" })
-      )
+      fetch(request, { cache: "no-store" }).catch(() => new Response("", { status: 503, statusText: "Offline" }))
+    );
+    return;
+  }
+
+  if (isAppDocument || isCodeAsset) {
+    event.respondWith(
+      networkFirst(request).catch(async () => {
+        if (isNavigationRequest) {
+          const cache = await caches.open(CACHE_NAME);
+          return (await cache.match("./index.html")) || Response.error();
+        }
+
+        const cachedResponse = await caches.match(request);
+        return cachedResponse || Response.error();
+      })
+    );
+    return;
+  }
+
+  if (isStaticAsset) {
+    event.respondWith(
+      cacheFirst(request).catch(async () => {
+        const cachedResponse = await caches.match(request);
+        return cachedResponse || Response.error();
+      })
     );
     return;
   }
 
   event.respondWith(
-    caches.match(request).then((cached) => {
-      if (cached) return cached;
-
-      return fetch(request)
-        .then((response) => {
-          if (!response || response.status !== 200) {
-            return response;
-          }
-
-          const clone = response.clone();
-          caches.open(CACHE_NAME).then((cache) => cache.put(request, clone));
-          return response;
-        })
-        .catch(() => caches.match("./index.html"));
+    fetch(request).catch(async () => {
+      const cachedResponse = await caches.match(request);
+      return cachedResponse || Response.error();
     })
   );
 });
