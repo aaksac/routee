@@ -18,6 +18,8 @@
     <link rel="apple-touch-icon" sizes="180x180" href="./icons/apple-touch-icon.png" />
     <link rel="manifest" href="./manifest.webmanifest" />
 
+    <script type="module" src="./js/version-guard.js"></script>
+
     <link rel="stylesheet" href="./css/style.css" />
     <link rel="stylesheet" href="./css/auth.css" />
   </head>
@@ -74,31 +76,6 @@
       </div>
     </div>
 
-    <script type="module" src="./js/login-page.js?v=104"></script>
-
-    <script>
-      async function requestPersistentStorage() {
-        if (!navigator.storage || !navigator.storage.persist) return;
-
-        try {
-          const alreadyPersisted = await navigator.storage.persisted();
-          if (alreadyPersisted) return;
-          await navigator.storage.persist();
-        } catch (error) {
-          console.warn("Persistent storage isteği başarısız:", error);
-        }
-      }
-
-      if ("serviceWorker" in navigator) {
-        window.addEventListener("load", async () => {
-          try {
-            await navigator.serviceWorker.register("./sw.js");
-            await requestPersistentStorage();
-          } catch (error) {
-            console.error("Service Worker kayıt hatası:", error);
-          }
-        });
-      }
-    </script>
+    <script type="module" src="./js/login-page.js"></script>
   </body>
 </html>
