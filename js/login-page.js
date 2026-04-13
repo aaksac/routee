@@ -223,10 +223,8 @@ async function handleLogin() {
 
   try {
     const { login } = await loadAuthModule();
-    const { ensureUserProfile } = await loadFirestoreModule();
 
     const result = await login(email, password);
-    await ensureUserProfile(result.user.uid, result.user.email);
     setStatus("Giriş başarılı.", "success");
     await routeAfterLogin(result.user, {
       message: "Girişiniz doğrulanıyor..."
