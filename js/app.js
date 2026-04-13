@@ -1227,6 +1227,7 @@ function bindEvents() {
   elements.btnCloseImportExportPanel?.addEventListener("click", closeFloatingPanels);
   elements.btnCloseMapListPanel?.addEventListener("click", closeSavedMapsOverlay);
   elements.savedMapsBackdrop?.addEventListener("click", closeSavedMapsOverlay);
+  elements.mobileFloatingBackdrop?.addEventListener("click", closeFloatingPanels);
   document.addEventListener("click", handleShellClick);
   window.addEventListener("resize", syncMobilePanelState);
 
