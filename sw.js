@@ -38,23 +38,6 @@ self.addEventListener("activate", (event) => {
       );
 
       await self.clients.claim();
-
-      const clients = await self.clients.matchAll({
-        type: "window",
-        includeUncontrolled: true
-      });
-
-      await Promise.all(
-        clients.map(async (client) => {
-          if (typeof client.navigate === "function") {
-            try {
-              await client.navigate(client.url);
-            } catch (error) {
-              console.warn("İstemci yeniden yönlendirilemedi:", error);
-            }
-          }
-        })
-      );
     })()
   );
 });
