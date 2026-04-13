@@ -1055,9 +1055,15 @@ function hasDraftCoordinates() {
 function syncMobilePanelState() {
   const isMobile = window.innerWidth <= 720;
   const panelName = state.activeFloatingPanel || "";
+  const hasOpenMobilePanel = isMobile && Boolean(panelName);
 
-  document.body.classList.toggle("has-mobile-floating-panel", isMobile && Boolean(panelName));
+  document.body.classList.toggle("has-mobile-floating-panel", hasOpenMobilePanel);
   document.body.dataset.mobilePanel = isMobile ? panelName : "";
+
+  if (elements.mobileFloatingBackdrop) {
+    elements.mobileFloatingBackdrop.classList.toggle("hidden", !hasOpenMobilePanel);
+    elements.mobileFloatingBackdrop.setAttribute("aria-hidden", hasOpenMobilePanel ? "false" : "true");
+  }
 }
 
 function toggleMapMenu(forceValue) {
