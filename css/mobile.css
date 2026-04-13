@@ -164,7 +164,7 @@ body.has-mobile-floating-panel .mobile-floating-backdrop {
   display: block;
   position: fixed;
   inset: 0;
-  z-index: 85;
+  z-index: 5;
   background: rgba(15, 23, 42, 0.26);
   backdrop-filter: blur(4px);
   -webkit-backdrop-filter: blur(4px);
