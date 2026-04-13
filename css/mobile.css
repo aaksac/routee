@@ -185,7 +185,7 @@ body.has-mobile-floating-panel .bottom-left {
     left: 50%;
     top: 50%;
     transform: translate(-50%, -50%);
-    z-index: 40;
+    z-index: 95;
     width: min(92vw, 360px) !important;
     min-width: min(92vw, 360px) !important;
     max-width: min(92vw, 360px) !important;
