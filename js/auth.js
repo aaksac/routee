@@ -38,7 +38,7 @@ function sendReset(email) {
 
 async function getUserClaims(user) {
   if (!user) return {};
-  const tokenResult = await getIdTokenResult(user, true);
+  const tokenResult = await getIdTokenResult(user);
   return tokenResult.claims || {};
 }
 
