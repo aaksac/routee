@@ -152,9 +152,25 @@
     border-radius: 14px;
   }
 
-  body.has-mobile-floating-panel {
-    overflow: hidden;
-  }
+body.has-mobile-floating-panel {
+  overflow: hidden;
+}
+
+.mobile-floating-backdrop {
+  display: none;
+}
+
+body.has-mobile-floating-panel .mobile-floating-backdrop {
+  display: block;
+  position: fixed;
+  inset: 0;
+  z-index: 85;
+  background: rgba(15, 23, 42, 0.26);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  touch-action: none;
+  pointer-events: auto;
+}
 
   /* Blur sadece arka plan etkisi için, içeriği tamamen yok etmez */
   body.has-mobile-floating-panel .map-canvas,
