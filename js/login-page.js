@@ -50,7 +50,7 @@ function setButtonsDisabled(disabled) {
   });
 }
 
-function showStartupSplash(title = "Rota Planlayıcı", message = "Oturumunuz kontrol ediliyor...") {
+function showStartupSplash(title = "Rota", message = "Oturumunuz kontrol ediliyor...") {
   if (!elements.startupSplash) return;
 
   if (elements.startupSplashTitle) {
@@ -183,7 +183,7 @@ async function routeAfterLogin(user, options = {}) {
     const isAdmin = claims.adminPanel === true;
     const targetUrl = isAdmin ? "./chooser.html" : "./app.html";
 
-    const splashTitle = isAdmin ? "Yönetim paneli açılıyor" : "Rota Planlayıcı";
+    const splashTitle = isAdmin ? "Yönetim paneli açılıyor" : "Rota";
     const splashMessage = isAdmin
       ? "Yetkileriniz doğrulanıyor..."
       : options.message || "Oturumunuz açılıyor...";
@@ -354,7 +354,7 @@ function applyQueryStatus() {
 function init() {
   bindEvents();
   applyQueryStatus();
-  showStartupSplash("Rota Planlayıcı", "Oturumunuz kontrol ediliyor...");
+  showStartupSplash("Rota", "Oturumunuz kontrol ediliyor...");
   initAuthWatcher();
 
   bootFallbackTimer = window.setTimeout(() => {
