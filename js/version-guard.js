@@ -68,37 +68,6 @@ async function fetchRemoteVersion() {
   return version;
 }
 
-async function clearAllCaches() {
-  if (!("caches" in window)) return;
-
-  const cacheKeys = await caches.keys();
-  await Promise.all(cacheKeys.map((cacheKey) => caches.delete(cacheKey)));
-}
-
-async function unregisterAllServiceWorkers() {
-  if (!("serviceWorker" in navigator)) return;
-
-  const registrations = await navigator.serviceWorker.getRegistrations();
-  await Promise.all(registrations.map((registration) => registration.unregister()));
-}
-
-function buildVersionedReloadUrl(version) {
-  const url = new URL(window.location.href);
-  url.searchParams.set("_v", version);
-  return url.toString();
-}
-
-async function hardRefreshToVersion(version) {
-  safeStorageSet(VERSION_STORAGE_KEY, version);
-
-  await Promise.allSettled([
-    clearAllCaches(),
-    unregisterAllServiceWorkers()
-  ]);
-
-  window.location.replace(buildVersionedReloadUrl(version));
-}
-
 async function registerServiceWorker(version) {
   if (!("serviceWorker" in navigator)) return;
 
@@ -130,7 +99,9 @@ async function enforceLatestVersion() {
   const localVersion = safeStorageGet(VERSION_STORAGE_KEY);
 
   if (localVersion && localVersion !== remoteVersion) {
-    await hardRefreshToVersion(remoteVersion);
+    safeStorageSet(VERSION_STORAGE_KEY, remoteVersion);
+    removeVersionQueryParam();
+    await registerServiceWorker(remoteVersion);
     return;
   }
 
