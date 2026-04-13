@@ -108,7 +108,8 @@ const elements = {
   savePanel: document.getElementById("savePanel"),
   importExportPanel: document.getElementById("importExportPanel"),
   appStartupSplash: document.getElementById("appStartupSplash"),
-  appStartupSplashText: document.getElementById("appStartupSplashText")
+  appStartupSplashText: document.getElementById("appStartupSplashText"),
+  mobileFloatingBackdrop: document.getElementById("mobileFloatingBackdrop")
 };
 
 function goToLogin() {
