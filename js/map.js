@@ -305,6 +305,48 @@ function openMarkerInfo(marker, pointData) {
   });
 }
 
+function openInfoForPoint(pointData) {
+  if (!map || !pointData) return false;
+
+  if (pointData.type === "start" && startMarker?.__pointData) {
+    const startIdMatch =
+      pointData.id != null &&
+      startMarker.__pointData.id != null &&
+      String(startMarker.__pointData.id) === String(pointData.id);
+
+    const startCoordMatch =
+      Number(startMarker.__pointData.lat) === Number(pointData.lat) &&
+      Number(startMarker.__pointData.lng) === Number(pointData.lng);
+
+    if (startIdMatch || startCoordMatch) {
+      openMarkerInfo(startMarker, startMarker.__pointData);
+      return true;
+    }
+  }
+
+  const matchedMarker = markers.find((marker) => {
+    if (!marker?.__pointData) return false;
+
+    const markerData = marker.__pointData;
+
+    const idMatch =
+      pointData.id != null &&
+      markerData.id != null &&
+      String(markerData.id) === String(pointData.id);
+
+    const coordMatch =
+      Number(markerData.lat) === Number(pointData.lat) &&
+      Number(markerData.lng) === Number(pointData.lng);
+
+    return idMatch || coordMatch;
+  });
+
+  if (!matchedMarker) return false;
+
+  openMarkerInfo(matchedMarker, matchedMarker.__pointData);
+  return true;
+}
+
 function addMarker({ lat, lng, title, label, onClick, pointData }) {
   if (!map) return null;
 
@@ -880,5 +922,6 @@ export {
   initPlaceSearch,
   clearDraftMarker,
   clearRouteLines,
-  drawRouteSegments
+  drawRouteSegments,
+  openInfoForPoint
 };
