@@ -438,8 +438,8 @@ function renderTripList() {
         </div>
         <div class="trip-actions">
           <button class="tiny-btn" type="button" data-action="directions-start">Yol Tarifi</button>
+          <button class="tiny-btn" type="button" data-action="focus-start">Odakla</button>
           <button class="tiny-btn" type="button" data-action="delete-start">Sil</button>
-          <button class="tiny-btn" type="button" data-action="focus-start">Yakınlaş</button>
         </div>
       </div>
     `
@@ -465,8 +465,8 @@ function renderTripList() {
           </div>
           <div class="trip-actions">
             <button class="tiny-btn" type="button" data-action="directions-point" data-id="${point.id}">Yol Tarifi</button>
+            <button class="tiny-btn" type="button" data-action="focus-point" data-id="${point.id}">Odakla</button>
             <button class="tiny-btn" type="button" data-action="delete-point" data-id="${point.id}">Sil</button>
-            <button class="tiny-btn" type="button" data-action="focus-point" data-id="${point.id}">Yakınlaş</button>
           </div>
         </div>
       `;
@@ -634,6 +634,19 @@ function deletePoint(pointId) {
   recomputeRoute();
   markDirty();
   elements.authStatus.textContent = "Nokta silindi.";
+}
+
+function handleMarkerDeleteRequest(event) {
+  const pointData = event?.detail?.pointData;
+  if (!pointData) return;
+
+  if (pointData.type === "start") {
+    clearStartPoint();
+    return;
+  }
+
+  if (pointData.id == null) return;
+  deletePoint(pointData.id);
 }
 
 function applyImportedData(startPoint, points) {
@@ -1040,21 +1053,6 @@ function handleTripListClick(event) {
     return;
   }
 
-  if (action === "directions-start") {
-    if (!state.startPoint) return;
-    const url = `https://www.google.com/maps/dir/?api=1&destination=${state.startPoint.lat},${state.startPoint.lng}`;
-    window.location.href = url;
-    return;
-  }
-
-  if (action === "directions-point") {
-    const point = state.points.find((item) => String(item.id) === String(target.dataset.id));
-    if (!point) return;
-    const url = `https://www.google.com/maps/dir/?api=1&destination=${point.lat},${point.lng}`;
-    window.location.href = url;
-    return;
-  }
-
   if (action === "focus-start") {
     if (!state.startPoint) return;
     const lat = Number(state.startPoint.lat);
@@ -1062,6 +1060,13 @@ function handleTripListClick(event) {
     if (!Number.isFinite(lat) || !Number.isFinite(lng)) return;
     scrollToMapArea();
     focusToLocation(lat, lng, 17);
+    return;
+  }
+
+  if (action === "directions-start") {
+    if (!state.startPoint) return;
+    const url = `https://www.google.com/maps/dir/?api=1&destination=${state.startPoint.lat},${state.startPoint.lng}`;
+    window.location.href = url;
     return;
   }
 
@@ -1073,6 +1078,14 @@ function handleTripListClick(event) {
     if (!Number.isFinite(lat) || !Number.isFinite(lng)) return;
     scrollToMapArea();
     focusToLocation(lat, lng, 17);
+    return;
+  }
+
+  if (action === "directions-point") {
+    const point = state.points.find((item) => String(item.id) === String(target.dataset.id));
+    if (!point) return;
+    const url = `https://www.google.com/maps/dir/?api=1&destination=${point.lat},${point.lng}`;
+    window.location.href = url;
   }
 }
 
@@ -1208,6 +1221,7 @@ function bindEvents() {
   elements.btnClearForm?.addEventListener("click", clearPointForm);
   elements.btnCurrentLocation?.addEventListener("click", handleCurrentLocationClick);
   elements.tripList?.addEventListener("click", handleTripListClick);
+  window.addEventListener("routee:delete-point-request", handleMarkerDeleteRequest);
 
   elements.btnExport?.addEventListener("click", handleExport);
   elements.btnImport?.addEventListener("click", handleImport);
