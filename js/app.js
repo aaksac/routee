@@ -84,6 +84,8 @@ const elements = {
   pointName: document.getElementById("pointName"),
   pointLat: document.getElementById("pointLat"),
   pointLng: document.getElementById("pointLng"),
+  pointColor: document.getElementById("pointColor"),
+  pointColorPalette: document.getElementById("pointColorPalette"),
   startName: document.getElementById("startName"),
   startLat: document.getElementById("startLat"),
   startLng: document.getElementById("startLng"),
@@ -113,6 +115,8 @@ const elements = {
   appStartupSplashText: document.getElementById("appStartupSplashText"),
   mobileFloatingBackdrop: document.getElementById("mobileFloatingBackdrop")
 };
+
+const DEFAULT_POINT_COLOR = "#dc2626";
 
 function goToLogin() {
   window.location.href = "./index.html";
@@ -325,6 +329,21 @@ function setStartForm(startPoint) {
   elements.startLng.value = Number(startPoint.lng).toFixed(6);
 }
 
+function setSelectedPointColor(color = DEFAULT_POINT_COLOR) {
+  if (elements.pointColor) {
+    elements.pointColor.value = color;
+  }
+
+  if (!elements.pointColorPalette) return;
+
+  const buttons = elements.pointColorPalette.querySelectorAll(".marker-color-option");
+  buttons.forEach((button) => {
+    const isSelected = String(button.dataset.color).toLowerCase() === String(color).toLowerCase();
+    button.classList.toggle("is-selected", isSelected);
+    button.setAttribute("aria-pressed", isSelected ? "true" : "false");
+  });
+}
+
 function commitStartPoint() {
   if (!hasActiveAccess()) {
     alert("Erişim süreniz dolmuş.");
@@ -413,11 +432,13 @@ function fillPointFormFromMarker(pointData) {
 
   if (pointData.type === "start") {
     state.editingPointId = null;
+    setSelectedPointColor(DEFAULT_POINT_COLOR);
     elements.authStatus.textContent = `Başlangıç bilgisi yüklendi: ${pointData.name}`;
     return;
   }
 
   state.editingPointId = pointData.id;
+  setSelectedPointColor(pointData.color || DEFAULT_POINT_COLOR);
   elements.authStatus.textContent = `Nokta düzenleme için yüklendi: ${pointData.name}`;
 }
 
@@ -488,7 +509,8 @@ function redrawPointMarkers() {
       label: String(index + 1),
       pointData: {
         ...point,
-        orderLabel: String(index + 1)
+        orderLabel: String(index + 1),
+        color: point.color || DEFAULT_POINT_COLOR
       },
       onClick: fillPointFormFromMarker
     });
@@ -536,6 +558,7 @@ function clearPointForm() {
   elements.pointLat.value = "";
   elements.pointLng.value = "";
   state.editingPointId = null;
+  setSelectedPointColor(DEFAULT_POINT_COLOR);
 }
 
 function bindTapSafe(button, handler) {
@@ -581,6 +604,7 @@ function addOrUpdatePoint() {
   const name = elements.pointName.value.trim();
   const lat = elements.pointLat.value.trim();
   const lng = elements.pointLng.value.trim();
+  const color = elements.pointColor?.value || DEFAULT_POINT_COLOR;
 
   if (!name || !lat || !lng) {
     alert("Lütfen nokta adı, enlem ve boylam gir.");
@@ -605,7 +629,8 @@ function addOrUpdatePoint() {
             ...point,
             name,
             lat: Number(lat),
-            lng: Number(lng)
+            lng: Number(lng),
+            color
           }
         : point
     );
@@ -615,6 +640,7 @@ function addOrUpdatePoint() {
       name,
       lat: Number(lat),
       lng: Number(lng),
+      color,
       distanceFromPrevious: 0,
       type: "point"
     });
@@ -698,6 +724,7 @@ function getMapPayload() {
       name: point.name,
       lat: point.lat,
       lng: point.lng,
+      color: point.color || DEFAULT_POINT_COLOR,
       type: "point"
     })),
     totalDistance: state.totalDistance,
@@ -886,6 +913,7 @@ async function handleMapListClick(event) {
           name: point.name,
           lat: Number(point.lat),
           lng: Number(point.lng),
+          color: point.color || DEFAULT_POINT_COLOR,
           distanceFromPrevious: 0,
           type: "point"
         }))
@@ -1054,29 +1082,29 @@ function handleTripListClick(event) {
     return;
   }
 
-if (action === "focus-start") {
-  if (!state.startPoint) return;
-  const lat = Number(state.startPoint.lat);
-  const lng = Number(state.startPoint.lng);
-  if (!Number.isFinite(lat) || !Number.isFinite(lng)) return;
+  if (action === "focus-start") {
+    if (!state.startPoint) return;
+    const lat = Number(state.startPoint.lat);
+    const lng = Number(state.startPoint.lng);
+    if (!Number.isFinite(lat) || !Number.isFinite(lng)) return;
 
-  fillPointFormFromMarker({
-    ...state.startPoint,
-    orderLabel: "S"
-  });
-
-  scrollToMapArea();
-  focusToLocation(lat, lng, 17);
-
-  window.setTimeout(() => {
-    openInfoForPoint({
+    fillPointFormFromMarker({
       ...state.startPoint,
       orderLabel: "S"
     });
-  }, 180);
 
-  return;
-}
+    scrollToMapArea();
+    focusToLocation(lat, lng, 17);
+
+    window.setTimeout(() => {
+      openInfoForPoint({
+        ...state.startPoint,
+        orderLabel: "S"
+      });
+    }, 180);
+
+    return;
+  }
 
   if (action === "directions-start") {
     if (!state.startPoint) return;
@@ -1085,34 +1113,35 @@ if (action === "focus-start") {
     return;
   }
 
-if (action === "focus-point") {
-  const point = state.points.find((item) => String(item.id) === String(target.dataset.id));
-  if (!point) return;
+  if (action === "focus-point") {
+    const point = state.points.find((item) => String(item.id) === String(target.dataset.id));
+    if (!point) return;
 
-  const lat = Number(point.lat);
-  const lng = Number(point.lng);
-  if (!Number.isFinite(lat) || !Number.isFinite(lng)) return;
+    const lat = Number(point.lat);
+    const lng = Number(point.lng);
+    if (!Number.isFinite(lat) || !Number.isFinite(lng)) return;
 
-  const pointIndex = state.points.findIndex(
-    (item) => String(item.id) === String(target.dataset.id)
-  );
+    const pointIndex = state.points.findIndex(
+      (item) => String(item.id) === String(target.dataset.id)
+    );
 
-  const pointDataForUi = {
-    ...point,
-    orderLabel: String(pointIndex + 1)
-  };
+    const pointDataForUi = {
+      ...point,
+      orderLabel: String(pointIndex + 1),
+      color: point.color || DEFAULT_POINT_COLOR
+    };
 
-  fillPointFormFromMarker(pointDataForUi);
+    fillPointFormFromMarker(pointDataForUi);
 
-  scrollToMapArea();
-  focusToLocation(lat, lng, 17);
+    scrollToMapArea();
+    focusToLocation(lat, lng, 17);
 
-  window.setTimeout(() => {
-    openInfoForPoint(pointDataForUi);
-  }, 180);
+    window.setTimeout(() => {
+      openInfoForPoint(pointDataForUi);
+    }, 180);
 
-  return;
-}
+    return;
+  }
 
   if (action === "directions-point") {
     const point = state.points.find((item) => String(item.id) === String(target.dataset.id));
@@ -1245,6 +1274,21 @@ function initMobileTopbarAutoHide() {
   );
 }
 
+function bindPointColorPalette() {
+  if (!elements.pointColorPalette) return;
+
+  elements.pointColorPalette.addEventListener("click", (event) => {
+    const button = event.target.closest(".marker-color-option");
+    if (!button) return;
+
+    const color = button.dataset.color || DEFAULT_POINT_COLOR;
+    setSelectedPointColor(color);
+    markDirty();
+  });
+
+  setSelectedPointColor(DEFAULT_POINT_COLOR);
+}
+
 function bindEvents() {
   elements.btnToggleTripPanel?.addEventListener("click", () => toggleTripPanel());
   elements.btnCloseTripPanel?.addEventListener("click", () => toggleTripPanel(false));
@@ -1330,6 +1374,8 @@ function bindEvents() {
   elements.pointName?.addEventListener("input", markDirty);
   elements.pointLat?.addEventListener("input", markDirty);
   elements.pointLng?.addEventListener("input", markDirty);
+
+  bindPointColorPalette();
 }
 
 function initMapClickPicker() {
