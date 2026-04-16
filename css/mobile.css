@@ -767,3 +767,20 @@ body.has-mobile-floating-panel .bottom-left {
     font-size: 0.74rem !important;
   }
 }
+.trip-actions .tiny-btn[data-action^="directions"] {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8) !important;
+  border-color: #1d4ed8 !important;
+  color: #ffffff !important;
+}
+
+.trip-actions .tiny-btn[data-action^="focus"] {
+  background: linear-gradient(135deg, #0f172a, #334155) !important;
+  border-color: #334155 !important;
+  color: #ffffff !important;
+}
+
+.trip-actions .tiny-btn[data-action^="delete"] {
+  background: #fff5f5 !important;
+  border-color: #fecaca !important;
+  color: #b91c1c !important;
+}
