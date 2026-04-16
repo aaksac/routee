@@ -328,10 +328,15 @@ select:focus {
 
 .menu-item {
   width: 100%;
+  min-height: 46px;
+  padding: 10px 14px;
   text-align: center;
   justify-content: center;
   display: flex;
   align-items: center;
+  font-size: 0.96rem;
+  font-weight: 600;
+  line-height: 1.2;
 }
 
 .floating-card {
