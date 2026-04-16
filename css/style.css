@@ -876,3 +876,31 @@ select:focus {
   box-shadow: 0 12px 22px rgba(22, 163, 74, 0.2) !important;
   color: #ffffff !important;
 }
+.trip-actions .tiny-btn[data-action^="directions"] {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  border-color: #1d4ed8;
+  color: #ffffff;
+}
+
+.trip-actions .tiny-btn[data-action^="focus"] {
+  background: linear-gradient(135deg, #0f172a, #334155);
+  border-color: #334155;
+  color: #ffffff;
+}
+
+.trip-actions .tiny-btn[data-action^="delete"] {
+  background: #fff5f5;
+  border-color: #fecaca;
+  color: #b91c1c;
+}
+
+.trip-actions .tiny-btn[data-action^="delete"]:hover {
+  background: #fee2e2;
+}
+
+.trip-actions .tiny-btn[data-action^="directions"]:hover,
+.trip-actions .tiny-btn[data-action^="focus"]:hover,
+.trip-actions .tiny-btn[data-action^="delete"]:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.08);
+}
