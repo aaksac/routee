@@ -350,6 +350,8 @@ function openInfoForPoint(pointData) {
 function addMarker({ lat, lng, title, label, onClick, pointData }) {
   if (!map) return null;
 
+  const markerColor = pointData?.color || "#dc2626";
+
   const marker = new google.maps.Marker({
     position: { lat, lng },
     map,
@@ -361,7 +363,7 @@ function addMarker({ lat, lng, title, label, onClick, pointData }) {
           fontWeight: "700"
         }
       : undefined,
-    icon: createCircleSymbol("#dc2626")
+    icon: createCircleSymbol(markerColor)
   });
 
   marker.__pointData = pointData || null;
