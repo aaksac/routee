@@ -22,7 +22,8 @@ import {
   clearRouteLines,
   drawRouteSegments,
   focusMapToPoints,
-  focusToLocation
+  focusToLocation,
+  openInfoForPoint
 } from "./map.js";
 import { locateAndShowUser } from "./location.js";
 import { nearestNeighborRoute } from "./route.js";
@@ -1060,6 +1061,9 @@ function handleTripListClick(event) {
     if (!Number.isFinite(lat) || !Number.isFinite(lng)) return;
     scrollToMapArea();
     focusToLocation(lat, lng, 17);
+    window.setTimeout(() => {
+      openInfoForPoint(state.startPoint);
+    }, 180);
     return;
   }
 
@@ -1078,6 +1082,9 @@ function handleTripListClick(event) {
     if (!Number.isFinite(lat) || !Number.isFinite(lng)) return;
     scrollToMapArea();
     focusToLocation(lat, lng, 17);
+    window.setTimeout(() => {
+      openInfoForPoint(point);
+    }, 180);
     return;
   }
 
