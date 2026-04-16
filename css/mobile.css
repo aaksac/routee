@@ -355,13 +355,13 @@ body.has-mobile-floating-panel .bottom-left {
     gap: 10px !important;
   }
 
-  .trip-item {
-    grid-template-columns: 40px minmax(0, 1fr) auto !important;
-    gap: 10px !important;
-    padding: 11px !important;
-    border-radius: 16px !important;
-    align-items: center !important;
-  }
+.trip-item {
+  grid-template-columns: 40px minmax(0, 1fr) auto !important;
+  gap: 12px !important;
+  padding: 11px !important;
+  border-radius: 16px !important;
+  align-items: center !important;
+}
 
   .trip-order {
     width: 40px !important;
@@ -683,11 +683,11 @@ body.has-mobile-floating-panel .bottom-left {
     gap: 9px !important;
   }
 
-  .trip-item {
-    grid-template-columns: 38px minmax(0, 1fr) !important;
-    gap: 9px !important;
-    padding: 10px !important;
-  }
+.trip-item {
+  grid-template-columns: 38px minmax(0, 1fr) !important;
+  gap: 11px !important;
+  padding: 10px !important;
+}
 
   .trip-item > div:last-child,
   .trip-item > button:last-child {
