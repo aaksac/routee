@@ -26,6 +26,17 @@ const MIN_SEARCH_LENGTH = 4;
 const SEARCH_DEBOUNCE_MS = 450;
 const MAX_PREDICTIONS = 5;
 
+const POINT_COLORS = [
+  { value: "#dc2626", label: "Kırmızı" },
+  { value: "#2563eb", label: "Mavi" },
+  { value: "#16a34a", label: "Yeşil" },
+  { value: "#ea580c", label: "Turuncu" },
+  { value: "#7c3aed", label: "Mor" },
+  { value: "#db2777", label: "Pembe" },
+  { value: "#ca8a04", label: "Sarı" },
+  { value: "#0f172a", label: "Koyu" }
+];
+
 function initMap() {
   const mapElement = document.getElementById("mapCanvas");
   if (!mapElement) return null;
@@ -83,6 +94,16 @@ function dispatchMarkerDeleteRequest(pointData) {
   );
 }
 
+function dispatchMarkerColorRequest(pointData, color) {
+  if (!pointData || !color) return;
+
+  window.dispatchEvent(
+    new CustomEvent("routee:marker-color-request", {
+      detail: { pointData, color }
+    })
+  );
+}
+
 function getPointDisplayTitle(pointData) {
   if (!pointData) return "Seçilen Konum";
 
@@ -109,8 +130,8 @@ function getPointSubtitle(pointData) {
 
 function createInfoWindowContent(pointData) {
   const wrapper = document.createElement("div");
-  wrapper.style.width = "210px";
-  wrapper.style.maxWidth = "210px";
+  wrapper.style.width = "236px";
+  wrapper.style.maxWidth = "236px";
   wrapper.style.boxSizing = "border-box";
   wrapper.style.padding = "12px";
   wrapper.style.borderRadius = "16px";
@@ -185,6 +206,59 @@ function createInfoWindowContent(pointData) {
     subtitle.style.wordBreak = "break-word";
     subtitle.style.marginBottom = "10px";
     wrapper.appendChild(subtitle);
+  }
+
+  if (pointData?.type !== "start") {
+    const paletteLabel = document.createElement("div");
+    paletteLabel.textContent = "İşaret rengi";
+    paletteLabel.style.fontSize = "11px";
+    paletteLabel.style.fontWeight = "700";
+    paletteLabel.style.color = "#334155";
+    paletteLabel.style.marginBottom = "8px";
+    wrapper.appendChild(paletteLabel);
+
+    const palette = document.createElement("div");
+    palette.style.display = "grid";
+    palette.style.gridTemplateColumns = "repeat(4, minmax(0, 1fr))";
+    palette.style.gap = "8px";
+    palette.style.marginBottom = "12px";
+
+    POINT_COLORS.forEach((item) => {
+      const colorBtn = document.createElement("button");
+      colorBtn.type = "button";
+      colorBtn.setAttribute("aria-label", item.label);
+      colorBtn.title = item.label;
+      colorBtn.style.height = "32px";
+      colorBtn.style.borderRadius = "12px";
+      colorBtn.style.border =
+        String(pointData.color || "#dc2626").toLowerCase() === item.value.toLowerCase()
+          ? "2px solid #0f172a"
+          : "1px solid rgba(203, 213, 225, 0.95)";
+      colorBtn.style.background = "#ffffff";
+      colorBtn.style.display = "inline-flex";
+      colorBtn.style.alignItems = "center";
+      colorBtn.style.justifyContent = "center";
+      colorBtn.style.cursor = "pointer";
+      colorBtn.style.padding = "0";
+
+      const swatch = document.createElement("span");
+      swatch.style.width = "16px";
+      swatch.style.height = "16px";
+      swatch.style.borderRadius = "999px";
+      swatch.style.display = "block";
+      swatch.style.background = item.value;
+      swatch.style.boxShadow = "inset 0 0 0 2px rgba(255,255,255,0.68)";
+
+      colorBtn.appendChild(swatch);
+      colorBtn.addEventListener("click", () => {
+        dispatchMarkerColorRequest(pointData, item.value);
+        activeInfoWindow?.close();
+      });
+
+      palette.appendChild(colorBtn);
+    });
+
+    wrapper.appendChild(palette);
   }
 
   const actions = document.createElement("div");
@@ -284,7 +358,7 @@ function openMarkerInfo(marker, pointData) {
 
   activeInfoWindow.setContent(createInfoWindowContent(pointData));
   activeInfoWindow.setOptions({
-    maxWidth: 240,
+    maxWidth: 248,
     pixelOffset: new google.maps.Size(0, -8),
     zIndex: 9999,
     disableAutoPan: false
@@ -350,6 +424,8 @@ function openInfoForPoint(pointData) {
 function addMarker({ lat, lng, title, label, onClick, pointData }) {
   if (!map) return null;
 
+  const markerColor = pointData?.color || "#dc2626";
+
   const marker = new google.maps.Marker({
     position: { lat, lng },
     map,
@@ -361,7 +437,7 @@ function addMarker({ lat, lng, title, label, onClick, pointData }) {
           fontWeight: "700"
         }
       : undefined,
-    icon: createCircleSymbol("#dc2626")
+    icon: createCircleSymbol(markerColor)
   });
 
   marker.__pointData = pointData || null;
