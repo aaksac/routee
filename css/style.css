@@ -833,3 +833,29 @@ select:focus {
     max-width: 360px;
   }
 }
+.trip-item {
+  grid-template-columns: 48px minmax(0, 1fr) !important;
+  align-items: start !important;
+}
+
+.trip-content {
+  min-width: 0;
+}
+
+.trip-item > div:last-child,
+.trip-item > button:last-child {
+  grid-column: 2;
+  justify-self: start;
+  margin-top: 6px;
+}
+
+.trip-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.trip-actions .tiny-btn {
+  white-space: nowrap;
+}
