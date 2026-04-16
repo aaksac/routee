@@ -696,11 +696,17 @@ body.has-mobile-floating-panel .bottom-left {
     margin-top: 2px !important;
   }
 
-  .trip-order {
-    width: 38px !important;
-    height: 38px !important;
-    font-size: 0.8rem !important;
-  }
+.trip-order {
+  width: 50px !important;
+  height: 50px !important;
+  border-radius: 16px !important;
+  font-size: 1.18rem !important;
+  font-weight: 800 !important;
+  line-height: 1 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
 
   .trip-content strong {
     font-size: 0.88rem !important;
