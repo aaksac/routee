@@ -73,6 +73,16 @@ function createGoogleMapsDirectionsUrl(lat, lng) {
   return `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`;
 }
 
+function dispatchMarkerDeleteRequest(pointData) {
+  if (!pointData) return;
+
+  window.dispatchEvent(
+    new CustomEvent("routee:delete-point-request", {
+      detail: { pointData }
+    })
+  );
+}
+
 function getPointDisplayTitle(pointData) {
   if (!pointData) return "Seçilen Konum";
 
@@ -177,25 +187,54 @@ function createInfoWindowContent(pointData) {
     wrapper.appendChild(subtitle);
   }
 
-  const button = document.createElement("button");
-  button.textContent = "Yol Tarifi Al";
-  button.style.width = "100%";
-  button.style.height = "38px";
-  button.style.border = "none";
-  button.style.borderRadius = "12px";
-  button.style.background = "linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)";
-  button.style.color = "#ffffff";
-  button.style.fontSize = "12px";
-  button.style.fontWeight = "700";
-  button.style.cursor = "pointer";
-  button.style.boxShadow = "0 8px 18px rgba(37, 99, 235, 0.24)";
+  const actions = document.createElement("div");
+  actions.style.display = "flex";
+  actions.style.gap = "8px";
+  actions.style.alignItems = "stretch";
 
-  button.addEventListener("click", () => {
+  const directionsBtn = document.createElement("button");
+  directionsBtn.type = "button";
+  directionsBtn.textContent = "Yol Tarifi Al";
+  directionsBtn.style.flex = "1";
+  directionsBtn.style.height = "38px";
+  directionsBtn.style.border = "none";
+  directionsBtn.style.borderRadius = "12px";
+  directionsBtn.style.background = "linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)";
+  directionsBtn.style.color = "#ffffff";
+  directionsBtn.style.fontSize = "12px";
+  directionsBtn.style.fontWeight = "700";
+  directionsBtn.style.cursor = "pointer";
+  directionsBtn.style.boxShadow = "0 8px 18px rgba(37, 99, 235, 0.24)";
+  directionsBtn.style.whiteSpace = "nowrap";
+
+  directionsBtn.addEventListener("click", () => {
     const url = createGoogleMapsDirectionsUrl(pointData.lat, pointData.lng);
     window.location.href = url;
   });
 
-  wrapper.appendChild(button);
+  const deleteBtn = document.createElement("button");
+  deleteBtn.type = "button";
+  deleteBtn.textContent = "Sil";
+  deleteBtn.style.height = "38px";
+  deleteBtn.style.padding = "0 14px";
+  deleteBtn.style.border = "1px solid #fecaca";
+  deleteBtn.style.borderRadius = "12px";
+  deleteBtn.style.background = "#fef2f2";
+  deleteBtn.style.color = "#b91c1c";
+  deleteBtn.style.fontSize = "12px";
+  deleteBtn.style.fontWeight = "700";
+  deleteBtn.style.cursor = "pointer";
+  deleteBtn.style.whiteSpace = "nowrap";
+
+  deleteBtn.addEventListener("click", () => {
+    dispatchMarkerDeleteRequest(pointData);
+    activeInfoWindow?.close();
+  });
+
+  actions.appendChild(directionsBtn);
+  actions.appendChild(deleteBtn);
+  wrapper.appendChild(actions);
+
   return wrapper;
 }
 
