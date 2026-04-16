@@ -509,16 +509,16 @@ select:focus {
 }
 
 .trip-order {
-  width: 50px;
-  height: 50px;
-  border-radius: 16px;
+  width: 46px;
+  height: 46px;
+  border-radius: 15px;
   display: flex;
   align-items: center;
   justify-content: center;
   background: var(--primary);
   color: #fff;
   font-weight: 800;
-  font-size: 1.22rem;
+  font-size: 1.02rem;
   line-height: 1;
   letter-spacing: 0;
   text-align: center;
