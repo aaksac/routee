@@ -428,19 +428,6 @@ function renderSummary() {
 }
 
 function renderTripList() {
-  const actionColumnStyle =
-    "display:flex; flex-direction:column; gap:8px; align-items:center; justify-content:flex-start; align-self:center;";
-
-  const focusIcon = `
-    <svg viewBox="0 0 24 24" aria-hidden="true" style="width:18px;height:18px;display:block;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;">
-      <circle cx="12" cy="12" r="4"></circle>
-      <path d="M12 2v3"></path>
-      <path d="M12 19v3"></path>
-      <path d="M2 12h3"></path>
-      <path d="M19 12h3"></path>
-    </svg>
-  `;
-
   const startHtml = state.startPoint
     ? `
       <div class="trip-item start">
@@ -449,19 +436,10 @@ function renderTripList() {
           <strong>${escapeHtml(state.startPoint.name)}</strong>
           <span>Önceki mesafe: —</span>
         </div>
-        <div style="${actionColumnStyle}">
+        <div style="display:flex; gap:8px; align-items:center;">
           <button class="tiny-btn" type="button" data-action="directions-start">Yol Tarifi</button>
-          <button
-            class="tiny-btn"
-            type="button"
-            data-action="focus-start"
-            aria-label="Odakla"
-            title="Odakla"
-            style="width:40px; min-width:40px; padding:0; display:grid; place-items:center;"
-          >
-            ${focusIcon}
-          </button>
           <button class="tiny-btn" type="button" data-action="delete-start">Sil</button>
+          <button class="tiny-btn" type="button" data-action="focus-start">Yakınlaş</button>
         </div>
       </div>
     `
@@ -485,20 +463,10 @@ function renderTripList() {
             <strong>${escapeHtml(point.name)}</strong>
             <span>Önceki mesafe: ${formatKm(point.distanceFromPrevious || 0)}</span>
           </div>
-          <div style="${actionColumnStyle}">
+          <div style="display:flex; gap:8px; align-items:center;">
             <button class="tiny-btn" type="button" data-action="directions-point" data-id="${point.id}">Yol Tarifi</button>
-            <button
-              class="tiny-btn"
-              type="button"
-              data-action="focus-point"
-              data-id="${point.id}"
-              aria-label="Odakla"
-              title="Odakla"
-              style="width:40px; min-width:40px; padding:0; display:grid; place-items:center;"
-            >
-              ${focusIcon}
-            </button>
             <button class="tiny-btn" type="button" data-action="delete-point" data-id="${point.id}">Sil</button>
+            <button class="tiny-btn" type="button" data-action="focus-point" data-id="${point.id}">Yakınlaş</button>
           </div>
         </div>
       `;
