@@ -859,3 +859,8 @@ select:focus {
 .trip-actions .tiny-btn {
   white-space: nowrap;
 }
+.trip-item.start .trip-order {
+  background: linear-gradient(135deg, #16a34a, #15803d) !important;
+  box-shadow: 0 12px 22px rgba(22, 163, 74, 0.2) !important;
+  color: #ffffff !important;
+}
