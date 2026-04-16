@@ -428,6 +428,9 @@ function renderSummary() {
 }
 
 function renderTripList() {
+  const actionColumnStyle =
+    "display:flex; flex-direction:column; gap:8px; align-items:flex-end; justify-content:flex-start; align-self:flex-start;";
+
   const startHtml = state.startPoint
     ? `
       <div class="trip-item start">
@@ -436,10 +439,10 @@ function renderTripList() {
           <strong>${escapeHtml(state.startPoint.name)}</strong>
           <span>Önceki mesafe: —</span>
         </div>
-        <div style="display:flex; gap:8px; align-items:center;">
+        <div style="${actionColumnStyle}">
           <button class="tiny-btn" type="button" data-action="directions-start">Yol Tarifi</button>
+          <button class="tiny-btn" type="button" data-action="focus-start">Odakla</button>
           <button class="tiny-btn" type="button" data-action="delete-start">Sil</button>
-          <button class="tiny-btn" type="button" data-action="focus-start">Yakınlaş</button>
         </div>
       </div>
     `
@@ -463,10 +466,10 @@ function renderTripList() {
             <strong>${escapeHtml(point.name)}</strong>
             <span>Önceki mesafe: ${formatKm(point.distanceFromPrevious || 0)}</span>
           </div>
-          <div style="display:flex; gap:8px; align-items:center;">
+          <div style="${actionColumnStyle}">
             <button class="tiny-btn" type="button" data-action="directions-point" data-id="${point.id}">Yol Tarifi</button>
+            <button class="tiny-btn" type="button" data-action="focus-point" data-id="${point.id}">Odakla</button>
             <button class="tiny-btn" type="button" data-action="delete-point" data-id="${point.id}">Sil</button>
-            <button class="tiny-btn" type="button" data-action="focus-point" data-id="${point.id}">Yakınlaş</button>
           </div>
         </div>
       `;
