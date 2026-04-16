@@ -697,10 +697,10 @@ body.has-mobile-floating-panel .bottom-left {
   }
 
 .trip-order {
-  width: 46px !important;
-  height: 46px !important;
+  width: 44px !important;
+  height: 44px !important;
   border-radius: 14px !important;
-  font-size: 1.08rem !important;
+  font-size: 1.1rem !important;
   font-weight: 800 !important;
   line-height: 1 !important;
   display: flex !important;
