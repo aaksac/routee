@@ -69,13 +69,13 @@ function getMap() {
   return map;
 }
 
-function createCircleSymbol(fillColor, strokeColor = "#ffffff", scale = 10) {
+function createCircleSymbol(fillColor, strokeColor = "#ffffff", scale = 14) {
   return {
     path: google.maps.SymbolPath.CIRCLE,
     fillColor,
     fillOpacity: 1,
     strokeColor,
-    strokeWeight: 2,
+    strokeWeight: 3,
     scale
   };
 }
@@ -437,7 +437,7 @@ function addMarker({ lat, lng, title, label, onClick, pointData }) {
           fontWeight: "700"
         }
       : undefined,
-    icon: createCircleSymbol(markerColor)
+    icon: createCircleSymbol(markerColor, "#ffffff", 14)
   });
 
   marker.__pointData = pointData || null;
@@ -474,7 +474,7 @@ function showStartMarker({ lat, lng, title, onClick, pointData }) {
       color: "#ffffff",
       fontWeight: "700"
     },
-    icon: createCircleSymbol("#16a34a", "#ffffff", 12)
+    icon: createCircleSymbol("#16a34a", "#ffffff", 16)
   });
 
   startMarker.__pointData = pointData || null;
@@ -570,7 +570,7 @@ function showCurrentLocationMarker(lat, lng) {
     position: { lat, lng },
     map,
     title: "Mevcut Konumum",
-    icon: createCircleSymbol("#2563eb")
+    icon: createCircleSymbol("#2563eb", "#ffffff", 14)
   });
 
   focusToLocation(lat, lng, 15);
@@ -587,7 +587,7 @@ function showDraftMarker(lat, lng) {
     position: { lat, lng },
     map,
     title: "Seçilen Nokta",
-    icon: createCircleSymbol("#facc15", "#92400e")
+    icon: createCircleSymbol("#facc15", "#92400e", 14)
   });
 }
 
@@ -881,7 +881,7 @@ function renderPredictions(predictions, onPlaceSelected) {
           position: { lat, lng },
           map,
           title: selectedName,
-          icon: createCircleSymbol("#2563eb", "#ffffff", 9)
+          icon: createCircleSymbol("#2563eb", "#ffffff", 13)
         });
 
         focusToLocation(lat, lng, 16);
