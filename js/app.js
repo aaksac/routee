@@ -21,7 +21,8 @@ import {
   clearDraftMarker,
   clearRouteLines,
   drawRouteSegments,
-  focusMapToPoints
+  focusMapToPoints,
+  focusToLocation
 } from "./map.js";
 import { locateAndShowUser } from "./location.js";
 import { nearestNeighborRoute } from "./route.js";
@@ -420,9 +421,10 @@ function renderTripList() {
           <strong>${escapeHtml(state.startPoint.name)}</strong>
           <span>Önceki mesafe: —</span>
         </div>
-        <div style="display:flex; gap:8px; align-items:center;">
-          <button class="tiny-btn" type="button" data-action="directions-start">Yol Tarifi</button>
-          <button class="tiny-btn" type="button" data-action="delete-start">Sil</button>
+        <div class="trip-actions">
+          <button class="tiny-btn trip-btn trip-btn-directions" type="button" data-action="directions-start">Yol Tarifi</button>
+          <button class="tiny-btn trip-btn trip-btn-focus" type="button" data-action="focus-start">Odakla</button>
+          <button class="tiny-btn trip-btn trip-btn-delete" type="button" data-action="delete-start">Sil</button>
         </div>
       </div>
     `
@@ -446,9 +448,10 @@ function renderTripList() {
             <strong>${escapeHtml(point.name)}</strong>
             <span>Önceki mesafe: ${formatKm(point.distanceFromPrevious || 0)}</span>
           </div>
-          <div style="display:flex; gap:8px; align-items:center;">
-            <button class="tiny-btn" type="button" data-action="directions-point" data-id="${point.id}">Yol Tarifi</button>
-            <button class="tiny-btn" type="button" data-action="delete-point" data-id="${point.id}">Sil</button>
+          <div class="trip-actions">
+            <button class="tiny-btn trip-btn trip-btn-directions" type="button" data-action="directions-point" data-id="${point.id}">Yol Tarifi</button>
+            <button class="tiny-btn trip-btn trip-btn-focus" type="button" data-action="focus-point" data-id="${point.id}">Odakla</button>
+            <button class="tiny-btn trip-btn trip-btn-delete" type="button" data-action="delete-point" data-id="${point.id}">Sil</button>
           </div>
         </div>
       `;
@@ -1022,10 +1025,23 @@ function handleTripListClick(event) {
     return;
   }
 
+  if (action === "focus-start") {
+    if (!state.startPoint) return;
+    focusToLocation(state.startPoint.lat, state.startPoint.lng, 17);
+    return;
+  }
+
   if (action === "directions-start") {
     if (!state.startPoint) return;
     const url = `https://www.google.com/maps/dir/?api=1&destination=${state.startPoint.lat},${state.startPoint.lng}`;
     window.location.href = url;
+    return;
+  }
+
+  if (action === "focus-point") {
+    const point = state.points.find((item) => String(item.id) === String(target.dataset.id));
+    if (!point) return;
+    focusToLocation(point.lat, point.lng, 17);
     return;
   }
 
