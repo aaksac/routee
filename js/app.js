@@ -463,24 +463,27 @@ function renderTripList() {
       </div>
     `;
 
-  const pointHtml = state.points
-    .map((point, index) => {
-      return `
-        <div class="trip-item">
-          <div class="trip-order">${index + 1}</div>
-          <div class="trip-content">
-            <strong>${escapeHtml(point.name)}</strong>
-            <span>Önceki mesafe: ${formatKm(point.distanceFromPrevious || 0)}</span>
-          </div>
-          <div class="trip-actions">
-            <button class="tiny-btn" type="button" data-action="directions-point" data-id="${point.id}">Yol Tarifi</button>
-            <button class="tiny-btn" type="button" data-action="focus-point" data-id="${point.id}">Odakla</button>
-            <button class="tiny-btn" type="button" data-action="delete-point" data-id="${point.id}">Sil</button>
-          </div>
+const pointHtml = state.points
+  .map((point, index) => {
+    const pointColor = point.color || DEFAULT_POINT_COLOR;
+    const pointShadow = `${pointColor}33`;
+
+    return `
+      <div class="trip-item">
+        <div class="trip-order" style="background:${escapeHtml(pointColor)}; box-shadow: 0 12px 22px ${escapeHtml(pointShadow)}">${index + 1}</div>
+        <div class="trip-content">
+          <strong>${escapeHtml(point.name)}</strong>
+          <span>Önceki mesafe: ${formatKm(point.distanceFromPrevious || 0)}</span>
         </div>
-      `;
-    })
-    .join("");
+        <div class="trip-actions">
+          <button class="tiny-btn" type="button" data-action="directions-point" data-id="${point.id}">Yol Tarifi</button>
+          <button class="tiny-btn" type="button" data-action="focus-point" data-id="${point.id}">Odakla</button>
+          <button class="tiny-btn" type="button" data-action="delete-point" data-id="${point.id}">Sil</button>
+        </div>
+      </div>
+    `;
+  })
+  .join("");
 
   elements.tripList.innerHTML = startHtml + pointHtml;
 }
