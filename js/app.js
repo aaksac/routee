@@ -807,14 +807,15 @@ async function handleSaveMap() {
 
   try {
     if (isPremiumAccessActive()) {
-      if (state.selectedMapId) {
-        await updateMap(state.currentUser.uid, state.selectedMapId, payload);
-        elements.authStatus.textContent = "Harita güncellendi.";
-        markClean();
-        await refreshMapList();
-        closeFloatingPanels();
-        return;
-      }
+if (state.selectedMapId) {
+  await updateMap(state.currentUser.uid, state.selectedMapId, payload);
+  elements.authStatus.textContent = "Haritanız güncellendi.";
+  markClean();
+  await refreshMapList();
+  closeFloatingPanels();
+  alert("Haritanız güncellendi.");
+  return;
+}
 
       await saveMap(state.currentUser.uid, payload, { fullAccess: true });
       await refreshMapList();
@@ -827,24 +828,29 @@ async function handleSaveMap() {
 
     const trialMapId = state.selectedMapId || TRIAL_MAP_ID;
 
-    if (state.selectedMapId) {
-      await updateMap(state.currentUser.uid, trialMapId, payload);
-    } else {
-      await saveMap(
-        state.currentUser.uid,
-        {
-          id: TRIAL_MAP_ID,
-          ...payload
-        },
-        { fullAccess: false }
-      );
-    }
+if (state.selectedMapId) {
+  await updateMap(state.currentUser.uid, trialMapId, payload);
+  await refreshMapList();
+  markClean();
+  closeFloatingPanels();
+  alert("Haritanız güncellendi.");
+  return;
+} else {
+  await saveMap(
+    state.currentUser.uid,
+    {
+      id: TRIAL_MAP_ID,
+      ...payload
+    },
+    { fullAccess: false }
+  );
+}
 
-    await refreshMapList();
-    markClean();
-    closeFloatingPanels();
-    alert("Haritanız kaydedilmiştir. Harita Listelerim kısmından ulaşabilirsiniz.");
-    resetMapEditor();
+await refreshMapList();
+markClean();
+closeFloatingPanels();
+alert("Haritanız kaydedilmiştir. Harita Listelerim kısmından ulaşabilirsiniz.");
+resetMapEditor();
   } catch (error) {
     elements.authStatus.textContent = `Kaydetme hatası: ${error.message}`;
   }
