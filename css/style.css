@@ -328,8 +328,10 @@ select:focus {
 
 .menu-item {
   width: 100%;
-  text-align: left;
-  justify-content: flex-start;
+  text-align: center;
+  justify-content: center;
+  display: flex;
+  align-items: center;
 }
 
 .floating-card {
