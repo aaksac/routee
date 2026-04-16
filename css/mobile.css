@@ -386,6 +386,19 @@ body.has-mobile-floating-panel .bottom-left {
     justify-self: start;
   }
 
+  .trip-actions {
+    grid-column: 2;
+    justify-self: start;
+    gap: 6px !important;
+  }
+
+  .trip-actions .tiny-btn {
+    min-height: 32px !important;
+    height: 32px !important;
+    padding: 5px 10px !important;
+    font-size: 0.74rem !important;
+  }
+
 .tiny-btn {
   min-height: 34px !important;
   height: 34px !important;
