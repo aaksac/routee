@@ -1054,18 +1054,29 @@ function handleTripListClick(event) {
     return;
   }
 
-  if (action === "focus-start") {
-    if (!state.startPoint) return;
-    const lat = Number(state.startPoint.lat);
-    const lng = Number(state.startPoint.lng);
-    if (!Number.isFinite(lat) || !Number.isFinite(lng)) return;
-    scrollToMapArea();
-    focusToLocation(lat, lng, 17);
-    window.setTimeout(() => {
-      openInfoForPoint(state.startPoint);
-    }, 180);
-    return;
-  }
+if (action === "focus-start") {
+  if (!state.startPoint) return;
+  const lat = Number(state.startPoint.lat);
+  const lng = Number(state.startPoint.lng);
+  if (!Number.isFinite(lat) || !Number.isFinite(lng)) return;
+
+  fillPointFormFromMarker({
+    ...state.startPoint,
+    orderLabel: "S"
+  });
+
+  scrollToMapArea();
+  focusToLocation(lat, lng, 17);
+
+  window.setTimeout(() => {
+    openInfoForPoint({
+      ...state.startPoint,
+      orderLabel: "S"
+    });
+  }, 180);
+
+  return;
+}
 
   if (action === "directions-start") {
     if (!state.startPoint) return;
@@ -1074,19 +1085,34 @@ function handleTripListClick(event) {
     return;
   }
 
-  if (action === "focus-point") {
-    const point = state.points.find((item) => String(item.id) === String(target.dataset.id));
-    if (!point) return;
-    const lat = Number(point.lat);
-    const lng = Number(point.lng);
-    if (!Number.isFinite(lat) || !Number.isFinite(lng)) return;
-    scrollToMapArea();
-    focusToLocation(lat, lng, 17);
-    window.setTimeout(() => {
-      openInfoForPoint(point);
-    }, 180);
-    return;
-  }
+if (action === "focus-point") {
+  const point = state.points.find((item) => String(item.id) === String(target.dataset.id));
+  if (!point) return;
+
+  const lat = Number(point.lat);
+  const lng = Number(point.lng);
+  if (!Number.isFinite(lat) || !Number.isFinite(lng)) return;
+
+  const pointIndex = state.points.findIndex(
+    (item) => String(item.id) === String(target.dataset.id)
+  );
+
+  const pointDataForUi = {
+    ...point,
+    orderLabel: String(pointIndex + 1)
+  };
+
+  fillPointFormFromMarker(pointDataForUi);
+
+  scrollToMapArea();
+  focusToLocation(lat, lng, 17);
+
+  window.setTimeout(() => {
+    openInfoForPoint(pointDataForUi);
+  }, 180);
+
+  return;
+}
 
   if (action === "directions-point") {
     const point = state.points.find((item) => String(item.id) === String(target.dataset.id));
