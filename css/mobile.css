@@ -357,7 +357,7 @@ body.has-mobile-floating-panel .bottom-left {
 
 .trip-item {
   grid-template-columns: 40px minmax(0, 1fr) auto !important;
-  gap: 12px !important;
+  gap: 14px !important;
   padding: 11px !important;
   border-radius: 16px !important;
   align-items: center !important;
@@ -685,7 +685,7 @@ body.has-mobile-floating-panel .bottom-left {
 
 .trip-item {
   grid-template-columns: 38px minmax(0, 1fr) !important;
-  gap: 11px !important;
+  gap: 13px !important;
   padding: 10px !important;
 }
 
