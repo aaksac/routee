@@ -429,10 +429,10 @@ function renderSummary() {
 
 function renderTripList() {
   const actionColumnStyle =
-    "display:flex; flex-direction:column; gap:8px; align-items:flex-end; justify-content:flex-start; align-self:flex-start;";
+    "display:flex; flex-direction:column; gap:8px; align-items:center; justify-content:flex-start; align-self:center;";
 
   const focusIcon = `
-    <svg viewBox="0 0 24 24" aria-hidden="true" style="width:18px;height:18px;display:block;">
+    <svg viewBox="0 0 24 24" aria-hidden="true" style="width:18px;height:18px;display:block;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;">
       <circle cx="12" cy="12" r="4"></circle>
       <path d="M12 2v3"></path>
       <path d="M12 19v3"></path>
