@@ -431,6 +431,16 @@ function renderTripList() {
   const actionColumnStyle =
     "display:flex; flex-direction:column; gap:8px; align-items:flex-end; justify-content:flex-start; align-self:flex-start;";
 
+  const focusIcon = `
+    <svg viewBox="0 0 24 24" aria-hidden="true" style="width:18px;height:18px;display:block;">
+      <circle cx="12" cy="12" r="4"></circle>
+      <path d="M12 2v3"></path>
+      <path d="M12 19v3"></path>
+      <path d="M2 12h3"></path>
+      <path d="M19 12h3"></path>
+    </svg>
+  `;
+
   const startHtml = state.startPoint
     ? `
       <div class="trip-item start">
@@ -441,7 +451,16 @@ function renderTripList() {
         </div>
         <div style="${actionColumnStyle}">
           <button class="tiny-btn" type="button" data-action="directions-start">Yol Tarifi</button>
-          <button class="tiny-btn" type="button" data-action="focus-start">Odakla</button>
+          <button
+            class="tiny-btn"
+            type="button"
+            data-action="focus-start"
+            aria-label="Odakla"
+            title="Odakla"
+            style="width:40px; min-width:40px; padding:0; display:grid; place-items:center;"
+          >
+            ${focusIcon}
+          </button>
           <button class="tiny-btn" type="button" data-action="delete-start">Sil</button>
         </div>
       </div>
@@ -468,7 +487,17 @@ function renderTripList() {
           </div>
           <div style="${actionColumnStyle}">
             <button class="tiny-btn" type="button" data-action="directions-point" data-id="${point.id}">Yol Tarifi</button>
-            <button class="tiny-btn" type="button" data-action="focus-point" data-id="${point.id}">Odakla</button>
+            <button
+              class="tiny-btn"
+              type="button"
+              data-action="focus-point"
+              data-id="${point.id}"
+              aria-label="Odakla"
+              title="Odakla"
+              style="width:40px; min-width:40px; padding:0; display:grid; place-items:center;"
+            >
+              ${focusIcon}
+            </button>
             <button class="tiny-btn" type="button" data-action="delete-point" data-id="${point.id}">Sil</button>
           </div>
         </div>
