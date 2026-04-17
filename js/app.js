@@ -121,10 +121,6 @@ function goToLogin() {
   window.location.href = "./index.html";
 }
 
-function wait(ms) {
-  return new Promise((resolve) => window.setTimeout(resolve, ms));
-}
-
 function hydrateAppStartupSplash() {
   if (!elements.appStartupSplash) return null;
 
