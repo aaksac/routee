@@ -53,7 +53,8 @@ const state = {
   locationQuota: TRIAL_LOCATION_QUOTA,
   mapQuota: 1,
   lastScrollY: 0,
-  appStartupSplash: null
+  appStartupSplash: null,
+  selectedPointColor: "#dc2626"
 };
 
 const elements = {
@@ -161,13 +162,6 @@ async function closeAppStartupSplash(splashState) {
   if (!splashState || !elements.appStartupSplash) {
     clearAppStartupSplashSession();
     return;
-  }
-
-  const elapsed = Date.now() - (splashState.startedAt || Date.now());
-  const remaining = Math.max(0, 900 - elapsed);
-
-  if (remaining > 0) {
-    await wait(remaining);
   }
 
   elements.appStartupSplash.classList.remove("is-visible");
@@ -463,27 +457,27 @@ function renderTripList() {
       </div>
     `;
 
-const pointHtml = state.points
-  .map((point, index) => {
-    const pointColor = point.color || DEFAULT_POINT_COLOR;
-    const pointShadow = `${pointColor}33`;
+  const pointHtml = state.points
+    .map((point, index) => {
+      const pointColor = point.color || DEFAULT_POINT_COLOR;
+      const pointShadow = `${pointColor}33`;
 
-    return `
-      <div class="trip-item">
-        <div class="trip-order" style="background:${escapeHtml(pointColor)}; box-shadow: 0 12px 22px ${escapeHtml(pointShadow)}">${index + 1}</div>
-        <div class="trip-content">
-          <strong>${escapeHtml(point.name)}</strong>
-          <span>Önceki mesafe: ${formatKm(point.distanceFromPrevious || 0)}</span>
+      return `
+        <div class="trip-item">
+          <div class="trip-order" style="background:${escapeHtml(pointColor)}; box-shadow: 0 12px 22px ${escapeHtml(pointShadow)}">${index + 1}</div>
+          <div class="trip-content">
+            <strong>${escapeHtml(point.name)}</strong>
+            <span>Önceki mesafe: ${formatKm(point.distanceFromPrevious || 0)}</span>
+          </div>
+          <div class="trip-actions">
+            <button class="tiny-btn" type="button" data-action="directions-point" data-id="${point.id}">Yol Tarifi</button>
+            <button class="tiny-btn" type="button" data-action="focus-point" data-id="${point.id}">Odakla</button>
+            <button class="tiny-btn" type="button" data-action="delete-point" data-id="${point.id}">Sil</button>
+          </div>
         </div>
-        <div class="trip-actions">
-          <button class="tiny-btn" type="button" data-action="directions-point" data-id="${point.id}">Yol Tarifi</button>
-          <button class="tiny-btn" type="button" data-action="focus-point" data-id="${point.id}">Odakla</button>
-          <button class="tiny-btn" type="button" data-action="delete-point" data-id="${point.id}">Sil</button>
-        </div>
-      </div>
-    `;
-  })
-  .join("");
+      `;
+    })
+    .join("");
 
   elements.tripList.innerHTML = startHtml + pointHtml;
 }
@@ -807,15 +801,15 @@ async function handleSaveMap() {
 
   try {
     if (isPremiumAccessActive()) {
-if (state.selectedMapId) {
-  await updateMap(state.currentUser.uid, state.selectedMapId, payload);
-  elements.authStatus.textContent = "Haritanız güncellendi.";
-  markClean();
-  await refreshMapList();
-  closeFloatingPanels();
-  alert("Haritanız güncellendi.");
-  return;
-}
+      if (state.selectedMapId) {
+        await updateMap(state.currentUser.uid, state.selectedMapId, payload);
+        elements.authStatus.textContent = "Haritanız güncellendi.";
+        markClean();
+        await refreshMapList();
+        closeFloatingPanels();
+        alert("Haritanız güncellendi.");
+        return;
+      }
 
       await saveMap(state.currentUser.uid, payload, { fullAccess: true });
       await refreshMapList();
@@ -828,29 +822,29 @@ if (state.selectedMapId) {
 
     const trialMapId = state.selectedMapId || TRIAL_MAP_ID;
 
-if (state.selectedMapId) {
-  await updateMap(state.currentUser.uid, trialMapId, payload);
-  await refreshMapList();
-  markClean();
-  closeFloatingPanels();
-  alert("Haritanız güncellendi.");
-  return;
-} else {
-  await saveMap(
-    state.currentUser.uid,
-    {
-      id: TRIAL_MAP_ID,
-      ...payload
-    },
-    { fullAccess: false }
-  );
-}
+    if (state.selectedMapId) {
+      await updateMap(state.currentUser.uid, trialMapId, payload);
+      await refreshMapList();
+      markClean();
+      closeFloatingPanels();
+      alert("Haritanız güncellendi.");
+      return;
+    } else {
+      await saveMap(
+        state.currentUser.uid,
+        {
+          id: TRIAL_MAP_ID,
+          ...payload
+        },
+        { fullAccess: false }
+      );
+    }
 
-await refreshMapList();
-markClean();
-closeFloatingPanels();
-alert("Haritanız kaydedilmiştir. Harita Listelerim kısmından ulaşabilirsiniz.");
-resetMapEditor();
+    await refreshMapList();
+    markClean();
+    closeFloatingPanels();
+    alert("Haritanız kaydedilmiştir. Harita Listelerim kısmından ulaşabilirsiniz.");
+    resetMapEditor();
   } catch (error) {
     elements.authStatus.textContent = `Kaydetme hatası: ${error.message}`;
   }
@@ -1419,12 +1413,22 @@ function initAuthWatcher() {
 
     try {
       if (user) {
+        await closeAppStartupSplash(state.appStartupSplash);
+        state.appStartupSplash = null;
+
+        elements.authStatus.textContent = `Aktif kullanıcı: ${user.email}`;
+
         await ensureUserProfile(user.uid, user.email);
         await loadAccessModel(user);
         elements.authStatus.textContent = `Aktif kullanıcı: ${user.email} · ${getAccessStatusText()}`;
-        await loadUserMaps(user.uid, isPremiumAccessActive());
-        await closeAppStartupSplash(state.appStartupSplash);
-        state.appStartupSplash = null;
+
+        window.setTimeout(async () => {
+          try {
+            await loadUserMaps(user.uid, isPremiumAccessActive());
+          } catch (error) {
+            console.warn("Harita listesi yüklenemedi:", error);
+          }
+        }, 0);
       } else {
         await closeAppStartupSplash(state.appStartupSplash);
         state.appStartupSplash = null;
