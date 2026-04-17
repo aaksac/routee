@@ -1418,13 +1418,23 @@ function initAuthWatcher() {
         await loadAccessModel(user);
         elements.authStatus.textContent = `Aktif kullanıcı: ${user.email} · ${getAccessStatusText()}`;
 
-        window.setTimeout(async () => {
+        const loadMapsTask = async () => {
           try {
             await loadUserMaps(user.uid, isPremiumAccessActive());
           } catch (error) {
             console.warn("Harita listesi yüklenemedi:", error);
           }
-        }, 0);
+        };
+
+        if ("requestIdleCallback" in window) {
+          window.requestIdleCallback(() => {
+            loadMapsTask();
+          });
+        } else {
+          window.setTimeout(() => {
+            loadMapsTask();
+          }, 0);
+        }
       } else {
         await closeAppStartupSplash(state.appStartupSplash);
         state.appStartupSplash = null;
@@ -1449,8 +1459,11 @@ function init() {
   window.requestAnimationFrame(() => {
     initMap();
     initMapClickPicker();
-    initSearchBox();
     initAuthWatcher();
+
+    window.requestAnimationFrame(() => {
+      initSearchBox();
+    });
   });
 }
 
