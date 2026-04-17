@@ -22,7 +22,7 @@ let initialStatus = {
   type: "normal"
 };
 
-const STARTUP_SPLASH_MIN_MS = 850;
+const STARTUP_SPLASH_MIN_MS = 300;
 const AUTH_BOOT_TIMEOUT_MS = 2600;
 
 function loadAuthModule() {
@@ -85,6 +85,7 @@ function revealLoginScreen() {
 
   document.body.classList.remove("auth-booting");
   hideStartupSplash();
+  setButtonsDisabled(false);
   setStatus(initialStatus.message, initialStatus.type);
 }
 
@@ -196,7 +197,12 @@ async function routeAfterLogin(user, options = {}) {
       clearAppStartupSplash();
     }
 
-    await wait(STARTUP_SPLASH_MIN_MS);
+    const shouldDelay = options.delay !== false;
+
+    if (shouldDelay) {
+      await wait(STARTUP_SPLASH_MIN_MS);
+    }
+
     window.location.href = targetUrl;
   } catch (error) {
     isRouting = false;
@@ -222,6 +228,9 @@ async function handleLogin() {
   }
 
   try {
+    setButtonsDisabled(true);
+    setStatus("Giriş yapılıyor...", "normal");
+
     const { login } = await loadAuthModule();
 
     const result = await login(email, password);
@@ -230,6 +239,8 @@ async function handleLogin() {
       message: "Girişiniz doğrulanıyor..."
     });
   } catch (error) {
+    setButtonsDisabled(false);
+
     if (isNetworkLikeError(error) || !(await hasInternetConnection())) {
       setOfflineStatus();
       return;
@@ -259,6 +270,9 @@ async function handleRegister() {
   }
 
   try {
+    setButtonsDisabled(true);
+    setStatus("Hesap oluşturuluyor...", "normal");
+
     const { register } = await loadAuthModule();
     const { ensureUserProfile } = await loadFirestoreModule();
 
@@ -269,6 +283,8 @@ async function handleRegister() {
       message: "Hesabınız hazırlanıyor..."
     });
   } catch (error) {
+    setButtonsDisabled(false);
+
     if (isNetworkLikeError(error) || !(await hasInternetConnection())) {
       setOfflineStatus();
       return;
@@ -292,13 +308,19 @@ async function handleReset() {
   }
 
   try {
+    setButtonsDisabled(true);
+    setStatus("Sıfırlama bağlantısı hazırlanıyor...", "normal");
+
     const { sendReset } = await loadAuthModule();
     await sendReset(email);
     setStatus(
       "Şifre sıfırlama maili gönderildi. Maildeki bağlantı yeni sıfırlama sayfasını açacak.",
       "success"
     );
+    setButtonsDisabled(false);
   } catch (error) {
+    setButtonsDisabled(false);
+
     if (isNetworkLikeError(error) || !(await hasInternetConnection())) {
       setOfflineStatus();
       return;
@@ -315,7 +337,8 @@ async function initAuthWatcher() {
     watchAuth(async (user) => {
       if (user) {
         await routeAfterLogin(user, {
-          message: "Oturumunuz açılıyor..."
+          message: "Oturumunuz açılıyor...",
+          delay: false
         });
         return;
       }
@@ -355,6 +378,7 @@ function init() {
   bindEvents();
   applyQueryStatus();
   showStartupSplash("Rota", "Oturumunuz kontrol ediliyor...");
+  setButtonsDisabled(true);
   initAuthWatcher();
 
   bootFallbackTimer = window.setTimeout(() => {
