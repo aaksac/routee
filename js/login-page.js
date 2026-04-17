@@ -145,7 +145,7 @@ async function hasInternetConnection() {
   if (!navigator.onLine) return false;
 
   try {
-    const response = await fetch("./manifest.webmanifest?check=" + Date.now(), {
+    const response = await fetch(`./manifest.webmanifest?check=${Date.now()}`, {
       method: "GET",
       cache: "no-store"
     });
@@ -198,7 +198,6 @@ async function routeAfterLogin(user, options = {}) {
     }
 
     const shouldDelay = options.delay !== false;
-
     if (shouldDelay) {
       await wait(STARTUP_SPLASH_MIN_MS);
     }
@@ -232,8 +231,8 @@ async function handleLogin() {
     setStatus("Giriş yapılıyor...", "normal");
 
     const { login } = await loadAuthModule();
-
     const result = await login(email, password);
+
     setStatus("Giriş başarılı.", "success");
     await routeAfterLogin(result.user, {
       message: "Girişiniz doğrulanıyor..."
@@ -278,6 +277,7 @@ async function handleRegister() {
 
     const result = await register(email, password);
     await ensureUserProfile(result.user.uid, result.user.email);
+
     setStatus("Kayıt başarılı. 7 günlük deneme hesabı oluşturuldu.", "success");
     await routeAfterLogin(result.user, {
       message: "Hesabınız hazırlanıyor..."
@@ -313,6 +313,7 @@ async function handleReset() {
 
     const { sendReset } = await loadAuthModule();
     await sendReset(email);
+
     setStatus(
       "Şifre sıfırlama maili gönderildi. Maildeki bağlantı yeni sıfırlama sayfasını açacak.",
       "success"
