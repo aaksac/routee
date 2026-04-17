@@ -1440,14 +1440,18 @@ function initAuthWatcher() {
 
 function init() {
   state.appStartupSplash = hydrateAppStartupSplash();
-  initMap();
-  initMapClickPicker();
-  initSearchBox();
+
   renderSummary();
   renderTripList();
   bindEvents();
   initMobileTopbarAutoHide();
-  initAuthWatcher();
+
+  window.requestAnimationFrame(() => {
+    initMap();
+    initMapClickPicker();
+    initSearchBox();
+    initAuthWatcher();
+  });
 }
 
 document.addEventListener("DOMContentLoaded", init);
