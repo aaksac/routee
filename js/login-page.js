@@ -202,7 +202,7 @@ async function routeAfterLogin(user, options = {}) {
       await wait(STARTUP_SPLASH_MIN_MS);
     }
 
-    window.location.href = targetUrl;
+    window.location.replace(targetUrl);
   } catch (error) {
     isRouting = false;
     setButtonsDisabled(false);
