@@ -1,5 +1,8 @@
 const SW_VERSION = new URL(self.location.href).searchParams.get("v") || "dev";
 const CACHE_NAME = `routee-shell-${SW_VERSION}`;
+const NETWORK_TIMEOUT_DOCUMENT_MS = 1800;
+const NETWORK_TIMEOUT_CODE_MS = 2200;
+
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -42,13 +45,30 @@ self.addEventListener("activate", (event) => {
   );
 });
 
-async function networkFirst(request) {
-  const cache = await caches.open(CACHE_NAME);
+async function fetchWithTimeout(request, options = {}, timeoutMs = NETWORK_TIMEOUT_CODE_MS) {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
 
   try {
-    const response = await fetch(request, {
-      cache: "no-store"
+    return await fetch(request, {
+      ...options,
+      signal: controller.signal
     });
+  } finally {
+    clearTimeout(timeoutId);
+  }
+}
+
+async function networkFirst(request) {
+  const cache = await caches.open(CACHE_NAME);
+  const cachedResponse = await cache.match(request);
+  const isNavigationRequest = request.mode === "navigate" || request.destination === "document";
+  const timeoutMs = isNavigationRequest ? NETWORK_TIMEOUT_DOCUMENT_MS : NETWORK_TIMEOUT_CODE_MS;
+
+  try {
+    const response = cachedResponse
+      ? await fetchWithTimeout(request, { cache: "no-store" }, timeoutMs)
+      : await fetch(request, { cache: "no-store" });
 
     if (response && response.status === 200) {
       await cache.put(request, response.clone());
@@ -56,7 +76,6 @@ async function networkFirst(request) {
 
     return response;
   } catch (error) {
-    const cachedResponse = await cache.match(request);
     if (cachedResponse) return cachedResponse;
     throw error;
   }
@@ -88,7 +107,10 @@ self.addEventListener("fetch", (event) => {
   const isVersionFile = pathname.endsWith("/version.json") || pathname.endsWith("version.json");
   const isServiceWorkerFile = pathname.endsWith("/sw.js") || pathname.endsWith("sw.js");
   const isAppDocument = pathname.endsWith(".html") || isNavigationRequest;
-  const isCodeAsset = pathname.endsWith(".js") || pathname.endsWith(".css") || pathname.endsWith(".webmanifest");
+  const isCodeAsset =
+    pathname.endsWith(".js") ||
+    pathname.endsWith(".css") ||
+    pathname.endsWith(".webmanifest");
   const isStaticAsset =
     pathname.endsWith(".png") ||
     pathname.endsWith(".jpg") ||
@@ -100,7 +122,9 @@ self.addEventListener("fetch", (event) => {
 
   if (isVersionFile || isServiceWorkerFile || url.searchParams.has("check")) {
     event.respondWith(
-      fetch(request, { cache: "no-store" }).catch(() => new Response("", { status: 503, statusText: "Offline" }))
+      fetch(request, { cache: "no-store" }).catch(
+        () => new Response("", { status: 503, statusText: "Offline" })
+      )
     );
     return;
   }
