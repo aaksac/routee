@@ -12,7 +12,12 @@ const elements = {
 };
 
 let authModulePromise = null;
+let authModuleRequestedAt = 0;
+let authModuleState = "idle";
+
 let firestoreModulePromise = null;
+let firestoreModuleState = "idle";
+
 let isRouting = false;
 let bootResolved = false;
 let bootFallbackTimer = null;
@@ -24,18 +29,65 @@ let initialStatus = {
 
 const STARTUP_SPLASH_MIN_MS = 300;
 const AUTH_BOOT_TIMEOUT_MS = 2600;
+const STALE_MODULE_RETRY_MS = AUTH_BOOT_TIMEOUT_MS - 100;
 
-function loadAuthModule() {
-  if (!authModulePromise) {
-    authModulePromise = import("./auth.js");
+function clearAuthModulePromise() {
+  authModulePromise = null;
+  authModuleRequestedAt = 0;
+  authModuleState = "idle";
+}
+
+function loadAuthModule(options = {}) {
+  const { allowRetryIfStale = false } = options;
+  const now = Date.now();
+
+  if (
+    allowRetryIfStale &&
+    authModuleState === "pending" &&
+    authModuleRequestedAt &&
+    now - authModuleRequestedAt >= STALE_MODULE_RETRY_MS
+  ) {
+    clearAuthModulePromise();
   }
+
+  if (!authModulePromise) {
+    authModuleRequestedAt = now;
+    authModuleState = "pending";
+
+    authModulePromise = import("./auth.js")
+      .then((module) => {
+        authModuleState = "resolved";
+        return module;
+      })
+      .catch((error) => {
+        clearAuthModulePromise();
+        throw error;
+      });
+  }
+
   return authModulePromise;
+}
+
+function clearFirestoreModulePromise() {
+  firestoreModulePromise = null;
+  firestoreModuleState = "idle";
 }
 
 function loadFirestoreModule() {
   if (!firestoreModulePromise) {
-    firestoreModulePromise = import("./firestore.js");
+    firestoreModuleState = "pending";
+
+    firestoreModulePromise = import("./firestore.js")
+      .then((module) => {
+        firestoreModuleState = "resolved";
+        return module;
+      })
+      .catch((error) => {
+        clearFirestoreModulePromise();
+        throw error;
+      });
   }
+
   return firestoreModulePromise;
 }
 
@@ -141,18 +193,8 @@ function setOfflineStatus() {
   setStatus("Lütfen internet bağlantınızı kontrol edin.", "offline");
 }
 
-async function hasInternetConnection() {
-  if (!navigator.onLine) return false;
-
-  try {
-    const response = await fetch(`./manifest.webmanifest?check=${Date.now()}`, {
-      method: "GET",
-      cache: "no-store"
-    });
-    return response.ok;
-  } catch {
-    return false;
-  }
+function hasInternetConnection() {
+  return navigator.onLine;
 }
 
 function isNetworkLikeError(error) {
@@ -179,7 +221,7 @@ async function routeAfterLogin(user, options = {}) {
   setButtonsDisabled(true);
 
   try {
-    const { getUserClaims } = await loadAuthModule();
+    const { getUserClaims } = await loadAuthModule({ allowRetryIfStale: true });
     const claims = await getUserClaims(user);
     const isAdmin = claims.adminPanel === true;
     const targetUrl = isAdmin ? "./chooser.html" : "./app.html";
@@ -221,16 +263,17 @@ async function handleLogin() {
     return;
   }
 
-  if (!(await hasInternetConnection())) {
+  setButtonsDisabled(true);
+  setStatus("Giriş yapılıyor...", "normal");
+
+  if (!hasInternetConnection()) {
+    setButtonsDisabled(false);
     setOfflineStatus();
     return;
   }
 
   try {
-    setButtonsDisabled(true);
-    setStatus("Giriş yapılıyor...", "normal");
-
-    const { login } = await loadAuthModule();
+    const { login } = await loadAuthModule({ allowRetryIfStale: true });
     const result = await login(email, password);
 
     setStatus("Giriş başarılı.", "success");
@@ -240,7 +283,7 @@ async function handleLogin() {
   } catch (error) {
     setButtonsDisabled(false);
 
-    if (isNetworkLikeError(error) || !(await hasInternetConnection())) {
+    if (isNetworkLikeError(error) || !hasInternetConnection()) {
       setOfflineStatus();
       return;
     }
@@ -263,16 +306,17 @@ async function handleRegister() {
     return;
   }
 
-  if (!(await hasInternetConnection())) {
+  setButtonsDisabled(true);
+  setStatus("Hesap oluşturuluyor...", "normal");
+
+  if (!hasInternetConnection()) {
+    setButtonsDisabled(false);
     setOfflineStatus();
     return;
   }
 
   try {
-    setButtonsDisabled(true);
-    setStatus("Hesap oluşturuluyor...", "normal");
-
-    const { register } = await loadAuthModule();
+    const { register } = await loadAuthModule({ allowRetryIfStale: true });
     const { ensureUserProfile } = await loadFirestoreModule();
 
     const result = await register(email, password);
@@ -285,7 +329,7 @@ async function handleRegister() {
   } catch (error) {
     setButtonsDisabled(false);
 
-    if (isNetworkLikeError(error) || !(await hasInternetConnection())) {
+    if (isNetworkLikeError(error) || !hasInternetConnection()) {
       setOfflineStatus();
       return;
     }
@@ -302,16 +346,17 @@ async function handleReset() {
     return;
   }
 
-  if (!(await hasInternetConnection())) {
+  setButtonsDisabled(true);
+  setStatus("Sıfırlama bağlantısı hazırlanıyor...", "normal");
+
+  if (!hasInternetConnection()) {
+    setButtonsDisabled(false);
     setOfflineStatus();
     return;
   }
 
   try {
-    setButtonsDisabled(true);
-    setStatus("Sıfırlama bağlantısı hazırlanıyor...", "normal");
-
-    const { sendReset } = await loadAuthModule();
+    const { sendReset } = await loadAuthModule({ allowRetryIfStale: true });
     await sendReset(email);
 
     setStatus(
@@ -322,7 +367,7 @@ async function handleReset() {
   } catch (error) {
     setButtonsDisabled(false);
 
-    if (isNetworkLikeError(error) || !(await hasInternetConnection())) {
+    if (isNetworkLikeError(error) || !hasInternetConnection()) {
       setOfflineStatus();
       return;
     }
