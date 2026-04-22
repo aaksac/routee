@@ -295,7 +295,15 @@
     </span>
   </button>
 
-  <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDNzTeais7ezxKyGmmPC_yf4DORuIowuVE&libraries=places"></script>
+    <script>
+    window.__routeeGoogleMapsLoaded = window.__routeeGoogleMapsLoaded || function () {};
+  </script>
+  <script
+    async
+    defer
+    data-routee-google-maps="1"
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDNzTeais7ezxKyGmmPC_yf4DORuIowuVE&libraries=places&callback=__routeeGoogleMapsLoaded"
+  ></script>
   <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
   <script type="module" src="./js/app.js"></script>
 </body>
