@@ -116,7 +116,93 @@ const elements = {
 };
 
 const DEFAULT_POINT_COLOR = "#dc2626";
+const GOOGLE_MAPS_BOOT_TIMEOUT_MS = 12000;
+let mapFeaturesInitialized = false;
+let mapsBootPromise = null;
 
+function areGoogleMapsLibrariesReady() {
+  return Boolean(
+    window.google?.maps?.Map &&
+      window.google?.maps?.Geocoder &&
+      window.google?.maps?.places?.AutocompleteService
+  );
+}
+
+function initializeMapFeatures() {
+  if (mapFeaturesInitialized || !areGoogleMapsLibrariesReady()) {
+    return false;
+  }
+
+  initMap();
+  initMapClickPicker();
+  initSearchBox();
+  mapFeaturesInitialized = true;
+  return true;
+}
+
+function waitForGoogleMaps() {
+  if (areGoogleMapsLibrariesReady()) {
+    return Promise.resolve();
+  }
+
+  if (mapsBootPromise) {
+    return mapsBootPromise;
+  }
+
+  mapsBootPromise = new Promise((resolve, reject) => {
+    const mapsScript = document.querySelector("script[data-routee-google-maps='1']");
+
+    const cleanup = () => {
+      if (mapsScript) {
+        mapsScript.removeEventListener("error", handleError);
+      }
+      window.clearTimeout(timeoutId);
+      delete window.__routeeGoogleMapsLoaded;
+    };
+
+    const handleReady = () => {
+      cleanup();
+      resolve();
+    };
+
+    const handleError = () => {
+      cleanup();
+      reject(new Error("Google Maps script yüklenemedi."));
+    };
+
+    const timeoutId = window.setTimeout(() => {
+      cleanup();
+      reject(new Error("Google Maps yükleme zaman aşımı."));
+    }, GOOGLE_MAPS_BOOT_TIMEOUT_MS);
+
+    window.__routeeGoogleMapsLoaded = handleReady;
+
+    if (mapsScript) {
+      mapsScript.addEventListener("error", handleError, { once: true });
+    }
+
+    if (areGoogleMapsLibrariesReady()) {
+      handleReady();
+    }
+  });
+
+  return mapsBootPromise;
+}
+
+async function bootstrapMapFeatures() {
+  if (initializeMapFeatures()) return;
+
+  elements.authStatus.textContent = "Harita servisi yükleniyor...";
+
+  try {
+    await waitForGoogleMaps();
+    initializeMapFeatures();
+  } catch (error) {
+    console.warn(error);
+    elements.authStatus.textContent =
+      "Harita servisine bağlanılamadı. İnternet bağlantınızı kontrol edip sayfayı yenileyin.";
+  }
+}
 function goToLogin() {
   window.location.href = "./index.html";
 }
@@ -1455,15 +1541,9 @@ function init() {
   renderTripList();
   bindEvents();
   initMobileTopbarAutoHide();
-
+  initAuthWatcher();
   window.requestAnimationFrame(() => {
-    initMap();
-    initMapClickPicker();
-    initAuthWatcher();
-
-    window.requestAnimationFrame(() => {
-      initSearchBox();
-    });
+  bootstrapMapFeatures();
   });
 }
 
