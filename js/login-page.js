@@ -15,9 +15,6 @@ let authModulePromise = null;
 let authModuleRequestedAt = 0;
 let authModuleState = "idle";
 
-let firestoreModulePromise = null;
-let firestoreModuleState = "idle";
-
 let isRouting = false;
 let bootResolved = false;
 let bootFallbackTimer = null;
@@ -66,29 +63,6 @@ function loadAuthModule(options = {}) {
   }
 
   return authModulePromise;
-}
-
-function clearFirestoreModulePromise() {
-  firestoreModulePromise = null;
-  firestoreModuleState = "idle";
-}
-
-function loadFirestoreModule() {
-  if (!firestoreModulePromise) {
-    firestoreModuleState = "pending";
-
-    firestoreModulePromise = import("./firestore.js")
-      .then((module) => {
-        firestoreModuleState = "resolved";
-        return module;
-      })
-      .catch((error) => {
-        clearFirestoreModulePromise();
-        throw error;
-      });
-  }
-
-  return firestoreModulePromise;
 }
 
 function wait(ms) {
@@ -292,50 +266,8 @@ async function handleLogin() {
   }
 }
 
-async function handleRegister() {
-  const email = elements.loginEmail.value.trim();
-  const password = elements.loginPassword.value.trim();
-
-  if (!email || !password) {
-    setStatus("Kayıt için e-posta ve şifre gerekli.");
-    return;
-  }
-
-  if (password.length < 6) {
-    setStatus("Şifre en az 6 karakter olmalı.");
-    return;
-  }
-
-  setButtonsDisabled(true);
-  setStatus("Hesap oluşturuluyor...", "normal");
-
-  if (!hasInternetConnection()) {
-    setButtonsDisabled(false);
-    setOfflineStatus();
-    return;
-  }
-
-  try {
-    const { register } = await loadAuthModule({ allowRetryIfStale: true });
-    const { ensureUserProfile } = await loadFirestoreModule();
-
-    const result = await register(email, password);
-    await ensureUserProfile(result.user.uid, result.user.email);
-
-    setStatus("Kayıt başarılı. 7 günlük deneme hesabı oluşturuldu.", "success");
-    await routeAfterLogin(result.user, {
-      message: "Hesabınız hazırlanıyor..."
-    });
-  } catch (error) {
-    setButtonsDisabled(false);
-
-    if (isNetworkLikeError(error) || !hasInternetConnection()) {
-      setOfflineStatus();
-      return;
-    }
-
-    setStatus(`Kayıt hatası: ${error.message}`);
-  }
+function handleRegisterRedirect() {
+  window.location.href = "./register.html";
 }
 
 async function handleReset() {
@@ -396,11 +328,11 @@ async function initAuthWatcher() {
   }
 }
 
-function bindEvents() {
-  elements.btnLogin?.addEventListener("click", handleLogin);
-  elements.btnRegister?.addEventListener("click", handleRegister);
-  elements.btnResetPassword?.addEventListener("click", handleReset);
-}
+function bindEvents() {␊
+  elements.btnLogin?.addEventListener("click", handleLogin);␊
+  elements.btnRegister?.addEventListener("click", handleRegisterRedirect);
+  elements.btnResetPassword?.addEventListener("click", handleReset);␊
+}␊
 
 function applyQueryStatus() {
   const params = new URLSearchParams(window.location.search);
