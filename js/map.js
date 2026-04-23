@@ -17,6 +17,7 @@ let searchSelectHandlerBound = false;
 let searchInputHandlerBound = false;
 let searchBlurHandlerBound = false;
 let searchFocusHandlerBound = false;
+let isInteractingWithSearchDropdown = false;
 let lastPredictionRequestId = 0;
 let currentPredictions = [];
 
@@ -750,6 +751,16 @@ function ensureSearchDropdown(inputElement) {
   dropdown.style.overflowX = "hidden";
   dropdown.style.boxSizing = "border-box";
 
+  dropdown.addEventListener("pointerdown", () => {
+    isInteractingWithSearchDropdown = true;
+  });
+
+  dropdown.addEventListener("pointerup", () => {
+    window.setTimeout(() => {
+      isInteractingWithSearchDropdown = false;
+    }, 0);
+  });
+
   const parent = inputElement.parentElement;
   if (parent) {
     const currentPosition = window.getComputedStyle(parent).position;
@@ -787,6 +798,7 @@ function renderPredictions(predictions, onPlaceSelected) {
   if (!dropdown) return;
 
   dropdown.innerHTML = "";
+  isInteractingWithSearchDropdown = false;
 
   if (!predictions.length) {
     dropdown.style.display = "none";
@@ -975,6 +987,7 @@ function initPlaceSearch(inputElement, onPlaceSelected) {
   if (!searchBlurHandlerBound) {
     inputElement.addEventListener("blur", () => {
       window.setTimeout(() => {
+        if (isInteractingWithSearchDropdown) return;
         hideSearchDropdown();
         resetPageZoomAfterSearch();
       }, 180);
