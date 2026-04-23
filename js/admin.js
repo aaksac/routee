@@ -21,6 +21,17 @@ const state = {
   searchTerm: ""
 };
 
+const emailCollator = new Intl.Collator("tr");
+const INITIAL_VISIBLE_USERS = 120;
+const VISIBLE_USERS_STEP = 120;
+let visibleUsersCount = INITIAL_VISIBLE_USERS;
+let latestLoadRequestId = 0;
+
+async function ensureAuthToken(forceRefresh = false) {
+  if (!state.currentUser) return;
+  await state.currentUser.getIdToken(forceRefresh);
+}
+
 const elements = {
   adminStatus: document.getElementById("adminStatus"),
   adminUserList: document.getElementById("adminUserList"),
@@ -94,16 +105,19 @@ function renderSelectedUser() {
       : formatDate(user.accessUntilMs);
 }
 
-function renderUsers() {
-  updateUserCount();
-
-  if (!state.filteredUsers.length) {
+function renderUsers() {␊
+  updateUserCount();␊
+␊
+  if (!state.filteredUsers.length) {␊
     elements.adminUserList.innerHTML =
       `<div class="admin-empty"><strong>Eşleşen kullanıcı bulunamadı</strong></div>`;
     return;
   }
 
-  elements.adminUserList.innerHTML = state.filteredUsers
+  const visibleUsers = state.filteredUsers.slice(0, visibleUsersCount);
+  const hasMoreUsers = state.filteredUsers.length > visibleUsers.length;
+
+  const listHtml = visibleUsers
     .map((user) => `
       <button
         class="admin-user-card ${state.selectedUser?.uid === user.uid ? "active" : ""}"
@@ -120,10 +134,21 @@ function renderUsers() {
       </button>
     `)
     .join("");
+
+  const loadMoreHtml = hasMoreUsers
+    ? `
+      <button class="admin-load-more" type="button" data-action="load-more-users">
+        Daha fazla göster (${state.filteredUsers.length - visibleUsers.length} kaldı)
+      </button>
+    `
+    : "";
+
+  elements.adminUserList.innerHTML = `${listHtml}${loadMoreHtml}`;
 }
 
 function applyUserFilter() {
   const term = (state.searchTerm || "").trim().toLocaleLowerCase("tr-TR");
+  visibleUsersCount = INITIAL_VISIBLE_USERS;
 
   if (!term) {
     state.filteredUsers = [...state.users];
@@ -139,16 +164,17 @@ function applyUserFilter() {
 }
 
 async function loadUsers() {
+  const requestId = ++latestLoadRequestId;
+  const startedAt = performance.now();
+
   try {
     elements.adminStatus.textContent = "Kullanıcılar yükleniyor...";
-
-    if (state.currentUser) {
-      await state.currentUser.getIdToken(true);
-    }
-
+    await ensureAuthToken();
     const result = await fnListUsers();
+    if (requestId !== latestLoadRequestId) return;
+
     state.users = Array.isArray(result.data?.users) ? result.data.users : [];
-    state.users.sort((a, b) => (a.email || "").localeCompare(b.email || "", "tr"));
+    state.users.sort((a, b) => emailCollator.compare(a.email || "", b.email || ""));
 
     if (state.selectedUser) {
       state.selectedUser = state.users.find((u) => u.uid === state.selectedUser.uid) || null;
@@ -156,8 +182,11 @@ async function loadUsers() {
 
     applyUserFilter();
     renderSelectedUser();
-    elements.adminStatus.textContent = `Kullanıcı listesi güncellendi. Toplam: ${state.users.length}`;
+    const elapsedMs = Math.round(performance.now() - startedAt);
+    elements.adminStatus.textContent =
+      `Kullanıcı listesi güncellendi. Toplam: ${state.users.length} (${elapsedMs}ms)`;
   } catch (error) {
+    if (requestId !== latestLoadRequestId) return;
     elements.adminStatus.textContent = `Listeleme hatası: ${error.message}`;
   }
 }
@@ -172,9 +201,7 @@ async function handleCreateUser() {
   }
 
   try {
-    if (state.currentUser) {
-      await state.currentUser.getIdToken(true);
-    }
+    await ensureAuthToken();
 
     await fnCreateUser({ email, password });
     elements.newUserEmail.value = "";
@@ -199,9 +226,7 @@ async function handleGrantAccess() {
   }
 
   try {
-    if (state.currentUser) {
-      await state.currentUser.getIdToken(true);
-    }
+    await ensureAuthToken();
 
     await fnSetAccess({
       uid: state.selectedUser.uid,
@@ -222,9 +247,7 @@ async function handleSetTrial() {
   }
 
   try {
-    if (state.currentUser) {
-      await state.currentUser.getIdToken(true);
-    }
+    await ensureAuthToken();
 
     await fnSetAccess({
       uid: state.selectedUser.uid,
@@ -247,9 +270,7 @@ async function handleDeleteUser() {
   if (!ok) return;
 
   try {
-    if (state.currentUser) {
-      await state.currentUser.getIdToken(true);
-    }
+    await ensureAuthToken();
 
     await fnDeleteUser({ uid: state.selectedUser.uid });
     state.selectedUser = null;
@@ -281,11 +302,20 @@ function bindEvents() {
   });
 
   elements.adminUserList?.addEventListener("click", (event) => {
+    const actionBtn = event.target.closest("[data-action='load-more-users']");
+    if (actionBtn) {
+      visibleUsersCount += VISIBLE_USERS_STEP;
+      renderUsers();
+      return;
+    }
+
     const btn = event.target.closest("[data-uid]");
     if (!btn) return;
 
     state.selectedUser = state.users.find((u) => u.uid === btn.dataset.uid) || null;
-    renderUsers();
+    const previousActive = elements.adminUserList.querySelector(".admin-user-card.active");
+    previousActive?.classList.remove("active");
+    btn.classList.add("active");
     renderSelectedUser();
   });
 }
@@ -297,8 +327,8 @@ function initAuthGuard() {
       return;
     }
 
-    state.currentUser = user;
-    await user.getIdToken(true);
+    state.currentUser = user;␊
+    await ensureAuthToken(true);
     state.claims = await getUserClaims(user);
 
     if (state.claims.adminPanel !== true) {
