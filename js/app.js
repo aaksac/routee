@@ -1260,9 +1260,31 @@ function hasDraftCoordinates() {
 
   return Boolean(hasStartCoords || hasPointCoords);
 }
+function getVisibleFloatingPanelName() {
+  const panelEntries = [
+    ["start", elements.startPanel],
+    ["point", elements.pointPanel],
+    ["save", elements.savePanel],
+    ["importExport", elements.importExportPanel]
+  ];
+
+  for (const [panelName, panel] of panelEntries) {
+    if (panel && !panel.classList.contains("hidden")) {
+      return panelName;
+    }
+  }
+
+  return null;
+}
 
 function syncMobilePanelState() {
   const isMobile = window.innerWidth <= 720;
+    const visiblePanelName = getVisibleFloatingPanelName();
+
+  if (visiblePanelName !== state.activeFloatingPanel) {
+    state.activeFloatingPanel = visiblePanelName;
+  }
+
   const panelName = state.activeFloatingPanel || "";
   const hasOpenMobilePanel = isMobile && Boolean(panelName);
 
@@ -1540,6 +1562,7 @@ function init() {
   renderSummary();
   renderTripList();
   bindEvents();
+  syncMobilePanelState();
   initMobileTopbarAutoHide();
   initAuthWatcher();
   window.requestAnimationFrame(() => {
