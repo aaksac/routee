@@ -292,50 +292,8 @@ async function handleLogin() {
   }
 }
 
-async function handleRegister() {
-  const email = elements.loginEmail.value.trim();
-  const password = elements.loginPassword.value.trim();
-
-  if (!email || !password) {
-    setStatus("Kayıt için e-posta ve şifre gerekli.");
-    return;
-  }
-
-  if (password.length < 6) {
-    setStatus("Şifre en az 6 karakter olmalı.");
-    return;
-  }
-
-  setButtonsDisabled(true);
-  setStatus("Hesap oluşturuluyor...", "normal");
-
-  if (!hasInternetConnection()) {
-    setButtonsDisabled(false);
-    setOfflineStatus();
-    return;
-  }
-
-  try {
-    const { register } = await loadAuthModule({ allowRetryIfStale: true });
-    const { ensureUserProfile } = await loadFirestoreModule();
-
-    const result = await register(email, password);
-    await ensureUserProfile(result.user.uid, result.user.email);
-
-    setStatus("Kayıt başarılı. 7 günlük deneme hesabı oluşturuldu.", "success");
-    await routeAfterLogin(result.user, {
-      message: "Hesabınız hazırlanıyor..."
-    });
-  } catch (error) {
-    setButtonsDisabled(false);
-
-    if (isNetworkLikeError(error) || !hasInternetConnection()) {
-      setOfflineStatus();
-      return;
-    }
-
-    setStatus(`Kayıt hatası: ${error.message}`);
-  }
+function handleRegisterNavigation() {
+  window.location.href = "./register.html";
 }
 
 async function handleReset() {
@@ -398,7 +356,7 @@ async function initAuthWatcher() {
 
 function bindEvents() {
   elements.btnLogin?.addEventListener("click", handleLogin);
-  elements.btnRegister?.addEventListener("click", handleRegister);
+  elements.btnRegister?.addEventListener("click", handleRegisterNavigation);
   elements.btnResetPassword?.addEventListener("click", handleReset);
 }
 
