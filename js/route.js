@@ -18,8 +18,8 @@ function haversineDistance(lat1, lng1, lat2, lng2) {
   return R * c;
 }
 
-function routeDistanceFromOrder(startPoint, orderedPoints) {
-  if (!startPoint || !orderedPoints.length) {
+function routeDistanceFromOrder(startPoint, orderedPoints, endPoint = null) {
+  if (!startPoint) {
     return 0;
   }
 
@@ -34,6 +34,15 @@ function routeDistanceFromOrder(startPoint, orderedPoints) {
       point.lng
     );
     current = point;
+  }
+
+  if (endPoint) {
+    totalDistance += haversineDistance(
+      current.lat,
+      current.lng,
+      endPoint.lat,
+      endPoint.lng
+    );
   }
 
   return totalDistance;
@@ -61,6 +70,24 @@ function attachStepDistances(startPoint, orderedPoints) {
       distanceFromPrevious
     };
   });
+}
+
+function attachEndPointDistance(startPoint, orderedPoints, endPoint) {
+  if (!startPoint || !endPoint) return null;
+
+  const previous = orderedPoints.length
+    ? orderedPoints[orderedPoints.length - 1]
+    : startPoint;
+
+  return {
+    ...endPoint,
+    distanceFromPrevious: haversineDistance(
+      previous.lat,
+      previous.lng,
+      endPoint.lat,
+      endPoint.lng
+    )
+  };
 }
 
 function nearestNeighborOrderFromSeed(startPoint, points, seedIndex = -1) {
@@ -111,14 +138,14 @@ function reverseSegment(order, startIndex, endIndex) {
   }
 }
 
-function improveWithTwoOpt(startPoint, initialOrder, timeLimitMs) {
+function improveWithTwoOpt(startPoint, initialOrder, timeLimitMs, endPoint = null) {
   const order = [...initialOrder];
 
   if (order.length < 4) {
     return order;
   }
 
-  let bestDistance = routeDistanceFromOrder(startPoint, order);
+  let bestDistance = routeDistanceFromOrder(startPoint, order, endPoint);
   const now =
     typeof performance !== "undefined" && typeof performance.now === "function"
       ? () => performance.now()
@@ -142,7 +169,12 @@ function improveWithTwoOpt(startPoint, initialOrder, timeLimitMs) {
 
         const candidate = [...order];
         reverseSegment(candidate, i, k);
-        const candidateDistance = routeDistanceFromOrder(startPoint, candidate);
+
+        const candidateDistance = routeDistanceFromOrder(
+          startPoint,
+          candidate,
+          endPoint
+        );
 
         if (candidateDistance + 1e-9 < bestDistance) {
           order.splice(0, order.length, ...candidate);
@@ -156,7 +188,7 @@ function improveWithTwoOpt(startPoint, initialOrder, timeLimitMs) {
   return order;
 }
 
-function buildSeedIndexes(startPoint, points) {
+function buildSeedIndexes(startPoint, points, endPoint = null) {
   if (!points.length) {
     return [];
   }
@@ -176,20 +208,21 @@ function buildSeedIndexes(startPoint, points) {
 
   for (let i = 0; i < points.length; i += 1) {
     const point = points[i];
-    const distance = haversineDistance(
+
+    const distanceFromStart = haversineDistance(
       startPoint.lat,
       startPoint.lng,
       point.lat,
       point.lng
     );
 
-    if (distance < nearestDistance) {
-      nearestDistance = distance;
+    if (distanceFromStart < nearestDistance) {
+      nearestDistance = distanceFromStart;
       nearestToStart = i;
     }
 
-    if (distance > farthestDistance) {
-      farthestDistance = distance;
+    if (distanceFromStart > farthestDistance) {
+      farthestDistance = distanceFromStart;
       farthestFromStart = i;
     }
 
@@ -199,43 +232,88 @@ function buildSeedIndexes(startPoint, points) {
     if (point.lng < points[westIndex].lng) westIndex = i;
   }
 
-  indexes.add(nearestToStart);
-  indexes.add(farthestFromStart);
-  indexes.add(northIndex);
-  indexes.add(southIndex);
-  indexes.add(eastIndex);
-  indexes.add(westIndex);
+  [
+    nearestToStart,
+    farthestFromStart,
+    northIndex,
+    southIndex,
+    eastIndex,
+    westIndex
+  ].forEach((index) => indexes.add(index));
+
+  if (endPoint) {
+    let nearestToEnd = 0;
+    let nearestEndDistance = Infinity;
+
+    for (let i = 0; i < points.length; i += 1) {
+      const point = points[i];
+
+      const distanceToEnd = haversineDistance(
+        point.lat,
+        point.lng,
+        endPoint.lat,
+        endPoint.lng
+      );
+
+      if (distanceToEnd < nearestEndDistance) {
+        nearestEndDistance = distanceToEnd;
+        nearestToEnd = i;
+      }
+    }
+
+    indexes.add(nearestToEnd);
+  }
 
   return [...indexes];
 }
 
-function nearestNeighborRoute(startPoint, points) {
-  if (!startPoint || !points.length) {
+function nearestNeighborRoute(startPoint, points, endPoint = null) {
+  if (!startPoint) {
     return {
       orderedPoints: [],
+      endPoint: endPoint || null,
       totalDistance: 0
+    };
+  }
+
+  if (!points.length) {
+    const endPointWithDistance = attachEndPointDistance(startPoint, [], endPoint);
+
+    return {
+      orderedPoints: [],
+      endPoint: endPointWithDistance,
+      totalDistance: endPointWithDistance?.distanceFromPrevious || 0
     };
   }
 
   if (points.length === 1) {
     const orderedPoints = attachStepDistances(startPoint, points);
+
+    const endPointWithDistance = attachEndPointDistance(
+      startPoint,
+      orderedPoints,
+      endPoint
+    );
+
     return {
       orderedPoints,
-      totalDistance: orderedPoints[0].distanceFromPrevious
+      endPoint: endPointWithDistance,
+      totalDistance: routeDistanceFromOrder(startPoint, orderedPoints, endPoint)
     };
   }
 
   const totalBudgetMs =
     points.length <= 60 ? 140 : points.length <= 120 ? 220 : 320;
 
-  const seedIndexes = buildSeedIndexes(startPoint, points);
+  const seedIndexes = buildSeedIndexes(startPoint, points, endPoint);
+
   const perSeedBudget = Math.max(
     20,
     Math.floor(totalBudgetMs / Math.max(seedIndexes.length, 1))
   );
 
   let bestOrder = nearestNeighborOrderFromSeed(startPoint, points, -1);
-  let bestDistance = routeDistanceFromOrder(startPoint, bestOrder);
+  let bestDistance = routeDistanceFromOrder(startPoint, bestOrder, endPoint);
 
   for (const seedIndex of seedIndexes) {
     let candidateOrder = nearestNeighborOrderFromSeed(
@@ -247,12 +325,14 @@ function nearestNeighborRoute(startPoint, points) {
     candidateOrder = improveWithTwoOpt(
       startPoint,
       candidateOrder,
-      perSeedBudget
+      perSeedBudget,
+      endPoint
     );
 
     const candidateDistance = routeDistanceFromOrder(
       startPoint,
-      candidateOrder
+      candidateOrder,
+      endPoint
     );
 
     if (candidateDistance + 1e-9 < bestDistance) {
@@ -263,8 +343,15 @@ function nearestNeighborRoute(startPoint, points) {
 
   const orderedPoints = attachStepDistances(startPoint, bestOrder);
 
+  const endPointWithDistance = attachEndPointDistance(
+    startPoint,
+    orderedPoints,
+    endPoint
+  );
+
   return {
     orderedPoints,
+    endPoint: endPointWithDistance,
     totalDistance: bestDistance
   };
 }
