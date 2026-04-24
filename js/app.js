@@ -326,9 +326,20 @@ function isTrialActive() {
 }
 
 function isPremiumAccessActive() {
-  if (!state.fullAccess) return false;
+  const profileRole = String(state.profile?.role || "").toLowerCase();
+
+  const hasPremiumIdentity =
+    state.fullAccess === true ||
+    state.claims?.fullAccess === true ||
+    state.profile?.fullAccess === true ||
+    profileRole === "premium";
+
+  if (!hasPremiumIdentity) return false;
+
   const accessUntil = getAccessUntilMs();
+
   if (!accessUntil) return true;
+
   return accessUntil > Date.now();
 }
 
@@ -475,11 +486,12 @@ function commitStartPoint() {
     }
   }
 
-  const nextLocationCount = nextPoints.length + 1;
-  if (nextLocationCount > state.locationQuota) {
-    alert(`Başlangıç dahil en fazla ${state.locationQuota} konum eklenebilir.`);
-    return;
-  }
+const nextLocationCount = nextPoints.length + 1;
+
+if (!isPremiumAccessActive() && nextLocationCount > state.locationQuota) {
+  alert(`Başlangıç dahil en fazla ${state.locationQuota} konum eklenebilir.`);
+  return;
+}
 
   state.points = nextPoints;
   state.startPoint = startPoint;
@@ -1572,7 +1584,14 @@ function initSearchBox() {
 async function loadAccessModel(user) {
   state.claims = await getUserClaims(user);
   state.profile = await getUserProfile(user.uid);
-  state.fullAccess = state.claims.fullAccess === true;
+
+  const profileRole = String(state.profile?.role || "").toLowerCase();
+
+  state.fullAccess =
+    state.claims?.fullAccess === true ||
+    state.profile?.fullAccess === true ||
+    profileRole === "premium";
+
   state.locationQuota = state.profile?.locationQuota || TRIAL_LOCATION_QUOTA;
   state.mapQuota = state.profile?.mapQuota || 1;
   state.accessActive = hasActiveAccess();
