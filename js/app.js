@@ -1483,6 +1483,7 @@ function initMapClickPicker() {
   enableMapClickPicker(({ lat, lng, name }) => {
     if (!hasActiveAccess()) return;
     fillBothFormsFromMap(lat, lng, name || "");
+    state.editingPointId = null;
     markDirty();
 
     if (name) {
@@ -1497,6 +1498,7 @@ function initSearchBox() {
   initPlaceSearch(elements.placeSearch, ({ name, lat, lng }) => {
     if (!hasActiveAccess()) return;
     fillBothFormsFromMap(lat, lng, name);
+    state.editingPointId = null;
     markDirty();
     elements.authStatus.textContent = `Arama ile yer seçildi: ${name}`;
   });
