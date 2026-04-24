@@ -8,7 +8,6 @@ let startMarker = null;
 let routePolylines = [];
 let distanceOverlays = [];
 let activeInfoWindow = null;
-let focusProjectionOverlay = null;
 
 let searchService = null;
 let geocoder = null;
@@ -50,7 +49,6 @@ function initMap() {
   map = new google.maps.Map(mapElement, {
     center: defaultCenter,
     zoom: 11,
-    backgroundColor: "#f8fafc",
     mapTypeControl: false,
     streetViewControl: false,
     fullscreenControl: false,
@@ -64,12 +62,6 @@ function initMap() {
 
   geocoder = new google.maps.Geocoder();
   searchService = new google.maps.places.AutocompleteService();
-
-  focusProjectionOverlay = new google.maps.OverlayView();
-  focusProjectionOverlay.onAdd = function () {};
-  focusProjectionOverlay.draw = function () {};
-  focusProjectionOverlay.onRemove = function () {};
-  focusProjectionOverlay.setMap(map);
 
   return map;
 }
@@ -511,170 +503,6 @@ function focusToLocation(lat, lng, zoom = 15) {
   map.setZoom(zoom);
 }
 
-function isElementVisuallyHidden(element) {
-  if (!element) return true;
-
-  const styles = window.getComputedStyle(element);
-  if (
-    styles.display === "none" ||
-    styles.visibility === "hidden" ||
-    Number(styles.opacity || "1") <= 0.05
-  ) {
-    return true;
-  }
-
-  if (element.classList?.contains("hidden") || element.getAttribute("aria-hidden") === "true") {
-    return true;
-  }
-
-  const rect = element.getBoundingClientRect();
-  return rect.width <= 1 || rect.height <= 1;
-}
-
-function getSelectionSafePadding() {
-  const mapDiv = map?.getDiv?.();
-
-  if (!mapDiv) {
-    return {
-      top: 26,
-      right: 26,
-      bottom: 30,
-      left: 26
-    };
-  }
-
-  const mapRect = mapDiv.getBoundingClientRect();
-  const isMobile = window.innerWidth <= 720;
-
-  const padding = {
-    top: isMobile ? 72 : 28,
-    right: isMobile ? 20 : 28,
-    bottom: isMobile ? 116 : 32,
-    left: isMobile ? 20 : 28
-  };
-
-  const overlaySelectors = [
-    ".map-overlay",
-    ".new-map-mobile-fab"
-  ];
-
-  const overlays = document.querySelectorAll(overlaySelectors.join(", "));
-  const EDGE_CAPTURE = 110;
-
-  overlays.forEach((overlay) => {
-    if (isElementVisuallyHidden(overlay)) return;
-
-    const rect = overlay.getBoundingClientRect();
-    const overlapLeft = Math.max(rect.left, mapRect.left);
-    const overlapRight = Math.min(rect.right, mapRect.right);
-    const overlapTop = Math.max(rect.top, mapRect.top);
-    const overlapBottom = Math.min(rect.bottom, mapRect.bottom);
-
-    const overlapWidth = overlapRight - overlapLeft;
-    const overlapHeight = overlapBottom - overlapTop;
-
-    if (overlapWidth <= 0 || overlapHeight <= 0) return;
-
-    if (overlapTop <= mapRect.top + EDGE_CAPTURE) {
-      padding.top = Math.max(padding.top, overlapBottom - mapRect.top + 14);
-    }
-
-    if (overlapBottom >= mapRect.bottom - EDGE_CAPTURE) {
-      padding.bottom = Math.max(padding.bottom, mapRect.bottom - overlapTop + 16);
-    }
-
-    if (overlapLeft <= mapRect.left + EDGE_CAPTURE) {
-      padding.left = Math.max(padding.left, overlapRight - mapRect.left + 14);
-    }
-
-    if (overlapRight >= mapRect.right - EDGE_CAPTURE) {
-      padding.right = Math.max(padding.right, mapRect.right - overlapLeft + 14);
-    }
-  });
-
-  return padding;
-}
-
-function getMarkerContainerPoint(lat, lng) {
-  if (!map) return;
-
-  const projection = focusProjectionOverlay?.getProjection?.();
-  if (!projection) return null;
-
-  const pixel = projection.fromLatLngToContainerPixel(new google.maps.LatLng(lat, lng));
-  if (!pixel) return null;
-
-  return {
-    x: pixel.x,
-    y: pixel.y
-  };
-}
-
-function focusMapForPickedLocation(lat, lng) {
-  if (!map) return;
-
-  const target = { lat, lng };
-  const mapDiv = map.getDiv();
-  const isDesktop = window.innerWidth > 720;
-
-  if (!mapDiv) {
-    map.panTo(target);
-    return;
-  }
-
-  const targetZoom = 18;
-  const maxZoomDeltaPerSelection = 4;
-  const currentZoom = Number(map.getZoom()) || 0;
-  const stagedTargetZoom = Math.min(targetZoom, currentZoom + maxZoomDeltaPerSelection);
-  const shouldZoomIn = currentZoom < stagedTargetZoom;
-
-  const padding = getSelectionSafePadding();
-  const safeRect = {
-    left: padding.left,
-    right: mapDiv.clientWidth - padding.right,
-    top: padding.top,
-    bottom: mapDiv.clientHeight - padding.bottom
-  };
-
-  const desiredX = isDesktop ? mapDiv.clientWidth / 2 : (safeRect.left + safeRect.right) / 2;
-  const desiredY = (safeRect.top + safeRect.bottom) / 2;
-  const COMFORT_TOLERANCE_PX = 42;
-
-  const placeMarkerToComfortZone = (force = false) => {
-    const markerPixel = getMarkerContainerPoint(lat, lng);
-    if (!markerPixel) return;
-
-    const isInSafeRect =
-      markerPixel.x >= safeRect.left &&
-      markerPixel.x <= safeRect.right &&
-      markerPixel.y >= safeRect.top &&
-      markerPixel.y <= safeRect.bottom;
-
-    const deltaX = desiredX - markerPixel.x;
-    const deltaY = desiredY - markerPixel.y;
-    const appliedDeltaX = isDesktop ? 0 : deltaX;
-    const needsComfortPan =
-      Math.abs(appliedDeltaX) > COMFORT_TOLERANCE_PX || Math.abs(deltaY) > COMFORT_TOLERANCE_PX;
-
-    if (!force && isInSafeRect && !needsComfortPan) {
-      return;
-    }
-
-    map.panBy(appliedDeltaX, deltaY);
-  };
-
-  map.panTo(target);
-
-  window.setTimeout(() => {
-    if (shouldZoomIn) {
-      smoothZoomIn(stagedTargetZoom, () => placeMarkerToComfortZone(true));
-      return;
-    }
-
-    placeMarkerToComfortZone(false);
-  }, 120);
-}
-
 function resetPageZoomAfterSearch() {
   if (!searchInputEl) return;
 
@@ -762,8 +590,6 @@ function showDraftMarker(lat, lng) {
     title: "Seçilen Nokta",
     icon: createCircleSymbol("#facc15", "#92400e", 14)
   });
-
-  focusMapForPickedLocation(lat, lng);
 }
 
 function clearDraftMarker() {
