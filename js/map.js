@@ -165,17 +165,17 @@ function initMap() {
 
   mapElement.innerHTML = "";
 
-  const defaultCenter = { lat: 37.0, lng: 35.3213 };
+const defaultCenter = { lat: 39.0, lng: 35.0 };
 
-  map = new google.maps.Map(mapElement, {
-    center: defaultCenter,
-    zoom: 11,
-    mapTypeControl: false,
-    streetViewControl: false,
-    fullscreenControl: false,
-    gestureHandling: "greedy",
-    clickableIcons: false
-  });
+map = new google.maps.Map(mapElement, {
+  center: defaultCenter,
+  zoom: 6,
+  mapTypeControl: false,
+  streetViewControl: false,
+  fullscreenControl: false,
+  gestureHandling: "greedy",
+  clickableIcons: false
+});
 
   activeInfoWindow = new google.maps.InfoWindow({
     ariaLabel: "Konum Bilgisi"
