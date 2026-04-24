@@ -26,8 +26,9 @@ let searchDebounceTimer = null;
 const MIN_SEARCH_LENGTH = 4;
 const SEARCH_DEBOUNCE_MS = 450;
 const MAX_PREDICTIONS = 5;
-const PICKER_MIN_FOCUS_ZOOM = 16;
-const PICKER_MAX_FOCUS_ZOOM = 18;
+const PICKER_FOCUS_ZOOM_STEPS = [16, 17, 18];
+
+let draftSelectionZoomStep = 0;
 
 const POINT_COLORS = [
   { value: "#dc2626", label: "Kırmızı" },
@@ -599,22 +600,22 @@ function clearDraftMarker() {
     draftMarker.setMap(null);
     draftMarker = null;
   }
+
+  draftSelectionZoomStep = 0;
 }
 
 function focusMapForDraftSelection(lat, lng) {
   if (!map) return;
 
-  const currentZoom = Number(map.getZoom());
-  const normalizedZoom = Number.isFinite(currentZoom) ? currentZoom : PICKER_MIN_FOCUS_ZOOM;
-  const nextZoom = Math.min(
-    PICKER_MAX_FOCUS_ZOOM,
-    Math.max(PICKER_MIN_FOCUS_ZOOM, normalizedZoom)
-  );
+  const maxStepIndex = PICKER_FOCUS_ZOOM_STEPS.length - 1;
+  const boundedStepIndex = Math.min(draftSelectionZoomStep, maxStepIndex);
+  const nextZoom = PICKER_FOCUS_ZOOM_STEPS[boundedStepIndex];
 
   map.panTo({ lat, lng });
+  map.setZoom(nextZoom);
 
-  if (normalizedZoom !== nextZoom) {
-    map.setZoom(nextZoom);
+  if (draftSelectionZoomStep < maxStepIndex) {
+    draftSelectionZoomStep += 1;
   }
 }
 
