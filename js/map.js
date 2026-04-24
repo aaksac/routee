@@ -8,6 +8,7 @@ let startMarker = null;
 let routePolylines = [];
 let distanceOverlays = [];
 let activeInfoWindow = null;
+let focusProjectionOverlay = null;
 
 let searchService = null;
 let geocoder = null;
@@ -62,6 +63,12 @@ function initMap() {
 
   geocoder = new google.maps.Geocoder();
   searchService = new google.maps.places.AutocompleteService();
+
+  focusProjectionOverlay = new google.maps.OverlayView();
+  focusProjectionOverlay.onAdd = function () {};
+  focusProjectionOverlay.draw = function () {};
+  focusProjectionOverlay.onRemove = function () {};
+  focusProjectionOverlay.setMap(map);
 
   return map;
 }
@@ -587,31 +594,47 @@ function getSelectionSafePadding() {
   return padding;
 }
 
-function projectLatLngToContainerPoint(lat, lng) {
-  if (!map) return null;
+function getMarkerContainerPoint(lat, lng) {
+  if (!map) return;
 
-  const bounds = map.getBounds();
-  const mapDiv = map.getDiv();
+  const projection = focusProjectionOverlay?.getProjection?.();
+  if (!projection) return null;
 
-  if (!bounds || !mapDiv) return null;
-
-  const northEast = bounds.getNorthEast();
-  const southWest = bounds.getSouthWest();
-
-  const latSpan = northEast.lat() - southWest.lat();
-  const lngSpan = northEast.lng() - southWest.lng();
-
-  if (!Number.isFinite(latSpan) || !Number.isFinite(lngSpan) || latSpan === 0 || lngSpan === 0) {
-    return null;
-  }
-
-  const xRatio = (lng - southWest.lng()) / lngSpan;
-  const yRatio = (northEast.lat() - lat) / latSpan;
+  const pixel = projection.fromLatLngToContainerPixel(new google.maps.LatLng(lat, lng));
+  if (!pixel) return null;
 
   return {
-    x: xRatio * mapDiv.clientWidth,
-    y: yRatio * mapDiv.clientHeight
+    x: pixel.x,
+    y: pixel.y
   };
+}
+
+function smoothZoomIn(targetZoom, onDone) {
+  if (!map) return;
+
+  let zoom = Number(map.getZoom()) || 0;
+  if (zoom >= targetZoom) {
+    if (typeof onDone === "function") onDone();
+    return;
+  }
+
+  const tick = () => {
+    if (!map) return;
+
+    zoom += 1;
+    map.setZoom(zoom);
+
+    if (zoom < targetZoom) {
+      window.setTimeout(tick, 75);
+      return;
+    }
+
+    if (typeof onDone === "function") {
+      window.setTimeout(onDone, 60);
+    }
+  };
+
+  tick();
 }
 
 function focusMapForPickedLocation(lat, lng) {
@@ -637,42 +660,42 @@ function focusMapForPickedLocation(lat, lng) {
     bottom: mapDiv.clientHeight - padding.bottom
   };
 
-  const markerPixel = projectLatLngToContainerPoint(lat, lng);
-  const isInSafeRect =
-    markerPixel &&
-    markerPixel.x >= safeRect.left &&
-    markerPixel.x <= safeRect.right &&
-    markerPixel.y >= safeRect.top &&
-    markerPixel.y <= safeRect.bottom;
+  const desiredX = (safeRect.left + safeRect.right) / 2;
+  const desiredY = (safeRect.top + safeRect.bottom) / 2;
+  const COMFORT_TOLERANCE_PX = 42;
 
-  if (!shouldZoomIn && isInSafeRect) {
-    return;
-  }
+  const placeMarkerToComfortZone = (force = false) => {
+    const markerPixel = getMarkerContainerPoint(lat, lng);
+    if (!markerPixel) return;
 
-  const offsetX = Math.round((padding.left - padding.right) / 2);
-  const offsetY = Math.round((padding.top - padding.bottom) / 2);
+    const isInSafeRect =
+      markerPixel.x >= safeRect.left &&
+      markerPixel.x <= safeRect.right &&
+      markerPixel.y >= safeRect.top &&
+      markerPixel.y <= safeRect.bottom;
+
+    const deltaX = desiredX - markerPixel.x;
+    const deltaY = desiredY - markerPixel.y;
+    const needsComfortPan =
+      Math.abs(deltaX) > COMFORT_TOLERANCE_PX || Math.abs(deltaY) > COMFORT_TOLERANCE_PX;
+
+    if (!force && isInSafeRect && !needsComfortPan) {
+      return;
+    }
+
+    map.panBy(deltaX, deltaY);
+  };
 
   map.panTo(target);
 
   window.setTimeout(() => {
-    if (offsetX || offsetY) {
-      map.panBy(offsetX, offsetY);
-    }
-
     if (shouldZoomIn) {
-      let animatedZoom = Number(map.getZoom()) || currentZoom;
-      const zoomStep = () => {
-        animatedZoom += 1;
-        map.setZoom(animatedZoom);
-
-        if (animatedZoom < targetZoom) {
-          window.setTimeout(zoomStep, 70);
-        }
-      };
-
-      zoomStep();
+      smoothZoomIn(targetZoom, () => placeMarkerToComfortZone(true));
+      return;
     }
-  }, 140);
+
+    placeMarkerToComfortZone(false);
+  }, 120);
 }
 
 function resetPageZoomAfterSearch() {
