@@ -182,7 +182,11 @@ function handleMarkerClickFocus(marker) {
   if (!position) return;
 
   scrollMapAreaIntoViewOnMobile();
-  focusToLocation(position.lat(), position.lng(), MARKER_CLICK_TARGET_ZOOM);
+
+  smoothFocusToLocation(position.lat(), position.lng(), MARKER_CLICK_TARGET_ZOOM, {
+    stepDelay: 95,
+    allowZoomOut: true
+  });
 }
 
 function initMap() {
@@ -626,7 +630,7 @@ function addMarker({ lat, lng, title, label, onClick, pointData }) {
 
     window.setTimeout(() => {
       openMarkerInfo(marker, marker.__pointData);
-    }, 180);
+    }, 360);
 
     if (typeof onClick === "function") {
       onClick(marker.__pointData);
@@ -668,7 +672,7 @@ function showStartMarker({ lat, lng, title, onClick, pointData }) {
 
     window.setTimeout(() => {
       openMarkerInfo(startMarker, startMarker.__pointData);
-    }, 180);
+    }, 360);
 
     if (typeof onClick === "function") {
       onClick(startMarker.__pointData);
@@ -711,7 +715,7 @@ function showEndMarker({ lat, lng, title, onClick, pointData }) {
 
     window.setTimeout(() => {
       openMarkerInfo(endMarker, endMarker.__pointData);
-    }, 180);
+    }, 360);
 
     if (typeof onClick === "function") {
       onClick(endMarker.__pointData);
@@ -953,10 +957,12 @@ function drawRouteSegments(startPoint, orderedPoints, endPoint = null) {
     const midLat = (previous.lat + point.lat) / 2;
     const midLng = (previous.lng + point.lng) / 2;
 
+    const distanceValue = Number(point.distanceFromPrevious) || 0;
+
     const distanceLabel =
-      point.distanceFromPrevious < 1
-        ? `${Math.round((point.distanceFromPrevious || 0) * 1000)} m`
-        : `${Number((point.distanceFromPrevious || 0).toFixed(2)).toString()} km`;
+      distanceValue < 1
+        ? `${Math.round(distanceValue * 1000)} m`
+        : `${Number(distanceValue.toFixed(2)).toString()} km`;
 
     createDistanceOverlay(
       new google.maps.LatLng(midLat, midLng),
