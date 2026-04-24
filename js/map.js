@@ -52,6 +52,7 @@ const SMOOTH_ZOOM_START_DELAY_MS = 110;
 
 let smoothZoomTimer = null;
 let smoothZoomRunId = 0;
+let markerInfoOpenTimer = null;
 
 function clampZoom(zoom) {
   const normalized = Number(zoom);
@@ -75,6 +76,22 @@ function cancelSmoothZoom() {
     window.clearTimeout(smoothZoomTimer);
     smoothZoomTimer = null;
   }
+}
+
+function cancelScheduledMarkerInfoOpen() {
+  if (markerInfoOpenTimer) {
+    window.clearTimeout(markerInfoOpenTimer);
+    markerInfoOpenTimer = null;
+  }
+}
+
+function scheduleMarkerInfoOpen(marker, pointData, delay = 180) {
+  cancelScheduledMarkerInfoOpen();
+
+  markerInfoOpenTimer = window.setTimeout(() => {
+    markerInfoOpenTimer = null;
+    openMarkerInfo(marker, pointData);
+  }, delay);
 }
 
 function getProgressiveClickTargetZoom(currentZoom) {
@@ -165,17 +182,17 @@ function initMap() {
 
   mapElement.innerHTML = "";
 
-const defaultCenter = { lat: 39.0, lng: 35.0 };
+  const defaultCenter = { lat: 39.0, lng: 35.0 };
 
-map = new google.maps.Map(mapElement, {
-  center: defaultCenter,
-  zoom: 6,
-  mapTypeControl: false,
-  streetViewControl: false,
-  fullscreenControl: false,
-  gestureHandling: "greedy",
-  clickableIcons: false
-});
+  map = new google.maps.Map(mapElement, {
+    center: defaultCenter,
+    zoom: 6,
+    mapTypeControl: false,
+    streetViewControl: false,
+    fullscreenControl: false,
+    gestureHandling: "greedy",
+    clickableIcons: false
+  });
 
   activeInfoWindow = new google.maps.InfoWindow({
     ariaLabel: "Konum Bilgisi"
@@ -483,7 +500,7 @@ function openMarkerInfo(marker, pointData) {
     maxWidth: 248,
     pixelOffset: new google.maps.Size(0, -8),
     zIndex: 9999,
-    disableAutoPan: false
+    disableAutoPan: true
   });
 
   activeInfoWindow.open({
@@ -566,7 +583,8 @@ function addMarker({ lat, lng, title, label, onClick, pointData }) {
 
   marker.addListener("click", () => {
     handleMarkerClickFocus(marker);
-    openMarkerInfo(marker, marker.__pointData);
+    scheduleMarkerInfoOpen(marker, marker.__pointData);
+
     if (typeof onClick === "function") {
       onClick(marker.__pointData);
     }
@@ -604,7 +622,8 @@ function showStartMarker({ lat, lng, title, onClick, pointData }) {
 
   startMarker.addListener("click", () => {
     handleMarkerClickFocus(startMarker);
-    openMarkerInfo(startMarker, startMarker.__pointData);
+    scheduleMarkerInfoOpen(startMarker, startMarker.__pointData);
+
     if (typeof onClick === "function") {
       onClick(startMarker.__pointData);
     }
@@ -624,6 +643,8 @@ function focusToLocation(lat, lng, zoom = 15) {
   if (!map) return;
 
   cancelSmoothZoom();
+  cancelScheduledMarkerInfoOpen();
+
   map.setCenter({ lat, lng });
   map.setZoom(zoom);
 }
@@ -840,24 +861,24 @@ function enableMapClickPicker(callback) {
     google.maps.event.removeListener(mapClickListener);
   }
 
-mapClickListener = map.addListener("click", (event) => {
-  const lat = event.latLng.lat();
-  const lng = event.latLng.lng();
+  mapClickListener = map.addListener("click", (event) => {
+    const lat = event.latLng.lat();
+    const lng = event.latLng.lng();
 
-  if (searchMarker) {
-    searchMarker.setMap(null);
-    searchMarker = null;
-  }
+    if (searchMarker) {
+      searchMarker.setMap(null);
+      searchMarker = null;
+    }
 
-  showDraftMarker(lat, lng);
-  handleProgressiveMapClickFocus(lat, lng);
+    showDraftMarker(lat, lng);
+    handleProgressiveMapClickFocus(lat, lng);
 
-  callback({
-    lat,
-    lng,
-    name: "İşaretli Konum"
+    callback({
+      lat,
+      lng,
+      name: "İşaretli Konum"
+    });
   });
-});
 }
 
 function ensureSearchDropdown(inputElement) {
@@ -1013,23 +1034,23 @@ function renderPredictions(predictions, onPlaceSelected) {
           return;
         }
 
-const location = results[0].geometry.location;
-const lat = location.lat();
-const lng = location.lng();
+        const location = results[0].geometry.location;
+        const lat = location.lat();
+        const lng = location.lng();
 
-clearDraftMarker();
+        clearDraftMarker();
 
-if (searchMarker) {
-  searchMarker.setMap(null);
-  searchMarker = null;
-}
+        if (searchMarker) {
+          searchMarker.setMap(null);
+          searchMarker = null;
+        }
 
-searchMarker = new google.maps.Marker({
-  position: { lat, lng },
-  map,
-  title: selectedName,
-  icon: createCircleSymbol("#2563eb", "#ffffff", 13)
-});
+        searchMarker = new google.maps.Marker({
+          position: { lat, lng },
+          map,
+          title: selectedName,
+          icon: createCircleSymbol("#2563eb", "#ffffff", 13)
+        });
 
         focusToLocation(lat, lng, 16);
         resetPageZoomAfterSearch();
