@@ -588,17 +588,42 @@ function commitEndPoint() {
     return;
   }
 
-  const isNewEndPoint = !state.endPoint;
+  const previousEndPoint = state.endPoint ? { ...state.endPoint } : null;
 
-  if (isNewEndPoint && !canAddMoreLocations(1)) {
+  const selectedPointCandidate = state.editingPointId
+    ? state.points.find((point) => String(point.id) === String(state.editingPointId))
+    : null;
+
+  const promotedPoint =
+    selectedPointCandidate && isSamePlace(selectedPointCandidate, endPoint)
+      ? selectedPointCandidate
+      : state.points.find((point) => isSamePlace(point, endPoint)) || null;
+
+  let nextPoints = [...state.points];
+
+  if (promotedPoint) {
+    nextPoints = nextPoints.filter(
+      (point) => String(point.id) !== String(promotedPoint.id)
+    );
+  }
+
+  const nextLocationCount =
+    nextPoints.length + (state.startPoint ? 1 : 0) + 1;
+
+  if (!isPremiumAccessActive() && nextLocationCount > state.locationQuota) {
     alert(`Başlangıç dahil en fazla ${state.locationQuota} konum eklenebilir.`);
     return;
   }
 
+  state.points = nextPoints;
   state.endPoint = endPoint;
   state.editingPointId = null;
 
   clearDraftMarker();
+
+  if (promotedPoint) {
+    clearPointForm();
+  }
 
   showEndMarker({
     lat: endPoint.lat,
@@ -614,7 +639,14 @@ function commitEndPoint() {
   recomputeRoute();
   markDirty();
 
-  elements.authStatus.textContent = `End point eklendi: ${endPoint.name}`;
+  if (promotedPoint) {
+    elements.authStatus.textContent = `Konum end point olarak ayarlandı: ${endPoint.name}`;
+  } else if (previousEndPoint) {
+    elements.authStatus.textContent = `End point değiştirildi: ${endPoint.name}`;
+  } else {
+    elements.authStatus.textContent = `End point eklendi: ${endPoint.name}`;
+  }
+
   closeFloatingPanels();
 }
 
