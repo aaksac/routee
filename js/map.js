@@ -77,6 +77,25 @@ function cancelSmoothZoom() {
   }
 }
 
+function scrollMapAreaIntoViewOnMobile() {
+  if (window.innerWidth > 720) return;
+
+  const mapCanvas = document.getElementById("mapCanvas");
+  if (!mapCanvas) return;
+
+  const topbar = document.querySelector(".topbar");
+  const topbarHeight = topbar?.offsetHeight || 0;
+  const extraOffset = 16;
+
+  const rect = mapCanvas.getBoundingClientRect();
+  const targetTop = window.scrollY + rect.top - topbarHeight - extraOffset;
+
+  window.scrollTo({
+    top: Math.max(0, targetTop),
+    behavior: "smooth"
+  });
+}
+
 function getProgressiveClickTargetZoom(currentZoom) {
   const normalizedZoom = getCurrentMapZoom();
   const sourceZoom = Number.isFinite(Number(currentZoom))
@@ -161,6 +180,7 @@ function handleMarkerClickFocus(marker) {
   const position = marker.getPosition();
   if (!position) return;
 
+  scrollMapAreaIntoViewOnMobile();
   focusToLocation(position.lat(), position.lng(), MARKER_CLICK_TARGET_ZOOM);
 }
 
