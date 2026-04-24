@@ -407,6 +407,31 @@ function setSelectedPointColor(color = DEFAULT_POINT_COLOR) {
   state.selectedPointColor = color;
 }
 
+function isSamePlace(a, b) {
+  if (!a || !b) return false;
+
+  const aLat = Number(a.lat);
+  const aLng = Number(a.lng);
+  const bLat = Number(b.lat);
+  const bLng = Number(b.lng);
+
+  if (![aLat, aLng, bLat, bLng].every(Number.isFinite)) return false;
+
+  return Math.abs(aLat - bLat) < 0.000001 && Math.abs(aLng - bLng) < 0.000001;
+}
+
+function createPointFromPreviousStart(startPoint) {
+  return {
+    id: Date.now() + Math.random(),
+    name: startPoint.name || "Eski Başlangıç",
+    lat: Number(startPoint.lat),
+    lng: Number(startPoint.lng),
+    color: DEFAULT_POINT_COLOR,
+    distanceFromPrevious: 0,
+    type: "point"
+  };
+}
+
 function commitStartPoint() {
   if (!hasActiveAccess()) {
     alert("Erişim süreniz dolmuş.");
@@ -420,13 +445,49 @@ function commitStartPoint() {
     return;
   }
 
-  const addingNewStart = !state.startPoint;
-  if (addingNewStart && !canAddMoreLocations(1)) {
+  const previousStartPoint = state.startPoint ? { ...state.startPoint } : null;
+  const promotedPointId = state.editingPointId;
+  const promotedPointCandidate = promotedPointId
+    ? state.points.find((point) => String(point.id) === String(promotedPointId))
+    : null;
+
+  const promotedPoint =
+    promotedPointCandidate && isSamePlace(promotedPointCandidate, startPoint)
+      ? promotedPointCandidate
+      : null;
+
+  let nextPoints = [...state.points];
+
+  if (promotedPoint) {
+    nextPoints = nextPoints.filter(
+      (point) => String(point.id) !== String(promotedPoint.id)
+    );
+  }
+
+  if (previousStartPoint && !isSamePlace(previousStartPoint, startPoint)) {
+    const oldStartAsPoint = createPointFromPreviousStart(previousStartPoint);
+    const alreadyExists = nextPoints.some((point) =>
+      isSamePlace(point, oldStartAsPoint)
+    );
+
+    if (!alreadyExists) {
+      nextPoints.push(oldStartAsPoint);
+    }
+  }
+
+  const nextLocationCount = nextPoints.length + 1;
+  if (nextLocationCount > state.locationQuota) {
     alert(`Başlangıç dahil en fazla ${state.locationQuota} konum eklenebilir.`);
     return;
   }
 
+  state.points = nextPoints;
   state.startPoint = startPoint;
+  state.editingPointId = null;
+
+  if (promotedPoint) {
+    clearPointForm();
+  }
 
   showStartMarker({
     lat: startPoint.lat,
@@ -441,7 +502,11 @@ function commitStartPoint() {
 
   recomputeRoute();
   markDirty();
-  elements.authStatus.textContent = `Başlangıç eklendi: ${startPoint.name}`;
+
+  elements.authStatus.textContent = previousStartPoint
+    ? `Başlangıç değiştirildi. Eski başlangıç konum olarak rotaya eklendi: ${startPoint.name}`
+    : `Başlangıç eklendi: ${startPoint.name}`;
+
   closeFloatingPanels();
 }
 
