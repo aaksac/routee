@@ -28,7 +28,8 @@ const SEARCH_DEBOUNCE_MS = 450;
 const MAX_PREDICTIONS = 5;
 const PICKER_FIRST_FOCUS_ZOOM = 14;
 const PICKER_MID_FOCUS_ZOOM = 16;
-const PICKER_FINAL_FOCUS_ZOOM_FALLBACK = 20;
+const PICKER_FINAL_FOCUS_ZOOM_FALLBACK = 21;
+const PICKER_MIN_STEP_DELTA = 1.5;
 const DRAFT_SELECTION_STEP_RESET_DISTANCE_METERS = 250;
 
 let draftSelectionZoomStep = 0;
@@ -627,7 +628,7 @@ function calculateDistanceMeters(lat1, lng1, lat2, lng2) {
 function getPickerFocusZoomSteps() {
   const mapMaxZoom = Number(map?.get?.("maxZoom"));
   const finalZoom = Number.isFinite(mapMaxZoom)
-    ? Math.max(PICKER_MID_FOCUS_ZOOM + 1, mapMaxZoom)
+    ? mapMaxZoom
     : PICKER_FINAL_FOCUS_ZOOM_FALLBACK;
 
   return [PICKER_FIRST_FOCUS_ZOOM, PICKER_MID_FOCUS_ZOOM, finalZoom];
@@ -663,9 +664,15 @@ function focusMapForDraftSelection(lat, lng) {
     nextStepIndex += 1;
   }
 
-  const nextZoom = Math.max(
+  const stepTargetZoom = Math.max(
     pickerFocusZoomSteps[nextStepIndex],
     normalizedCurrentZoom
+  );
+  const zoomWithMinimumStepDelta = normalizedCurrentZoom + PICKER_MIN_STEP_DELTA;
+  const maxAvailableZoom = pickerFocusZoomSteps[maxStepIndex];
+  const nextZoom = Math.min(
+    maxAvailableZoom,
+    Math.max(stepTargetZoom, zoomWithMinimumStepDelta)
   );
 
   map.panTo({ lat, lng });
