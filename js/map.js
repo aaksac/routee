@@ -503,6 +503,178 @@ function focusToLocation(lat, lng, zoom = 15) {
   map.setZoom(zoom);
 }
 
+function isElementVisuallyHidden(element) {
+  if (!element) return true;
+
+  const styles = window.getComputedStyle(element);
+  if (
+    styles.display === "none" ||
+    styles.visibility === "hidden" ||
+    Number(styles.opacity || "1") <= 0.05
+  ) {
+    return true;
+  }
+
+  if (element.classList?.contains("hidden") || element.getAttribute("aria-hidden") === "true") {
+    return true;
+  }
+
+  const rect = element.getBoundingClientRect();
+  return rect.width <= 1 || rect.height <= 1;
+}
+
+function getSelectionSafePadding() {
+  const mapDiv = map?.getDiv?.();
+
+  if (!mapDiv) {
+    return {
+      top: 26,
+      right: 26,
+      bottom: 30,
+      left: 26
+    };
+  }
+
+  const mapRect = mapDiv.getBoundingClientRect();
+  const isMobile = window.innerWidth <= 720;
+
+  const padding = {
+    top: isMobile ? 72 : 28,
+    right: isMobile ? 20 : 28,
+    bottom: isMobile ? 116 : 32,
+    left: isMobile ? 20 : 28
+  };
+
+  const overlaySelectors = [
+    ".map-overlay",
+    ".new-map-mobile-fab"
+  ];
+
+  const overlays = document.querySelectorAll(overlaySelectors.join(", "));
+  const EDGE_CAPTURE = 110;
+
+  overlays.forEach((overlay) => {
+    if (isElementVisuallyHidden(overlay)) return;
+
+    const rect = overlay.getBoundingClientRect();
+    const overlapLeft = Math.max(rect.left, mapRect.left);
+    const overlapRight = Math.min(rect.right, mapRect.right);
+    const overlapTop = Math.max(rect.top, mapRect.top);
+    const overlapBottom = Math.min(rect.bottom, mapRect.bottom);
+
+    const overlapWidth = overlapRight - overlapLeft;
+    const overlapHeight = overlapBottom - overlapTop;
+
+    if (overlapWidth <= 0 || overlapHeight <= 0) return;
+
+    if (overlapTop <= mapRect.top + EDGE_CAPTURE) {
+      padding.top = Math.max(padding.top, overlapBottom - mapRect.top + 14);
+    }
+
+    if (overlapBottom >= mapRect.bottom - EDGE_CAPTURE) {
+      padding.bottom = Math.max(padding.bottom, mapRect.bottom - overlapTop + 16);
+    }
+
+    if (overlapLeft <= mapRect.left + EDGE_CAPTURE) {
+      padding.left = Math.max(padding.left, overlapRight - mapRect.left + 14);
+    }
+
+    if (overlapRight >= mapRect.right - EDGE_CAPTURE) {
+      padding.right = Math.max(padding.right, mapRect.right - overlapLeft + 14);
+    }
+  });
+
+  return padding;
+}
+
+function projectLatLngToContainerPoint(lat, lng) {
+  if (!map) return null;
+
+  const bounds = map.getBounds();
+  const mapDiv = map.getDiv();
+
+  if (!bounds || !mapDiv) return null;
+
+  const northEast = bounds.getNorthEast();
+  const southWest = bounds.getSouthWest();
+
+  const latSpan = northEast.lat() - southWest.lat();
+  const lngSpan = northEast.lng() - southWest.lng();
+
+  if (!Number.isFinite(latSpan) || !Number.isFinite(lngSpan) || latSpan === 0 || lngSpan === 0) {
+    return null;
+  }
+
+  const xRatio = (lng - southWest.lng()) / lngSpan;
+  const yRatio = (northEast.lat() - lat) / latSpan;
+
+  return {
+    x: xRatio * mapDiv.clientWidth,
+    y: yRatio * mapDiv.clientHeight
+  };
+}
+
+function focusMapForPickedLocation(lat, lng) {
+  if (!map) return;
+
+  const target = { lat, lng };
+  const mapDiv = map.getDiv();
+
+  if (!mapDiv) {
+    map.panTo(target);
+    return;
+  }
+
+  const targetZoom = 16;
+  const currentZoom = Number(map.getZoom()) || 0;
+  const shouldZoomIn = currentZoom < targetZoom;
+
+  const padding = getSelectionSafePadding();
+  const safeRect = {
+    left: padding.left,
+    right: mapDiv.clientWidth - padding.right,
+    top: padding.top,
+    bottom: mapDiv.clientHeight - padding.bottom
+  };
+
+  const markerPixel = projectLatLngToContainerPoint(lat, lng);
+  const isInSafeRect =
+    markerPixel &&
+    markerPixel.x >= safeRect.left &&
+    markerPixel.x <= safeRect.right &&
+    markerPixel.y >= safeRect.top &&
+    markerPixel.y <= safeRect.bottom;
+
+  if (!shouldZoomIn && isInSafeRect) {
+    return;
+  }
+
+  const offsetX = Math.round((padding.left - padding.right) / 2);
+  const offsetY = Math.round((padding.top - padding.bottom) / 2);
+
+  map.panTo(target);
+
+  window.setTimeout(() => {
+    if (offsetX || offsetY) {
+      map.panBy(offsetX, offsetY);
+    }
+
+    if (shouldZoomIn) {
+      let animatedZoom = Number(map.getZoom()) || currentZoom;
+      const zoomStep = () => {
+        animatedZoom += 1;
+        map.setZoom(animatedZoom);
+
+        if (animatedZoom < targetZoom) {
+          window.setTimeout(zoomStep, 70);
+        }
+      };
+
+      zoomStep();
+    }
+  }, 140);
+}
+
 function resetPageZoomAfterSearch() {
   if (!searchInputEl) return;
 
@@ -590,6 +762,8 @@ function showDraftMarker(lat, lng) {
     title: "Seçilen Nokta",
     icon: createCircleSymbol("#facc15", "#92400e", 14)
   });
+
+  focusMapForPickedLocation(lat, lng);
 }
 
 function clearDraftMarker() {
