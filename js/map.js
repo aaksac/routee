@@ -667,7 +667,7 @@ function createDistanceOverlay(position, text) {
   distanceOverlays.push(overlay);
 }
 
-function drawRouteSegments(startPoint, orderedPoints) {␊
+function drawRouteSegments(startPoint, orderedPoints) {
   if (!map) return;
 
   clearRouteLines();
