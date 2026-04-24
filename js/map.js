@@ -26,8 +26,8 @@ let searchDebounceTimer = null;
 const MIN_SEARCH_LENGTH = 4;
 const SEARCH_DEBOUNCE_MS = 450;
 const MAX_PREDICTIONS = 5;
-const PICKER_MIN_FOCUS_ZOOM = 15;
-const PICKER_MAX_FOCUS_ZOOM = 17;
+const PICKER_MIN_FOCUS_ZOOM = 16;
+const PICKER_MAX_FOCUS_ZOOM = 18;
 
 const POINT_COLORS = [
   { value: "#dc2626", label: "Kırmızı" },
