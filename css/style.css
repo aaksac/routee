@@ -216,6 +216,9 @@ select:focus {
   background: #eaf1ff;
   border: 1px solid rgba(219, 228, 240, 0.95);
   box-shadow: var(--shadow);
+  outline: none;
+  transform: translateZ(0);
+  backface-visibility: hidden;
 }
 
 .map-overlay {
