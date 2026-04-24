@@ -84,6 +84,7 @@
 
   #btnOpenStartPanel,
   #btnOpenPointPanel,
+  #btnOpenEndPanel,
   #btnToggleMenu,
   #btnCurrentLocation,
   .icon-only-btn {
@@ -100,6 +101,7 @@
 
   #btnOpenStartPanel svg,
   #btnOpenPointPanel svg,
+  #btnOpenEndPanel svg,
   #btnToggleMenu svg,
   #btnCurrentLocation svg,
   .icon-only-btn svg {
@@ -213,6 +215,7 @@
 
   body[data-mobile-panel="start"] #startPanel,
   body[data-mobile-panel="point"] #pointPanel,
+  body[data-mobile-panel="end"] #endPanel,
   body[data-mobile-panel="save"] #savePanel,
   body[data-mobile-panel="importExport"] #importExportPanel {
     position: fixed;
@@ -236,6 +239,7 @@
 
   #startPanel .card-title-row,
   #pointPanel .card-title-row,
+  #endPanel .card-title-row,
   #savePanel .card-title-row,
   #importExportPanel .card-title-row {
     margin-bottom: 12px !important;
@@ -245,6 +249,7 @@
 
   #startPanel .card-title-row h2,
   #pointPanel .card-title-row h2,
+  #endPanel .card-title-row h2,
   #savePanel .card-title-row h2,
   #importExportPanel .card-title-row h2 {
     font-size: 1rem !important;
@@ -254,6 +259,7 @@
 
   #startPanel .field-group,
   #pointPanel .field-group,
+  #endPanel .field-group,
   #savePanel .field-group,
   #importExportPanel .field-group {
     margin-bottom: 10px !important;
@@ -261,6 +267,7 @@
 
   #startPanel .field-group label,
   #pointPanel .field-group label,
+  #endPanel .field-group label,
   #savePanel .field-group label,
   #importExportPanel .field-group label {
     font-size: 0.78rem !important;
@@ -270,6 +277,7 @@
 
   #startPanel input,
   #pointPanel input,
+  #endPanel input,
   #savePanel input,
   #importExportPanel input,
   #savePanel select,
@@ -283,7 +291,8 @@
   }
 
   #startPanel .field-row,
-  #pointPanel .field-row {
+  #pointPanel .field-row,
+  #endPanel .field-row {
     display: grid !important;
     grid-template-columns: 1fr !important;
     gap: 8px !important;
@@ -296,6 +305,7 @@
 
   #startPanel .panel-actions,
   #pointPanel .panel-actions,
+  #endPanel .panel-actions,
   #savePanel .panel-actions,
   #importExportPanel .panel-actions {
     display: flex !important;
@@ -306,6 +316,7 @@
 
   #startPanel .small-btn,
   #pointPanel .small-btn,
+  #endPanel .small-btn,
   #savePanel .small-btn,
   #importExportPanel .small-btn {
     min-height: 42px !important;
@@ -316,6 +327,7 @@
 
   #btnCloseStartPanel,
   #btnClosePointPanel,
+  #btnCloseEndPanel,
   #btnCloseSavePanel,
   #btnCloseImportExportPanel {
     width: 32px !important;
@@ -578,6 +590,7 @@
 
   #btnOpenStartPanel,
   #btnOpenPointPanel,
+  #btnOpenEndPanel,
   #btnToggleMenu,
   #btnCurrentLocation,
   .icon-only-btn {
@@ -591,6 +604,7 @@
 
   #btnOpenStartPanel svg,
   #btnOpenPointPanel svg,
+  #btnOpenEndPanel svg,
   #btnToggleMenu svg,
   #btnCurrentLocation svg,
   .icon-only-btn svg {
@@ -644,6 +658,7 @@
 
   body[data-mobile-panel="start"] #startPanel,
   body[data-mobile-panel="point"] #pointPanel,
+  body[data-mobile-panel="end"] #endPanel,
   body[data-mobile-panel="save"] #savePanel,
   body[data-mobile-panel="importExport"] #importExportPanel {
     width: min(94vw, 340px) !important;
@@ -656,6 +671,7 @@
 
   #startPanel .card-title-row h2,
   #pointPanel .card-title-row h2,
+  #endPanel .card-title-row h2,
   #savePanel .card-title-row h2,
   #importExportPanel .card-title-row h2 {
     font-size: 0.92rem !important;
@@ -663,6 +679,7 @@
 
   #startPanel .field-group label,
   #pointPanel .field-group label,
+  #endPanel .field-group label,
   #savePanel .field-group label,
   #importExportPanel .field-group label {
     font-size: 0.72rem !important;
@@ -670,6 +687,7 @@
 
   #startPanel input,
   #pointPanel input,
+  #endPanel input,
   #savePanel input,
   #importExportPanel input,
   #savePanel select,
@@ -683,6 +701,7 @@
 
   #startPanel .small-btn,
   #pointPanel .small-btn,
+  #endPanel .small-btn,
   #savePanel .small-btn,
   #importExportPanel .small-btn {
     min-height: 44px !important;
@@ -694,6 +713,7 @@
 
   #btnCloseStartPanel,
   #btnClosePointPanel,
+  #btnCloseEndPanel,
   #btnCloseSavePanel,
   #btnCloseImportExportPanel {
     width: 30px !important;
