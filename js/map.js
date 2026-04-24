@@ -38,6 +38,128 @@ const POINT_COLORS = [
   { value: "#0f172a", label: "Koyu" }
 ];
 
+const MAP_CLICK_PROGRESSIVE_ZOOM_LEVELS = [
+  { maxZoom: 4, targetZoom: 6 },
+  { maxZoom: 7, targetZoom: 9 },
+  { maxZoom: 10, targetZoom: 12 },
+  { maxZoom: 13, targetZoom: 15 },
+  { maxZoom: 16, targetZoom: 17 }
+];
+
+const MAP_CLICK_FINAL_PICK_ZOOM = 17;
+const MARKER_CLICK_TARGET_ZOOM = 18;
+const SMOOTH_ZOOM_STEP_DELAY_MS = 120;
+const SMOOTH_ZOOM_START_DELAY_MS = 110;
+
+let smoothZoomTimer = null;
+let smoothZoomRunId = 0;
+
+function clampZoom(zoom) {
+  const normalized = Number(zoom);
+
+  if (!Number.isFinite(normalized)) return 15;
+
+  return Math.min(20, Math.max(2, Math.round(normalized)));
+}
+
+function getCurrentMapZoom() {
+  if (!map || typeof map.getZoom !== "function") return 11;
+
+  const zoom = Number(map.getZoom());
+  return Number.isFinite(zoom) ? zoom : 11;
+}
+
+function cancelSmoothZoom() {
+  smoothZoomRunId += 1;
+
+  if (smoothZoomTimer) {
+    window.clearTimeout(smoothZoomTimer);
+    smoothZoomTimer = null;
+  }
+}
+
+function getProgressiveClickTargetZoom(currentZoom) {
+  const normalizedZoom = getCurrentMapZoom();
+  const sourceZoom = Number.isFinite(Number(currentZoom))
+    ? Math.round(Number(currentZoom))
+    : normalizedZoom;
+
+  const matchedStage = MAP_CLICK_PROGRESSIVE_ZOOM_LEVELS.find(
+    (stage) => sourceZoom <= stage.maxZoom
+  );
+
+  if (matchedStage) {
+    return matchedStage.targetZoom;
+  }
+
+  return Math.max(sourceZoom, MAP_CLICK_FINAL_PICK_ZOOM);
+}
+
+function smoothFocusToLocation(lat, lng, targetZoom, options = {}) {
+  if (!map) return;
+
+  const normalizedLat = Number(lat);
+  const normalizedLng = Number(lng);
+
+  if (!Number.isFinite(normalizedLat) || !Number.isFinite(normalizedLng)) return;
+
+  cancelSmoothZoom();
+
+  const runId = smoothZoomRunId;
+  const center = { lat: normalizedLat, lng: normalizedLng };
+  const currentZoom = getCurrentMapZoom();
+  const finalZoom = clampZoom(Math.max(targetZoom, currentZoom));
+  const stepDelay = Number.isFinite(Number(options.stepDelay))
+    ? Number(options.stepDelay)
+    : SMOOTH_ZOOM_STEP_DELAY_MS;
+
+  map.panTo(center);
+
+  if (finalZoom === currentZoom) return;
+
+  const zoomStep = () => {
+    if (runId !== smoothZoomRunId || !map) return;
+
+    const activeZoom = getCurrentMapZoom();
+
+    if (activeZoom >= finalZoom) {
+      smoothZoomTimer = null;
+      return;
+    }
+
+    const nextZoom = Math.min(finalZoom, activeZoom + 1);
+    map.setZoom(nextZoom);
+
+    if (nextZoom < finalZoom) {
+      smoothZoomTimer = window.setTimeout(zoomStep, stepDelay);
+    } else {
+      smoothZoomTimer = null;
+    }
+  };
+
+  smoothZoomTimer = window.setTimeout(zoomStep, SMOOTH_ZOOM_START_DELAY_MS);
+}
+
+function handleProgressiveMapClickFocus(lat, lng) {
+  if (!map) return;
+
+  const currentZoom = getCurrentMapZoom();
+  const targetZoom = getProgressiveClickTargetZoom(currentZoom);
+
+  smoothFocusToLocation(lat, lng, targetZoom);
+}
+
+function handleMarkerClickFocus(marker) {
+  if (!marker || typeof marker.getPosition !== "function") return;
+
+  const position = marker.getPosition();
+  if (!position) return;
+
+  smoothFocusToLocation(position.lat(), position.lng(), MARKER_CLICK_TARGET_ZOOM, {
+    stepDelay: 95
+  });
+}
+
 function initMap() {
   const mapElement = document.getElementById("mapCanvas");
   if (!mapElement) return null;
@@ -444,6 +566,7 @@ function addMarker({ lat, lng, title, label, onClick, pointData }) {
   marker.__pointData = pointData || null;
 
   marker.addListener("click", () => {
+    handleMarkerClickFocus(marker);
     openMarkerInfo(marker, marker.__pointData);
     if (typeof onClick === "function") {
       onClick(marker.__pointData);
@@ -481,6 +604,7 @@ function showStartMarker({ lat, lng, title, onClick, pointData }) {
   startMarker.__pointData = pointData || null;
 
   startMarker.addListener("click", () => {
+    handleMarkerClickFocus(startMarker);
     openMarkerInfo(startMarker, startMarker.__pointData);
     if (typeof onClick === "function") {
       onClick(startMarker.__pointData);
@@ -499,6 +623,8 @@ function clearStartMarker() {
 
 function focusToLocation(lat, lng, zoom = 15) {
   if (!map) return;
+
+  cancelSmoothZoom();
   map.setCenter({ lat, lng });
   map.setZoom(zoom);
 }
@@ -525,6 +651,8 @@ function resetPageZoomAfterSearch() {
 
 function focusMapToPoints(startPoint, points = []) {
   if (!map) return;
+
+  cancelSmoothZoom();
 
   const validPoints = [];
 
@@ -718,6 +846,7 @@ function enableMapClickPicker(callback) {
     const lng = event.latLng.lng();
 
     showDraftMarker(lat, lng);
+    handleProgressiveMapClickFocus(lat, lng);
 
     callback({
       lat,
