@@ -79,6 +79,14 @@ function cancelSmoothZoom() {
   }
 }
 
+function cancelMarkerFocusStabilization() {
+  markerFocusStabilizeTimers.forEach((timerId) => {
+    window.clearTimeout(timerId);
+  });
+
+  markerFocusStabilizeTimers = [];
+}
+
 function cancelScheduledMarkerInfoOpen() {
   if (markerInfoOpenTimer) {
     window.clearTimeout(markerInfoOpenTimer);
@@ -97,12 +105,41 @@ function scheduleMarkerInfoOpen(marker, pointData, delay = 180) {
   }, delay);
 }
 
-function cancelMarkerFocusStabilization() {
-  markerFocusStabilizeTimers.forEach((timerId) => {
-    window.clearTimeout(timerId);
-  });
+function scrollMapCanvasIntoView() {
+  const mapCanvas = document.getElementById("mapCanvas");
+  if (!mapCanvas) return;
 
-  markerFocusStabilizeTimers = [];
+  const topbar = document.querySelector(".topbar");
+  const topbarHeight = topbar?.offsetHeight || 0;
+  const extraOffset = 10;
+
+  const rect = mapCanvas.getBoundingClientRect();
+  const targetTop = window.scrollY + rect.top - topbarHeight - extraOffset;
+
+  window.scrollTo({
+    top: Math.max(0, targetTop),
+    behavior: "smooth"
+  });
+}
+
+function getInfoWindowVisualOffsetY() {
+  return window.innerWidth <= 720 ? 115 : 85;
+}
+
+function centerMarkerWithInfoWindowOffset(marker) {
+  if (!map || !marker || typeof marker.getPosition !== "function") return;
+
+  const position = marker.getPosition();
+  if (!position) return;
+
+  map.setCenter(position);
+
+  window.setTimeout(() => {
+    if (!map || !marker.getMap()) return;
+
+    map.setCenter(position);
+    map.panBy(0, getInfoWindowVisualOffsetY());
+  }, 80);
 }
 
 function stabilizeMarkerFocusAfterInfoOpen(marker) {
@@ -110,17 +147,19 @@ function stabilizeMarkerFocusAfterInfoOpen(marker) {
 
   cancelMarkerFocusStabilization();
 
-  const position = marker.getPosition();
-  if (!position) return;
-
   const isMobile = window.innerWidth <= 720;
-  const delays = isMobile ? [80, 260, 520] : [80];
+
+  if (isMobile) {
+    scrollMapCanvasIntoView();
+  }
+
+  const delays = isMobile ? [140, 360, 700, 1000] : [120, 360];
 
   delays.forEach((delay) => {
     const timerId = window.setTimeout(() => {
       if (!map || !marker.getMap()) return;
 
-      map.panTo(position);
+      centerMarkerWithInfoWindowOffset(marker);
     }, delay);
 
     markerFocusStabilizeTimers.push(timerId);
@@ -210,6 +249,10 @@ function handleMarkerClickFocus(marker) {
 
   const position = marker.getPosition();
   if (!position) return;
+
+  if (window.innerWidth <= 720) {
+    scrollMapCanvasIntoView();
+  }
 
   smoothFocusToLocation(position.lat(), position.lng(), MARKER_CLICK_TARGET_ZOOM, {
     stepDelay: 95,
@@ -687,7 +730,33 @@ function focusToLocation(lat, lng, zoom = 15) {
   cancelSmoothZoom();
   cancelScheduledMarkerInfoOpen();
 
-  map.setCenter({ lat, lng });
+  const normalizedLat = Number(lat);
+  const normalizedLng = Number(lng);
+
+  if (!Number.isFinite(normalizedLat) || !Number.isFinite(normalizedLng)) return;
+
+  if (window.innerWidth <= 720) {
+    scrollMapCanvasIntoView();
+
+    window.setTimeout(() => {
+      if (!map) return;
+
+      map.setCenter({
+        lat: normalizedLat,
+        lng: normalizedLng
+      });
+
+      map.setZoom(zoom);
+    }, 160);
+
+    return;
+  }
+
+  map.setCenter({
+    lat: normalizedLat,
+    lng: normalizedLng
+  });
+
   map.setZoom(zoom);
 }
 
