@@ -493,24 +493,26 @@ if (!isPremiumAccessActive() && nextLocationCount > state.locationQuota) {
   return;
 }
 
-  state.points = nextPoints;
-  state.startPoint = startPoint;
-  state.editingPointId = null;
+state.points = nextPoints;
+state.startPoint = startPoint;
+state.editingPointId = null;
 
-  if (promotedPoint) {
-    clearPointForm();
-  }
+clearDraftMarker();
 
-  showStartMarker({
-    lat: startPoint.lat,
-    lng: startPoint.lng,
-    title: startPoint.name,
-    pointData: {
-      ...startPoint,
-      orderLabel: "S"
-    },
-    onClick: fillPointFormFromMarker
-  });
+if (promotedPoint) {
+  clearPointForm();
+}
+
+showStartMarker({
+  lat: startPoint.lat,
+  lng: startPoint.lng,
+  title: startPoint.name,
+  pointData: {
+    ...startPoint,
+    orderLabel: "S"
+  },
+  onClick: fillPointFormFromMarker
+});
 
   recomputeRoute();
   markDirty();
