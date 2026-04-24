@@ -88,6 +88,14 @@
                   <circle cx="12" cy="12" r="1.8"></circle>
                 </svg>
               </button>
+
+              <button class="overlay-btn icon-only-btn" id="btnOpenEndPanel" type="button" aria-label="End Point Ekle" title="End Point Ekle">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M5 4v16"></path>
+                  <path d="M7 5h10l-2.4 3L17 11H7z"></path>
+                  <path d="M7 15h8"></path>
+                </svg>
+              </button>
             </div>
 
             <section class="floating-card hidden" id="startPanel">
@@ -135,6 +143,30 @@
               </div>
               <div class="panel-actions">
                 <button class="small-btn primary" id="btnAddPoint" type="button">Ekle</button>
+              </div>
+            </section>
+
+            <section class="floating-card hidden" id="endPanel">
+              <div class="card-title-row">
+                <h2>End Point</h2>
+                <button class="icon-close" id="btnCloseEndPanel" type="button" aria-label="Kapat">×</button>
+              </div>
+              <div class="field-group">
+                <label for="endName">End Point Adı</label>
+                <input id="endName" type="text" placeholder="Örn. Varış Noktası" />
+              </div>
+              <div class="field-row">
+                <div class="field-group">
+                  <label for="endLat">Enlem</label>
+                  <input id="endLat" type="number" step="any" placeholder="37.0200" />
+                </div>
+                <div class="field-group">
+                  <label for="endLng">Boylam</label>
+                  <input id="endLng" type="number" step="any" placeholder="35.3400" />
+                </div>
+              </div>
+              <div class="panel-actions">
+                <button class="small-btn primary" id="btnAddEndPoint" type="button">Ekle</button>
               </div>
             </section>
           </div>
@@ -295,7 +327,7 @@
     </span>
   </button>
 
-    <script>
+  <script>
     window.__routeeGoogleMapsLoaded = window.__routeeGoogleMapsLoaded || function () {};
   </script>
   <script
