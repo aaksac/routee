@@ -16,6 +16,8 @@ import {
   clearMarkers,
   showStartMarker,
   clearStartMarker,
+  showEndMarker,
+  clearEndMarker,
   enableMapClickPicker,
   initPlaceSearch,
   clearDraftMarker,
@@ -43,6 +45,7 @@ const state = {
   totalDistance: 0,
   currentUser: null,
   startPoint: null,
+  endPoint: null,
   editingPointId: null,
   selectedMapId: null,
   hasUnsavedChanges: false,
@@ -65,6 +68,7 @@ const elements = {
   btnTripList: document.getElementById("btnTripList"),
   btnAddPoint: document.getElementById("btnAddPoint"),
   btnAddStartPoint: document.getElementById("btnAddStartPoint"),
+  btnAddEndPoint: document.getElementById("btnAddEndPoint"),
   btnClearForm: document.getElementById("btnClearForm"),
   btnCurrentLocation: document.getElementById("btnCurrentLocation"),
   btnSaveMap: document.getElementById("btnSaveMap"),
@@ -88,14 +92,19 @@ const elements = {
   startName: document.getElementById("startName"),
   startLat: document.getElementById("startLat"),
   startLng: document.getElementById("startLng"),
+  endName: document.getElementById("endName"),
+  endLat: document.getElementById("endLat"),
+  endLng: document.getElementById("endLng"),
   mapName: document.getElementById("mapName"),
   authStatus: document.getElementById("authStatus"),
   mapList: document.getElementById("mapList"),
   placeSearch: document.getElementById("placeSearch"),
   btnOpenStartPanel: document.getElementById("btnOpenStartPanel"),
   btnOpenPointPanel: document.getElementById("btnOpenPointPanel"),
+  btnOpenEndPanel: document.getElementById("btnOpenEndPanel"),
   btnCloseStartPanel: document.getElementById("btnCloseStartPanel"),
   btnClosePointPanel: document.getElementById("btnClosePointPanel"),
+  btnCloseEndPanel: document.getElementById("btnCloseEndPanel"),
   btnToggleMenu: document.getElementById("btnToggleMenu"),
   mapMenu: document.getElementById("mapMenu"),
   btnOpenSavePanel: document.getElementById("btnOpenSavePanel"),
@@ -108,6 +117,7 @@ const elements = {
   savedMapsBackdrop: document.getElementById("savedMapsBackdrop"),
   startPanel: document.getElementById("startPanel"),
   pointPanel: document.getElementById("pointPanel"),
+  endPanel: document.getElementById("endPanel"),
   savePanel: document.getElementById("savePanel"),
   importExportPanel: document.getElementById("importExportPanel"),
   appStartupSplash: document.getElementById("appStartupSplash"),
@@ -203,6 +213,7 @@ async function bootstrapMapFeatures() {
       "Harita servisine bağlanılamadı. İnternet bağlantınızı kontrol edip sayfayı yenileyin.";
   }
 }
+
 function goToLogin() {
   window.location.href = "./index.html";
 }
@@ -299,18 +310,26 @@ function hasMapContent() {
   return Boolean(
     elements.mapName.value.trim() ||
       state.startPoint ||
+      state.endPoint ||
       state.points.length ||
       elements.startName.value.trim() ||
       elements.startLat.value.trim() ||
       elements.startLng.value.trim() ||
       elements.pointName.value.trim() ||
       elements.pointLat.value.trim() ||
-      elements.pointLng.value.trim()
+      elements.pointLng.value.trim() ||
+      elements.endName?.value.trim() ||
+      elements.endLat?.value.trim() ||
+      elements.endLng?.value.trim()
   );
 }
 
 function getCurrentLocationCount() {
-  return state.points.length + (state.startPoint ? 1 : 0);
+  return (
+    state.points.length +
+    (state.startPoint ? 1 : 0) +
+    (state.endPoint ? 1 : 0)
+  );
 }
 
 function getTrialEndsAtMs() {
@@ -401,6 +420,22 @@ function buildStartPointFromForm() {
   };
 }
 
+function buildEndPointFromForm() {
+  const name = elements.endName?.value.trim();
+  const lat = elements.endLat?.value.trim();
+  const lng = elements.endLng?.value.trim();
+
+  if (!name || !lat || !lng) return null;
+
+  return {
+    id: "end-point",
+    name,
+    lat: Number(lat),
+    lng: Number(lng),
+    type: "end"
+  };
+}
+
 function setStartForm(startPoint) {
   if (!startPoint) {
     elements.startName.value = "";
@@ -412,6 +447,21 @@ function setStartForm(startPoint) {
   elements.startName.value = startPoint.name || "";
   elements.startLat.value = Number(startPoint.lat).toFixed(6);
   elements.startLng.value = Number(startPoint.lng).toFixed(6);
+}
+
+function setEndForm(endPoint) {
+  if (!elements.endName || !elements.endLat || !elements.endLng) return;
+
+  if (!endPoint) {
+    elements.endName.value = "";
+    elements.endLat.value = "";
+    elements.endLng.value = "";
+    return;
+  }
+
+  elements.endName.value = endPoint.name || "";
+  elements.endLat.value = Number(endPoint.lat).toFixed(6);
+  elements.endLng.value = Number(endPoint.lng).toFixed(6);
 }
 
 function setSelectedPointColor(color = DEFAULT_POINT_COLOR) {
@@ -486,33 +536,34 @@ function commitStartPoint() {
     }
   }
 
-const nextLocationCount = nextPoints.length + 1;
+  const nextLocationCount =
+    nextPoints.length + 1 + (state.endPoint ? 1 : 0);
 
-if (!isPremiumAccessActive() && nextLocationCount > state.locationQuota) {
-  alert(`Başlangıç dahil en fazla ${state.locationQuota} konum eklenebilir.`);
-  return;
-}
+  if (!isPremiumAccessActive() && nextLocationCount > state.locationQuota) {
+    alert(`Başlangıç dahil en fazla ${state.locationQuota} konum eklenebilir.`);
+    return;
+  }
 
-state.points = nextPoints;
-state.startPoint = startPoint;
-state.editingPointId = null;
+  state.points = nextPoints;
+  state.startPoint = startPoint;
+  state.editingPointId = null;
 
-clearDraftMarker();
+  clearDraftMarker();
 
-if (promotedPoint) {
-  clearPointForm();
-}
+  if (promotedPoint) {
+    clearPointForm();
+  }
 
-showStartMarker({
-  lat: startPoint.lat,
-  lng: startPoint.lng,
-  title: startPoint.name,
-  pointData: {
-    ...startPoint,
-    orderLabel: "S"
-  },
-  onClick: fillPointFormFromMarker
-});
+  showStartMarker({
+    lat: startPoint.lat,
+    lng: startPoint.lng,
+    title: startPoint.name,
+    pointData: {
+      ...startPoint,
+      orderLabel: "S"
+    },
+    onClick: fillPointFormFromMarker
+  });
 
   recomputeRoute();
   markDirty();
@@ -521,6 +572,49 @@ showStartMarker({
     ? `Başlangıç değiştirildi. Eski başlangıç konum olarak rotaya eklendi: ${startPoint.name}`
     : `Başlangıç eklendi: ${startPoint.name}`;
 
+  closeFloatingPanels();
+}
+
+function commitEndPoint() {
+  if (!hasActiveAccess()) {
+    alert("Erişim süreniz dolmuş.");
+    return;
+  }
+
+  const endPoint = buildEndPointFromForm();
+
+  if (!endPoint) {
+    alert("Lütfen end point adı, enlem ve boylam gir.");
+    return;
+  }
+
+  const isNewEndPoint = !state.endPoint;
+
+  if (isNewEndPoint && !canAddMoreLocations(1)) {
+    alert(`Başlangıç dahil en fazla ${state.locationQuota} konum eklenebilir.`);
+    return;
+  }
+
+  state.endPoint = endPoint;
+  state.editingPointId = null;
+
+  clearDraftMarker();
+
+  showEndMarker({
+    lat: endPoint.lat,
+    lng: endPoint.lng,
+    title: endPoint.name,
+    pointData: {
+      ...endPoint,
+      orderLabel: "E"
+    },
+    onClick: fillPointFormFromMarker
+  });
+
+  recomputeRoute();
+  markDirty();
+
+  elements.authStatus.textContent = `End point eklendi: ${endPoint.name}`;
   closeFloatingPanels();
 }
 
@@ -534,6 +628,18 @@ function clearStartPoint() {
   recomputeRoute();
   markDirty();
   elements.authStatus.textContent = "Başlangıç kaldırıldı.";
+}
+
+function clearEndPoint() {
+  state.endPoint = null;
+  clearEndMarker();
+  clearRouteLines();
+  setEndForm(null);
+  renderSummary();
+  renderTripList();
+  recomputeRoute();
+  markDirty();
+  elements.authStatus.textContent = "End point kaldırıldı.";
 }
 
 function fillStartFormFromMap(lat, lng, suggestedName = "") {
@@ -558,9 +664,23 @@ function fillPointFormFromMap(lat, lng, suggestedName = "") {
   }
 }
 
+function fillEndFormFromMap(lat, lng, suggestedName = "") {
+  if (!elements.endLat || !elements.endLng || !elements.endName) return;
+
+  elements.endLat.value = lat.toFixed(6);
+  elements.endLng.value = lng.toFixed(6);
+
+  if (suggestedName) {
+    elements.endName.value = suggestedName;
+  } else {
+    elements.endName.value = "İşaretli Konum";
+  }
+}
+
 function fillBothFormsFromMap(lat, lng, suggestedName = "") {
   fillPointFormFromMap(lat, lng, suggestedName);
   fillStartFormFromMap(lat, lng, suggestedName);
+  fillEndFormFromMap(lat, lng, suggestedName);
 }
 
 function fillPointFormFromMarker(pointData) {
@@ -576,6 +696,13 @@ function fillPointFormFromMarker(pointData) {
     state.editingPointId = null;
     setSelectedPointColor(DEFAULT_POINT_COLOR);
     elements.authStatus.textContent = `Başlangıç bilgisi yüklendi: ${pointData.name}`;
+    return;
+  }
+
+  if (pointData.type === "end") {
+    state.editingPointId = null;
+    setSelectedPointColor(DEFAULT_POINT_COLOR);
+    elements.authStatus.textContent = `End point bilgisi yüklendi: ${pointData.name}`;
     return;
   }
 
@@ -640,7 +767,24 @@ function renderTripList() {
     })
     .join("");
 
-  elements.tripList.innerHTML = startHtml + pointHtml;
+  const endHtml = state.endPoint
+    ? `
+      <div class="trip-item end">
+        <div class="trip-order end-order">E</div>
+        <div class="trip-content">
+          <strong>${escapeHtml(state.endPoint.name)}</strong>
+          <span>Önceki mesafe: ${formatKm(state.endPoint.distanceFromPrevious || 0)}</span>
+        </div>
+        <div class="trip-actions">
+          <button class="tiny-btn" type="button" data-action="directions-end">Yol Tarifi</button>
+          <button class="tiny-btn" type="button" data-action="focus-end">Odakla</button>
+          <button class="tiny-btn" type="button" data-action="delete-end">Sil</button>
+        </div>
+      </div>
+    `
+    : "";
+
+  elements.tripList.innerHTML = startHtml + pointHtml + endHtml;
 }
 
 function redrawPointMarkers() {
@@ -662,6 +806,24 @@ function redrawPointMarkers() {
   });
 }
 
+function redrawEndMarker() {
+  if (!state.endPoint) {
+    clearEndMarker();
+    return;
+  }
+
+  showEndMarker({
+    lat: state.endPoint.lat,
+    lng: state.endPoint.lng,
+    title: state.endPoint.name,
+    pointData: {
+      ...state.endPoint,
+      orderLabel: "E"
+    },
+    onClick: fillPointFormFromMarker
+  });
+}
+
 function recomputeRoute() {
   if (!state.startPoint) {
     state.totalDistance = 0;
@@ -669,24 +831,33 @@ function recomputeRoute() {
     renderSummary();
     renderTripList();
     redrawPointMarkers();
+    redrawEndMarker();
     return;
   }
 
-  if (!state.points.length) {
+  if (!state.points.length && !state.endPoint) {
     state.totalDistance = 0;
     clearRouteLines();
     renderSummary();
     renderTripList();
     redrawPointMarkers();
+    redrawEndMarker();
     return;
   }
 
-  const result = nearestNeighborRoute(state.startPoint, state.points);
+  const result = nearestNeighborRoute(
+    state.startPoint,
+    state.points,
+    state.endPoint
+  );
+
   state.points = result.orderedPoints;
+  state.endPoint = result.endPoint;
   state.totalDistance = result.totalDistance;
 
   redrawPointMarkers();
-  drawRouteSegments(state.startPoint, state.points);
+  redrawEndMarker();
+  drawRouteSegments(state.startPoint, state.points, state.endPoint);
   renderSummary();
   renderTripList();
 }
@@ -704,6 +875,10 @@ function clearPointForm() {
   elements.pointLng.value = "";
   state.editingPointId = null;
   setSelectedPointColor(DEFAULT_POINT_COLOR);
+}
+
+function clearEndFormOnly() {
+  setEndForm(null);
 }
 
 function bindTapSafe(button, handler) {
@@ -817,6 +992,11 @@ function handleMarkerDeleteRequest(event) {
     return;
   }
 
+  if (pointData.type === "end") {
+    clearEndPoint();
+    return;
+  }
+
   if (pointData.id == null) return;
   deletePoint(pointData.id);
 }
@@ -825,7 +1005,7 @@ function handleMarkerColorRequest(event) {
   const pointData = event?.detail?.pointData;
   const color = event?.detail?.color;
 
-  if (!pointData || !color || pointData.type === "start") return;
+  if (!pointData || !color || pointData.type === "start" || pointData.type === "end") return;
 
   state.points = state.points.map((point) => {
     if (String(point.id) !== String(pointData.id)) return point;
@@ -844,18 +1024,20 @@ function handleMarkerColorRequest(event) {
   elements.authStatus.textContent = `Konum rengi güncellendi: ${pointData.name || "Nokta"}`;
 }
 
-function applyImportedData(startPoint, points) {
-  const importedCount = points.length + (startPoint ? 1 : 0);
+function applyImportedData(startPoint, points, endPoint = null) {
+  const importedCount = points.length + (startPoint ? 1 : 0) + (endPoint ? 1 : 0);
   if (!isPremiumAccessActive() && importedCount > state.locationQuota) {
     alert(`İçe aktarılan veride başlangıç dahil en fazla ${state.locationQuota} konum olabilir.`);
     return false;
   }
 
   state.startPoint = startPoint;
+  state.endPoint = endPoint;
   state.points = points;
   state.editingPointId = null;
 
   setStartForm(startPoint);
+  setEndForm(endPoint);
 
   if (startPoint) {
     showStartMarker({
@@ -872,6 +1054,21 @@ function applyImportedData(startPoint, points) {
     clearStartMarker();
   }
 
+  if (endPoint) {
+    showEndMarker({
+      lat: endPoint.lat,
+      lng: endPoint.lng,
+      title: endPoint.name,
+      pointData: {
+        ...endPoint,
+        orderLabel: "E"
+      },
+      onClick: fillPointFormFromMarker
+    });
+  } else {
+    clearEndMarker();
+  }
+
   clearPointForm();
   recomputeRoute();
   markDirty();
@@ -886,6 +1083,13 @@ function getMapPayload() {
           name: state.startPoint.name,
           lat: state.startPoint.lat,
           lng: state.startPoint.lng
+        }
+      : null,
+    endPoint: state.endPoint
+      ? {
+          name: state.endPoint.name,
+          lat: state.endPoint.lat,
+          lng: state.endPoint.lng
         }
       : null,
     points: state.points.map((point) => ({
@@ -908,14 +1112,17 @@ async function refreshMapList() {
 function resetMapEditor() {
   state.selectedMapId = null;
   state.startPoint = null;
+  state.endPoint = null;
   state.points = [];
   state.totalDistance = 0;
   state.editingPointId = null;
 
   elements.mapName.value = "";
   setStartForm(null);
+  setEndForm(null);
   clearPointForm();
   clearStartMarker();
+  clearEndMarker();
   clearMarkers();
   clearDraftMarker();
   clearRouteLines();
@@ -1093,6 +1300,16 @@ async function handleMapListClick(event) {
         }
       : null;
 
+    const endPoint = mapData.endPoint
+      ? {
+          id: "end-point",
+          name: mapData.endPoint.name,
+          lat: Number(mapData.endPoint.lat),
+          lng: Number(mapData.endPoint.lng),
+          type: "end"
+        }
+      : null;
+
     const points = Array.isArray(mapData.points)
       ? mapData.points.map((point) => ({
           id: Date.now() + Math.random(),
@@ -1105,10 +1322,10 @@ async function handleMapListClick(event) {
         }))
       : [];
 
-    const applied = applyImportedData(startPoint, points);
+    const applied = applyImportedData(startPoint, points, endPoint);
     if (!applied) return false;
 
-    focusMapToPoints(startPoint, points);
+    focusMapToPoints(startPoint, points, endPoint);
 
     markClean();
     elements.authStatus.textContent = `Harita yüklendi: ${mapData.name || "İsimsiz Harita"}`;
@@ -1131,12 +1348,12 @@ function handleExport() {
   const type = elements.exportType?.value || "csv";
 
   if (type === "xlsx") {
-    exportToXlsx("gezi-listesi.xlsx", state.startPoint, state.points);
+    exportToXlsx("gezi-listesi.xlsx", state.startPoint, state.points, state.endPoint);
     elements.authStatus.textContent = "XLSX dışa aktarıldı.";
     return;
   }
 
-  exportToCsv("gezi-listesi.csv", state.startPoint, state.points);
+  exportToCsv("gezi-listesi.csv", state.startPoint, state.points, state.endPoint);
   elements.authStatus.textContent = "CSV dışa aktarıldı.";
 }
 
@@ -1162,11 +1379,11 @@ async function handleCsvFileChange(event) {
 
   try {
     const rows = await importFromCsvFile(file);
-    const { startPoint, points } = convertImportedRowsToState(rows);
-    const applied = applyImportedData(startPoint, points);
+    const { startPoint, points, endPoint } = convertImportedRowsToState(rows);
+    const applied = applyImportedData(startPoint, points, endPoint);
     if (!applied) return;
     state.selectedMapId = null;
-    focusMapToPoints(startPoint, points);
+    focusMapToPoints(startPoint, points, endPoint);
     elements.authStatus.textContent = "CSV içe aktarıldı.";
     closeFloatingPanels();
   } catch (error) {
@@ -1182,11 +1399,11 @@ async function handleXlsxFileChange(event) {
 
   try {
     const rows = await importFromXlsxFile(file);
-    const { startPoint, points } = convertImportedRowsToState(rows);
-    const applied = applyImportedData(startPoint, points);
+    const { startPoint, points, endPoint } = convertImportedRowsToState(rows);
+    const applied = applyImportedData(startPoint, points, endPoint);
     if (!applied) return;
     state.selectedMapId = null;
-    focusMapToPoints(startPoint, points);
+    focusMapToPoints(startPoint, points, endPoint);
     elements.authStatus.textContent = "XLSX içe aktarıldı.";
     closeFloatingPanels();
   } catch (error) {
@@ -1271,25 +1488,52 @@ function handleTripListClick(event) {
     return;
   }
 
+  if (action === "delete-end") {
+    clearEndPoint();
+    return;
+  }
+
   if (action === "focus-start") {
     if (!state.startPoint) return;
     const lat = Number(state.startPoint.lat);
     const lng = Number(state.startPoint.lng);
     if (!Number.isFinite(lat) || !Number.isFinite(lng)) return;
 
-    fillPointFormFromMarker({
+    const pointDataForUi = {
       ...state.startPoint,
       orderLabel: "S"
-    });
+    };
+
+    fillPointFormFromMarker(pointDataForUi);
 
     scrollToMapArea();
     focusToLocation(lat, lng, 17);
 
     window.setTimeout(() => {
-      openInfoForPoint({
-        ...state.startPoint,
-        orderLabel: "S"
-      });
+      openInfoForPoint(pointDataForUi);
+    }, 180);
+
+    return;
+  }
+
+  if (action === "focus-end") {
+    if (!state.endPoint) return;
+    const lat = Number(state.endPoint.lat);
+    const lng = Number(state.endPoint.lng);
+    if (!Number.isFinite(lat) || !Number.isFinite(lng)) return;
+
+    const pointDataForUi = {
+      ...state.endPoint,
+      orderLabel: "E"
+    };
+
+    fillPointFormFromMarker(pointDataForUi);
+
+    scrollToMapArea();
+    focusToLocation(lat, lng, 17);
+
+    window.setTimeout(() => {
+      openInfoForPoint(pointDataForUi);
     }, 180);
 
     return;
@@ -1298,6 +1542,13 @@ function handleTripListClick(event) {
   if (action === "directions-start") {
     if (!state.startPoint) return;
     const url = `https://www.google.com/maps/dir/?api=1&destination=${state.startPoint.lat},${state.startPoint.lng}`;
+    window.location.href = url;
+    return;
+  }
+
+  if (action === "directions-end") {
+    if (!state.endPoint) return;
+    const url = `https://www.google.com/maps/dir/?api=1&destination=${state.endPoint.lat},${state.endPoint.lng}`;
     window.location.href = url;
     return;
   }
@@ -1352,12 +1603,17 @@ function hasDraftCoordinates() {
   const hasPointCoords =
     elements.pointLat?.value.trim() && elements.pointLng?.value.trim();
 
-  return Boolean(hasStartCoords || hasPointCoords);
+  const hasEndCoords =
+    elements.endLat?.value.trim() && elements.endLng?.value.trim();
+
+  return Boolean(hasStartCoords || hasPointCoords || hasEndCoords);
 }
+
 function getVisibleFloatingPanelName() {
   const panelEntries = [
     ["start", elements.startPanel],
     ["point", elements.pointPanel],
+    ["end", elements.endPanel],
     ["save", elements.savePanel],
     ["importExport", elements.importExportPanel]
   ];
@@ -1373,7 +1629,7 @@ function getVisibleFloatingPanelName() {
 
 function syncMobilePanelState() {
   const isMobile = window.innerWidth <= 720;
-    const visiblePanelName = getVisibleFloatingPanelName();
+  const visiblePanelName = getVisibleFloatingPanelName();
 
   if (visiblePanelName !== state.activeFloatingPanel) {
     state.activeFloatingPanel = visiblePanelName;
@@ -1397,7 +1653,13 @@ function toggleMapMenu(forceValue) {
 }
 
 function closeFloatingPanels() {
-  [elements.startPanel, elements.pointPanel, elements.savePanel, elements.importExportPanel].forEach((panel) => {
+  [
+    elements.startPanel,
+    elements.pointPanel,
+    elements.endPanel,
+    elements.savePanel,
+    elements.importExportPanel
+  ].forEach((panel) => {
     panel?.classList.add("hidden");
   });
   state.activeFloatingPanel = null;
@@ -1408,6 +1670,7 @@ function openFloatingPanel(panelName) {
   const panelMap = {
     start: elements.startPanel,
     point: elements.pointPanel,
+    end: elements.endPanel,
     save: elements.savePanel,
     importExport: elements.importExportPanel
   };
@@ -1442,8 +1705,9 @@ function handleShellClick(event) {
   const insideFloatingCard = event.target.closest(".floating-card");
   const startTrigger = event.target.closest("#btnOpenStartPanel");
   const pointTrigger = event.target.closest("#btnOpenPointPanel");
+  const endTrigger = event.target.closest("#btnOpenEndPanel");
 
-  if (!insideMenu && !insideFloatingCard && !startTrigger && !pointTrigger) {
+  if (!insideMenu && !insideFloatingCard && !startTrigger && !pointTrigger && !endTrigger) {
     closeMapMenu();
   }
 }
@@ -1489,11 +1753,15 @@ function bindEvents() {
   elements.btnToggleTripPanel?.addEventListener("click", () => toggleTripPanel());
   elements.btnCloseTripPanel?.addEventListener("click", () => toggleTripPanel(false));
   elements.btnTripList?.addEventListener("click", () => toggleTripPanel());
+
   bindTapSafe(elements.btnAddPoint, addOrUpdatePoint);
   bindTapSafe(elements.btnAddStartPoint, commitStartPoint);
+  bindTapSafe(elements.btnAddEndPoint, commitEndPoint);
+
   elements.btnClearForm?.addEventListener("click", clearPointForm);
   elements.btnCurrentLocation?.addEventListener("click", handleCurrentLocationClick);
   elements.tripList?.addEventListener("click", handleTripListClick);
+
   window.addEventListener("routee:delete-point-request", handleMarkerDeleteRequest);
   window.addEventListener("routee:marker-color-request", handleMarkerColorRequest);
 
@@ -1505,6 +1773,7 @@ function bindEvents() {
   elements.btnSaveMap?.addEventListener("click", async () => {
     await handleSaveMap();
   });
+
   elements.btnNewMap?.addEventListener("click", async () => {
     await handleNewMap();
     closeSavedMapsOverlay();
@@ -1523,18 +1792,19 @@ function bindEvents() {
     closeSavedMapsOverlay();
   });
 
-elements.mapList?.addEventListener("click", async (event) => {
-  const opened = await handleMapListClick(event);
-  const clickedMap = event.target.closest(".map-list-item");
+  elements.mapList?.addEventListener("click", async (event) => {
+    const opened = await handleMapListClick(event);
+    const clickedMap = event.target.closest(".map-list-item");
 
-  if (
-    opened &&
-    clickedMap &&
-    !event.target.closest("[data-action='delete-map']")
-  ) {
-    closeSavedMapsOverlay();
-  }
-});
+    if (
+      opened &&
+      clickedMap &&
+      !event.target.closest("[data-action='delete-map']")
+    ) {
+      closeSavedMapsOverlay();
+    }
+  });
+
   elements.btnLogoutTop?.addEventListener("click", handleLogout);
 
   elements.btnOpenStartPanel?.addEventListener("click", () => {
@@ -1555,8 +1825,18 @@ elements.mapList?.addEventListener("click", async (event) => {
     openFloatingPanel("point");
   });
 
+  elements.btnOpenEndPanel?.addEventListener("click", () => {
+    if (window.innerWidth <= 720 && !hasDraftCoordinates()) {
+      alert("Önce konum seçiniz.");
+      return;
+    }
+
+    openFloatingPanel("end");
+  });
+
   elements.btnCloseStartPanel?.addEventListener("click", closeFloatingPanels);
   elements.btnClosePointPanel?.addEventListener("click", closeFloatingPanels);
+  elements.btnCloseEndPanel?.addEventListener("click", closeFloatingPanels);
   elements.btnToggleMenu?.addEventListener("click", () => toggleMapMenu());
   elements.btnOpenSavePanel?.addEventListener("click", () => openFloatingPanel("save"));
   elements.btnOpenImportExportPanel?.addEventListener("click", () => openFloatingPanel("importExport"));
@@ -1576,6 +1856,9 @@ elements.mapList?.addEventListener("click", async (event) => {
   elements.pointName?.addEventListener("input", markDirty);
   elements.pointLat?.addEventListener("input", markDirty);
   elements.pointLng?.addEventListener("input", markDirty);
+  elements.endName?.addEventListener("input", markDirty);
+  elements.endLat?.addEventListener("input", markDirty);
+  elements.endLng?.addEventListener("input", markDirty);
 }
 
 function initMapClickPicker() {
@@ -1673,8 +1956,9 @@ function init() {
   syncMobilePanelState();
   initMobileTopbarAutoHide();
   initAuthWatcher();
+
   window.requestAnimationFrame(() => {
-  bootstrapMapFeatures();
+    bootstrapMapFeatures();
   });
 }
 
