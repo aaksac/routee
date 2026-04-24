@@ -319,24 +319,31 @@ select:focus {
   position: absolute;
   top: calc(100% + 8px);
   right: 0;
-  width: 220px;
+  width: max-content;
+  min-width: 0;
+  max-width: calc(100vw - 36px);
   padding: 8px;
   display: flex;
   flex-direction: column;
+  align-items: stretch;
   gap: 6px;
 }
 
 .menu-item {
   width: 100%;
-  min-height: 46px;
-  padding: 10px 14px;
+  min-width: 0;
+  min-height: 44px;
+  padding: 0 16px;
   text-align: center;
   justify-content: center;
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  font-size: 0.96rem;
-  font-weight: 600;
-  line-height: 1.2;
+  font-size: 0.9rem;
+  font-weight: 700;
+  line-height: 1;
+  white-space: nowrap;
+  border-radius: 14px;
+  box-sizing: border-box;
 }
 
 .floating-card {
