@@ -584,7 +584,7 @@ function commitEndPoint() {
   const endPoint = buildEndPointFromForm();
 
   if (!endPoint) {
-    alert("Lütfen end point adı, enlem ve boylam gir.");
+    alert("Lütfen bitiş noktası adı, enlem ve boylam gir.");
     return;
   }
 
@@ -640,11 +640,11 @@ function commitEndPoint() {
   markDirty();
 
   if (promotedPoint) {
-    elements.authStatus.textContent = `Konum end point olarak ayarlandı: ${endPoint.name}`;
+    elements.authStatus.textContent = `Konum bitiş noktası olarak ayarlandı: ${endPoint.name}`;
   } else if (previousEndPoint) {
-    elements.authStatus.textContent = `End point değiştirildi: ${endPoint.name}`;
+    elements.authStatus.textContent = `Bitiş noktası değiştirildi: ${endPoint.name}`;
   } else {
-    elements.authStatus.textContent = `End point eklendi: ${endPoint.name}`;
+    elements.authStatus.textContent = `Bitiş noktası eklendi: ${endPoint.name}`;
   }
 
   closeFloatingPanels();
@@ -671,7 +671,7 @@ function clearEndPoint() {
   renderTripList();
   recomputeRoute();
   markDirty();
-  elements.authStatus.textContent = "End point kaldırıldı.";
+  elements.authStatus.textContent = "Bitiş noktası kaldırıldı.";
 }
 
 function fillStartFormFromMap(lat, lng, suggestedName = "") {
@@ -734,7 +734,7 @@ function fillPointFormFromMarker(pointData) {
   if (pointData.type === "end") {
     state.editingPointId = null;
     setSelectedPointColor(DEFAULT_POINT_COLOR);
-    elements.authStatus.textContent = `End point bilgisi yüklendi: ${pointData.name}`;
+    elements.authStatus.textContent = `Bitiş noktası bilgisi yüklendi: ${pointData.name}`;
     return;
   }
 
