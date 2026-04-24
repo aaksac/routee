@@ -46,7 +46,7 @@ const MAP_CLICK_PROGRESSIVE_ZOOM_LEVELS = [
 ];
 
 const MAP_CLICK_FINAL_PICK_ZOOM = 19;
-const MARKER_CLICK_TARGET_ZOOM = 20;
+const MARKER_CLICK_TARGET_ZOOM = 17;
 const SMOOTH_ZOOM_STEP_DELAY_MS = 120;
 const SMOOTH_ZOOM_START_DELAY_MS = 110;
 
@@ -124,7 +124,9 @@ function smoothFocusToLocation(lat, lng, targetZoom, options = {}) {
   const runId = smoothZoomRunId;
   const center = { lat: normalizedLat, lng: normalizedLng };
   const currentZoom = getCurrentMapZoom();
-  const finalZoom = clampZoom(Math.max(targetZoom, currentZoom));
+  const finalZoom = options.allowZoomOut
+    ? clampZoom(targetZoom)
+    : clampZoom(Math.max(targetZoom, currentZoom));
   const stepDelay = Number.isFinite(Number(options.stepDelay))
     ? Number(options.stepDelay)
     : SMOOTH_ZOOM_STEP_DELAY_MS;
@@ -138,15 +140,20 @@ function smoothFocusToLocation(lat, lng, targetZoom, options = {}) {
 
     const activeZoom = getCurrentMapZoom();
 
-    if (activeZoom >= finalZoom) {
+    if (activeZoom === finalZoom) {
       smoothZoomTimer = null;
       return;
     }
 
-    const nextZoom = Math.min(finalZoom, activeZoom + 1);
+    const direction = finalZoom > activeZoom ? 1 : -1;
+    const nextZoom =
+      direction > 0
+        ? Math.min(finalZoom, activeZoom + 1)
+        : Math.max(finalZoom, activeZoom - 1);
+
     map.setZoom(nextZoom);
 
-    if (nextZoom < finalZoom) {
+    if (nextZoom !== finalZoom) {
       smoothZoomTimer = window.setTimeout(zoomStep, stepDelay);
     } else {
       smoothZoomTimer = null;
@@ -172,7 +179,8 @@ function handleMarkerClickFocus(marker) {
   if (!position) return;
 
   smoothFocusToLocation(position.lat(), position.lng(), MARKER_CLICK_TARGET_ZOOM, {
-    stepDelay: 95
+    stepDelay: 95,
+    allowZoomOut: true
   });
 }
 
