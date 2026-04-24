@@ -53,6 +53,7 @@ const SMOOTH_ZOOM_START_DELAY_MS = 110;
 let smoothZoomTimer = null;
 let smoothZoomRunId = 0;
 let markerInfoOpenTimer = null;
+let markerFocusStabilizeTimers = [];
 
 function clampZoom(zoom) {
   const normalized = Number(zoom);
@@ -83,6 +84,8 @@ function cancelScheduledMarkerInfoOpen() {
     window.clearTimeout(markerInfoOpenTimer);
     markerInfoOpenTimer = null;
   }
+
+  cancelMarkerFocusStabilization();
 }
 
 function scheduleMarkerInfoOpen(marker, pointData, delay = 180) {
@@ -92,6 +95,36 @@ function scheduleMarkerInfoOpen(marker, pointData, delay = 180) {
     markerInfoOpenTimer = null;
     openMarkerInfo(marker, pointData);
   }, delay);
+}
+
+function cancelMarkerFocusStabilization() {
+  markerFocusStabilizeTimers.forEach((timerId) => {
+    window.clearTimeout(timerId);
+  });
+
+  markerFocusStabilizeTimers = [];
+}
+
+function stabilizeMarkerFocusAfterInfoOpen(marker) {
+  if (!map || !marker || typeof marker.getPosition !== "function") return;
+
+  cancelMarkerFocusStabilization();
+
+  const position = marker.getPosition();
+  if (!position) return;
+
+  const isMobile = window.innerWidth <= 720;
+  const delays = isMobile ? [80, 260, 520] : [80];
+
+  delays.forEach((delay) => {
+    const timerId = window.setTimeout(() => {
+      if (!map || !marker.getMap()) return;
+
+      map.panTo(position);
+    }, delay);
+
+    markerFocusStabilizeTimers.push(timerId);
+  });
 }
 
 function getProgressiveClickTargetZoom(currentZoom) {
@@ -523,6 +556,7 @@ function openMarkerInfo(marker, pointData) {
 
   google.maps.event.addListenerOnce(activeInfoWindow, "domready", () => {
     styleNativeInfoWindowShell();
+    stabilizeMarkerFocusAfterInfoOpen(marker);
   });
 }
 
