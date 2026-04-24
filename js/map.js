@@ -161,10 +161,7 @@ function handleMarkerClickFocus(marker) {
   const position = marker.getPosition();
   if (!position) return;
 
-  smoothFocusToLocation(position.lat(), position.lng(), MARKER_CLICK_TARGET_ZOOM, {
-    stepDelay: 95,
-    allowZoomOut: true
-  });
+  focusToLocation(position.lat(), position.lng(), MARKER_CLICK_TARGET_ZOOM);
 }
 
 function initMap() {
@@ -574,7 +571,10 @@ function addMarker({ lat, lng, title, label, onClick, pointData }) {
 
   marker.addListener("click", () => {
     handleMarkerClickFocus(marker);
-    openMarkerInfo(marker, marker.__pointData);
+
+    window.setTimeout(() => {
+      openMarkerInfo(marker, marker.__pointData);
+    }, 180);
 
     if (typeof onClick === "function") {
       onClick(marker.__pointData);
@@ -613,7 +613,10 @@ function showStartMarker({ lat, lng, title, onClick, pointData }) {
 
   startMarker.addListener("click", () => {
     handleMarkerClickFocus(startMarker);
-    openMarkerInfo(startMarker, startMarker.__pointData);
+
+    window.setTimeout(() => {
+      openMarkerInfo(startMarker, startMarker.__pointData);
+    }, 180);
 
     if (typeof onClick === "function") {
       onClick(startMarker.__pointData);
