@@ -1046,25 +1046,37 @@ async function handleMapListClick(event) {
   if (deleteBtn) {
     const mapId = deleteBtn.dataset.mapId;
     await handleDeleteMap(mapId);
-    return;
+    return false;
   }
 
   const button = event.target.closest(".map-list-item");
-  if (!button) return;
+  if (!button) return false;
 
   const mapId = button.dataset.mapId;
-  if (!mapId || !state.currentUser) return;
+  if (!mapId || !state.currentUser) return false;
 
   if (!canReadMapId(mapId)) {
     elements.authStatus.textContent = "Bu harita yalnızca premium erişimde görüntülenebilir.";
-    return;
+    return false;
+  }
+
+  if (state.hasUnsavedChanges && hasMapContent()) {
+    const confirmed = window.confirm(
+      "Kaydedilmemiş değişiklikler silinecektir. Devam etmek istiyor musunuz?"
+    );
+
+    if (!confirmed) {
+      elements.authStatus.textContent = "Harita yükleme işlemi iptal edildi.";
+      return false;
+    }
   }
 
   try {
     const mapData = await getMapById(state.currentUser.uid, mapId, {
       fullAccess: isPremiumAccessActive()
     });
-    if (!mapData) return;
+
+    if (!mapData) return false;
 
     state.selectedMapId = mapData.id;
     elements.mapName.value = mapData.name || "";
@@ -1092,15 +1104,18 @@ async function handleMapListClick(event) {
       : [];
 
     const applied = applyImportedData(startPoint, points);
-    if (!applied) return;
+    if (!applied) return false;
 
     focusMapToPoints(startPoint, points);
 
     markClean();
     elements.authStatus.textContent = `Harita yüklendi: ${mapData.name || "İsimsiz Harita"}`;
     highlightSelectedMap(mapId);
+
+    return true;
   } catch (error) {
     elements.authStatus.textContent = `Harita yükleme hatası: ${error.message}`;
+    return false;
   }
 }
 
@@ -1506,13 +1521,18 @@ function bindEvents() {
     closeSavedMapsOverlay();
   });
 
-  elements.mapList?.addEventListener("click", async (event) => {
-    await handleMapListClick(event);
-    const clickedMap = event.target.closest(".map-list-item");
-    if (clickedMap && !event.target.closest("[data-action='delete-map']")) {
-      closeSavedMapsOverlay();
-    }
-  });
+elements.mapList?.addEventListener("click", async (event) => {
+  const opened = await handleMapListClick(event);
+  const clickedMap = event.target.closest(".map-list-item");
+
+  if (
+    opened &&
+    clickedMap &&
+    !event.target.closest("[data-action='delete-map']")
+  ) {
+    closeSavedMapsOverlay();
+  }
+});
   elements.btnLogoutTop?.addEventListener("click", handleLogout);
 
   elements.btnOpenStartPanel?.addEventListener("click", () => {
