@@ -649,8 +649,10 @@ function focusMapForPickedLocation(lat, lng) {
   }
 
   const targetZoom = 18;
+  const maxZoomDeltaPerSelection = 4;
   const currentZoom = Number(map.getZoom()) || 0;
-  const shouldZoomIn = currentZoom < targetZoom;
+  const stagedTargetZoom = Math.min(targetZoom, currentZoom + maxZoomDeltaPerSelection);
+  const shouldZoomIn = currentZoom < stagedTargetZoom;
 
   const padding = getSelectionSafePadding();
   const safeRect = {
@@ -690,7 +692,7 @@ function focusMapForPickedLocation(lat, lng) {
 
   window.setTimeout(() => {
     if (shouldZoomIn) {
-      smoothZoomIn(targetZoom, () => placeMarkerToComfortZone(true));
+      smoothZoomIn(stagedTargetZoom, () => placeMarkerToComfortZone(true));
       return;
     }
 
