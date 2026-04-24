@@ -636,6 +636,7 @@ select:focus {
     height: 64vh;
   }
 }
+
 @media (min-width: 1101px) {
   .trip-panel {
     display: flex;
@@ -651,14 +652,13 @@ select:focus {
     scrollbar-gutter: stable;
   }
 }
+
 @media (min-width: 721px) {
   .topbar.is-hidden-on-scroll {
     transform: none;
     opacity: 1;
   }
-}
 
-@media (min-width: 721px) {
   .top-left {
     top: 18px;
     left: 18px;
@@ -845,6 +845,7 @@ select:focus {
     max-width: 360px;
   }
 }
+
 .trip-item {
   grid-template-columns: 48px minmax(0, 1fr) !important;
   align-items: start !important;
@@ -871,11 +872,13 @@ select:focus {
 .trip-actions .tiny-btn {
   white-space: nowrap;
 }
+
 .trip-item.start .trip-order {
   background: linear-gradient(135deg, #16a34a, #15803d) !important;
   box-shadow: 0 12px 22px rgba(22, 163, 74, 0.2) !important;
   color: #ffffff !important;
 }
+
 .trip-actions .tiny-btn[data-action^="directions"] {
   background: linear-gradient(135deg, #2563eb, #1d4ed8);
   border-color: #1d4ed8;
@@ -903,4 +906,13 @@ select:focus {
 .trip-actions .tiny-btn[data-action^="delete"]:hover {
   transform: translateY(-1px);
   box-shadow: 0 8px 18px rgba(15, 23, 42, 0.08);
+}
+
+.trip-order.end-order {
+  background: #f97316;
+  box-shadow: 0 12px 22px rgba(249, 115, 22, 0.24);
+}
+
+.trip-item.end {
+  border-color: rgba(249, 115, 22, 0.28);
 }
