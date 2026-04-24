@@ -41,7 +41,7 @@ const POINT_COLORS = [
 const MAP_CLICK_PROGRESSIVE_ZOOM_LEVELS = [
   { maxZoom: 4, targetZoom: 6 },
   { maxZoom: 9, targetZoom: 11 },
-  { maxZoom: 13, targetZoom: 15 },
+  { maxZoom: 14, targetZoom: 16 },
   { maxZoom: 19, targetZoom: 20 }
 ];
 
