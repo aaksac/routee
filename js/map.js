@@ -43,7 +43,6 @@ const MAP_CLICK_PROGRESSIVE_ZOOM_LEVELS = [
   { maxZoom: 7, targetZoom: 9 },
   { maxZoom: 10, targetZoom: 12 },
   { maxZoom: 13, targetZoom: 15 },
-  { maxZoom: 16, targetZoom: 17 },
   { maxZoom: 18, targetZoom: 19 }
 ];
 
