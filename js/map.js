@@ -26,12 +26,6 @@ let searchDebounceTimer = null;
 const MIN_SEARCH_LENGTH = 4;
 const SEARCH_DEBOUNCE_MS = 450;
 const MAX_PREDICTIONS = 5;
-const PICKER_FINAL_FOCUS_ZOOM_FALLBACK = 18.5;
-const DRAFT_SELECTION_STEP_RESET_DISTANCE_METERS = 250;
-
-let draftSelectionZoomStep = 0;
-let lastDraftSelection = null;
-let openingMapZoomLevel = 11;
 
 const POINT_COLORS = [
   { value: "#dc2626", label: "Kırmızı" },
@@ -52,7 +46,7 @@ function initMap() {
 
   const defaultCenter = { lat: 37.0, lng: 35.3213 };
 
-  map = new google.maps.Map(mapElement, {␊
+  map = new google.maps.Map(mapElement, {
     center: defaultCenter,
     zoom: 11,
     mapTypeControl: false,
@@ -68,7 +62,6 @@ function initMap() {
 
   geocoder = new google.maps.Geocoder();
   searchService = new google.maps.places.AutocompleteService();
-  openingMapZoomLevel = Number(map.getZoom()) || 11;
 
   return map;
 }
@@ -604,75 +597,6 @@ function clearDraftMarker() {
     draftMarker.setMap(null);
     draftMarker = null;
   }
-
-  draftSelectionZoomStep = 0;
-  lastDraftSelection = null;
-}
-
-function calculateDistanceMeters(lat1, lng1, lat2, lng2) {
-  const earthRadius = 6371000;
-  const toRadians = (value) => (value * Math.PI) / 180;
-  const dLat = toRadians(lat2 - lat1);
-  const dLng = toRadians(lng2 - lng1);
-  const a =
-    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-    Math.cos(toRadians(lat1)) *
-      Math.cos(toRadians(lat2)) *
-      Math.sin(dLng / 2) *
-      Math.sin(dLng / 2);
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-  return earthRadius * c;
-}
-
-function getPickerFocusZoomSteps() {
-  const mapMaxZoom = Number(map?.get?.("maxZoom"));
-  const finalZoom = Number.isFinite(mapMaxZoom)
-    ? Math.min(mapMaxZoom, PICKER_FINAL_FOCUS_ZOOM_FALLBACK)
-    : PICKER_FINAL_FOCUS_ZOOM_FALLBACK;
-  const startZoom = Number.isFinite(openingMapZoomLevel)
-    ? openingMapZoomLevel
-    : 11;
-  const zoomDelta = Math.max(0, finalZoom - startZoom);
-  const stepSize = zoomDelta / 3;
-
-  return [
-    startZoom + stepSize,
-    startZoom + stepSize * 2,
-    finalZoom
-  ];
-}
-
-function focusMapForDraftSelection(lat, lng) {
-  if (!map) return;
-
-  if (lastDraftSelection) {
-    const distanceFromPreviousSelection = calculateDistanceMeters(
-      lastDraftSelection.lat,
-      lastDraftSelection.lng,
-      lat,
-      lng
-    );
-
-    if (distanceFromPreviousSelection > DRAFT_SELECTION_STEP_RESET_DISTANCE_METERS) {
-      draftSelectionZoomStep = 0;
-    }
-  }
-
-  const pickerFocusZoomSteps = getPickerFocusZoomSteps();
-  const maxStepIndex = pickerFocusZoomSteps.length - 1;
-  let nextStepIndex = Math.min(draftSelectionZoomStep, maxStepIndex);
-  const currentZoom = Number(map.getZoom());
-  const stepTargetZoom = pickerFocusZoomSteps[nextStepIndex];
-  const nextZoom = Number.isFinite(currentZoom)
-    ? Math.max(stepTargetZoom, currentZoom)
-    : stepTargetZoom;
-
-  map.panTo({ lat, lng });
-  map.setZoom(nextZoom);
-
-  lastDraftSelection = { lat, lng };
-
-  draftSelectionZoomStep = Math.min(nextStepIndex + 1, maxStepIndex);
 }
 
 function clearRouteLines() {
@@ -794,7 +718,6 @@ function enableMapClickPicker(callback) {
     const lng = event.latLng.lng();
 
     showDraftMarker(lat, lng);
-    focusMapForDraftSelection(lat, lng);
 
     callback({
       lat,
