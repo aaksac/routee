@@ -8,7 +8,6 @@ let startMarker = null;
 let routePolylines = [];
 let distanceOverlays = [];
 let activeInfoWindow = null;
-let mapClickZoomTimer = null;
 
 let searchService = null;
 let geocoder = null;
@@ -27,9 +26,6 @@ let searchDebounceTimer = null;
 const MIN_SEARCH_LENGTH = 4;
 const SEARCH_DEBOUNCE_MS = 450;
 const MAX_PREDICTIONS = 5;
-const LOCATION_PICKER_TARGET_ZOOM = 17;
-const LOCATION_PICKER_MAX_ZOOM = 18;
-const LOCATION_PICKER_ZOOM_DELAY_MS = 120;
 
 const POINT_COLORS = [
   { value: "#dc2626", label: "Kırmızı" },
@@ -710,44 +706,6 @@ function drawRouteSegments(startPoint, orderedPoints) {
   });
 }
 
-function getSmartZoomStep(currentZoom) {
-  if (!Number.isFinite(currentZoom)) return 2;
-  if (currentZoom < 9) return 4;
-  if (currentZoom < 12) return 3;
-  if (currentZoom < 15) return 2;
-  if (currentZoom < LOCATION_PICKER_TARGET_ZOOM) return 1;
-  return 0;
-}
-
-function softlyZoomToClickTarget(latLng) {
-  if (!map || !latLng) return;
-  if (typeof latLng.lat !== "function" || typeof latLng.lng !== "function") return;
-
-  const rawZoom = Number(map.getZoom());
-  const currentZoom = Number.isFinite(rawZoom) ? rawZoom : 11;
-  const zoomStep = getSmartZoomStep(currentZoom);
-
-  if (zoomStep <= 0) return;
-
-  const nextZoom = Math.min(
-    LOCATION_PICKER_MAX_ZOOM,
-    LOCATION_PICKER_TARGET_ZOOM,
-    currentZoom + zoomStep
-  );
-
-  if (!Number.isFinite(nextZoom) || nextZoom <= currentZoom) return;
-
-  map.panTo(latLng);
-
-  if (mapClickZoomTimer) {
-    window.clearTimeout(mapClickZoomTimer);
-  }
-
-  mapClickZoomTimer = window.setTimeout(() => {
-    map.setZoom(nextZoom);
-  }, LOCATION_PICKER_ZOOM_DELAY_MS);
-}
-
 function enableMapClickPicker(callback) {
   if (!map) return;
 
@@ -760,7 +718,6 @@ function enableMapClickPicker(callback) {
     const lng = event.latLng.lng();
 
     showDraftMarker(lat, lng);
-    softlyZoomToClickTarget(event.latLng);
 
     callback({
       lat,
