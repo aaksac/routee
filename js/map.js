@@ -50,6 +50,7 @@ function initMap() {
   map = new google.maps.Map(mapElement, {
     center: defaultCenter,
     zoom: 11,
+    backgroundColor: "#f8fafc",
     mapTypeControl: false,
     streetViewControl: false,
     fullscreenControl: false,
