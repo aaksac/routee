@@ -1,4 +1,4 @@
-function buildExportRows(startPoint, points) {
+function buildExportRows(startPoint, points, endPoint = null) {
   const rows = [];
 
   if (startPoint) {
@@ -19,11 +19,20 @@ function buildExportRows(startPoint, points) {
     });
   });
 
+  if (endPoint) {
+    rows.push({
+      type: "end",
+      name: endPoint.name || "",
+      lat: Number(endPoint.lat),
+      lng: Number(endPoint.lng)
+    });
+  }
+
   return rows;
 }
 
-function exportToCsv(filename, startPoint, points) {
-  const rows = buildExportRows(startPoint, points);
+function exportToCsv(filename, startPoint, points, endPoint = null) {
+  const rows = buildExportRows(startPoint, points, endPoint);
   const headers = ["type", "name", "lat", "lng"];
   const delimiter = ",";
 
@@ -68,8 +77,8 @@ function sanitizeCsvCell(value) {
   return str;
 }
 
-function exportToXlsx(filename, startPoint, points) {
-  const rows = buildExportRows(startPoint, points);
+function exportToXlsx(filename, startPoint, points, endPoint = null) {
+  const rows = buildExportRows(startPoint, points, endPoint);
   const worksheet = XLSX.utils.json_to_sheet(rows);
   const workbook = XLSX.utils.book_new();
 
@@ -80,16 +89,20 @@ function exportToXlsx(filename, startPoint, points) {
 function downloadBlob(blob, filename) {
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
+
   link.href = url;
   link.download = filename;
+
   document.body.appendChild(link);
   link.click();
   link.remove();
+
   URL.revokeObjectURL(url);
 }
 
 function parseCsvText(csvText) {
   const normalizedText = String(csvText || "").replace(/^\uFEFF/, "").trim();
+
   if (!normalizedText) return [];
 
   const delimiter = detectCsvDelimiter(normalizedText);
@@ -97,7 +110,9 @@ function parseCsvText(csvText) {
 
   if (!lines.length) return [];
 
-  const headers = splitCsvLine(lines[0], delimiter).map((header) => normalizeHeader(header));
+  const headers = splitCsvLine(lines[0], delimiter).map((header) =>
+    normalizeHeader(header)
+  );
 
   return lines
     .slice(1)
@@ -228,6 +243,7 @@ function splitCsvLine(line, delimiter = ",") {
   }
 
   result.push(current);
+
   return result.map((value) => value.trim());
 }
 
@@ -241,7 +257,11 @@ function normalizeHeader(header) {
 
 function getRowValue(row, keys) {
   for (const key of keys) {
-    if (row[key] !== undefined && row[key] !== null && String(row[key]).trim() !== "") {
+    if (
+      row[key] !== undefined &&
+      row[key] !== null &&
+      String(row[key]).trim() !== ""
+    ) {
       return row[key];
     }
   }
@@ -260,6 +280,22 @@ function normalizeImportedType(value) {
     return "point";
   }
 
+  if (
+    [
+      "end",
+      "endpoint",
+      "end_point",
+      "bitis",
+      "bitisnoktasi",
+      "finish",
+      "destination",
+      "varis",
+      "varisnoktasi"
+    ].includes(normalized)
+  ) {
+    return "end";
+  }
+
   return normalized;
 }
 
@@ -273,7 +309,8 @@ function toAsciiLower(value) {
     .replace(/[İ]/g, "i")
     .replace(/[ö]/g, "o")
     .replace(/[ş]/g, "s")
-    .replace(/[ü]/g, "u");
+    .replace(/[ü]/g, "u")
+    .replace(/[_\-\s]+/g, "");
 }
 
 function parseCoordinateValue(value) {
@@ -288,6 +325,7 @@ function parseCoordinateValue(value) {
     .replace(/,/g, ".");
 
   const number = Number(normalized);
+
   return Number.isFinite(number) ? number : NaN;
 }
 
@@ -342,7 +380,7 @@ function normalizeImportedRow(row) {
 function validateImportedRows(rows) {
   return rows.filter(
     (row) =>
-      (row.type === "start" || row.type === "point") &&
+      (row.type === "start" || row.type === "point" || row.type === "end") &&
       row.name &&
       Number.isFinite(row.lat) &&
       Number.isFinite(row.lng)
@@ -362,8 +400,10 @@ function scoreDecodedText(text, parsedRows) {
   const turkishCharCount = countTurkishChars(text);
 
   let rowNameScore = 0;
+
   parsedRows.forEach((row) => {
     rowNameScore += countTurkishChars(row.name);
+
     if (row.name.includes("�")) {
       rowNameScore -= 5;
     }
@@ -411,6 +451,7 @@ async function decodeCsvFile(file) {
   }
 
   candidates.sort((a, b) => b.score - a.score);
+
   return candidates[0].parsedRows;
 }
 
@@ -440,6 +481,7 @@ async function importFromXlsxFile(file) {
 
 function convertImportedRowsToState(rows) {
   const startRow = rows.find((row) => row.type === "start") || null;
+  const endRow = rows.find((row) => row.type === "end") || null;
   const pointRows = rows.filter((row) => row.type === "point");
 
   const startPoint = startRow
@@ -452,6 +494,16 @@ function convertImportedRowsToState(rows) {
       }
     : null;
 
+  const endPoint = endRow
+    ? {
+        id: "end-point",
+        name: endRow.name,
+        lat: Number(endRow.lat),
+        lng: Number(endRow.lng),
+        type: "end"
+      }
+    : null;
+
   const points = pointRows.map((row) => ({
     id: Date.now() + Math.random(),
     name: row.name,
@@ -461,7 +513,11 @@ function convertImportedRowsToState(rows) {
     type: "point"
   }));
 
-  return { startPoint, points };
+  return {
+    startPoint,
+    points,
+    endPoint
+  };
 }
 
 export {
