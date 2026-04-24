@@ -26,14 +26,12 @@ let searchDebounceTimer = null;
 const MIN_SEARCH_LENGTH = 4;
 const SEARCH_DEBOUNCE_MS = 450;
 const MAX_PREDICTIONS = 5;
-const PICKER_FIRST_FOCUS_ZOOM = 14;
-const PICKER_MID_FOCUS_ZOOM = 15.5;
-const PICKER_NEAR_FINAL_FOCUS_ZOOM = 17;
 const PICKER_FINAL_FOCUS_ZOOM_FALLBACK = 18.5;
 const DRAFT_SELECTION_STEP_RESET_DISTANCE_METERS = 250;
 
 let draftSelectionZoomStep = 0;
 let lastDraftSelection = null;
+let openingMapZoomLevel = 11;
 
 const POINT_COLORS = [
   { value: "#dc2626", label: "Kırmızı" },
@@ -54,7 +52,7 @@ function initMap() {
 
   const defaultCenter = { lat: 37.0, lng: 35.3213 };
 
-  map = new google.maps.Map(mapElement, {
+  map = new google.maps.Map(mapElement, {␊
     center: defaultCenter,
     zoom: 11,
     mapTypeControl: false,
@@ -70,6 +68,7 @@ function initMap() {
 
   geocoder = new google.maps.Geocoder();
   searchService = new google.maps.places.AutocompleteService();
+  openingMapZoomLevel = Number(map.getZoom()) || 11;
 
   return map;
 }
@@ -630,11 +629,15 @@ function getPickerFocusZoomSteps() {
   const finalZoom = Number.isFinite(mapMaxZoom)
     ? Math.min(mapMaxZoom, PICKER_FINAL_FOCUS_ZOOM_FALLBACK)
     : PICKER_FINAL_FOCUS_ZOOM_FALLBACK;
+  const startZoom = Number.isFinite(openingMapZoomLevel)
+    ? openingMapZoomLevel
+    : 11;
+  const zoomDelta = Math.max(0, finalZoom - startZoom);
+  const stepSize = zoomDelta / 3;
 
   return [
-    PICKER_FIRST_FOCUS_ZOOM,
-    PICKER_MID_FOCUS_ZOOM,
-    PICKER_NEAR_FINAL_FOCUS_ZOOM,
+    startZoom + stepSize,
+    startZoom + stepSize * 2,
     finalZoom
   ];
 }
@@ -657,22 +660,12 @@ function focusMapForDraftSelection(lat, lng) {
 
   const pickerFocusZoomSteps = getPickerFocusZoomSteps();
   const maxStepIndex = pickerFocusZoomSteps.length - 1;
-  const currentZoom = Number(map.getZoom());
-  const normalizedCurrentZoom = Number.isFinite(currentZoom) ? currentZoom : 0;
-
   let nextStepIndex = Math.min(draftSelectionZoomStep, maxStepIndex);
-
-  while (
-    nextStepIndex < maxStepIndex &&
-    normalizedCurrentZoom >= pickerFocusZoomSteps[nextStepIndex] - 0.05
-  ) {
-    nextStepIndex += 1;
-  }
-
-  const nextZoom = Math.max(
-    pickerFocusZoomSteps[nextStepIndex],
-    normalizedCurrentZoom
-  );
+  const currentZoom = Number(map.getZoom());
+  const stepTargetZoom = pickerFocusZoomSteps[nextStepIndex];
+  const nextZoom = Number.isFinite(currentZoom)
+    ? Math.max(stepTargetZoom, currentZoom)
+    : stepTargetZoom;
 
   map.panTo({ lat, lng });
   map.setZoom(nextZoom);
