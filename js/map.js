@@ -52,8 +52,6 @@ const SMOOTH_ZOOM_START_DELAY_MS = 110;
 
 let smoothZoomTimer = null;
 let smoothZoomRunId = 0;
-let markerInfoOpenTimer = null;
-let markerFocusStabilizeTimers = [];
 
 function clampZoom(zoom) {
   const normalized = Number(zoom);
@@ -77,93 +75,6 @@ function cancelSmoothZoom() {
     window.clearTimeout(smoothZoomTimer);
     smoothZoomTimer = null;
   }
-}
-
-function cancelMarkerFocusStabilization() {
-  markerFocusStabilizeTimers.forEach((timerId) => {
-    window.clearTimeout(timerId);
-  });
-
-  markerFocusStabilizeTimers = [];
-}
-
-function cancelScheduledMarkerInfoOpen() {
-  if (markerInfoOpenTimer) {
-    window.clearTimeout(markerInfoOpenTimer);
-    markerInfoOpenTimer = null;
-  }
-
-  cancelMarkerFocusStabilization();
-}
-
-function scheduleMarkerInfoOpen(marker, pointData, delay = 180) {
-  cancelScheduledMarkerInfoOpen();
-
-  markerInfoOpenTimer = window.setTimeout(() => {
-    markerInfoOpenTimer = null;
-    openMarkerInfo(marker, pointData);
-  }, delay);
-}
-
-function scrollMapCanvasIntoView() {
-  const mapCanvas = document.getElementById("mapCanvas");
-  if (!mapCanvas) return;
-
-  const topbar = document.querySelector(".topbar");
-  const topbarHeight = topbar?.offsetHeight || 0;
-  const extraOffset = 10;
-
-  const rect = mapCanvas.getBoundingClientRect();
-  const targetTop = window.scrollY + rect.top - topbarHeight - extraOffset;
-
-  window.scrollTo({
-    top: Math.max(0, targetTop),
-    behavior: "smooth"
-  });
-}
-
-function getInfoWindowVisualOffsetY() {
-  return window.innerWidth <= 720 ? 115 : 85;
-}
-
-function centerMarkerWithInfoWindowOffset(marker) {
-  if (!map || !marker || typeof marker.getPosition !== "function") return;
-
-  const position = marker.getPosition();
-  if (!position) return;
-
-  map.setCenter(position);
-
-  window.setTimeout(() => {
-    if (!map || !marker.getMap()) return;
-
-    map.setCenter(position);
-    map.panBy(0, getInfoWindowVisualOffsetY());
-  }, 80);
-}
-
-function stabilizeMarkerFocusAfterInfoOpen(marker) {
-  if (!map || !marker || typeof marker.getPosition !== "function") return;
-
-  cancelMarkerFocusStabilization();
-
-  const isMobile = window.innerWidth <= 720;
-
-  if (isMobile) {
-    scrollMapCanvasIntoView();
-  }
-
-  const delays = isMobile ? [140, 360, 700, 1000] : [120, 360];
-
-  delays.forEach((delay) => {
-    const timerId = window.setTimeout(() => {
-      if (!map || !marker.getMap()) return;
-
-      centerMarkerWithInfoWindowOffset(marker);
-    }, delay);
-
-    markerFocusStabilizeTimers.push(timerId);
-  });
 }
 
 function getProgressiveClickTargetZoom(currentZoom) {
@@ -249,10 +160,6 @@ function handleMarkerClickFocus(marker) {
 
   const position = marker.getPosition();
   if (!position) return;
-
-  if (window.innerWidth <= 720) {
-    scrollMapCanvasIntoView();
-  }
 
   smoothFocusToLocation(position.lat(), position.lng(), MARKER_CLICK_TARGET_ZOOM, {
     stepDelay: 95,
@@ -584,7 +491,7 @@ function openMarkerInfo(marker, pointData) {
     maxWidth: 248,
     pixelOffset: new google.maps.Size(0, -8),
     zIndex: 9999,
-    disableAutoPan: true
+    disableAutoPan: false
   });
 
   activeInfoWindow.open({
@@ -599,7 +506,6 @@ function openMarkerInfo(marker, pointData) {
 
   google.maps.event.addListenerOnce(activeInfoWindow, "domready", () => {
     styleNativeInfoWindowShell();
-    stabilizeMarkerFocusAfterInfoOpen(marker);
   });
 }
 
@@ -668,7 +574,7 @@ function addMarker({ lat, lng, title, label, onClick, pointData }) {
 
   marker.addListener("click", () => {
     handleMarkerClickFocus(marker);
-    scheduleMarkerInfoOpen(marker, marker.__pointData);
+    openMarkerInfo(marker, marker.__pointData);
 
     if (typeof onClick === "function") {
       onClick(marker.__pointData);
@@ -707,7 +613,7 @@ function showStartMarker({ lat, lng, title, onClick, pointData }) {
 
   startMarker.addListener("click", () => {
     handleMarkerClickFocus(startMarker);
-    scheduleMarkerInfoOpen(startMarker, startMarker.__pointData);
+    openMarkerInfo(startMarker, startMarker.__pointData);
 
     if (typeof onClick === "function") {
       onClick(startMarker.__pointData);
@@ -728,29 +634,11 @@ function focusToLocation(lat, lng, zoom = 15) {
   if (!map) return;
 
   cancelSmoothZoom();
-  cancelScheduledMarkerInfoOpen();
 
   const normalizedLat = Number(lat);
   const normalizedLng = Number(lng);
 
   if (!Number.isFinite(normalizedLat) || !Number.isFinite(normalizedLng)) return;
-
-  if (window.innerWidth <= 720) {
-    scrollMapCanvasIntoView();
-
-    window.setTimeout(() => {
-      if (!map) return;
-
-      map.setCenter({
-        lat: normalizedLat,
-        lng: normalizedLng
-      });
-
-      map.setZoom(zoom);
-    }, 160);
-
-    return;
-  }
 
   map.setCenter({
     lat: normalizedLat,
