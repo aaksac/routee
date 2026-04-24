@@ -8,7 +8,6 @@ let startMarker = null;
 let routePolylines = [];
 let distanceOverlays = [];
 let activeInfoWindow = null;
-let cameraTransitionToken = 0;
 
 let searchService = null;
 let geocoder = null;
@@ -27,9 +26,6 @@ let searchDebounceTimer = null;
 const MIN_SEARCH_LENGTH = 4;
 const SEARCH_DEBOUNCE_MS = 450;
 const MAX_PREDICTIONS = 5;
-const MOBILE_BREAKPOINT = 720;
-const SMOOTH_ZOOM_STEP_DELAY_MS = 95;
-const CAMERA_IDLE_TIMEOUT_MS = 260;
 
 const POINT_COLORS = [
   { value: "#dc2626", label: "Kırmızı" },
@@ -87,84 +83,6 @@ function createCircleSymbol(fillColor, strokeColor = "#ffffff", scale = 14) {
 
 function createGoogleMapsDirectionsUrl(lat, lng) {
   return `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`;
-}
-
-function clampZoom(zoomLevel) {
-  return Math.max(2, Math.min(21, Number(zoomLevel)));
-}
-
-function getNextZoomForMapClick(currentZoom) {
-  if (!Number.isFinite(currentZoom)) return 10;
-
-  if (currentZoom < 5) return 6;
-  if (currentZoom <= 8) return 10;
-  if (currentZoom <= 12) return 14;
-  return null;
-}
-
-function getSelectionPanOffsetPx() {
-  if (window.innerWidth > MOBILE_BREAKPOINT) return 0;
-  return -Math.round(window.innerHeight * 0.15);
-}
-
-async function smoothSetZoom(targetZoom, transitionToken) {
-  if (!map || !Number.isFinite(targetZoom)) return;
-
-  const desiredZoom = clampZoom(Math.round(targetZoom));
-
-  while (map && Math.round(map.getZoom() ?? desiredZoom) !== desiredZoom) {
-    if (transitionToken !== cameraTransitionToken) return;
-
-    const currentZoom = Math.round(map.getZoom() ?? desiredZoom);
-    const direction = currentZoom < desiredZoom ? 1 : -1;
-    map.setZoom(currentZoom + direction);
-    await waitForMapIdleOrTimeout(SMOOTH_ZOOM_STEP_DELAY_MS);
-  }
-}
-
-function waitForMapIdleOrTimeout(timeoutMs = CAMERA_IDLE_TIMEOUT_MS) {
-  if (!map) return Promise.resolve();
-
-  return new Promise((resolve) => {
-    let done = false;
-    let idleListener = null;
-
-    const finish = () => {
-      if (done) return;
-      done = true;
-      if (idleListener) {
-        google.maps.event.removeListener(idleListener);
-      }
-      resolve();
-    };
-
-    idleListener = map.addListener("idle", finish);
-    window.setTimeout(finish, timeoutMs);
-  });
-}
-
-async function panAndZoomTo(lat, lng, targetZoom, { applyMobileOffset = false } = {}) {
-  if (!map) return;
-
-  const transitionToken = ++cameraTransitionToken;
-
-  const center = { lat, lng };
-  map.panTo(center);
-  await waitForMapIdleOrTimeout();
-
-  if (transitionToken !== cameraTransitionToken) return;
-
-  if (applyMobileOffset) {
-    const panOffset = getSelectionPanOffsetPx();
-    if (panOffset !== 0) {
-      map.panBy(0, panOffset);
-      await waitForMapIdleOrTimeout(180);
-    }
-  }
-
-  if (Number.isFinite(targetZoom)) {
-    await smoothSetZoom(targetZoom, transitionToken);
-  }
 }
 
 function dispatchMarkerDeleteRequest(pointData) {
@@ -526,17 +444,7 @@ function addMarker({ lat, lng, title, label, onClick, pointData }) {
   marker.__pointData = pointData || null;
 
   marker.addListener("click", () => {
-    const markerPosition = marker.getPosition();
-    if (markerPosition) {
-      panAndZoomTo(markerPosition.lat(), markerPosition.lng(), 18, {
-        applyMobileOffset: true
-      }).then(() => {
-        openMarkerInfo(marker, marker.__pointData);
-      });
-    } else {
-      openMarkerInfo(marker, marker.__pointData);
-    }
-
+    openMarkerInfo(marker, marker.__pointData);
     if (typeof onClick === "function") {
       onClick(marker.__pointData);
     }
@@ -573,17 +481,7 @@ function showStartMarker({ lat, lng, title, onClick, pointData }) {
   startMarker.__pointData = pointData || null;
 
   startMarker.addListener("click", () => {
-    const markerPosition = startMarker.getPosition();
-    if (markerPosition) {
-      panAndZoomTo(markerPosition.lat(), markerPosition.lng(), 18, {
-        applyMobileOffset: true
-      }).then(() => {
-        openMarkerInfo(startMarker, startMarker.__pointData);
-      });
-    } else {
-      openMarkerInfo(startMarker, startMarker.__pointData);
-    }
-
+    openMarkerInfo(startMarker, startMarker.__pointData);
     if (typeof onClick === "function") {
       onClick(startMarker.__pointData);
     }
@@ -818,16 +716,8 @@ function enableMapClickPicker(callback) {
   mapClickListener = map.addListener("click", (event) => {
     const lat = event.latLng.lat();
     const lng = event.latLng.lng();
-    const currentZoom = Number(map.getZoom() || 0);
-    const nextZoom = getNextZoomForMapClick(currentZoom);
 
     showDraftMarker(lat, lng);
-
-    if (nextZoom != null) {
-      panAndZoomTo(lat, lng, nextZoom, { applyMobileOffset: false });
-    } else if (currentZoom >= 13 && currentZoom <= 16) {
-      panAndZoomTo(lat, lng, null, { applyMobileOffset: true });
-    }
 
     callback({
       lat,
