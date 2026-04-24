@@ -5,6 +5,7 @@ let mapClickListener = null;
 let draftMarker = null;
 let searchMarker = null;
 let startMarker = null;
+let endMarker = null;
 let routePolylines = [];
 let distanceOverlays = [];
 let activeInfoWindow = null;
@@ -258,6 +259,10 @@ function getPointDisplayTitle(pointData) {
     return `S. ${pointData.name || "Başlangıç"}`;
   }
 
+  if (pointData.type === "end") {
+    return `E. ${pointData.name || "End Point"}`;
+  }
+
   if (pointData.orderLabel) {
     return `${pointData.orderLabel}. ${pointData.name || "Nokta"}`;
   }
@@ -316,15 +321,26 @@ function createInfoWindowContent(pointData) {
   });
 
   const badge = document.createElement("div");
-  badge.textContent = pointData?.type === "start" ? "Başlangıç Noktası" : "Konum Bilgisi";
+
+  if (pointData?.type === "start") {
+    badge.textContent = "Başlangıç Noktası";
+  } else if (pointData?.type === "end") {
+    badge.textContent = "End Point";
+  } else {
+    badge.textContent = "Konum Bilgisi";
+  }
+
   badge.style.display = "inline-flex";
   badge.style.alignItems = "center";
   badge.style.fontSize = "10px";
   badge.style.fontWeight = "700";
   badge.style.letterSpacing = "0.04em";
   badge.style.textTransform = "uppercase";
-  badge.style.color = "#1d4ed8";
-  badge.style.background = "rgba(37, 99, 235, 0.10)";
+  badge.style.color = pointData?.type === "end" ? "#c2410c" : "#1d4ed8";
+  badge.style.background =
+    pointData?.type === "end"
+      ? "rgba(249, 115, 22, 0.12)"
+      : "rgba(37, 99, 235, 0.10)";
   badge.style.padding = "5px 8px";
   badge.style.borderRadius = "999px";
   badge.style.marginBottom = "8px";
@@ -355,7 +371,7 @@ function createInfoWindowContent(pointData) {
     wrapper.appendChild(subtitle);
   }
 
-  if (pointData?.type !== "start") {
+  if (pointData?.type !== "start" && pointData?.type !== "end") {
     const paletteLabel = document.createElement("div");
     paletteLabel.textContent = "İşaret rengi";
     paletteLabel.style.fontSize = "11px";
@@ -545,6 +561,22 @@ function openInfoForPoint(pointData) {
     }
   }
 
+  if (pointData.type === "end" && endMarker?.__pointData) {
+    const endIdMatch =
+      pointData.id != null &&
+      endMarker.__pointData.id != null &&
+      String(endMarker.__pointData.id) === String(pointData.id);
+
+    const endCoordMatch =
+      Number(endMarker.__pointData.lat) === Number(pointData.lat) &&
+      Number(endMarker.__pointData.lng) === Number(pointData.lng);
+
+    if (endIdMatch || endCoordMatch) {
+      openMarkerInfo(endMarker, endMarker.__pointData);
+      return true;
+    }
+  }
+
   const matchedMarker = markers.find((marker) => {
     if (!marker?.__pointData) return false;
 
@@ -653,6 +685,49 @@ function clearStartMarker() {
   }
 }
 
+function showEndMarker({ lat, lng, title, onClick, pointData }) {
+  if (!map) return null;
+
+  if (endMarker) {
+    endMarker.setMap(null);
+  }
+
+  endMarker = new google.maps.Marker({
+    position: { lat, lng },
+    map,
+    title: title || "End Point",
+    label: {
+      text: "E",
+      color: "#ffffff",
+      fontWeight: "700"
+    },
+    icon: createCircleSymbol("#f97316", "#ffffff", 16)
+  });
+
+  endMarker.__pointData = pointData || null;
+
+  endMarker.addListener("click", () => {
+    handleMarkerClickFocus(endMarker);
+
+    window.setTimeout(() => {
+      openMarkerInfo(endMarker, endMarker.__pointData);
+    }, 180);
+
+    if (typeof onClick === "function") {
+      onClick(endMarker.__pointData);
+    }
+  });
+
+  return endMarker;
+}
+
+function clearEndMarker() {
+  if (endMarker) {
+    endMarker.setMap(null);
+    endMarker = null;
+  }
+}
+
 function focusToLocation(lat, lng, zoom = 15) {
   if (!map) return;
 
@@ -691,7 +766,7 @@ function resetPageZoomAfterSearch() {
   }, 250);
 }
 
-function focusMapToPoints(startPoint, points = []) {
+function focusMapToPoints(startPoint, points = [], endPoint = null) {
   if (!map) return;
 
   cancelSmoothZoom();
@@ -713,6 +788,13 @@ function focusMapToPoints(startPoint, points = []) {
       });
     }
   });
+
+  if (endPoint && Number.isFinite(endPoint.lat) && Number.isFinite(endPoint.lng)) {
+    validPoints.push({
+      lat: Number(endPoint.lat),
+      lng: Number(endPoint.lng)
+    });
+  }
 
   if (!validPoints.length) return;
 
@@ -833,16 +915,25 @@ function createDistanceOverlay(position, text) {
   distanceOverlays.push(overlay);
 }
 
-function drawRouteSegments(startPoint, orderedPoints) {
+function drawRouteSegments(startPoint, orderedPoints, endPoint = null) {
   if (!map) return;
 
   clearRouteLines();
 
-  if (!startPoint || !orderedPoints.length) return;
+  if (!startPoint) return;
 
-  let previous = startPoint;
+  const routePoints = [startPoint, ...orderedPoints];
 
-  orderedPoints.forEach((point) => {
+  if (endPoint) {
+    routePoints.push(endPoint);
+  }
+
+  if (routePoints.length < 2) return;
+
+  for (let index = 1; index < routePoints.length; index += 1) {
+    const previous = routePoints[index - 1];
+    const point = routePoints[index];
+
     const path = [
       { lat: previous.lat, lng: previous.lng },
       { lat: point.lat, lng: point.lng }
@@ -864,16 +955,14 @@ function drawRouteSegments(startPoint, orderedPoints) {
 
     const distanceLabel =
       point.distanceFromPrevious < 1
-        ? `${Math.round(point.distanceFromPrevious * 1000)} m`
-        : `${Number(point.distanceFromPrevious.toFixed(2)).toString()} km`;
+        ? `${Math.round((point.distanceFromPrevious || 0) * 1000)} m`
+        : `${Number((point.distanceFromPrevious || 0).toFixed(2)).toString()} km`;
 
     createDistanceOverlay(
       new google.maps.LatLng(midLat, midLng),
       distanceLabel
     );
-
-    previous = point;
-  });
+  }
 }
 
 function enableMapClickPicker(callback) {
@@ -1182,6 +1271,8 @@ export {
   clearMarkers,
   showStartMarker,
   clearStartMarker,
+  showEndMarker,
+  clearEndMarker,
   focusToLocation,
   focusMapToPoints,
   showCurrentLocationMarker,
