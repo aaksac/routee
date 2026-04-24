@@ -642,6 +642,7 @@ function focusMapForPickedLocation(lat, lng) {
 
   const target = { lat, lng };
   const mapDiv = map.getDiv();
+  const isDesktop = window.innerWidth > 720;
 
   if (!mapDiv) {
     map.panTo(target);
@@ -662,7 +663,7 @@ function focusMapForPickedLocation(lat, lng) {
     bottom: mapDiv.clientHeight - padding.bottom
   };
 
-  const desiredX = (safeRect.left + safeRect.right) / 2;
+  const desiredX = isDesktop ? mapDiv.clientWidth / 2 : (safeRect.left + safeRect.right) / 2;
   const desiredY = (safeRect.top + safeRect.bottom) / 2;
   const COMFORT_TOLERANCE_PX = 42;
 
@@ -678,14 +679,15 @@ function focusMapForPickedLocation(lat, lng) {
 
     const deltaX = desiredX - markerPixel.x;
     const deltaY = desiredY - markerPixel.y;
+    const appliedDeltaX = isDesktop ? 0 : deltaX;
     const needsComfortPan =
-      Math.abs(deltaX) > COMFORT_TOLERANCE_PX || Math.abs(deltaY) > COMFORT_TOLERANCE_PX;
+      Math.abs(appliedDeltaX) > COMFORT_TOLERANCE_PX || Math.abs(deltaY) > COMFORT_TOLERANCE_PX;
 
     if (!force && isInSafeRect && !needsComfortPan) {
       return;
     }
 
-    map.panBy(deltaX, deltaY);
+    map.panBy(appliedDeltaX, deltaY);
   };
 
   map.panTo(target);
