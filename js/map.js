@@ -42,11 +42,11 @@ const MAP_CLICK_PROGRESSIVE_ZOOM_LEVELS = [
   { maxZoom: 4, targetZoom: 6 },
   { maxZoom: 9, targetZoom: 11 },
   { maxZoom: 13, targetZoom: 15 },
-  { maxZoom: 18, targetZoom: 19 }
+  { maxZoom: 19, targetZoom: 20 }
 ];
 
-const MAP_CLICK_FINAL_PICK_ZOOM = 19;
-const MARKER_CLICK_TARGET_ZOOM = 20;
+const MAP_CLICK_FINAL_PICK_ZOOM = 20;
+const MARKER_CLICK_TARGET_ZOOM = 21;
 const SMOOTH_ZOOM_STEP_DELAY_MS = 120;
 const SMOOTH_ZOOM_START_DELAY_MS = 110;
 
