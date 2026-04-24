@@ -667,7 +667,7 @@ select:focus {
 
   .top-center {
     top: 18px;
-    left: 126px;
+    left: 184px;
     transform: none;
     max-width: none;
     z-index: 7;
@@ -727,10 +727,13 @@ select:focus {
 }
 
 .new-map-inline-btn {
-  gap: 8px;
+  gap: 0;
   cursor: pointer;
-  font-weight: 700;
+  font-weight: 800;
   color: #0f172a;
+  padding-left: 14px;
+  padding-right: 14px;
+  min-width: auto;
   transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
 }
 
