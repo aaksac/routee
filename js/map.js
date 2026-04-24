@@ -610,34 +610,6 @@ function getMarkerContainerPoint(lat, lng) {
   };
 }
 
-function smoothZoomIn(targetZoom, onDone) {
-  if (!map) return;
-
-  let zoom = Number(map.getZoom()) || 0;
-  if (zoom >= targetZoom) {
-    if (typeof onDone === "function") onDone();
-    return;
-  }
-
-  const tick = () => {
-    if (!map) return;
-
-    zoom += 1;
-    map.setZoom(zoom);
-
-    if (zoom < targetZoom) {
-      window.setTimeout(tick, 75);
-      return;
-    }
-
-    if (typeof onDone === "function") {
-      window.setTimeout(onDone, 60);
-    }
-  };
-
-  tick();
-}
-
 function focusMapForPickedLocation(lat, lng) {
   if (!map) return;
 
