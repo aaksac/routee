@@ -260,7 +260,7 @@ function getPointDisplayTitle(pointData) {
   }
 
   if (pointData.type === "end") {
-    return `E. ${pointData.name || "End Point"}`;
+    return `E. ${pointData.name || "Bitiş Noktası"}`;
   }
 
   if (pointData.orderLabel) {
@@ -325,7 +325,7 @@ function createInfoWindowContent(pointData) {
   if (pointData?.type === "start") {
     badge.textContent = "Başlangıç Noktası";
   } else if (pointData?.type === "end") {
-    badge.textContent = "End Point";
+    badge.textContent = "Bitiş Noktası";
   } else {
     badge.textContent = "Konum Bilgisi";
   }
@@ -695,7 +695,7 @@ function showEndMarker({ lat, lng, title, onClick, pointData }) {
   endMarker = new google.maps.Marker({
     position: { lat, lng },
     map,
-    title: title || "End Point",
+    title: title || "Bitiş Noktası",
     label: {
       text: "E",
       color: "#ffffff",
