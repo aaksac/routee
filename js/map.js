@@ -648,7 +648,7 @@ function focusMapForPickedLocation(lat, lng) {
     return;
   }
 
-  const targetZoom = 19;
+  const targetZoom = 18;
   const currentZoom = Number(map.getZoom()) || 0;
   const shouldZoomIn = currentZoom < targetZoom;
 
