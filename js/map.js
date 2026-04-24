@@ -840,19 +840,24 @@ function enableMapClickPicker(callback) {
     google.maps.event.removeListener(mapClickListener);
   }
 
-  mapClickListener = map.addListener("click", (event) => {
-    const lat = event.latLng.lat();
-    const lng = event.latLng.lng();
+mapClickListener = map.addListener("click", (event) => {
+  const lat = event.latLng.lat();
+  const lng = event.latLng.lng();
 
-    showDraftMarker(lat, lng);
-    handleProgressiveMapClickFocus(lat, lng);
+  if (searchMarker) {
+    searchMarker.setMap(null);
+    searchMarker = null;
+  }
 
-    callback({
-      lat,
-      lng,
-      name: "İşaretli Konum"
-    });
+  showDraftMarker(lat, lng);
+  handleProgressiveMapClickFocus(lat, lng);
+
+  callback({
+    lat,
+    lng,
+    name: "İşaretli Konum"
   });
+});
 }
 
 function ensureSearchDropdown(inputElement) {
@@ -1008,21 +1013,23 @@ function renderPredictions(predictions, onPlaceSelected) {
           return;
         }
 
-        const location = results[0].geometry.location;
-        const lat = location.lat();
-        const lng = location.lng();
+const location = results[0].geometry.location;
+const lat = location.lat();
+const lng = location.lng();
 
-        if (searchMarker) {
-          searchMarker.setMap(null);
-          searchMarker = null;
-        }
+clearDraftMarker();
 
-        searchMarker = new google.maps.Marker({
-          position: { lat, lng },
-          map,
-          title: selectedName,
-          icon: createCircleSymbol("#2563eb", "#ffffff", 13)
-        });
+if (searchMarker) {
+  searchMarker.setMap(null);
+  searchMarker = null;
+}
+
+searchMarker = new google.maps.Marker({
+  position: { lat, lng },
+  map,
+  title: selectedName,
+  icon: createCircleSymbol("#2563eb", "#ffffff", 13)
+});
 
         focusToLocation(lat, lng, 16);
         resetPageZoomAfterSearch();
