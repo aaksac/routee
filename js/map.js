@@ -26,9 +26,11 @@ let searchDebounceTimer = null;
 const MIN_SEARCH_LENGTH = 4;
 const SEARCH_DEBOUNCE_MS = 450;
 const MAX_PREDICTIONS = 5;
-const PICKER_FOCUS_ZOOM_STEPS = [16, 17, 18];
+const PICKER_FOCUS_ZOOM_STEPS = [14, 15, 16.5];
+const DRAFT_SELECTION_STEP_RESET_DISTANCE_METERS = 250;
 
 let draftSelectionZoomStep = 0;
+let lastDraftSelection = null;
 
 const POINT_COLORS = [
   { value: "#dc2626", label: "Kırmızı" },
@@ -602,21 +604,64 @@ function clearDraftMarker() {
   }
 
   draftSelectionZoomStep = 0;
+  lastDraftSelection = null;
+}
+
+function calculateDistanceMeters(lat1, lng1, lat2, lng2) {
+  const earthRadius = 6371000;
+  const toRadians = (value) => (value * Math.PI) / 180;
+  const dLat = toRadians(lat2 - lat1);
+  const dLng = toRadians(lng2 - lng1);
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(toRadians(lat1)) *
+      Math.cos(toRadians(lat2)) *
+      Math.sin(dLng / 2) *
+      Math.sin(dLng / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return earthRadius * c;
 }
 
 function focusMapForDraftSelection(lat, lng) {
   if (!map) return;
 
+  if (lastDraftSelection) {
+    const distanceFromPreviousSelection = calculateDistanceMeters(
+      lastDraftSelection.lat,
+      lastDraftSelection.lng,
+      lat,
+      lng
+    );
+
+    if (distanceFromPreviousSelection > DRAFT_SELECTION_STEP_RESET_DISTANCE_METERS) {
+      draftSelectionZoomStep = 0;
+    }
+  }
+
   const maxStepIndex = PICKER_FOCUS_ZOOM_STEPS.length - 1;
-  const boundedStepIndex = Math.min(draftSelectionZoomStep, maxStepIndex);
-  const nextZoom = PICKER_FOCUS_ZOOM_STEPS[boundedStepIndex];
+  const currentZoom = Number(map.getZoom());
+  const normalizedCurrentZoom = Number.isFinite(currentZoom) ? currentZoom : 0;
+
+  let nextStepIndex = Math.min(draftSelectionZoomStep, maxStepIndex);
+
+  while (
+    nextStepIndex < maxStepIndex &&
+    normalizedCurrentZoom >= PICKER_FOCUS_ZOOM_STEPS[nextStepIndex] - 0.05
+  ) {
+    nextStepIndex += 1;
+  }
+
+  const nextZoom = Math.max(
+    PICKER_FOCUS_ZOOM_STEPS[nextStepIndex],
+    normalizedCurrentZoom
+  );
 
   map.panTo({ lat, lng });
   map.setZoom(nextZoom);
 
-  if (draftSelectionZoomStep < maxStepIndex) {
-    draftSelectionZoomStep += 1;
-  }
+  lastDraftSelection = { lat, lng };
+
+  draftSelectionZoomStep = Math.min(nextStepIndex + 1, maxStepIndex);
 }
 
 function clearRouteLines() {
