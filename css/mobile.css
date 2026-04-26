@@ -918,3 +918,82 @@
     grid-column: 1 / -1 !important;
   }
 }
+
+/* Final not görünümü mobil/tablet son override */
+@media (max-width: 1024px) {
+  .trip-note-btn {
+    width: 31px !important;
+    min-width: 31px !important;
+    max-width: 31px !important;
+    height: 31px !important;
+    min-height: 31px !important;
+    top: 9px !important;
+    right: 9px !important;
+    padding: 0 !important;
+    gap: 0 !important;
+  }
+
+  .trip-note-icon {
+    width: 100% !important;
+    height: 100% !important;
+    background: transparent !important;
+    color: inherit !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 1rem !important;
+  }
+
+  .trip-item.has-note,
+  .trip-item.no-note {
+    padding-top: 44px !important;
+  }
+
+  .note-dialog-overlay {
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 14px !important;
+  }
+
+  .note-dialog-card {
+    width: min(390px, calc(100vw - 28px)) !important;
+    max-height: min(78vh, 540px) !important;
+    overflow: auto !important;
+    border-radius: 22px !important;
+    padding: 15px !important;
+  }
+
+  #noteDialogTextarea {
+    min-height: 98px !important;
+  }
+}
+
+@media (max-width: 720px) {
+  .trip-note-btn {
+    width: 30px !important;
+    min-width: 30px !important;
+    max-width: 30px !important;
+    height: 30px !important;
+    min-height: 30px !important;
+    top: 8px !important;
+    right: 8px !important;
+  }
+
+  .trip-item.has-note,
+  .trip-item.no-note {
+    padding-top: 42px !important;
+  }
+
+  .note-dialog-card {
+    width: min(360px, calc(100vw - 28px)) !important;
+  }
+
+  .note-dialog-actions {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+  }
+
+  .note-dialog-btn.primary {
+    grid-column: 1 / -1 !important;
+  }
+}
