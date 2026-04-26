@@ -317,15 +317,6 @@ function hasLocationNote(location) {
   return normalizeLocationNote(location?.note).length > 0;
 }
 
-function getLocationNotePreview(location, maxLength = 96) {
-  const clean = normalizeLocationNote(location?.note).replace(/\s+/g, " ");
-
-  if (!clean) return "";
-  if (clean.length <= maxLength) return clean;
-
-  return `${clean.slice(0, maxLength - 1).trim()}…`;
-}
-
 function getNoteButtonHtml(action, location, id = "") {
   const hasNote = hasLocationNote(location);
   const noteClass = hasNote ? "has-note" : "is-empty";
@@ -333,7 +324,7 @@ function getNoteButtonHtml(action, location, id = "") {
   const dataId = id !== "" && id !== null && id !== undefined ? ` data-id="${escapeHtml(id)}"` : "";
 
   return `
-    <button class="trip-note-btn ${noteClass}" type="button" data-action="${action}"${dataId} title="${title}" aria-label="${title}">
+    <button class="tiny-btn trip-note-btn trip-note-action-btn ${noteClass}" type="button" data-action="${action}"${dataId} title="${title}" aria-label="${title}">
       <span class="trip-note-icon" aria-hidden="true">📝</span>
       <span class="sr-only">${title}</span>
     </button>
@@ -341,11 +332,15 @@ function getNoteButtonHtml(action, location, id = "") {
 }
 
 function getNotePreviewHtml(location) {
-  const preview = getLocationNotePreview(location);
+  const note = normalizeLocationNote(location?.note);
 
-  if (!preview) return "";
+  if (!note) return "";
 
-  return `<span class="trip-note-preview">${escapeHtml(preview)}</span>`;
+  return `
+    <div class="trip-note-preview" aria-label="Konum notu">
+      ${escapeHtml(note).replace(/\n/g, "<br>")}
+    </div>
+  `;
 }
 
 function getNoteStatusClass(location) {
@@ -855,7 +850,6 @@ function renderTripList() {
   const startHtml = state.startPoint
     ? `
       <div class="trip-item start ${getNoteStatusClass(state.startPoint)}">
-        ${getNoteButtonHtml("note-start", state.startPoint)}
         <div class="trip-order">S</div>
         <div class="trip-content">
           <strong>${escapeHtml(state.startPoint.name)}</strong>
@@ -863,9 +857,10 @@ function renderTripList() {
           ${getNotePreviewHtml(state.startPoint)}
         </div>
         <div class="trip-actions">
-          <button class="tiny-btn" type="button" data-action="directions-start">Yol Tarifi</button>
+          ${getNoteButtonHtml("note-start", state.startPoint)}
           <button class="tiny-btn" type="button" data-action="focus-start">Odakla</button>
           <button class="tiny-btn" type="button" data-action="delete-start">Sil</button>
+          <button class="tiny-btn" type="button" data-action="directions-start">Yol Tarifi</button>
         </div>
       </div>
     `
@@ -887,7 +882,6 @@ function renderTripList() {
 
       return `
         <div class="trip-item ${getNoteStatusClass(point)}">
-          ${getNoteButtonHtml("note-point", point, point.id)}
           <div class="trip-order" style="background:${escapeHtml(pointColor)}; box-shadow: 0 12px 22px ${escapeHtml(pointShadow)}">${index + 1}</div>
           <div class="trip-content">
             <strong>${escapeHtml(point.name)}</strong>
@@ -895,9 +889,10 @@ function renderTripList() {
             ${getNotePreviewHtml(point)}
           </div>
           <div class="trip-actions">
-            <button class="tiny-btn" type="button" data-action="directions-point" data-id="${point.id}">Yol Tarifi</button>
+            ${getNoteButtonHtml("note-point", point, point.id)}
             <button class="tiny-btn" type="button" data-action="focus-point" data-id="${point.id}">Odakla</button>
             <button class="tiny-btn" type="button" data-action="delete-point" data-id="${point.id}">Sil</button>
+            <button class="tiny-btn" type="button" data-action="directions-point" data-id="${point.id}">Yol Tarifi</button>
           </div>
         </div>
       `;
@@ -907,7 +902,6 @@ function renderTripList() {
   const endHtml = state.endPoint
     ? `
       <div class="trip-item end ${getNoteStatusClass(state.endPoint)}">
-        ${getNoteButtonHtml("note-end", state.endPoint)}
         <div class="trip-order end-order">E</div>
         <div class="trip-content">
           <strong>${escapeHtml(state.endPoint.name)}</strong>
@@ -915,9 +909,10 @@ function renderTripList() {
           ${getNotePreviewHtml(state.endPoint)}
         </div>
         <div class="trip-actions">
-          <button class="tiny-btn" type="button" data-action="directions-end">Yol Tarifi</button>
+          ${getNoteButtonHtml("note-end", state.endPoint)}
           <button class="tiny-btn" type="button" data-action="focus-end">Odakla</button>
           <button class="tiny-btn" type="button" data-action="delete-end">Sil</button>
+          <button class="tiny-btn" type="button" data-action="directions-end">Yol Tarifi</button>
         </div>
       </div>
     `
