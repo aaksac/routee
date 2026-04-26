@@ -256,6 +256,24 @@ function dispatchMarkerColorRequest(pointData, color) {
   );
 }
 
+function dispatchLocationNoteRequest(pointData) {
+  if (!pointData) return;
+
+  window.dispatchEvent(
+    new CustomEvent("routee:location-note-request", {
+      detail: { pointData }
+    })
+  );
+}
+
+function getPointNote(pointData) {
+  return String(pointData?.note ?? "").trim();
+}
+
+function hasPointNote(pointData) {
+  return getPointNote(pointData).length > 0;
+}
+
 function getPointDisplayTitle(pointData) {
   if (!pointData) return "Seçilen Konum";
 
@@ -324,6 +342,41 @@ function createInfoWindowContent(pointData) {
     activeInfoWindow?.close();
   });
 
+  const hasNote = hasPointNote(pointData);
+  const noteBtn = document.createElement("button");
+  noteBtn.type = "button";
+  noteBtn.setAttribute(
+    "aria-label",
+    hasNote ? "Konum notunu görüntüle veya düzenle" : "Bu konuma not ekle"
+  );
+  noteBtn.title = hasNote ? "Notu görüntüle veya düzenle" : "Not ekle";
+  noteBtn.textContent = hasNote ? "Not var" : "Not ekle";
+  noteBtn.style.position = "absolute";
+  noteBtn.style.top = "8px";
+  noteBtn.style.right = "42px";
+  noteBtn.style.height = "26px";
+  noteBtn.style.minWidth = "70px";
+  noteBtn.style.border = hasNote ? "1px solid #d97706" : "1px solid rgba(203, 213, 225, 0.95)";
+  noteBtn.style.borderRadius = "999px";
+  noteBtn.style.background = hasNote ? "#f59e0b" : "#f8fafc";
+  noteBtn.style.color = hasNote ? "#ffffff" : "#475569";
+  noteBtn.style.fontSize = "10px";
+  noteBtn.style.fontWeight = "800";
+  noteBtn.style.lineHeight = "1";
+  noteBtn.style.display = "inline-flex";
+  noteBtn.style.alignItems = "center";
+  noteBtn.style.justifyContent = "center";
+  noteBtn.style.cursor = "pointer";
+  noteBtn.style.padding = "0 8px";
+  noteBtn.style.boxShadow = hasNote ? "0 8px 16px rgba(217, 119, 6, 0.22)" : "none";
+  noteBtn.style.zIndex = "3";
+  noteBtn.style.whiteSpace = "nowrap";
+
+  noteBtn.addEventListener("click", () => {
+    dispatchLocationNoteRequest(pointData);
+    activeInfoWindow?.close();
+  });
+
   const badge = document.createElement("div");
 
   if (pointData?.type === "start") {
@@ -356,12 +409,44 @@ function createInfoWindowContent(pointData) {
   title.style.lineHeight = "1.25";
   title.style.color = "#0f172a";
   title.style.wordBreak = "break-word";
-  title.style.paddingRight = "30px";
+  title.style.paddingRight = "112px";
   title.style.marginBottom = "8px";
 
   wrapper.appendChild(closeBtn);
+  wrapper.appendChild(noteBtn);
   wrapper.appendChild(badge);
   wrapper.appendChild(title);
+
+  const noteText = getPointNote(pointData);
+  const noteBox = document.createElement("div");
+  noteBox.style.marginBottom = "10px";
+  noteBox.style.padding = hasNote ? "8px 9px" : "7px 9px";
+  noteBox.style.borderRadius = "12px";
+  noteBox.style.border = hasNote ? "1px solid rgba(245, 158, 11, 0.28)" : "1px dashed rgba(148, 163, 184, 0.55)";
+  noteBox.style.background = hasNote ? "#fffbeb" : "#f8fafc";
+
+  const noteLabel = document.createElement("div");
+  noteLabel.textContent = hasNote ? "Not" : "Not yok";
+  noteLabel.style.fontSize = "10px";
+  noteLabel.style.fontWeight = "800";
+  noteLabel.style.color = hasNote ? "#92400e" : "#64748b";
+  noteLabel.style.textTransform = "uppercase";
+  noteLabel.style.letterSpacing = "0.04em";
+  noteLabel.style.marginBottom = hasNote ? "4px" : "0";
+  noteBox.appendChild(noteLabel);
+
+  if (hasNote) {
+    const noteContent = document.createElement("div");
+    noteContent.textContent = noteText;
+    noteContent.style.fontSize = "11px";
+    noteContent.style.lineHeight = "1.38";
+    noteContent.style.color = "#78350f";
+    noteContent.style.wordBreak = "break-word";
+    noteContent.style.whiteSpace = "pre-wrap";
+    noteBox.appendChild(noteContent);
+  }
+
+  wrapper.appendChild(noteBox);
 
   const subtitleText = getPointSubtitle(pointData);
   if (subtitleText) {
