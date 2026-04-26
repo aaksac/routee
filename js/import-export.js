@@ -6,7 +6,8 @@ function buildExportRows(startPoint, points, endPoint = null) {
       type: "start",
       name: startPoint.name || "",
       lat: Number(startPoint.lat),
-      lng: Number(startPoint.lng)
+      lng: Number(startPoint.lng),
+      note: startPoint.note || ""
     });
   }
 
@@ -15,7 +16,8 @@ function buildExportRows(startPoint, points, endPoint = null) {
       type: "point",
       name: point.name || "",
       lat: Number(point.lat),
-      lng: Number(point.lng)
+      lng: Number(point.lng),
+      note: point.note || ""
     });
   });
 
@@ -24,7 +26,8 @@ function buildExportRows(startPoint, points, endPoint = null) {
       type: "end",
       name: endPoint.name || "",
       lat: Number(endPoint.lat),
-      lng: Number(endPoint.lng)
+      lng: Number(endPoint.lng),
+      note: endPoint.note || ""
     });
   }
 
@@ -33,7 +36,7 @@ function buildExportRows(startPoint, points, endPoint = null) {
 
 function exportToCsv(filename, startPoint, points, endPoint = null) {
   const rows = buildExportRows(startPoint, points, endPoint);
-  const headers = ["type", "name", "lat", "lng"];
+  const headers = ["type", "name", "lat", "lng", "note"];
   const delimiter = ",";
 
   const csvLines = [
@@ -43,7 +46,8 @@ function exportToCsv(filename, startPoint, points, endPoint = null) {
         escapeCsvValue(row.type, delimiter),
         escapeCsvValue(row.name, delimiter),
         escapeCsvValue(row.lat, delimiter),
-        escapeCsvValue(row.lng, delimiter)
+        escapeCsvValue(row.lng, delimiter),
+        escapeCsvValue(row.note, delimiter)
       ].join(delimiter)
     )
   ];
@@ -368,12 +372,22 @@ function normalizeImportedRow(row) {
   const nameValue = getRowValue(row, ["name", "ad", "isim", "yeradi", "yeradı", "placename"]);
   const latValue = getRowValue(row, ["lat", "latitude", "enlem"]);
   const lngValue = getRowValue(row, ["lng", "lon", "long", "longitude", "boylam"]);
+  const noteValue = getRowValue(row, [
+    "note",
+    "not",
+    "notes",
+    "aciklama",
+    "açıklama",
+    "description",
+    "notlar"
+  ]);
 
   return {
     type: normalizeImportedType(typeValue),
     name: cleanImportedText(nameValue),
     lat: parseCoordinateValue(latValue),
-    lng: parseCoordinateValue(lngValue)
+    lng: parseCoordinateValue(lngValue),
+    note: cleanImportedText(noteValue)
   };
 }
 
@@ -490,6 +504,7 @@ function convertImportedRowsToState(rows) {
         name: startRow.name,
         lat: Number(startRow.lat),
         lng: Number(startRow.lng),
+        note: startRow.note || "",
         type: "start"
       }
     : null;
@@ -500,6 +515,7 @@ function convertImportedRowsToState(rows) {
         name: endRow.name,
         lat: Number(endRow.lat),
         lng: Number(endRow.lng),
+        note: endRow.note || "",
         type: "end"
       }
     : null;
@@ -509,6 +525,7 @@ function convertImportedRowsToState(rows) {
     name: row.name,
     lat: Number(row.lat),
     lng: Number(row.lng),
+    note: row.note || "",
     distanceFromPrevious: 0,
     type: "point"
   }));
