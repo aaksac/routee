@@ -1325,3 +1325,62 @@ select:focus {
     grid-column: 1 / -1 !important;
   }
 }
+
+/* Gezi listesi not ikonu: sağ alt profesyonel konum */
+.trip-item.has-note,
+.trip-item.no-note {
+  padding-top: 12px !important;
+  padding-bottom: 54px !important;
+}
+
+.trip-note-btn {
+  top: auto !important;
+  right: 12px !important;
+  bottom: 12px !important;
+  width: 34px !important;
+  min-width: 34px !important;
+  max-width: 34px !important;
+  height: 34px !important;
+  min-height: 34px !important;
+  padding: 0 !important;
+  border-radius: 14px !important;
+}
+
+.trip-note-btn.is-empty {
+  background: #f8fafc !important;
+  border: 1px solid rgba(203, 213, 225, 0.95) !important;
+  color: #334155 !important;
+  box-shadow: 0 6px 14px rgba(15, 23, 42, 0.06) !important;
+}
+
+.trip-note-btn.has-note {
+  background: linear-gradient(135deg, #f59e0b, #d97706) !important;
+  border: 1px solid #d97706 !important;
+  color: #ffffff !important;
+  box-shadow: 0 10px 20px rgba(217, 119, 6, 0.24) !important;
+}
+
+.trip-note-btn:hover {
+  transform: translateY(-1px) !important;
+  box-shadow: 0 12px 22px rgba(15, 23, 42, 0.12) !important;
+}
+
+.trip-note-icon {
+  width: 100% !important;
+  height: 100% !important;
+  font-size: 1rem !important;
+  line-height: 1 !important;
+}
+
+.trip-content {
+  padding-right: 0 !important;
+}
+
+.trip-actions {
+  padding-right: 46px !important;
+}
+
+.trip-note-preview {
+  margin-top: 4px !important;
+  max-width: calc(100% - 4px) !important;
+}
