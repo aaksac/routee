@@ -329,14 +329,13 @@ function getLocationNotePreview(location, maxLength = 96) {
 function getNoteButtonHtml(action, location, id = "") {
   const hasNote = hasLocationNote(location);
   const noteClass = hasNote ? "has-note" : "is-empty";
-  const noteLabel = hasNote ? "Not var" : "Not ekle";
   const title = hasNote ? "Notu görüntüle veya düzenle" : "Bu konuma not ekle";
   const dataId = id !== "" && id !== null && id !== undefined ? ` data-id="${escapeHtml(id)}"` : "";
 
   return `
     <button class="trip-note-btn ${noteClass}" type="button" data-action="${action}"${dataId} title="${title}" aria-label="${title}">
-      <span class="trip-note-icon" aria-hidden="true">${hasNote ? "✎" : "+"}</span>
-      <span class="trip-note-text">${noteLabel}</span>
+      <span class="trip-note-icon" aria-hidden="true">📝</span>
+      <span class="sr-only">${title}</span>
     </button>
   `;
 }
@@ -1085,7 +1084,7 @@ function ensureNoteDialog() {
     <section class="note-dialog-card" role="dialog" aria-modal="true" aria-labelledby="noteDialogTitle">
       <button class="note-dialog-close" type="button" data-action="close-note-dialog" aria-label="Not penceresini kapat">×</button>
       <div class="note-dialog-header">
-        <span class="note-dialog-icon" aria-hidden="true">✎</span>
+        <span class="note-dialog-icon" aria-hidden="true">📝</span>
         <div>
           <h3 id="noteDialogTitle">Konum Notu</h3>
           <p id="noteDialogSubtitle">Bu konuma kısa bir not ekleyebilirsiniz.</p>
