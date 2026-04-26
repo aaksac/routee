@@ -1384,3 +1384,94 @@ select:focus {
   margin-top: 4px !important;
   max-width: calc(100% - 4px) !important;
 }
+/* Gezi listesi aksiyon satırı: Not solda, Yol Tarifi en sağda */
+.trip-item.has-note,
+.trip-item.no-note {
+  padding-top: 12px !important;
+  padding-bottom: 12px !important;
+}
+
+.trip-content {
+  padding-right: 0 !important;
+}
+
+.trip-actions {
+  width: 100% !important;
+  padding-right: 0 !important;
+  display: flex !important;
+  flex-wrap: wrap !important;
+  align-items: center !important;
+  gap: 8px !important;
+}
+
+.trip-note-action-btn {
+  position: static !important;
+  top: auto !important;
+  right: auto !important;
+  bottom: auto !important;
+  width: 36px !important;
+  min-width: 36px !important;
+  max-width: 36px !important;
+  height: 34px !important;
+  min-height: 34px !important;
+  padding: 0 !important;
+  border-radius: 999px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  order: 0 !important;
+}
+
+.trip-note-action-btn .trip-note-icon {
+  width: 100% !important;
+  height: 100% !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 1rem !important;
+  line-height: 1 !important;
+}
+
+.trip-note-action-btn.is-empty {
+  background: #f8fafc !important;
+  border: 1px solid rgba(203, 213, 225, 0.95) !important;
+  color: #334155 !important;
+  box-shadow: 0 6px 14px rgba(15, 23, 42, 0.06) !important;
+}
+
+.trip-note-action-btn.has-note {
+  background: linear-gradient(135deg, #f59e0b, #d97706) !important;
+  border: 1px solid #d97706 !important;
+  color: #ffffff !important;
+  box-shadow: 0 10px 20px rgba(217, 119, 6, 0.24) !important;
+}
+
+.trip-actions .tiny-btn[data-action^="focus"] {
+  order: 1 !important;
+}
+
+.trip-actions .tiny-btn[data-action^="delete"] {
+  order: 2 !important;
+}
+
+.trip-actions .tiny-btn[data-action^="directions"] {
+  order: 10 !important;
+  margin-left: auto !important;
+}
+
+.trip-note-preview {
+  display: block !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  margin-top: 8px !important;
+  padding: 8px 10px !important;
+  border-radius: 12px !important;
+  border: 1px solid rgba(245, 158, 11, 0.28) !important;
+  background: #fffbeb !important;
+  color: #92400e !important;
+  font-size: 0.82rem !important;
+  line-height: 1.42 !important;
+  font-weight: 600 !important;
+  white-space: normal !important;
+  overflow-wrap: anywhere !important;
+}
