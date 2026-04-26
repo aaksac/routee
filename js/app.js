@@ -493,6 +493,18 @@ function createPointFromPreviousStart(startPoint) {
   };
 }
 
+function createPointFromPreviousEnd(endPoint) {
+  return {
+    id: Date.now() + Math.random(),
+    name: endPoint.name || "Eski Bitiş",
+    lat: Number(endPoint.lat),
+    lng: Number(endPoint.lng),
+    color: DEFAULT_POINT_COLOR,
+    distanceFromPrevious: 0,
+    type: "point"
+  };
+}
+
 function commitStartPoint() {
   if (!hasActiveAccess()) {
     alert("Erişim süreniz dolmuş.");
@@ -605,6 +617,17 @@ function commitEndPoint() {
     nextPoints = nextPoints.filter(
       (point) => String(point.id) !== String(promotedPoint.id)
     );
+  }
+
+    if (previousEndPoint && !isSamePlace(previousEndPoint, endPoint)) {
+    const oldEndAsPoint = createPointFromPreviousEnd(previousEndPoint);
+    const alreadyExists = nextPoints.some((point) =>
+      isSamePlace(point, oldEndAsPoint)
+    );
+
+    if (!alreadyExists) {
+      nextPoints.push(oldEndAsPoint);
+    }
   }
 
   const nextLocationCount =
