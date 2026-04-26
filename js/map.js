@@ -302,6 +302,47 @@ function getPointSubtitle(pointData) {
   return String(raw).trim();
 }
 
+function ensureRouteeInfoWindowStyle() {
+  if (document.getElementById("routeeInfoWindowStableStyle")) return;
+
+  const style = document.createElement("style");
+  style.id = "routeeInfoWindowStableStyle";
+  style.textContent = `
+    .gm-style .gm-style-iw-t::after,
+    .gm-style .gm-style-iw-tc {
+      display: none !important;
+      opacity: 0 !important;
+      pointer-events: none !important;
+    }
+
+    .routee-info-card {
+      overflow: visible !important;
+    }
+
+    .routee-info-card-pointer {
+      position: absolute;
+      left: 50%;
+      bottom: -7px;
+      width: 14px;
+      height: 14px;
+      transform: translateX(-50%) rotate(45deg);
+      background: #ffffff;
+      border-right: 1px solid rgba(226, 232, 240, 0.95);
+      border-bottom: 1px solid rgba(226, 232, 240, 0.95);
+      box-shadow: 6px 6px 14px rgba(15, 23, 42, 0.12);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .routee-info-card > *:not(.routee-info-card-pointer) {
+      position: relative;
+      z-index: 1;
+    }
+  `;
+
+  document.head.appendChild(style);
+}
+
 function createInfoWindowContent(pointData) {
   const wrapper = document.createElement("div");
   wrapper.style.width = "236px";
@@ -315,6 +356,8 @@ function createInfoWindowContent(pointData) {
   wrapper.style.fontFamily = "inherit";
   wrapper.style.position = "relative";
   wrapper.style.overflow = "visible";
+  wrapper.className = "routee-info-card";
+  ensureRouteeInfoWindowStyle();
 
   const closeBtn = document.createElement("button");
   closeBtn.type = "button";
@@ -404,7 +447,9 @@ function createInfoWindowContent(pointData) {
   noteBox.style.marginBottom = "10px";
   noteBox.style.padding = hasNote ? "8px 9px" : "7px 9px";
   noteBox.style.borderRadius = "12px";
-  noteBox.style.border = hasNote ? "1px solid rgba(245, 158, 11, 0.28)" : "1px dashed rgba(148, 163, 184, 0.55)";
+  noteBox.style.border = hasNote
+    ? "1px solid rgba(245, 158, 11, 0.28)"
+    : "1px dashed rgba(148, 163, 184, 0.55)";
   noteBox.style.background = hasNote ? "#fffbeb" : "#f8fafc";
 
   const noteLabel = document.createElement("div");
@@ -543,15 +588,23 @@ function createInfoWindowContent(pointData) {
   actions.appendChild(deleteBtn);
   wrapper.appendChild(actions);
 
+  const pointer = document.createElement("span");
+  pointer.className = "routee-info-card-pointer";
+  pointer.setAttribute("aria-hidden", "true");
+  wrapper.appendChild(pointer);
+
   return wrapper;
 }
 
 function styleNativeInfoWindowShell() {
+  ensureRouteeInfoWindowStyle();
+
   const iwOuter = document.querySelector(".gm-style .gm-style-iw");
   if (iwOuter) {
     iwOuter.style.padding = "0";
     iwOuter.style.maxWidth = "none";
     iwOuter.style.maxHeight = "none";
+    iwOuter.style.overflow = "visible";
   }
 
   const iwContainer = document.querySelector(".gm-style .gm-style-iw-c");
@@ -573,6 +626,13 @@ function styleNativeInfoWindowShell() {
     iwContent.style.maxWidth = "none";
   }
 
+  const nativeTails = document.querySelectorAll(".gm-style .gm-style-iw-tc");
+  nativeTails.forEach((tail) => {
+    tail.style.display = "none";
+    tail.style.opacity = "0";
+    tail.style.pointerEvents = "none";
+  });
+
   const nativeCloseButtons = document.querySelectorAll(
     ".gm-style .gm-ui-hover-effect, .gm-style button[aria-label='Close']"
   );
@@ -593,7 +653,7 @@ function openMarkerInfo(marker, pointData) {
   activeInfoWindow.setContent(createInfoWindowContent(pointData));
   activeInfoWindow.setOptions({
     maxWidth: 248,
-    pixelOffset: new google.maps.Size(0, -8),
+    pixelOffset: new google.maps.Size(0, -14),
     zIndex: 9999,
     disableAutoPan: false
   });
