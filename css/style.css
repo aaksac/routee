@@ -928,6 +928,18 @@ select:focus {
 }
 
 /* Konum notları */
+.sr-only {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
 .trip-item {
   position: relative;
 }
@@ -935,7 +947,7 @@ select:focus {
 .trip-item.has-note,
 .trip-item.no-note {
   align-items: start;
-  padding-top: 50px;
+  padding-top: 46px !important;
 }
 
 .trip-item.has-note {
@@ -964,26 +976,23 @@ select:focus {
 }
 
 .trip-note-btn {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  z-index: 4;
-  min-height: 30px;
-  height: 30px;
-  padding: 0 10px;
-  border-radius: 999px;
-  border: 1px solid rgba(203, 213, 225, 0.95);
-  background: #f8fafc;
-  color: #475569;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 5px;
-  font-size: 0.72rem;
-  font-weight: 800;
-  line-height: 1;
-  white-space: nowrap;
-  cursor: pointer;
+  position: absolute !important;
+  top: 10px !important;
+  right: 10px !important;
+  z-index: 4 !important;
+  width: 32px !important;
+  min-width: 32px !important;
+  max-width: 32px !important;
+  height: 32px !important;
+  min-height: 32px !important;
+  padding: 0 !important;
+  border-radius: 999px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 0 !important;
+  line-height: 1 !important;
+  cursor: pointer !important;
   transition: transform 0.16s ease, box-shadow 0.16s ease, background 0.16s ease;
 }
 
@@ -992,34 +1001,39 @@ select:focus {
   box-shadow: 0 8px 18px rgba(15, 23, 42, 0.08);
 }
 
-.trip-note-btn.has-note {
-  border-color: #d97706;
-  background: linear-gradient(135deg, #f59e0b, #d97706);
-  color: #ffffff;
-  box-shadow: 0 8px 18px rgba(217, 119, 6, 0.2);
+.trip-note-btn.is-empty {
+  border: 1px solid rgba(203, 213, 225, 0.95) !important;
+  background: #f8fafc !important;
+  color: #334155 !important;
+  box-shadow: none !important;
 }
 
-.trip-note-btn.is-empty {
-  border-color: rgba(203, 213, 225, 0.95);
-  background: #f8fafc;
-  color: #475569;
+.trip-note-btn.has-note {
+  border: 1px solid #d97706 !important;
+  background: linear-gradient(135deg, #f59e0b, #d97706) !important;
+  color: #ffffff !important;
+  box-shadow: 0 8px 18px rgba(217, 119, 6, 0.22) !important;
 }
 
 .trip-note-icon {
-  width: 15px;
-  height: 15px;
-  border-radius: 999px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(255, 255, 255, 0.28);
-  font-size: 0.7rem;
-  line-height: 1;
+  width: 100% !important;
+  height: 100% !important;
+  background: transparent !important;
+  color: inherit !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 1rem !important;
+  font-weight: 900 !important;
+  line-height: 1 !important;
 }
 
 .trip-note-btn.is-empty .trip-note-icon {
-  background: #e2e8f0;
-  color: #334155;
+  font-size: 1.12rem !important;
+}
+
+.trip-note-btn .trip-note-text {
+  display: none !important;
 }
 
 .trip-note-preview {
@@ -1038,14 +1052,50 @@ select:focus {
   overflow-wrap: anywhere;
 }
 
+/* Harita üzerindeki konum bilgisi not ikonu */
+.info-note-btn {
+  position: absolute !important;
+  top: 8px !important;
+  right: 42px !important;
+  z-index: 3 !important;
+  width: 28px !important;
+  min-width: 28px !important;
+  height: 28px !important;
+  min-height: 28px !important;
+  padding: 0 !important;
+  border-radius: 999px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  line-height: 1 !important;
+  cursor: pointer !important;
+  font-weight: 900 !important;
+}
+
+.info-note-btn.is-empty {
+  border: 1px solid rgba(203, 213, 225, 0.95) !important;
+  background: #f8fafc !important;
+  color: #334155 !important;
+  font-size: 16px !important;
+}
+
+.info-note-btn.has-note {
+  border: 1px solid #d97706 !important;
+  background: #f59e0b !important;
+  color: #ffffff !important;
+  font-size: 16px !important;
+  box-shadow: 0 8px 16px rgba(217, 119, 6, 0.22) !important;
+}
+
+/* Not penceresi */
 .note-dialog-overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 130;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 18px;
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 140 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 16px !important;
 }
 
 .note-dialog-overlay.hidden {
@@ -1053,29 +1103,32 @@ select:focus {
 }
 
 .note-dialog-backdrop {
-  position: absolute;
-  inset: 0;
-  background: rgba(15, 23, 42, 0.48);
-  backdrop-filter: blur(4px);
+  position: absolute !important;
+  inset: 0 !important;
+  background: rgba(15, 23, 42, 0.36) !important;
+  backdrop-filter: blur(6px) !important;
+  -webkit-backdrop-filter: blur(6px) !important;
 }
 
 .note-dialog-card {
-  position: relative;
-  z-index: 1;
-  width: min(520px, calc(100vw - 28px));
-  border-radius: 24px;
-  border: 1px solid rgba(226, 232, 240, 0.96);
-  background: #ffffff;
-  box-shadow: 0 26px 70px rgba(15, 23, 42, 0.24);
-  padding: 22px;
+  position: relative !important;
+  z-index: 1 !important;
+  width: min(410px, calc(100vw - 32px)) !important;
+  max-height: min(78vh, 560px) !important;
+  overflow: auto !important;
+  border-radius: 22px !important;
+  border: 1px solid rgba(226, 232, 240, 0.96) !important;
+  background: #ffffff !important;
+  box-shadow: 0 24px 58px rgba(15, 23, 42, 0.24) !important;
+  padding: 16px !important;
 }
 
 .note-dialog-close {
   position: absolute;
-  top: 14px;
-  right: 14px;
-  width: 32px;
-  height: 32px;
+  top: 12px !important;
+  right: 12px !important;
+  width: 30px !important;
+  height: 30px !important;
   border: 0;
   border-radius: 999px;
   background: rgba(15, 23, 42, 0.06);
@@ -1090,51 +1143,52 @@ select:focus {
 
 .note-dialog-header {
   display: flex;
-  gap: 12px;
-  align-items: flex-start;
-  padding-right: 42px;
-  margin-bottom: 14px;
+  gap: 10px !important;
+  align-items: flex-start !important;
+  margin-bottom: 10px !important;
+  padding-right: 38px !important;
 }
 
 .note-dialog-icon {
-  width: 38px;
-  height: 38px;
-  border-radius: 14px;
+  width: 34px !important;
+  height: 34px !important;
+  border-radius: 12px !important;
   background: #fffbeb;
   color: #b45309;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   font-weight: 900;
-  flex: 0 0 auto;
+  flex: 0 0 34px !important;
 }
 
 .note-dialog-header h3 {
   margin: 0 0 4px;
   color: #0f172a;
-  font-size: 1.08rem;
-  line-height: 1.25;
+  font-size: 0.98rem !important;
+  line-height: 1.22 !important;
 }
 
 .note-dialog-header p {
   margin: 0;
   color: #64748b;
-  font-size: 0.9rem;
-  line-height: 1.35;
+  font-size: 0.8rem !important;
+  line-height: 1.3 !important;
 }
 
 #noteDialogTextarea {
   width: 100%;
-  min-height: 138px;
+  min-height: 104px !important;
+  max-height: 190px !important;
   resize: vertical;
   border: 1px solid #cbd5e1;
-  border-radius: 16px;
-  padding: 13px 14px;
+  border-radius: 14px !important;
+  padding: 10px 11px !important;
   color: #0f172a;
   background: #f8fafc;
   font-family: inherit;
-  font-size: 0.95rem;
-  line-height: 1.45;
+  font-size: 0.88rem !important;
+  line-height: 1.4 !important;
   outline: none;
   box-sizing: border-box;
 }
@@ -1150,25 +1204,25 @@ select:focus {
   align-items: center;
   justify-content: space-between;
   gap: 10px;
-  margin-top: 8px;
+  margin-top: 6px !important;
   color: #64748b;
-  font-size: 0.78rem;
+  font-size: 0.72rem !important;
 }
 
 .note-dialog-actions {
   display: flex;
   justify-content: flex-end;
-  gap: 9px;
-  margin-top: 18px;
+  gap: 7px !important;
+  margin-top: 12px !important;
   flex-wrap: wrap;
 }
 
 .note-dialog-btn {
-  min-height: 38px;
+  min-height: 34px !important;
   border-radius: 999px;
-  padding: 0 15px;
+  padding: 0 12px !important;
   font-weight: 800;
-  font-size: 0.86rem;
+  font-size: 0.78rem !important;
   border: 1px solid transparent;
   cursor: pointer;
 }
@@ -1195,4 +1249,79 @@ select:focus {
   opacity: 0.45;
   cursor: not-allowed;
   box-shadow: none;
+}
+
+/* Tablet */
+@media (min-width: 721px) and (max-width: 1024px) {
+  .trip-note-btn {
+    width: 31px !important;
+    min-width: 31px !important;
+    max-width: 31px !important;
+    height: 31px !important;
+    min-height: 31px !important;
+    top: 9px !important;
+    right: 9px !important;
+  }
+
+  .trip-item.has-note,
+  .trip-item.no-note {
+    padding-top: 44px !important;
+  }
+
+  .note-dialog-card {
+    width: min(390px, calc(100vw - 34px)) !important;
+  }
+}
+
+/* Mobil */
+@media (max-width: 720px) {
+  .trip-note-btn {
+    width: 30px !important;
+    min-width: 30px !important;
+    max-width: 30px !important;
+    height: 30px !important;
+    min-height: 30px !important;
+    top: 8px !important;
+    right: 8px !important;
+  }
+
+  .trip-note-icon {
+    font-size: 1rem !important;
+  }
+
+  .trip-item.has-note,
+  .trip-item.no-note {
+    padding-top: 42px !important;
+  }
+
+  .note-dialog-overlay {
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 14px !important;
+  }
+
+  .note-dialog-card {
+    width: min(360px, calc(100vw - 28px)) !important;
+    max-height: min(78vh, 520px) !important;
+    overflow: auto !important;
+    padding: 15px !important;
+    border-radius: 22px !important;
+  }
+
+  #noteDialogTextarea {
+    min-height: 96px !important;
+  }
+
+  .note-dialog-actions {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+  }
+
+  .note-dialog-btn {
+    width: 100% !important;
+  }
+
+  .note-dialog-btn.primary {
+    grid-column: 1 / -1 !important;
+  }
 }
