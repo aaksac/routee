@@ -344,33 +344,15 @@ function createInfoWindowContent(pointData) {
 
   const hasNote = hasPointNote(pointData);
   const noteBtn = document.createElement("button");
+
   noteBtn.type = "button";
+  noteBtn.className = `info-note-btn ${hasNote ? "has-note" : "is-empty"}`;
   noteBtn.setAttribute(
     "aria-label",
     hasNote ? "Konum notunu görüntüle veya düzenle" : "Bu konuma not ekle"
   );
   noteBtn.title = hasNote ? "Notu görüntüle veya düzenle" : "Not ekle";
-  noteBtn.textContent = hasNote ? "Not var" : "Not ekle";
-  noteBtn.style.position = "absolute";
-  noteBtn.style.top = "8px";
-  noteBtn.style.right = "42px";
-  noteBtn.style.height = "26px";
-  noteBtn.style.minWidth = "70px";
-  noteBtn.style.border = hasNote ? "1px solid #d97706" : "1px solid rgba(203, 213, 225, 0.95)";
-  noteBtn.style.borderRadius = "999px";
-  noteBtn.style.background = hasNote ? "#f59e0b" : "#f8fafc";
-  noteBtn.style.color = hasNote ? "#ffffff" : "#475569";
-  noteBtn.style.fontSize = "10px";
-  noteBtn.style.fontWeight = "800";
-  noteBtn.style.lineHeight = "1";
-  noteBtn.style.display = "inline-flex";
-  noteBtn.style.alignItems = "center";
-  noteBtn.style.justifyContent = "center";
-  noteBtn.style.cursor = "pointer";
-  noteBtn.style.padding = "0 8px";
-  noteBtn.style.boxShadow = hasNote ? "0 8px 16px rgba(217, 119, 6, 0.22)" : "none";
-  noteBtn.style.zIndex = "3";
-  noteBtn.style.whiteSpace = "nowrap";
+  noteBtn.textContent = "📝";
 
   noteBtn.addEventListener("click", () => {
     dispatchLocationNoteRequest(pointData);
@@ -409,7 +391,7 @@ function createInfoWindowContent(pointData) {
   title.style.lineHeight = "1.25";
   title.style.color = "#0f172a";
   title.style.wordBreak = "break-word";
-  title.style.paddingRight = "112px";
+  title.style.paddingRight = "76px";
   title.style.marginBottom = "8px";
 
   wrapper.appendChild(closeBtn);
