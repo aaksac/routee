@@ -57,7 +57,8 @@ const state = {
   mapQuota: 1,
   lastScrollY: 0,
   appStartupSplash: null,
-  selectedPointColor: "#dc2626"
+  selectedPointColor: "#dc2626",
+  activeNoteTarget: null
 };
 
 const elements = {
@@ -122,10 +123,17 @@ const elements = {
   importExportPanel: document.getElementById("importExportPanel"),
   appStartupSplash: document.getElementById("appStartupSplash"),
   appStartupSplashText: document.getElementById("appStartupSplashText"),
-  mobileFloatingBackdrop: document.getElementById("mobileFloatingBackdrop")
+  mobileFloatingBackdrop: document.getElementById("mobileFloatingBackdrop"),
+  noteDialogOverlay: null,
+  noteDialogTitle: null,
+  noteDialogSubtitle: null,
+  noteDialogTextarea: null,
+  noteDialogCounter: null,
+  btnClearNote: null
 };
 
 const DEFAULT_POINT_COLOR = "#dc2626";
+const MAX_LOCATION_NOTE_LENGTH = 500;
 const GOOGLE_MAPS_BOOT_TIMEOUT_MS = 12000;
 let mapFeaturesInitialized = false;
 let mapsBootPromise = null;
@@ -298,6 +306,53 @@ function escapeHtml(value) {
     .replace(/'/g, "&#39;");
 }
 
+function normalizeLocationNote(value) {
+  return String(value ?? "")
+    .replace(/\r\n/g, "\n")
+    .trim()
+    .slice(0, MAX_LOCATION_NOTE_LENGTH);
+}
+
+function hasLocationNote(location) {
+  return normalizeLocationNote(location?.note).length > 0;
+}
+
+function getLocationNotePreview(location, maxLength = 96) {
+  const clean = normalizeLocationNote(location?.note).replace(/\s+/g, " ");
+
+  if (!clean) return "";
+  if (clean.length <= maxLength) return clean;
+
+  return `${clean.slice(0, maxLength - 1).trim()}…`;
+}
+
+function getNoteButtonHtml(action, location, id = "") {
+  const hasNote = hasLocationNote(location);
+  const noteClass = hasNote ? "has-note" : "is-empty";
+  const noteLabel = hasNote ? "Not var" : "Not ekle";
+  const title = hasNote ? "Notu görüntüle veya düzenle" : "Bu konuma not ekle";
+  const dataId = id !== "" && id !== null && id !== undefined ? ` data-id="${escapeHtml(id)}"` : "";
+
+  return `
+    <button class="trip-note-btn ${noteClass}" type="button" data-action="${action}"${dataId} title="${title}" aria-label="${title}">
+      <span class="trip-note-icon" aria-hidden="true">${hasNote ? "✎" : "+"}</span>
+      <span class="trip-note-text">${noteLabel}</span>
+    </button>
+  `;
+}
+
+function getNotePreviewHtml(location) {
+  const preview = getLocationNotePreview(location);
+
+  if (!preview) return "";
+
+  return `<span class="trip-note-preview">${escapeHtml(preview)}</span>`;
+}
+
+function getNoteStatusClass(location) {
+  return hasLocationNote(location) ? "has-note" : "no-note";
+}
+
 function markDirty() {
   state.hasUnsavedChanges = true;
 }
@@ -416,6 +471,7 @@ function buildStartPointFromForm() {
     name,
     lat: Number(lat),
     lng: Number(lng),
+    note: "",
     type: "start"
   };
 }
@@ -432,6 +488,7 @@ function buildEndPointFromForm() {
     name,
     lat: Number(lat),
     lng: Number(lng),
+    note: "",
     type: "end"
   };
 }
@@ -487,6 +544,7 @@ function createPointFromPreviousStart(startPoint) {
     name: startPoint.name || "Eski Başlangıç",
     lat: Number(startPoint.lat),
     lng: Number(startPoint.lng),
+    note: normalizeLocationNote(startPoint.note),
     color: DEFAULT_POINT_COLOR,
     distanceFromPrevious: 0,
     type: "point"
@@ -499,6 +557,7 @@ function createPointFromPreviousEnd(endPoint) {
     name: endPoint.name || "Eski Bitiş",
     lat: Number(endPoint.lat),
     lng: Number(endPoint.lng),
+    note: normalizeLocationNote(endPoint.note),
     color: DEFAULT_POINT_COLOR,
     distanceFromPrevious: 0,
     type: "point"
@@ -511,7 +570,7 @@ function commitStartPoint() {
     return;
   }
 
-  const startPoint = buildStartPointFromForm();
+  let startPoint = buildStartPointFromForm();
 
   if (!startPoint) {
     alert("Lütfen başlangıç adı, enlem ve boylam gir.");
@@ -547,6 +606,16 @@ function commitStartPoint() {
       nextPoints.push(oldStartAsPoint);
     }
   }
+
+  startPoint = {
+    ...startPoint,
+    note: normalizeLocationNote(
+      promotedPoint?.note ||
+        (previousStartPoint && isSamePlace(previousStartPoint, startPoint)
+          ? previousStartPoint.note
+          : "")
+    )
+  };
 
   const nextLocationCount =
     nextPoints.length + 1 + (state.endPoint ? 1 : 0);
@@ -593,7 +662,7 @@ function commitEndPoint() {
     return;
   }
 
-  const endPoint = buildEndPointFromForm();
+  let endPoint = buildEndPointFromForm();
 
   if (!endPoint) {
     alert("Lütfen bitiş noktası adı, enlem ve boylam gir.");
@@ -619,7 +688,7 @@ function commitEndPoint() {
     );
   }
 
-    if (previousEndPoint && !isSamePlace(previousEndPoint, endPoint)) {
+  if (previousEndPoint && !isSamePlace(previousEndPoint, endPoint)) {
     const oldEndAsPoint = createPointFromPreviousEnd(previousEndPoint);
     const alreadyExists = nextPoints.some((point) =>
       isSamePlace(point, oldEndAsPoint)
@@ -629,6 +698,16 @@ function commitEndPoint() {
       nextPoints.push(oldEndAsPoint);
     }
   }
+
+  endPoint = {
+    ...endPoint,
+    note: normalizeLocationNote(
+      promotedPoint?.note ||
+        (previousEndPoint && isSamePlace(previousEndPoint, endPoint)
+          ? previousEndPoint.note
+          : "")
+    )
+  };
 
   const nextLocationCount =
     nextPoints.length + (state.startPoint ? 1 : 0) + 1;
@@ -776,11 +855,13 @@ function renderSummary() {
 function renderTripList() {
   const startHtml = state.startPoint
     ? `
-      <div class="trip-item start">
+      <div class="trip-item start ${getNoteStatusClass(state.startPoint)}">
+        ${getNoteButtonHtml("note-start", state.startPoint)}
         <div class="trip-order">S</div>
         <div class="trip-content">
           <strong>${escapeHtml(state.startPoint.name)}</strong>
           <span>Önceki mesafe: —</span>
+          ${getNotePreviewHtml(state.startPoint)}
         </div>
         <div class="trip-actions">
           <button class="tiny-btn" type="button" data-action="directions-start">Yol Tarifi</button>
@@ -806,11 +887,13 @@ function renderTripList() {
       const pointShadow = `${pointColor}33`;
 
       return `
-        <div class="trip-item">
+        <div class="trip-item ${getNoteStatusClass(point)}">
+          ${getNoteButtonHtml("note-point", point, point.id)}
           <div class="trip-order" style="background:${escapeHtml(pointColor)}; box-shadow: 0 12px 22px ${escapeHtml(pointShadow)}">${index + 1}</div>
           <div class="trip-content">
             <strong>${escapeHtml(point.name)}</strong>
             <span>Önceki mesafe: ${formatKm(point.distanceFromPrevious || 0)}</span>
+            ${getNotePreviewHtml(point)}
           </div>
           <div class="trip-actions">
             <button class="tiny-btn" type="button" data-action="directions-point" data-id="${point.id}">Yol Tarifi</button>
@@ -824,11 +907,13 @@ function renderTripList() {
 
   const endHtml = state.endPoint
     ? `
-      <div class="trip-item end">
+      <div class="trip-item end ${getNoteStatusClass(state.endPoint)}">
+        ${getNoteButtonHtml("note-end", state.endPoint)}
         <div class="trip-order end-order">E</div>
         <div class="trip-content">
           <strong>${escapeHtml(state.endPoint.name)}</strong>
           <span>Önceki mesafe: ${formatKm(state.endPoint.distanceFromPrevious || 0)}</span>
+          ${getNotePreviewHtml(state.endPoint)}
         </div>
         <div class="trip-actions">
           <button class="tiny-btn" type="button" data-action="directions-end">Yol Tarifi</button>
@@ -840,6 +925,24 @@ function renderTripList() {
     : "";
 
   elements.tripList.innerHTML = startHtml + pointHtml + endHtml;
+}
+
+function redrawStartMarker() {
+  if (!state.startPoint) {
+    clearStartMarker();
+    return;
+  }
+
+  showStartMarker({
+    lat: state.startPoint.lat,
+    lng: state.startPoint.lng,
+    title: state.startPoint.name,
+    pointData: {
+      ...state.startPoint,
+      orderLabel: "S"
+    },
+    onClick: fillPointFormFromMarker
+  });
 }
 
 function redrawPointMarkers() {
@@ -970,6 +1073,264 @@ function bindTapSafe(button, handler) {
   });
 }
 
+function ensureNoteDialog() {
+  if (elements.noteDialogOverlay) return;
+
+  const overlay = document.createElement("div");
+  overlay.className = "note-dialog-overlay hidden";
+  overlay.setAttribute("aria-hidden", "true");
+
+  overlay.innerHTML = `
+    <div class="note-dialog-backdrop" data-action="close-note-dialog"></div>
+    <section class="note-dialog-card" role="dialog" aria-modal="true" aria-labelledby="noteDialogTitle">
+      <button class="note-dialog-close" type="button" data-action="close-note-dialog" aria-label="Not penceresini kapat">×</button>
+      <div class="note-dialog-header">
+        <span class="note-dialog-icon" aria-hidden="true">✎</span>
+        <div>
+          <h3 id="noteDialogTitle">Konum Notu</h3>
+          <p id="noteDialogSubtitle">Bu konuma kısa bir not ekleyebilirsiniz.</p>
+        </div>
+      </div>
+      <textarea id="noteDialogTextarea" maxlength="${MAX_LOCATION_NOTE_LENGTH}" rows="6" placeholder="Örn. Müze pazartesi kapalı, giriş ücreti var, burada kahve molası verilecek..."></textarea>
+      <div class="note-dialog-meta">
+        <span>Notlar bu kayıtlı haritanın içinde saklanır.</span>
+        <span id="noteDialogCounter">0/${MAX_LOCATION_NOTE_LENGTH}</span>
+      </div>
+      <div class="note-dialog-actions">
+        <button class="note-dialog-btn secondary" type="button" data-action="clear-note">Notu Sil</button>
+        <button class="note-dialog-btn ghost" type="button" data-action="close-note-dialog">Vazgeç</button>
+        <button class="note-dialog-btn primary" type="button" data-action="save-note">Kaydet</button>
+      </div>
+    </section>
+  `;
+
+  document.body.appendChild(overlay);
+
+  elements.noteDialogOverlay = overlay;
+  elements.noteDialogTitle = overlay.querySelector("#noteDialogTitle");
+  elements.noteDialogSubtitle = overlay.querySelector("#noteDialogSubtitle");
+  elements.noteDialogTextarea = overlay.querySelector("#noteDialogTextarea");
+  elements.noteDialogCounter = overlay.querySelector("#noteDialogCounter");
+  elements.btnClearNote = overlay.querySelector('[data-action="clear-note"]');
+
+  elements.noteDialogTextarea?.addEventListener("input", updateNoteCounter);
+
+  overlay.addEventListener("click", (event) => {
+    const actionTarget = event.target.closest("[data-action]");
+    if (!actionTarget) return;
+
+    const action = actionTarget.dataset.action;
+
+    if (action === "save-note") {
+      saveActiveLocationNote();
+      return;
+    }
+
+    if (action === "clear-note") {
+      clearActiveLocationNote();
+      return;
+    }
+
+    if (action === "close-note-dialog") {
+      closeNoteDialog();
+    }
+  });
+}
+
+function updateNoteCounter() {
+  if (!elements.noteDialogCounter || !elements.noteDialogTextarea) return;
+
+  const length = elements.noteDialogTextarea.value.length;
+  elements.noteDialogCounter.textContent = `${length}/${MAX_LOCATION_NOTE_LENGTH}`;
+}
+
+function getLocationByNoteTarget(target) {
+  if (!target?.type) return null;
+
+  if (target.type === "start") {
+    return state.startPoint
+      ? {
+          ...state.startPoint,
+          orderLabel: "S"
+        }
+      : null;
+  }
+
+  if (target.type === "end") {
+    return state.endPoint
+      ? {
+          ...state.endPoint,
+          orderLabel: "E"
+        }
+      : null;
+  }
+
+  if (target.type === "point") {
+    const pointIndex = state.points.findIndex(
+      (point) => String(point.id) === String(target.id)
+    );
+
+    if (pointIndex < 0) return null;
+
+    const point = state.points[pointIndex];
+    return {
+      ...point,
+      orderLabel: String(pointIndex + 1),
+      color: point.color || DEFAULT_POINT_COLOR
+    };
+  }
+
+  return null;
+}
+
+function updateLocationNoteByTarget(target, note) {
+  const cleanNote = normalizeLocationNote(note);
+
+  if (target.type === "start" && state.startPoint) {
+    state.startPoint = {
+      ...state.startPoint,
+      note: cleanNote
+    };
+    return true;
+  }
+
+  if (target.type === "end" && state.endPoint) {
+    state.endPoint = {
+      ...state.endPoint,
+      note: cleanNote
+    };
+    return true;
+  }
+
+  if (target.type === "point") {
+    let updated = false;
+    state.points = state.points.map((point) => {
+      if (String(point.id) !== String(target.id)) return point;
+      updated = true;
+      return {
+        ...point,
+        note: cleanNote
+      };
+    });
+    return updated;
+  }
+
+  return false;
+}
+
+function closeNoteDialog() {
+  state.activeNoteTarget = null;
+  elements.noteDialogOverlay?.classList.add("hidden");
+  elements.noteDialogOverlay?.setAttribute("aria-hidden", "true");
+}
+
+function openLocationNoteEditor(target) {
+  ensureNoteDialog();
+
+  const location = getLocationByNoteTarget(target);
+  if (!location) return;
+
+  state.activeNoteTarget = { ...target };
+
+  const displayName = location.name || "Konum";
+  const typeLabel =
+    target.type === "start"
+      ? "Başlangıç noktası"
+      : target.type === "end"
+        ? "Bitiş noktası"
+        : "Gezi noktası";
+
+  elements.noteDialogTitle.textContent = hasLocationNote(location)
+    ? "Konum Notunu Düzenle"
+    : "Konuma Not Ekle";
+  elements.noteDialogSubtitle.textContent = `${typeLabel}: ${displayName}`;
+  elements.noteDialogTextarea.value = normalizeLocationNote(location.note);
+  elements.btnClearNote.disabled = !hasLocationNote(location);
+
+  updateNoteCounter();
+
+  elements.noteDialogOverlay.classList.remove("hidden");
+  elements.noteDialogOverlay.setAttribute("aria-hidden", "false");
+
+  window.setTimeout(() => {
+    elements.noteDialogTextarea?.focus();
+  }, 60);
+}
+
+function refreshLocationUiAfterNoteChange(target) {
+  redrawStartMarker();
+  redrawPointMarkers();
+  redrawEndMarker();
+  drawRouteSegments(state.startPoint, state.points, state.endPoint);
+  renderSummary();
+  renderTripList();
+
+  if (target?.reopenInfo) {
+    const updatedLocation = getLocationByNoteTarget(target);
+    window.setTimeout(() => {
+      openInfoForPoint(updatedLocation);
+    }, 120);
+  }
+}
+
+function saveActiveLocationNote() {
+  if (!state.activeNoteTarget || !elements.noteDialogTextarea) return;
+
+  const target = { ...state.activeNoteTarget };
+  const note = elements.noteDialogTextarea.value;
+  const updated = updateLocationNoteByTarget(target, note);
+
+  if (!updated) return;
+
+  refreshLocationUiAfterNoteChange(target);
+  markDirty();
+  closeNoteDialog();
+
+  const location = getLocationByNoteTarget(target);
+  elements.authStatus.textContent = hasLocationNote(location)
+    ? `Not kaydedildi: ${location.name || "Konum"}`
+    : `Not boş kaydedildi: ${location?.name || "Konum"}`;
+}
+
+function clearActiveLocationNote() {
+  if (!state.activeNoteTarget) return;
+
+  const target = { ...state.activeNoteTarget };
+  const updated = updateLocationNoteByTarget(target, "");
+
+  if (!updated) return;
+
+  refreshLocationUiAfterNoteChange(target);
+  markDirty();
+  closeNoteDialog();
+
+  const location = getLocationByNoteTarget(target);
+  elements.authStatus.textContent = `Not silindi: ${location?.name || "Konum"}`;
+}
+
+function handleLocationNoteRequest(event) {
+  const pointData = event?.detail?.pointData;
+  if (!pointData) return;
+
+  if (pointData.type === "start") {
+    openLocationNoteEditor({ type: "start", reopenInfo: true });
+    return;
+  }
+
+  if (pointData.type === "end") {
+    openLocationNoteEditor({ type: "end", reopenInfo: true });
+    return;
+  }
+
+  if (pointData.id == null) return;
+
+  openLocationNoteEditor({
+    type: "point",
+    id: pointData.id,
+    reopenInfo: true
+  });
+}
+
 function addOrUpdatePoint() {
   if (!hasActiveAccess()) {
     alert("Erişim süreniz dolmuş.");
@@ -1016,6 +1377,7 @@ function addOrUpdatePoint() {
       lat: Number(lat),
       lng: Number(lng),
       color,
+      note: "",
       distanceFromPrevious: 0,
       type: "point"
     });
@@ -1086,21 +1448,54 @@ function applyImportedData(startPoint, points, endPoint = null) {
     return false;
   }
 
-  state.startPoint = startPoint;
-  state.endPoint = endPoint;
-  state.points = points;
+  const normalizedStartPoint = startPoint
+    ? {
+        ...startPoint,
+        id: startPoint.id || "start-point",
+        lat: Number(startPoint.lat),
+        lng: Number(startPoint.lng),
+        note: normalizeLocationNote(startPoint.note),
+        type: "start"
+      }
+    : null;
+
+  const normalizedEndPoint = endPoint
+    ? {
+        ...endPoint,
+        id: endPoint.id || "end-point",
+        lat: Number(endPoint.lat),
+        lng: Number(endPoint.lng),
+        note: normalizeLocationNote(endPoint.note),
+        type: "end"
+      }
+    : null;
+
+  const normalizedPoints = points.map((point) => ({
+    ...point,
+    id: point.id || Date.now() + Math.random(),
+    lat: Number(point.lat),
+    lng: Number(point.lng),
+    color: point.color || DEFAULT_POINT_COLOR,
+    note: normalizeLocationNote(point.note),
+    distanceFromPrevious: Number(point.distanceFromPrevious) || 0,
+    type: "point"
+  }));
+
+  state.startPoint = normalizedStartPoint;
+  state.endPoint = normalizedEndPoint;
+  state.points = normalizedPoints;
   state.editingPointId = null;
 
-  setStartForm(startPoint);
-  setEndForm(endPoint);
+  setStartForm(normalizedStartPoint);
+  setEndForm(normalizedEndPoint);
 
-  if (startPoint) {
+  if (normalizedStartPoint) {
     showStartMarker({
-      lat: startPoint.lat,
-      lng: startPoint.lng,
-      title: startPoint.name,
+      lat: normalizedStartPoint.lat,
+      lng: normalizedStartPoint.lng,
+      title: normalizedStartPoint.name,
       pointData: {
-        ...startPoint,
+        ...normalizedStartPoint,
         orderLabel: "S"
       },
       onClick: fillPointFormFromMarker
@@ -1109,13 +1504,13 @@ function applyImportedData(startPoint, points, endPoint = null) {
     clearStartMarker();
   }
 
-  if (endPoint) {
+  if (normalizedEndPoint) {
     showEndMarker({
-      lat: endPoint.lat,
-      lng: endPoint.lng,
-      title: endPoint.name,
+      lat: normalizedEndPoint.lat,
+      lng: normalizedEndPoint.lng,
+      title: normalizedEndPoint.name,
       pointData: {
-        ...endPoint,
+        ...normalizedEndPoint,
         orderLabel: "E"
       },
       onClick: fillPointFormFromMarker
@@ -1137,14 +1532,16 @@ function getMapPayload() {
       ? {
           name: state.startPoint.name,
           lat: state.startPoint.lat,
-          lng: state.startPoint.lng
+          lng: state.startPoint.lng,
+          note: normalizeLocationNote(state.startPoint.note)
         }
       : null,
     endPoint: state.endPoint
       ? {
           name: state.endPoint.name,
           lat: state.endPoint.lat,
-          lng: state.endPoint.lng
+          lng: state.endPoint.lng,
+          note: normalizeLocationNote(state.endPoint.note)
         }
       : null,
     points: state.points.map((point) => ({
@@ -1152,6 +1549,7 @@ function getMapPayload() {
       lat: point.lat,
       lng: point.lng,
       color: point.color || DEFAULT_POINT_COLOR,
+      note: normalizeLocationNote(point.note),
       type: "point"
     })),
     totalDistance: state.totalDistance,
@@ -1171,6 +1569,8 @@ function resetMapEditor() {
   state.points = [];
   state.totalDistance = 0;
   state.editingPointId = null;
+  state.activeNoteTarget = null;
+  closeNoteDialog();
 
   elements.mapName.value = "";
   setStartForm(null);
@@ -1351,6 +1751,7 @@ async function handleMapListClick(event) {
           name: mapData.startPoint.name,
           lat: Number(mapData.startPoint.lat),
           lng: Number(mapData.startPoint.lng),
+          note: normalizeLocationNote(mapData.startPoint.note),
           type: "start"
         }
       : null;
@@ -1361,6 +1762,7 @@ async function handleMapListClick(event) {
           name: mapData.endPoint.name,
           lat: Number(mapData.endPoint.lat),
           lng: Number(mapData.endPoint.lng),
+          note: normalizeLocationNote(mapData.endPoint.note),
           type: "end"
         }
       : null;
@@ -1372,6 +1774,7 @@ async function handleMapListClick(event) {
           lat: Number(point.lat),
           lng: Number(point.lng),
           color: point.color || DEFAULT_POINT_COLOR,
+          note: normalizeLocationNote(point.note),
           distanceFromPrevious: 0,
           type: "point"
         }))
@@ -1532,6 +1935,21 @@ function handleTripListClick(event) {
 
   const action = target.dataset.action;
   if (!action) return;
+
+  if (action === "note-start") {
+    openLocationNoteEditor({ type: "start" });
+    return;
+  }
+
+  if (action === "note-end") {
+    openLocationNoteEditor({ type: "end" });
+    return;
+  }
+
+  if (action === "note-point") {
+    openLocationNoteEditor({ type: "point", id: target.dataset.id });
+    return;
+  }
 
   if (action === "delete-point") {
     deletePoint(target.dataset.id);
@@ -1819,6 +2237,7 @@ function bindEvents() {
 
   window.addEventListener("routee:delete-point-request", handleMarkerDeleteRequest);
   window.addEventListener("routee:marker-color-request", handleMarkerColorRequest);
+  window.addEventListener("routee:location-note-request", handleLocationNoteRequest);
 
   elements.btnExport?.addEventListener("click", handleExport);
   elements.btnImport?.addEventListener("click", handleImport);
