@@ -1,1418 +1,1183 @@
-let map;
-let markers = [];
-let currentLocationMarker = null;
-let mapClickListener = null;
-let draftMarker = null;
-let searchMarker = null;
-let startMarker = null;
-let endMarker = null;
-let routePolylines = [];
-let distanceOverlays = [];
-let activeInfoWindow = null;
+@media (max-width: 720px) {
+  .topbar {
+    padding: 12px 14px;
+    gap: 10px;
+  }
 
-let searchService = null;
-let geocoder = null;
-let searchDropdown = null;
-let searchInputEl = null;
-let searchSelectHandlerBound = false;
-let searchInputHandlerBound = false;
-let searchBlurHandlerBound = false;
-let searchFocusHandlerBound = false;
-let isInteractingWithSearchDropdown = false;
-let lastPredictionRequestId = 0;
-let currentPredictions = [];
+  .brand-area {
+    gap: 10px;
+    min-width: 0;
+  }
 
-let activeAutocompleteSessionToken = null;
-let searchDebounceTimer = null;
-const MIN_SEARCH_LENGTH = 4;
-const SEARCH_DEBOUNCE_MS = 450;
-const MAX_PREDICTIONS = 5;
+  .brand-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 14px;
+    flex: 0 0 40px;
+  }
 
-const POINT_COLORS = [
-  { value: "#dc2626", label: "Kırmızı" },
-  { value: "#2563eb", label: "Mavi" },
-  { value: "#16a34a", label: "Yeşil" },
-  { value: "#ea580c", label: "Turuncu" },
-  { value: "#7c3aed", label: "Mor" },
-  { value: "#db2777", label: "Pembe" },
-  { value: "#ca8a04", label: "Sarı" },
-  { value: "#0f172a", label: "Koyu" }
-];
+  .brand-text h1 {
+    font-size: 1rem;
+    line-height: 1.15;
+  }
 
-const MAP_CLICK_PROGRESSIVE_ZOOM_LEVELS = [
-  { maxZoom: 4, targetZoom: 6 },
-  { maxZoom: 10, targetZoom: 11 },
-  { maxZoom: 14, targetZoom: 16 },
-  { maxZoom: 18, targetZoom: 19 }
-];
+  .brand-text p {
+    display: none;
+  }
 
-const MAP_CLICK_FINAL_PICK_ZOOM = 19;
-const MARKER_CLICK_TARGET_ZOOM = 17;
-const SMOOTH_ZOOM_STEP_DELAY_MS = 120;
-const SMOOTH_ZOOM_START_DELAY_MS = 110;
+  .page-action-btn {
+    min-height: 36px;
+    padding: 6px 10px;
+    font-size: 0.84rem;
+  }
 
-let smoothZoomTimer = null;
-let smoothZoomRunId = 0;
+  .status-strip {
+    padding: 8px 14px 0;
+  }
 
-function clampZoom(zoom) {
-  const normalized = Number(zoom);
+  .auth-status {
+    font-size: 0.88rem;
+    line-height: 1.35;
+  }
 
-  if (!Number.isFinite(normalized)) return 15;
+  .app-layout {
+    padding: 12px 14px 16px;
+    gap: 12px;
+  }
 
-  return Math.min(20, Math.max(2, Math.round(normalized)));
-}
+  .map-canvas {
+    min-height: 56vh;
+    height: 56vh;
+    border-radius: 20px;
+  }
 
-function getCurrentMapZoom() {
-  if (!map || typeof map.getZoom !== "function") return 11;
+  .map-overlay {
+    gap: 8px;
+  }
 
-  const zoom = Number(map.getZoom());
-  return Number.isFinite(zoom) ? zoom : 11;
-}
+  .top-left {
+    top: 10px;
+    left: 10px;
+    max-width: 60px;
+  }
 
-function cancelSmoothZoom() {
-  smoothZoomRunId += 1;
+  .top-right {
+    top: 8px;
+    right: 8px;
+    width: calc(100% - 88px);
+    max-width: calc(100% - 88px);
+    align-items: stretch;
+  }
 
-  if (smoothZoomTimer) {
-    window.clearTimeout(smoothZoomTimer);
-    smoothZoomTimer = null;
+  .bottom-left {
+    left: 10px;
+    bottom: 10px;
+  }
+
+  .top-left .compact-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+    align-items: stretch;
+    width: 52px;
+  }
+
+  #btnOpenStartPanel,
+  #btnOpenPointPanel,
+  #btnOpenEndPanel,
+  #btnToggleMenu,
+  #btnCurrentLocation,
+  .icon-only-btn {
+    width: 52px !important;
+    min-width: 52px !important;
+    max-width: 52px !important;
+    height: 52px !important;
+    min-height: 52px !important;
+    padding: 0 !important;
+    border-radius: 17px !important;
+    display: grid !important;
+    place-items: center !important;
+  }
+
+  #btnOpenStartPanel svg,
+  #btnOpenPointPanel svg,
+  #btnOpenEndPanel svg,
+  #btnToggleMenu svg,
+  #btnCurrentLocation svg,
+  .icon-only-btn svg {
+    width: 24px !important;
+    height: 24px !important;
+  }
+
+  .right-tools {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 9px;
+    align-items: start;
+    justify-content: stretch;
+    width: 100%;
+  }
+
+  .map-search-input {
+    width: 100%;
+    min-width: 0;
+    max-width: none;
+    min-height: 52px;
+    height: 52px;
+    padding: 12px 17px;
+    font-size: 0.9rem;
+    line-height: 1.1;
+    border-radius: 17px;
+  }
+
+  .menu-wrapper {
+    position: relative;
+    justify-self: end;
+    flex: 0 0 auto;
+    z-index: 22;
+  }
+
+  .floating-menu {
+    top: calc(100% + 8px);
+    right: 0;
+    width: max-content;
+    min-width: 0;
+    max-width: calc(100vw - 16px);
+    padding: 8px;
+    gap: 8px;
+    border-radius: 18px;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .menu-item {
+    width: 100%;
+    min-width: 0;
+    min-height: 46px;
+    padding: 0 16px;
+    font-size: 0.88rem;
+    font-weight: 700;
+    line-height: 1;
+    border-radius: 14px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    white-space: nowrap;
+    box-sizing: border-box;
+  }
+
+  body.has-mobile-floating-panel {
+    overflow: hidden;
+  }
+
+  .mobile-floating-backdrop {
+    display: none;
+  }
+
+  body.has-mobile-floating-panel .mobile-floating-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 5;
+    background: rgba(15, 23, 42, 0.26);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    touch-action: none;
+    pointer-events: auto;
+  }
+
+  body.has-mobile-floating-panel .map-canvas,
+  body.has-mobile-floating-panel .trip-panel,
+  body.has-mobile-floating-panel .status-strip,
+  body.has-mobile-floating-panel .topbar {
+    filter: blur(4px);
+    transition: filter 0.18s ease;
+  }
+
+  body.has-mobile-floating-panel .top-left .compact-buttons,
+  body.has-mobile-floating-panel .menu-wrapper,
+  body.has-mobile-floating-panel #placeSearch {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  body.has-mobile-floating-panel #btnCurrentLocation,
+  body.has-mobile-floating-panel #btnCurrentLocation * {
+    pointer-events: none !important;
+  }
+
+  body.has-mobile-floating-panel .bottom-left {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  body[data-mobile-panel="start"] #startPanel,
+  body[data-mobile-panel="point"] #pointPanel,
+  body[data-mobile-panel="end"] #endPanel,
+  body[data-mobile-panel="save"] #savePanel,
+  body[data-mobile-panel="importExport"] #importExportPanel {
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 95;
+    width: min(92vw, 360px) !important;
+    min-width: min(92vw, 360px) !important;
+    max-width: min(92vw, 360px) !important;
+    max-height: min(82vh, 640px);
+    overflow: auto;
+    padding: 16px !important;
+    border-radius: 24px !important;
+    background: rgba(255, 255, 255, 0.98) !important;
+    border: 1px solid rgba(219, 228, 240, 0.96) !important;
+    box-shadow: 0 24px 60px rgba(15, 23, 42, 0.22) !important;
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+  }
+
+  #startPanel .card-title-row,
+  #pointPanel .card-title-row,
+  #endPanel .card-title-row,
+  #savePanel .card-title-row,
+  #importExportPanel .card-title-row {
+    margin-bottom: 12px !important;
+    gap: 10px !important;
+    align-items: center !important;
+  }
+
+  #startPanel .card-title-row h2,
+  #pointPanel .card-title-row h2,
+  #endPanel .card-title-row h2,
+  #savePanel .card-title-row h2,
+  #importExportPanel .card-title-row h2 {
+    font-size: 1rem !important;
+    line-height: 1.2 !important;
+    margin: 0 !important;
+  }
+
+  #startPanel .field-group,
+  #pointPanel .field-group,
+  #endPanel .field-group,
+  #savePanel .field-group,
+  #importExportPanel .field-group {
+    margin-bottom: 10px !important;
+  }
+
+  #startPanel .field-group label,
+  #pointPanel .field-group label,
+  #endPanel .field-group label,
+  #savePanel .field-group label,
+  #importExportPanel .field-group label {
+    font-size: 0.78rem !important;
+    margin-bottom: 5px !important;
+    line-height: 1.2 !important;
+  }
+
+  #startPanel input,
+  #pointPanel input,
+  #endPanel input,
+  #savePanel input,
+  #importExportPanel input,
+  #savePanel select,
+  #importExportPanel select {
+    min-height: 44px !important;
+    height: 44px !important;
+    padding: 10px 12px !important;
+    font-size: 0.92rem !important;
+    line-height: 1.2 !important;
+    border-radius: 12px !important;
+  }
+
+  #startPanel .field-row,
+  #pointPanel .field-row,
+  #endPanel .field-row {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    gap: 8px !important;
+  }
+
+  #savePanel .summary-grid {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 8px !important;
+  }
+
+  #startPanel .panel-actions,
+  #pointPanel .panel-actions,
+  #endPanel .panel-actions,
+  #savePanel .panel-actions,
+  #importExportPanel .panel-actions {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 8px !important;
+    margin-top: 10px !important;
+  }
+
+  #startPanel .small-btn,
+  #pointPanel .small-btn,
+  #endPanel .small-btn,
+  #savePanel .small-btn,
+  #importExportPanel .small-btn {
+    min-height: 42px !important;
+    height: 42px !important;
+    padding: 9px 15px !important;
+    font-size: 0.88rem !important;
+  }
+
+  #btnCloseStartPanel,
+  #btnClosePointPanel,
+  #btnCloseEndPanel,
+  #btnCloseSavePanel,
+  #btnCloseImportExportPanel {
+    width: 32px !important;
+    height: 32px !important;
+    min-width: 32px !important;
+    min-height: 32px !important;
+    padding: 0 !important;
+    font-size: 1rem !important;
+    line-height: 1 !important;
+    border-radius: 999px !important;
+    flex: 0 0 32px !important;
+  }
+
+  .summary-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .map-list-row {
+    grid-template-columns: minmax(0, 1fr) auto !important;
+    align-items: center !important;
+    gap: 8px !important;
+  }
+
+  .summary-card {
+    padding: 8px 9px;
+    border-radius: 10px;
+  }
+
+  .summary-card span {
+    font-size: 0.68rem;
+    margin-bottom: 3px;
+  }
+
+  .summary-card strong {
+    font-size: 0.8rem;
+  }
+
+  .fab-btn {
+    border-radius: 15px !important;
+  }
+
+  .trip-panel {
+    padding: 14px !important;
+    border-radius: 22px !important;
+  }
+
+  .trip-panel-header h2 {
+    font-size: 1rem !important;
+    line-height: 1.2 !important;
+  }
+
+  .trip-list {
+    gap: 10px !important;
+  }
+
+  .trip-item {
+    grid-template-columns: 40px minmax(0, 1fr) auto !important;
+    gap: 14px !important;
+    padding: 11px !important;
+    border-radius: 16px !important;
+    align-items: center !important;
+  }
+
+  .trip-order {
+    width: 40px !important;
+    height: 40px !important;
+    border-radius: 12px !important;
+    font-size: 0.84rem !important;
+  }
+
+  .trip-content strong {
+    font-size: 0.92rem !important;
+    line-height: 1.15 !important;
+  }
+
+  .trip-content span {
+    font-size: 0.8rem !important;
+    line-height: 1.25 !important;
+  }
+
+  .trip-item > div:last-child,
+  .trip-item > button:last-child {
+    grid-column: 2;
+    justify-self: start;
+  }
+
+  .trip-actions {
+    grid-column: 2;
+    justify-self: start;
+    gap: 6px !important;
+  }
+
+  .trip-actions .tiny-btn {
+    min-height: 32px !important;
+    height: 32px !important;
+    padding: 5px 10px !important;
+    font-size: 0.74rem !important;
+  }
+
+  .tiny-btn {
+    min-height: 34px !important;
+    height: 34px !important;
+    padding: 6px 11px !important;
+    font-size: 0.78rem !important;
+    border-radius: 999px !important;
+    white-space: nowrap !important;
+  }
+
+  .desktop-only-inline {
+    display: none !important;
+  }
+
+  .mobile-only-inline {
+    display: inline-flex;
+  }
+
+  .new-map-mobile-fab {
+    display: inline-flex !important;
+  }
+
+  .screen-overlay-panel {
+    width: calc(100vw - 16px) !important;
+    margin-top: 34px !important;
+    padding: 14px !important;
+    border-radius: 20px !important;
+  }
+
+  .screen-overlay-panel .panel-actions {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+
+  .screen-overlay-panel .small-btn {
+    min-height: 32px;
+    padding: 5px 8px;
+    font-size: 0.73rem;
+  }
+
+  .screen-overlay-panel .card-title-row.large-gap {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 10px !important;
+    margin-bottom: 14px !important;
+  }
+
+  .screen-overlay-panel .card-title-row.large-gap .panel-actions {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    gap: 8px !important;
+    justify-content: flex-start !important;
+  }
+
+  .screen-overlay-panel .card-title-row.large-gap .small-btn {
+    min-height: 34px !important;
+    padding: 6px 10px !important;
+    font-size: 0.75rem !important;
+    border-radius: 999px !important;
+    white-space: nowrap !important;
+  }
+
+  .map-list-row {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) auto !important;
+    gap: 8px !important;
+    align-items: center !important;
+  }
+
+  .map-list-item {
+    min-width: 0 !important;
+    padding: 12px 13px !important;
+    border-radius: 16px !important;
+    box-shadow: 0 8px 18px rgba(15, 23, 42, 0.06) !important;
+  }
+
+  .map-list-item strong,
+  .map-list-item b {
+    font-size: 0.9rem !important;
+    line-height: 1.15 !important;
+  }
+
+  .map-list-item span {
+    font-size: 0.76rem !important;
+    line-height: 1.3 !important;
+  }
+
+  .map-list-row .danger-outline,
+  .map-list-row .small-btn,
+  .map-list-row .tiny-btn {
+    min-height: 34px !important;
+    height: 34px !important;
+    padding: 0 10px !important;
+    font-size: 0.72rem !important;
+    border-radius: 999px !important;
+    white-space: nowrap !important;
+    align-self: center !important;
+    justify-self: end !important;
+  }
+
+  .map-list-item,
+  .trip-content {
+    overflow-wrap: anywhere !important;
   }
 }
 
-function scrollMapAreaIntoViewOnMobile() {
-  if (window.innerWidth > 720) return;
-
-  const mapCanvas = document.getElementById("mapCanvas");
-  if (!mapCanvas) return;
-
-  const topbar = document.querySelector(".topbar");
-  const topbarHeight = topbar?.offsetHeight || 0;
-  const extraOffset = 16;
-
-  const rect = mapCanvas.getBoundingClientRect();
-  const targetTop = window.scrollY + rect.top - topbarHeight - extraOffset;
-
-  window.scrollTo({
-    top: Math.max(0, targetTop),
-    behavior: "smooth"
-  });
-}
-
-function getProgressiveClickTargetZoom(currentZoom) {
-  const normalizedZoom = getCurrentMapZoom();
-  const sourceZoom = Number.isFinite(Number(currentZoom))
-    ? Math.round(Number(currentZoom))
-    : normalizedZoom;
-
-  const matchedStage = MAP_CLICK_PROGRESSIVE_ZOOM_LEVELS.find(
-    (stage) => sourceZoom <= stage.maxZoom
-  );
-
-  if (matchedStage) {
-    return matchedStage.targetZoom;
+@media (max-width: 480px) {
+  .topbar {
+    padding: 10px 12px;
   }
 
-  return Math.max(sourceZoom, MAP_CLICK_FINAL_PICK_ZOOM);
-}
-
-function smoothFocusToLocation(lat, lng, targetZoom, options = {}) {
-  if (!map) return;
-
-  const normalizedLat = Number(lat);
-  const normalizedLng = Number(lng);
-
-  if (!Number.isFinite(normalizedLat) || !Number.isFinite(normalizedLng)) return;
-
-  cancelSmoothZoom();
-
-  const runId = smoothZoomRunId;
-  const center = { lat: normalizedLat, lng: normalizedLng };
-  const currentZoom = getCurrentMapZoom();
-  const finalZoom = options.allowZoomOut
-    ? clampZoom(targetZoom)
-    : clampZoom(Math.max(targetZoom, currentZoom));
-  const stepDelay = Number.isFinite(Number(options.stepDelay))
-    ? Number(options.stepDelay)
-    : SMOOTH_ZOOM_STEP_DELAY_MS;
-
-  map.panTo(center);
-
-  if (finalZoom === currentZoom) return;
-
-  const zoomStep = () => {
-    if (runId !== smoothZoomRunId || !map) return;
-
-    const activeZoom = getCurrentMapZoom();
-
-    if (activeZoom === finalZoom) {
-      smoothZoomTimer = null;
-      return;
-    }
-
-    const direction = finalZoom > activeZoom ? 1 : -1;
-    const nextZoom =
-      direction > 0
-        ? Math.min(finalZoom, activeZoom + 1)
-        : Math.max(finalZoom, activeZoom - 1);
-
-    map.setZoom(nextZoom);
-
-    if (nextZoom !== finalZoom) {
-      smoothZoomTimer = window.setTimeout(zoomStep, stepDelay);
-    } else {
-      smoothZoomTimer = null;
-    }
-  };
-
-  smoothZoomTimer = window.setTimeout(zoomStep, SMOOTH_ZOOM_START_DELAY_MS);
-}
-
-function handleProgressiveMapClickFocus(lat, lng) {
-  if (!map) return;
-
-  const currentZoom = getCurrentMapZoom();
-  const targetZoom = getProgressiveClickTargetZoom(currentZoom);
-
-  smoothFocusToLocation(lat, lng, targetZoom);
-}
-
-function handleMarkerClickFocus(marker) {
-  if (!marker || typeof marker.getPosition !== "function") return;
-
-  const position = marker.getPosition();
-  if (!position) return;
-
-  scrollMapAreaIntoViewOnMobile();
-
-  smoothFocusToLocation(position.lat(), position.lng(), MARKER_CLICK_TARGET_ZOOM, {
-    stepDelay: 95,
-    allowZoomOut: true
-  });
-}
-
-function initMap() {
-  const mapElement = document.getElementById("mapCanvas");
-  if (!mapElement) return null;
-
-  mapElement.innerHTML = "";
-
-  const defaultCenter = { lat: 39.0, lng: 35.0 };
-
-  map = new google.maps.Map(mapElement, {
-    center: defaultCenter,
-    zoom: 6,
-    mapTypeControl: false,
-    streetViewControl: false,
-    fullscreenControl: false,
-    gestureHandling: "greedy",
-    clickableIcons: false
-  });
-
-  activeInfoWindow = new google.maps.InfoWindow({
-    ariaLabel: "Konum Bilgisi"
-  });
-
-  geocoder = new google.maps.Geocoder();
-  searchService = new google.maps.places.AutocompleteService();
-
-  return map;
-}
-
-function getMap() {
-  return map;
-}
-
-function createCircleSymbol(fillColor, strokeColor = "#ffffff", scale = 14) {
-  return {
-    path: google.maps.SymbolPath.CIRCLE,
-    fillColor,
-    fillOpacity: 1,
-    strokeColor,
-    strokeWeight: 3,
-    scale
-  };
-}
-
-function createGoogleMapsDirectionsUrl(lat, lng) {
-  return `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`;
-}
-
-function dispatchMarkerDeleteRequest(pointData) {
-  if (!pointData) return;
-
-  window.dispatchEvent(
-    new CustomEvent("routee:delete-point-request", {
-      detail: { pointData }
-    })
-  );
-}
-
-function dispatchMarkerColorRequest(pointData, color) {
-  if (!pointData || !color) return;
-
-  window.dispatchEvent(
-    new CustomEvent("routee:marker-color-request", {
-      detail: { pointData, color }
-    })
-  );
-}
-
-function dispatchLocationNoteRequest(pointData) {
-  if (!pointData) return;
-
-  window.dispatchEvent(
-    new CustomEvent("routee:location-note-request", {
-      detail: { pointData }
-    })
-  );
-}
-
-function getPointNote(pointData) {
-  return String(pointData?.note ?? "").trim();
-}
-
-function hasPointNote(pointData) {
-  return getPointNote(pointData).length > 0;
-}
-
-function getPointDisplayTitle(pointData) {
-  if (!pointData) return "Seçilen Konum";
-
-  if (pointData.type === "start") {
-    return `S. ${pointData.name || "Başlangıç"}`;
+  .brand-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 12px;
+    flex-basis: 36px;
   }
 
-  if (pointData.type === "end") {
-    return `E. ${pointData.name || "Bitiş Noktası"}`;
+  .brand-text h1 {
+    font-size: 0.92rem;
   }
 
-  if (pointData.orderLabel) {
-    return `${pointData.orderLabel}. ${pointData.name || "Nokta"}`;
+  .page-action-btn {
+    min-height: 34px;
+    padding: 5px 9px;
+    font-size: 0.78rem;
   }
 
-  return pointData.name || "Nokta";
-}
-
-function getPointSubtitle(pointData) {
-  if (!pointData) return "";
-
-  const raw = pointData.description || "";
-
-  if (!raw) return "";
-
-  return String(raw).trim();
-}
-
-function ensureRouteeInfoWindowStyle() {
-  if (document.getElementById("routeeInfoWindowStableStyle")) return;
-
-  const style = document.createElement("style");
-  style.id = "routeeInfoWindowStableStyle";
-  style.textContent = `
-    .gm-style .gm-style-iw-t::after,
-    .gm-style .gm-style-iw-tc {
-      display: none !important;
-      opacity: 0 !important;
-      pointer-events: none !important;
-    }
-
-    .routee-info-card {
-      overflow: visible !important;
-    }
-
-    .routee-info-card-pointer {
-      position: absolute;
-      left: 50%;
-      bottom: -7px;
-      width: 14px;
-      height: 14px;
-      transform: translateX(-50%) rotate(45deg);
-      background: #ffffff;
-      border-right: 1px solid rgba(226, 232, 240, 0.95);
-      border-bottom: 1px solid rgba(226, 232, 240, 0.95);
-      box-shadow: 6px 6px 14px rgba(15, 23, 42, 0.12);
-      pointer-events: none;
-      z-index: 0;
-    }
-
-    .routee-info-card > *:not(.routee-info-card-pointer) {
-      position: relative;
-      z-index: 1;
-    }
-  `;
-
-  document.head.appendChild(style);
-}
-
-function createInfoWindowContent(pointData) {
-  const wrapper = document.createElement("div");
-  wrapper.style.width = "236px";
-  wrapper.style.maxWidth = "236px";
-  wrapper.style.boxSizing = "border-box";
-  wrapper.style.padding = "12px";
-  wrapper.style.borderRadius = "16px";
-  wrapper.style.background = "#ffffff";
-  wrapper.style.border = "1px solid rgba(226, 232, 240, 0.95)";
-  wrapper.style.boxShadow = "0 14px 28px rgba(15, 23, 42, 0.16)";
-  wrapper.style.fontFamily = "inherit";
-  wrapper.style.position = "relative";
-  wrapper.style.overflow = "visible";
-  wrapper.className = "routee-info-card";
-  ensureRouteeInfoWindowStyle();
-
-  const closeBtn = document.createElement("button");
-  closeBtn.type = "button";
-  closeBtn.setAttribute("aria-label", "Kapat");
-  closeBtn.textContent = "×";
-  closeBtn.style.position = "absolute";
-  closeBtn.style.top = "8px";
-  closeBtn.style.right = "8px";
-  closeBtn.style.width = "26px";
-  closeBtn.style.height = "26px";
-  closeBtn.style.border = "none";
-  closeBtn.style.borderRadius = "999px";
-  closeBtn.style.background = "rgba(15, 23, 42, 0.06)";
-  closeBtn.style.color = "#475569";
-  closeBtn.style.fontSize = "18px";
-  closeBtn.style.lineHeight = "1";
-  closeBtn.style.display = "flex";
-  closeBtn.style.alignItems = "center";
-  closeBtn.style.justifyContent = "center";
-  closeBtn.style.cursor = "pointer";
-  closeBtn.style.padding = "0";
-  closeBtn.style.zIndex = "3";
-
-  closeBtn.addEventListener("click", () => {
-    activeInfoWindow?.close();
-  });
-
-  const hasNote = hasPointNote(pointData);
-  const noteBtn = document.createElement("button");
-
-  noteBtn.type = "button";
-  noteBtn.className = `info-note-btn ${hasNote ? "has-note" : "is-empty"}`;
-  noteBtn.setAttribute(
-    "aria-label",
-    hasNote ? "Konum notunu görüntüle veya düzenle" : "Bu konuma not ekle"
-  );
-  noteBtn.title = hasNote ? "Notu görüntüle veya düzenle" : "Not ekle";
-  noteBtn.textContent = "📝";
-
-  noteBtn.addEventListener("click", () => {
-    dispatchLocationNoteRequest(pointData);
-    activeInfoWindow?.close();
-  });
-
-  const badge = document.createElement("div");
-
-  if (pointData?.type === "start") {
-    badge.textContent = "Başlangıç Noktası";
-  } else if (pointData?.type === "end") {
-    badge.textContent = "Bitiş Noktası";
-  } else {
-    badge.textContent = "Konum Bilgisi";
+  .app-layout {
+    padding: 10px 12px 14px;
   }
 
-  badge.style.display = "inline-flex";
-  badge.style.alignItems = "center";
-  badge.style.fontSize = "10px";
-  badge.style.fontWeight = "700";
-  badge.style.letterSpacing = "0.04em";
-  badge.style.textTransform = "uppercase";
-  badge.style.color = pointData?.type === "end" ? "#c2410c" : "#1d4ed8";
-  badge.style.background =
-    pointData?.type === "end"
-      ? "rgba(249, 115, 22, 0.12)"
-      : "rgba(37, 99, 235, 0.10)";
-  badge.style.padding = "5px 8px";
-  badge.style.borderRadius = "999px";
-  badge.style.marginBottom = "8px";
-
-  const title = document.createElement("div");
-  title.textContent = getPointDisplayTitle(pointData);
-  title.style.fontSize = "14px";
-  title.style.fontWeight = "800";
-  title.style.lineHeight = "1.25";
-  title.style.color = "#0f172a";
-  title.style.wordBreak = "break-word";
-  title.style.paddingRight = "76px";
-  title.style.marginBottom = "8px";
-
-  wrapper.appendChild(closeBtn);
-  wrapper.appendChild(noteBtn);
-  wrapper.appendChild(badge);
-  wrapper.appendChild(title);
-
-  const noteText = getPointNote(pointData);
-  const noteBox = document.createElement("div");
-  noteBox.style.marginBottom = "10px";
-  noteBox.style.padding = hasNote ? "8px 9px" : "7px 9px";
-  noteBox.style.borderRadius = "12px";
-  noteBox.style.border = hasNote
-    ? "1px solid rgba(245, 158, 11, 0.28)"
-    : "1px dashed rgba(148, 163, 184, 0.55)";
-  noteBox.style.background = hasNote ? "#fffbeb" : "#f8fafc";
-
-  const noteLabel = document.createElement("div");
-  noteLabel.textContent = hasNote ? "Not" : "Not yok";
-  noteLabel.style.fontSize = "10px";
-  noteLabel.style.fontWeight = "800";
-  noteLabel.style.color = hasNote ? "#92400e" : "#64748b";
-  noteLabel.style.textTransform = "uppercase";
-  noteLabel.style.letterSpacing = "0.04em";
-  noteLabel.style.marginBottom = hasNote ? "4px" : "0";
-  noteBox.appendChild(noteLabel);
-
-  if (hasNote) {
-    const noteContent = document.createElement("div");
-    noteContent.textContent = noteText;
-    noteContent.style.fontSize = "11px";
-    noteContent.style.lineHeight = "1.38";
-    noteContent.style.color = "#78350f";
-    noteContent.style.wordBreak = "break-word";
-    noteContent.style.whiteSpace = "pre-wrap";
-    noteBox.appendChild(noteContent);
+  .map-canvas {
+    min-height: 54vh;
+    height: 54vh;
   }
 
-  wrapper.appendChild(noteBox);
-
-  const subtitleText = getPointSubtitle(pointData);
-  if (subtitleText) {
-    const subtitle = document.createElement("div");
-    subtitle.textContent = subtitleText;
-    subtitle.style.fontSize = "11px";
-    subtitle.style.lineHeight = "1.35";
-    subtitle.style.color = "#64748b";
-    subtitle.style.wordBreak = "break-word";
-    subtitle.style.marginBottom = "10px";
-    wrapper.appendChild(subtitle);
+  .top-left {
+    top: 8px;
+    left: 8px;
+    max-width: 56px;
   }
 
-  if (pointData?.type !== "start" && pointData?.type !== "end") {
-    const paletteLabel = document.createElement("div");
-    paletteLabel.textContent = "İşaret rengi";
-    paletteLabel.style.fontSize = "11px";
-    paletteLabel.style.fontWeight = "700";
-    paletteLabel.style.color = "#334155";
-    paletteLabel.style.marginBottom = "8px";
-    wrapper.appendChild(paletteLabel);
-
-    const palette = document.createElement("div");
-    palette.style.display = "grid";
-    palette.style.gridTemplateColumns = "repeat(4, minmax(0, 1fr))";
-    palette.style.gap = "8px";
-    palette.style.marginBottom = "12px";
-
-    POINT_COLORS.forEach((item) => {
-      const colorBtn = document.createElement("button");
-      colorBtn.type = "button";
-      colorBtn.setAttribute("aria-label", item.label);
-      colorBtn.title = item.label;
-      colorBtn.style.height = "32px";
-      colorBtn.style.borderRadius = "12px";
-      colorBtn.style.border =
-        String(pointData.color || "#dc2626").toLowerCase() === item.value.toLowerCase()
-          ? "2px solid #0f172a"
-          : "1px solid rgba(203, 213, 225, 0.95)";
-      colorBtn.style.background = "#ffffff";
-      colorBtn.style.display = "inline-flex";
-      colorBtn.style.alignItems = "center";
-      colorBtn.style.justifyContent = "center";
-      colorBtn.style.cursor = "pointer";
-      colorBtn.style.padding = "0";
-
-      const swatch = document.createElement("span");
-      swatch.style.width = "16px";
-      swatch.style.height = "16px";
-      swatch.style.borderRadius = "999px";
-      swatch.style.display = "block";
-      swatch.style.background = item.value;
-      swatch.style.boxShadow = "inset 0 0 0 2px rgba(255,255,255,0.68)";
-
-      colorBtn.appendChild(swatch);
-      colorBtn.addEventListener("click", () => {
-        dispatchMarkerColorRequest(pointData, item.value);
-        activeInfoWindow?.close();
-      });
-
-      palette.appendChild(colorBtn);
-    });
-
-    wrapper.appendChild(palette);
+  .top-right {
+    top: 6px;
+    right: 6px;
+    width: calc(100% - 80px);
+    max-width: calc(100% - 80px);
   }
 
-  const actions = document.createElement("div");
-  actions.style.display = "flex";
-  actions.style.gap = "8px";
-  actions.style.alignItems = "stretch";
-
-  const directionsBtn = document.createElement("button");
-  directionsBtn.type = "button";
-  directionsBtn.textContent = "Yol Tarifi Al";
-  directionsBtn.style.flex = "1";
-  directionsBtn.style.height = "38px";
-  directionsBtn.style.border = "none";
-  directionsBtn.style.borderRadius = "12px";
-  directionsBtn.style.background = "linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)";
-  directionsBtn.style.color = "#ffffff";
-  directionsBtn.style.fontSize = "12px";
-  directionsBtn.style.fontWeight = "700";
-  directionsBtn.style.cursor = "pointer";
-  directionsBtn.style.boxShadow = "0 8px 18px rgba(37, 99, 235, 0.24)";
-  directionsBtn.style.whiteSpace = "nowrap";
-
-  directionsBtn.addEventListener("click", () => {
-    const url = createGoogleMapsDirectionsUrl(pointData.lat, pointData.lng);
-    window.location.href = url;
-  });
-
-  const deleteBtn = document.createElement("button");
-  deleteBtn.type = "button";
-  deleteBtn.textContent = "Sil";
-  deleteBtn.style.height = "38px";
-  deleteBtn.style.padding = "0 14px";
-  deleteBtn.style.border = "1px solid #fecaca";
-  deleteBtn.style.borderRadius = "12px";
-  deleteBtn.style.background = "#fef2f2";
-  deleteBtn.style.color = "#b91c1c";
-  deleteBtn.style.fontSize = "12px";
-  deleteBtn.style.fontWeight = "700";
-  deleteBtn.style.cursor = "pointer";
-  deleteBtn.style.whiteSpace = "nowrap";
-
-  deleteBtn.addEventListener("click", () => {
-    dispatchMarkerDeleteRequest(pointData);
-    activeInfoWindow?.close();
-  });
-
-  actions.appendChild(directionsBtn);
-  actions.appendChild(deleteBtn);
-  wrapper.appendChild(actions);
-
-  const pointer = document.createElement("span");
-  pointer.className = "routee-info-card-pointer";
-  pointer.setAttribute("aria-hidden", "true");
-  wrapper.appendChild(pointer);
-
-  return wrapper;
-}
-
-function styleNativeInfoWindowShell() {
-  ensureRouteeInfoWindowStyle();
-
-  const iwOuter = document.querySelector(".gm-style .gm-style-iw");
-  if (iwOuter) {
-    iwOuter.style.padding = "0";
-    iwOuter.style.maxWidth = "none";
-    iwOuter.style.maxHeight = "none";
-    iwOuter.style.overflow = "visible";
+  .bottom-left {
+    left: 8px;
+    bottom: 8px;
   }
 
-  const iwContainer = document.querySelector(".gm-style .gm-style-iw-c");
-  if (iwContainer) {
-    iwContainer.style.padding = "0";
-    iwContainer.style.maxWidth = "none";
-    iwContainer.style.maxHeight = "none";
-    iwContainer.style.borderRadius = "0";
-    iwContainer.style.boxShadow = "none";
-    iwContainer.style.overflow = "visible";
-    iwContainer.style.background = "transparent";
+  .top-left .compact-buttons {
+    width: 48px;
+    gap: 8px;
   }
 
-  const iwContent = document.querySelector(".gm-style .gm-style-iw-d");
-  if (iwContent) {
-    iwContent.style.padding = "0";
-    iwContent.style.overflow = "visible";
-    iwContent.style.maxHeight = "none";
-    iwContent.style.maxWidth = "none";
+  #btnOpenStartPanel,
+  #btnOpenPointPanel,
+  #btnOpenEndPanel,
+  #btnToggleMenu,
+  #btnCurrentLocation,
+  .icon-only-btn {
+    width: 48px !important;
+    min-width: 48px !important;
+    max-width: 48px !important;
+    height: 48px !important;
+    min-height: 48px !important;
+    border-radius: 15px !important;
   }
 
-  const nativeTails = document.querySelectorAll(".gm-style .gm-style-iw-tc");
-  nativeTails.forEach((tail) => {
-    tail.style.display = "none";
-    tail.style.opacity = "0";
-    tail.style.pointerEvents = "none";
-  });
-
-  const nativeCloseButtons = document.querySelectorAll(
-    ".gm-style .gm-ui-hover-effect, .gm-style button[aria-label='Close']"
-  );
-
-  nativeCloseButtons.forEach((btn) => {
-    btn.style.display = "none";
-    btn.style.opacity = "0";
-    btn.style.pointerEvents = "none";
-  });
-}
-
-function openMarkerInfo(marker, pointData) {
-  if (!map || !marker || !activeInfoWindow || !pointData) return;
-
-  activeInfoWindow.close();
-  google.maps.event.clearListeners(activeInfoWindow, "domready");
-
-  activeInfoWindow.setContent(createInfoWindowContent(pointData));
-  activeInfoWindow.setOptions({
-    maxWidth: 248,
-    pixelOffset: new google.maps.Size(0, -14),
-    zIndex: 9999,
-    disableAutoPan: false
-  });
-
-  activeInfoWindow.open({
-    anchor: marker,
-    map,
-    shouldFocus: false
-  });
-
-  if (typeof activeInfoWindow.setZIndex === "function") {
-    activeInfoWindow.setZIndex(9999);
+  #btnOpenStartPanel svg,
+  #btnOpenPointPanel svg,
+  #btnOpenEndPanel svg,
+  #btnToggleMenu svg,
+  #btnCurrentLocation svg,
+  .icon-only-btn svg {
+    width: 22px !important;
+    height: 22px !important;
   }
 
-  google.maps.event.addListenerOnce(activeInfoWindow, "domready", () => {
-    styleNativeInfoWindowShell();
-  });
-}
-
-function openInfoForPoint(pointData) {
-  if (!map || !pointData) return false;
-
-  if (pointData.type === "start" && startMarker?.__pointData) {
-    const startIdMatch =
-      pointData.id != null &&
-      startMarker.__pointData.id != null &&
-      String(startMarker.__pointData.id) === String(pointData.id);
-
-    const startCoordMatch =
-      Number(startMarker.__pointData.lat) === Number(pointData.lat) &&
-      Number(startMarker.__pointData.lng) === Number(pointData.lng);
-
-    if (startIdMatch || startCoordMatch) {
-      openMarkerInfo(startMarker, startMarker.__pointData);
-      return true;
-    }
+  .right-tools {
+    gap: 8px;
   }
 
-  if (pointData.type === "end" && endMarker?.__pointData) {
-    const endIdMatch =
-      pointData.id != null &&
-      endMarker.__pointData.id != null &&
-      String(endMarker.__pointData.id) === String(pointData.id);
-
-    const endCoordMatch =
-      Number(endMarker.__pointData.lat) === Number(pointData.lat) &&
-      Number(endMarker.__pointData.lng) === Number(pointData.lng);
-
-    if (endIdMatch || endCoordMatch) {
-      openMarkerInfo(endMarker, endMarker.__pointData);
-      return true;
-    }
+  .map-search-input {
+    width: 100%;
+    min-width: 0;
+    max-width: none;
+    min-height: 48px;
+    height: 48px;
+    padding: 11px 15px;
+    font-size: 0.84rem;
+    border-radius: 15px;
   }
 
-  const matchedMarker = markers.find((marker) => {
-    if (!marker?.__pointData) return false;
-
-    const markerData = marker.__pointData;
-
-    const idMatch =
-      pointData.id != null &&
-      markerData.id != null &&
-      String(markerData.id) === String(pointData.id);
-
-    const coordMatch =
-      Number(markerData.lat) === Number(pointData.lat) &&
-      Number(markerData.lng) === Number(pointData.lng);
-
-    return idMatch || coordMatch;
-  });
-
-  if (!matchedMarker) return false;
-
-  openMarkerInfo(matchedMarker, matchedMarker.__pointData);
-  return true;
-}
-
-function addMarker({ lat, lng, title, label, onClick, pointData }) {
-  if (!map) return null;
-
-  const markerColor = pointData?.color || "#dc2626";
-
-  const marker = new google.maps.Marker({
-    position: { lat, lng },
-    map,
-    title: title || "",
-    label: label
-      ? {
-          text: String(label),
-          color: "#ffffff",
-          fontWeight: "700"
-        }
-      : undefined,
-    icon: createCircleSymbol(markerColor, "#ffffff", 14)
-  });
-
-  marker.__pointData = pointData || null;
-
-  marker.addListener("click", () => {
-    handleMarkerClickFocus(marker);
-
-    window.setTimeout(() => {
-      openMarkerInfo(marker, marker.__pointData);
-    }, 360);
-
-    if (typeof onClick === "function") {
-      onClick(marker.__pointData);
-    }
-  });
-
-  markers.push(marker);
-  return marker;
-}
-
-function clearMarkers() {
-  markers.forEach((marker) => marker.setMap(null));
-  markers = [];
-}
-
-function showStartMarker({ lat, lng, title, onClick, pointData }) {
-  if (!map) return null;
-
-  if (startMarker) {
-    startMarker.setMap(null);
+  .floating-menu {
+    width: max-content;
+    min-width: 0;
+    max-width: calc(100vw - 12px);
+    padding: 7px;
+    gap: 7px;
+    border-radius: 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
   }
 
-  startMarker = new google.maps.Marker({
-    position: { lat, lng },
-    map,
-    title: title || "Başlangıç",
-    label: {
-      text: "S",
-      color: "#ffffff",
-      fontWeight: "700"
-    },
-    icon: createCircleSymbol("#16a34a", "#ffffff", 16)
-  });
+  .menu-item {
+    width: 100%;
+    min-width: 0;
+    min-height: 42px;
+    padding: 0 14px;
+    font-size: 0.82rem;
+    font-weight: 700;
+    line-height: 1;
+    border-radius: 13px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    white-space: nowrap;
+    box-sizing: border-box;
+  }
 
-  startMarker.__pointData = pointData || null;
+  body[data-mobile-panel="start"] #startPanel,
+  body[data-mobile-panel="point"] #pointPanel,
+  body[data-mobile-panel="end"] #endPanel,
+  body[data-mobile-panel="save"] #savePanel,
+  body[data-mobile-panel="importExport"] #importExportPanel {
+    width: min(94vw, 340px) !important;
+    min-width: min(94vw, 340px) !important;
+    max-width: min(94vw, 340px) !important;
+    max-height: min(80vh, 600px);
+    padding: 14px !important;
+    border-radius: 20px !important;
+  }
 
-  startMarker.addListener("click", () => {
-    handleMarkerClickFocus(startMarker);
+  #startPanel .card-title-row h2,
+  #pointPanel .card-title-row h2,
+  #endPanel .card-title-row h2,
+  #savePanel .card-title-row h2,
+  #importExportPanel .card-title-row h2 {
+    font-size: 0.92rem !important;
+  }
 
-    window.setTimeout(() => {
-      openMarkerInfo(startMarker, startMarker.__pointData);
-    }, 360);
+  #startPanel .field-group label,
+  #pointPanel .field-group label,
+  #endPanel .field-group label,
+  #savePanel .field-group label,
+  #importExportPanel .field-group label {
+    font-size: 0.72rem !important;
+  }
 
-    if (typeof onClick === "function") {
-      onClick(startMarker.__pointData);
-    }
-  });
+  #startPanel input,
+  #pointPanel input,
+  #endPanel input,
+  #savePanel input,
+  #importExportPanel input,
+  #savePanel select,
+  #importExportPanel select {
+    min-height: 42px !important;
+    height: 42px !important;
+    padding: 9px 11px !important;
+    font-size: 0.88rem !important;
+    border-radius: 11px !important;
+  }
 
-  return startMarker;
-}
+  #startPanel .small-btn,
+  #pointPanel .small-btn,
+  #endPanel .small-btn,
+  #savePanel .small-btn,
+  #importExportPanel .small-btn {
+    min-height: 44px !important;
+    height: 44px !important;
+    padding: 10px 16px !important;
+    font-size: 0.9rem !important;
+    border-radius: 999px !important;
+  }
 
-function clearStartMarker() {
-  if (startMarker) {
-    startMarker.setMap(null);
-    startMarker = null;
+  #btnCloseStartPanel,
+  #btnClosePointPanel,
+  #btnCloseEndPanel,
+  #btnCloseSavePanel,
+  #btnCloseImportExportPanel {
+    width: 30px !important;
+    height: 30px !important;
+    min-width: 30px !important;
+    min-height: 30px !important;
+    font-size: 0.96rem !important;
+    flex: 0 0 30px !important;
+  }
+
+  .trip-panel {
+    padding: 13px !important;
+    border-radius: 20px !important;
+  }
+
+  .trip-panel-header h2 {
+    font-size: 0.94rem !important;
+  }
+
+  .trip-list {
+    gap: 9px !important;
+  }
+
+  .trip-item {
+    grid-template-columns: 38px minmax(0, 1fr) !important;
+    gap: 13px !important;
+    padding: 10px !important;
+  }
+
+  .trip-item > div:last-child,
+  .trip-item > button:last-child {
+    grid-column: 2 !important;
+    justify-self: start !important;
+    margin-top: 2px !important;
+  }
+
+  .trip-order {
+    width: 44px !important;
+    height: 44px !important;
+    border-radius: 14px !important;
+    font-size: 1.1rem !important;
+    font-weight: 800 !important;
+    line-height: 1 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+
+  .trip-content strong {
+    font-size: 0.88rem !important;
+  }
+
+  .trip-content span {
+    font-size: 0.76rem !important;
+  }
+
+  .tiny-btn {
+    min-height: 32px !important;
+    height: 32px !important;
+    padding: 5px 10px !important;
+    font-size: 0.75rem !important;
+  }
+
+  .screen-overlay-panel {
+    width: calc(100vw - 12px) !important;
+    margin-top: 30px !important;
+    padding: 12px !important;
+    border-radius: 18px !important;
+  }
+
+  .screen-overlay-panel .card-title-row.large-gap {
+    gap: 8px !important;
+    margin-bottom: 12px !important;
+  }
+
+  .screen-overlay-panel .card-title-row.large-gap .small-btn {
+    min-height: 32px !important;
+    padding: 5px 9px !important;
+    font-size: 0.72rem !important;
+  }
+
+  .map-list-row {
+    grid-template-columns: minmax(0, 1fr) auto !important;
+    gap: 7px !important;
+    align-items: center !important;
+  }
+
+  .map-list-row .danger-outline,
+  .map-list-row .small-btn,
+  .map-list-row .tiny-btn {
+    width: auto !important;
+    justify-self: start !important;
+  }
+
+  .map-list-item {
+    padding: 11px 12px !important;
+    border-radius: 15px !important;
+  }
+
+  .map-list-item strong,
+  .map-list-item b {
+    font-size: 0.86rem !important;
+  }
+
+  .map-list-item span {
+    font-size: 0.74rem !important;
   }
 }
 
-function showEndMarker({ lat, lng, title, onClick, pointData }) {
-  if (!map) return null;
-
-  if (endMarker) {
-    endMarker.setMap(null);
-  }
-
-  endMarker = new google.maps.Marker({
-    position: { lat, lng },
-    map,
-    title: title || "Bitiş Noktası",
-    label: {
-      text: "E",
-      color: "#ffffff",
-      fontWeight: "700"
-    },
-    icon: createCircleSymbol("#f97316", "#ffffff", 16)
-  });
-
-  endMarker.__pointData = pointData || null;
-
-  endMarker.addListener("click", () => {
-    handleMarkerClickFocus(endMarker);
-
-    window.setTimeout(() => {
-      openMarkerInfo(endMarker, endMarker.__pointData);
-    }, 360);
-
-    if (typeof onClick === "function") {
-      onClick(endMarker.__pointData);
-    }
-  });
-
-  return endMarker;
+.trip-actions .tiny-btn[data-action^="directions"] {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8) !important;
+  border-color: #1d4ed8 !important;
+  color: #ffffff !important;
 }
 
-function clearEndMarker() {
-  if (endMarker) {
-    endMarker.setMap(null);
-    endMarker = null;
-  }
+.trip-actions .tiny-btn[data-action^="focus"] {
+  background: linear-gradient(135deg, #0f172a, #334155) !important;
+  border-color: #334155 !important;
+  color: #ffffff !important;
 }
 
-function focusToLocation(lat, lng, zoom = 15) {
-  if (!map) return;
-
-  cancelSmoothZoom();
-
-  const normalizedLat = Number(lat);
-  const normalizedLng = Number(lng);
-
-  if (!Number.isFinite(normalizedLat) || !Number.isFinite(normalizedLng)) return;
-
-  map.setCenter({
-    lat: normalizedLat,
-    lng: normalizedLng
-  });
-
-  map.setZoom(zoom);
+.trip-actions .tiny-btn[data-action^="delete"] {
+  background: #fff5f5 !important;
+  border-color: #fecaca !important;
+  color: #b91c1c !important;
 }
 
-function resetPageZoomAfterSearch() {
-  if (!searchInputEl) return;
-
-  searchInputEl.blur();
-
-  const viewportMeta = document.querySelector('meta[name="viewport"]');
-  if (!viewportMeta) return;
-
-  const originalContent = viewportMeta.getAttribute("content") || "";
-
-  viewportMeta.setAttribute(
-    "content",
-    "width=device-width, initial-scale=1, maximum-scale=1"
-  );
-
-  window.setTimeout(() => {
-    viewportMeta.setAttribute("content", originalContent);
-  }, 250);
-}
-
-function focusMapToPoints(startPoint, points = [], endPoint = null) {
-  if (!map) return;
-
-  cancelSmoothZoom();
-
-  const validPoints = [];
-
-  if (startPoint && Number.isFinite(startPoint.lat) && Number.isFinite(startPoint.lng)) {
-    validPoints.push({
-      lat: Number(startPoint.lat),
-      lng: Number(startPoint.lng)
-    });
+@media (max-width: 720px) {
+  .trip-item.has-note,
+  .trip-item.no-note {
+    padding-top: 44px !important;
   }
 
-  points.forEach((point) => {
-    if (Number.isFinite(point.lat) && Number.isFinite(point.lng)) {
-      validPoints.push({
-        lat: Number(point.lat),
-        lng: Number(point.lng)
-      });
-    }
-  });
-
-  if (endPoint && Number.isFinite(endPoint.lat) && Number.isFinite(endPoint.lng)) {
-    validPoints.push({
-      lat: Number(endPoint.lat),
-      lng: Number(endPoint.lng)
-    });
+  .trip-content {
+    padding-right: 0 !important;
   }
 
-  if (!validPoints.length) return;
-
-  if (validPoints.length === 1) {
-    focusToLocation(validPoints[0].lat, validPoints[0].lng, 15);
-    return;
+  .trip-note-btn {
+    top: 8px !important;
+    right: 8px !important;
+    min-height: 28px !important;
+    height: 28px !important;
+    padding: 0 8px !important;
+    gap: 4px !important;
+    font-size: 0.66rem !important;
   }
 
-  const bounds = new google.maps.LatLngBounds();
-
-  validPoints.forEach((point) => {
-    bounds.extend(point);
-  });
-
-  map.fitBounds(bounds, 60);
-}
-
-function showCurrentLocationMarker(lat, lng) {
-  if (!map) return;
-
-  if (currentLocationMarker) {
-    currentLocationMarker.setMap(null);
+  .trip-note-icon {
+    width: 14px !important;
+    height: 14px !important;
+    font-size: 0.64rem !important;
   }
 
-  currentLocationMarker = new google.maps.Marker({
-    position: { lat, lng },
-    map,
-    title: "Mevcut Konumum",
-    icon: createCircleSymbol("#2563eb", "#ffffff", 14)
-  });
-
-  focusToLocation(lat, lng, 15);
-}
-
-function showDraftMarker(lat, lng) {
-  if (!map) return;
-
-  if (draftMarker) {
-    draftMarker.setMap(null);
+  .trip-note-preview {
+    font-size: 0.74rem !important;
+    padding: 5px 7px !important;
   }
 
-  draftMarker = new google.maps.Marker({
-    position: { lat, lng },
-    map,
-    title: "Seçilen Nokta",
-    icon: createCircleSymbol("#facc15", "#92400e", 14)
-  });
-}
+  .note-dialog-overlay {
+    align-items: flex-end !important;
+    padding: 12px !important;
+  }
 
-function clearDraftMarker() {
-  if (draftMarker) {
-    draftMarker.setMap(null);
-    draftMarker = null;
+  .note-dialog-card {
+    width: 100% !important;
+    max-height: calc(100vh - 24px) !important;
+    overflow: auto !important;
+    border-radius: 22px !important;
+    padding: 18px !important;
+  }
+
+  .note-dialog-header h3 {
+    font-size: 1rem !important;
+  }
+
+  .note-dialog-header p {
+    font-size: 0.82rem !important;
+  }
+
+  #noteDialogTextarea {
+    min-height: 126px !important;
+    font-size: 0.9rem !important;
+  }
+
+  .note-dialog-meta {
+    align-items: flex-start !important;
+    flex-direction: column !important;
+    gap: 4px !important;
+  }
+
+  .note-dialog-actions {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+  }
+
+  .note-dialog-btn {
+    width: 100% !important;
+    min-height: 40px !important;
+  }
+
+  .note-dialog-btn.primary {
+    grid-column: 1 / -1 !important;
   }
 }
 
-function clearRouteLines() {
-  routePolylines.forEach((line) => line.setMap(null));
-  routePolylines = [];
-
-  distanceOverlays.forEach((overlay) => overlay.setMap(null));
-  distanceOverlays = [];
-}
-
-function createDistanceOverlay(position, text) {
-  class DistanceOverlay extends google.maps.OverlayView {
-    constructor(pos, labelText) {
-      super();
-      this.position = pos;
-      this.text = labelText;
-      this.div = null;
-    }
-
-    onAdd() {
-      const div = document.createElement("div");
-      div.style.position = "absolute";
-      div.style.background = "rgba(255,255,255,0.96)";
-      div.style.border = "1px solid rgba(203, 213, 225, 0.95)";
-      div.style.borderRadius = "999px";
-      div.style.padding = "4px 8px";
-      div.style.fontSize = "12px";
-      div.style.fontWeight = "700";
-      div.style.color = "#0f172a";
-      div.style.boxShadow = "0 8px 18px rgba(15,23,42,0.10)";
-      div.style.whiteSpace = "nowrap";
-      div.style.backdropFilter = "blur(8px)";
-      div.style.pointerEvents = "none";
-      div.style.zIndex = "20";
-      div.innerText = this.text;
-      this.div = div;
-
-      const panes = this.getPanes();
-      panes.floatPane.appendChild(div);
-    }
-
-    draw() {
-      if (!this.div) return;
-
-      const projection = this.getProjection();
-      const pixel = projection.fromLatLngToDivPixel(this.position);
-
-      if (!pixel) return;
-
-      this.div.style.left = `${pixel.x - 24}px`;
-      this.div.style.top = `${pixel.y - 14}px`;
-    }
-
-    onRemove() {
-      if (this.div) {
-        this.div.remove();
-        this.div = null;
-      }
-    }
+/* Final not görünümü mobil/tablet son override */
+@media (max-width: 1024px) {
+  .trip-note-btn {
+    width: 31px !important;
+    min-width: 31px !important;
+    max-width: 31px !important;
+    height: 31px !important;
+    min-height: 31px !important;
+    top: 9px !important;
+    right: 9px !important;
+    padding: 0 !important;
+    gap: 0 !important;
   }
 
-  const overlay = new DistanceOverlay(position, text);
-  overlay.setMap(map);
-  distanceOverlays.push(overlay);
-}
-
-function drawRouteSegments(startPoint, orderedPoints, endPoint = null) {
-  if (!map) return;
-
-  clearRouteLines();
-
-  if (!startPoint) return;
-
-  const routePoints = [startPoint, ...orderedPoints];
-
-  if (endPoint) {
-    routePoints.push(endPoint);
+  .trip-note-icon {
+    width: 100% !important;
+    height: 100% !important;
+    background: transparent !important;
+    color: inherit !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 1rem !important;
   }
 
-  if (routePoints.length < 2) return;
+  .trip-item.has-note,
+  .trip-item.no-note {
+    padding-top: 44px !important;
+  }
 
-  for (let index = 1; index < routePoints.length; index += 1) {
-    const previous = routePoints[index - 1];
-    const point = routePoints[index];
+  .note-dialog-overlay {
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 14px !important;
+  }
 
-    const path = [
-      { lat: previous.lat, lng: previous.lng },
-      { lat: point.lat, lng: point.lng }
-    ];
+  .note-dialog-card {
+    width: min(390px, calc(100vw - 28px)) !important;
+    max-height: min(78vh, 540px) !important;
+    overflow: auto !important;
+    border-radius: 22px !important;
+    padding: 15px !important;
+  }
 
-    const polyline = new google.maps.Polyline({
-      path,
-      geodesic: true,
-      strokeColor: "#2563eb",
-      strokeOpacity: 0.95,
-      strokeWeight: 3,
-      map
-    });
-
-    routePolylines.push(polyline);
-
-    const midLat = (previous.lat + point.lat) / 2;
-    const midLng = (previous.lng + point.lng) / 2;
-
-    const distanceValue = Number(point.distanceFromPrevious) || 0;
-
-    const distanceLabel =
-      distanceValue < 1
-        ? `${Math.round(distanceValue * 1000)} m`
-        : `${Number(distanceValue.toFixed(2)).toString()} km`;
-
-    createDistanceOverlay(
-      new google.maps.LatLng(midLat, midLng),
-      distanceLabel
-    );
+  #noteDialogTextarea {
+    min-height: 98px !important;
   }
 }
 
-function enableMapClickPicker(callback) {
-  if (!map) return;
-
-  if (mapClickListener) {
-    google.maps.event.removeListener(mapClickListener);
+@media (max-width: 720px) {
+  .trip-note-btn {
+    width: 30px !important;
+    min-width: 30px !important;
+    max-width: 30px !important;
+    height: 30px !important;
+    min-height: 30px !important;
+    top: 8px !important;
+    right: 8px !important;
   }
 
-  mapClickListener = map.addListener("click", (event) => {
-    const lat = event.latLng.lat();
-    const lng = event.latLng.lng();
-
-    if (searchMarker) {
-      searchMarker.setMap(null);
-      searchMarker = null;
-    }
-
-    showDraftMarker(lat, lng);
-    handleProgressiveMapClickFocus(lat, lng);
-
-    callback({
-      lat,
-      lng,
-      name: "İşaretli Konum"
-    });
-  });
-}
-
-function ensureSearchDropdown(inputElement) {
-  if (searchDropdown) return searchDropdown;
-
-  const dropdown = document.createElement("div");
-  dropdown.id = "customPlaceSearchDropdown";
-  dropdown.style.position = "absolute";
-  dropdown.style.top = "calc(100% + 6px)";
-  dropdown.style.left = "0";
-  dropdown.style.width = "100%";
-  dropdown.style.minWidth = "100%";
-  dropdown.style.maxWidth = "100%";
-  dropdown.style.background = "rgba(255,255,255,0.98)";
-  dropdown.style.border = "1px solid rgba(226, 232, 240, 0.98)";
-  dropdown.style.borderRadius = "16px";
-  dropdown.style.boxShadow = "0 12px 24px rgba(15, 23, 42, 0.12)";
-  dropdown.style.backdropFilter = "blur(8px)";
-  dropdown.style.padding = "4px";
-  dropdown.style.display = "none";
-  dropdown.style.zIndex = "30";
-  dropdown.style.maxHeight = "196px";
-  dropdown.style.overflowY = "auto";
-  dropdown.style.overflowX = "hidden";
-  dropdown.style.boxSizing = "border-box";
-
-  dropdown.addEventListener("pointerdown", () => {
-    isInteractingWithSearchDropdown = true;
-  });
-
-  dropdown.addEventListener("pointerup", () => {
-    window.setTimeout(() => {
-      isInteractingWithSearchDropdown = false;
-    }, 0);
-  });
-
-  const parent = inputElement.parentElement;
-  if (parent) {
-    const currentPosition = window.getComputedStyle(parent).position;
-    if (currentPosition === "static") {
-      parent.style.position = "relative";
-    }
-    parent.appendChild(dropdown);
+  .trip-item.has-note,
+  .trip-item.no-note {
+    padding-top: 42px !important;
   }
 
-  searchDropdown = dropdown;
-  return dropdown;
-}
-
-function hideSearchDropdown() {
-  if (!searchDropdown) return;
-  searchDropdown.style.display = "none";
-  searchDropdown.innerHTML = "";
-  currentPredictions = [];
-}
-
-function ensureAutocompleteSessionToken() {
-  if (!activeAutocompleteSessionToken) {
-    activeAutocompleteSessionToken = new google.maps.places.AutocompleteSessionToken();
+  .note-dialog-card {
+    width: min(360px, calc(100vw - 28px)) !important;
   }
 
-  return activeAutocompleteSessionToken;
-}
-
-function clearAutocompleteSession() {
-  activeAutocompleteSessionToken = null;
-}
-
-function renderPredictions(predictions, onPlaceSelected) {
-  const dropdown = searchDropdown;
-  if (!dropdown) return;
-
-  dropdown.innerHTML = "";
-  isInteractingWithSearchDropdown = false;
-
-  if (!predictions.length) {
-    dropdown.style.display = "none";
-    return;
+  .note-dialog-actions {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
   }
 
-  predictions.forEach((prediction, index) => {
-    const item = document.createElement("button");
-    item.type = "button";
-    item.dataset.placeId = prediction.place_id;
-    item.dataset.index = String(index);
-    item.style.width = "100%";
-    item.style.textAlign = "left";
-    item.style.padding = "7px 9px";
-    item.style.border = "1px solid transparent";
-    item.style.background = "#fff";
-    item.style.borderRadius = "9px";
-    item.style.display = "block";
-    item.style.marginBottom = index === predictions.length - 1 ? "0" : "3px";
-    item.style.cursor = "pointer";
-    item.style.boxSizing = "border-box";
-    item.style.minHeight = "unset";
-    item.style.overflow = "hidden";
-
-    const title = document.createElement("div");
-    title.textContent =
-      prediction.structured_formatting?.main_text || prediction.description;
-    title.style.fontWeight = "600";
-    title.style.color = "#0f172a";
-    title.style.fontSize = "0.88rem";
-    title.style.lineHeight = "1.15";
-    title.style.margin = "0";
-    title.style.whiteSpace = "nowrap";
-    title.style.overflow = "hidden";
-    title.style.textOverflow = "ellipsis";
-
-    const subtitle = document.createElement("div");
-    subtitle.textContent = prediction.structured_formatting?.secondary_text || "";
-    subtitle.style.color = "#64748b";
-    subtitle.style.fontSize = "0.76rem";
-    subtitle.style.lineHeight = "1.1";
-    subtitle.style.marginTop = "2px";
-    subtitle.style.whiteSpace = "nowrap";
-    subtitle.style.overflow = "hidden";
-    subtitle.style.textOverflow = "ellipsis";
-
-    item.appendChild(title);
-    if (subtitle.textContent) {
-      item.appendChild(subtitle);
-    }
-
-    item.addEventListener("mouseenter", () => {
-      item.style.background = "rgba(37, 99, 235, 0.06)";
-      item.style.borderColor = "rgba(37, 99, 235, 0.10)";
-    });
-
-    item.addEventListener("mouseleave", () => {
-      item.style.background = "#fff";
-      item.style.borderColor = "transparent";
-    });
-
-    item.addEventListener("click", () => {
-      if (!geocoder) {
-        geocoder = new google.maps.Geocoder();
-      }
-
-      const selectedName =
-        prediction.structured_formatting?.main_text ||
-        prediction.description ||
-        "";
-
-      geocoder.geocode({ placeId: prediction.place_id }, (results, status) => {
-        if (
-          status !== google.maps.GeocoderStatus.OK ||
-          !Array.isArray(results) ||
-          !results.length ||
-          !results[0]?.geometry?.location
-        ) {
-          return;
-        }
-
-        const location = results[0].geometry.location;
-        const lat = location.lat();
-        const lng = location.lng();
-
-        clearDraftMarker();
-
-        if (searchMarker) {
-          searchMarker.setMap(null);
-          searchMarker = null;
-        }
-
-        searchMarker = new google.maps.Marker({
-          position: { lat, lng },
-          map,
-          title: selectedName,
-          icon: createCircleSymbol("#2563eb", "#ffffff", 13)
-        });
-
-        focusToLocation(lat, lng, 16);
-        resetPageZoomAfterSearch();
-
-        if (searchInputEl) {
-          searchInputEl.value = selectedName;
-        }
-
-        hideSearchDropdown();
-        clearAutocompleteSession();
-
-        if (typeof onPlaceSelected === "function") {
-          onPlaceSelected({
-            name: selectedName,
-            lat,
-            lng
-          });
-        }
-      });
-    });
-
-    dropdown.appendChild(item);
-  });
-
-  dropdown.style.display = "block";
-}
-
-function initPlaceSearch(inputElement, onPlaceSelected) {
-  if (!inputElement || !map || !searchService) return;
-
-  searchInputEl = inputElement;
-  ensureSearchDropdown(inputElement);
-
-  if (!searchInputHandlerBound) {
-    inputElement.addEventListener("input", () => {
-      const query = inputElement.value.trim();
-
-      window.clearTimeout(searchDebounceTimer);
-
-      if (query.length < MIN_SEARCH_LENGTH) {
-        hideSearchDropdown();
-        clearAutocompleteSession();
-        return;
-      }
-
-      searchDebounceTimer = window.setTimeout(() => {
-        const requestId = ++lastPredictionRequestId;
-        const sessionToken = ensureAutocompleteSessionToken();
-
-        searchService.getPlacePredictions(
-          {
-            input: query,
-            bounds: map.getBounds() || undefined,
-            sessionToken
-          },
-          (predictions, status) => {
-            if (requestId !== lastPredictionRequestId) return;
-
-            if (
-              status !== google.maps.places.PlacesServiceStatus.OK ||
-              !Array.isArray(predictions) ||
-              !predictions.length
-            ) {
-              hideSearchDropdown();
-              return;
-            }
-
-            const limitedPredictions = predictions.slice(0, MAX_PREDICTIONS);
-            currentPredictions = limitedPredictions;
-            renderPredictions(limitedPredictions, onPlaceSelected);
-          }
-        );
-      }, SEARCH_DEBOUNCE_MS);
-    });
-
-    searchInputHandlerBound = true;
-  }
-
-  if (!searchFocusHandlerBound) {
-    inputElement.addEventListener("focus", () => {
-      const query = inputElement.value.trim();
-      if (query.length >= MIN_SEARCH_LENGTH && currentPredictions.length) {
-        searchDropdown.style.display = "block";
-      }
-    });
-
-    searchFocusHandlerBound = true;
-  }
-
-  if (!searchBlurHandlerBound) {
-    inputElement.addEventListener("blur", () => {
-      window.setTimeout(() => {
-        if (isInteractingWithSearchDropdown) return;
-        hideSearchDropdown();
-        resetPageZoomAfterSearch();
-      }, 180);
-    });
-
-    searchBlurHandlerBound = true;
+  .note-dialog-btn.primary {
+    grid-column: 1 / -1 !important;
   }
 }
 
-export {
-  initMap,
-  getMap,
-  addMarker,
-  clearMarkers,
-  showStartMarker,
-  clearStartMarker,
-  showEndMarker,
-  clearEndMarker,
-  focusToLocation,
-  focusMapToPoints,
-  showCurrentLocationMarker,
-  enableMapClickPicker,
-  initPlaceSearch,
-  clearDraftMarker,
-  clearRouteLines,
-  drawRouteSegments,
-  openInfoForPoint
-};
+/* Gezi listesi not ikonu: mobil ve tablet sağ alt */
+@media (max-width: 1024px) {
+  .trip-item.has-note,
+  .trip-item.no-note {
+    padding-top: 11px !important;
+    padding-bottom: 52px !important;
+  }
+
+  .trip-note-btn {
+    top: auto !important;
+    right: 10px !important;
+    bottom: 10px !important;
+    width: 32px !important;
+    min-width: 32px !important;
+    max-width: 32px !important;
+    height: 32px !important;
+    min-height: 32px !important;
+    padding: 0 !important;
+    border-radius: 13px !important;
+  }
+
+  .trip-note-icon {
+    width: 100% !important;
+    height: 100% !important;
+    font-size: 0.96rem !important;
+  }
+
+  .trip-content {
+    padding-right: 0 !important;
+  }
+
+  .trip-actions {
+    padding-right: 44px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .trip-item.has-note,
+  .trip-item.no-note {
+    padding-top: 10px !important;
+    padding-bottom: 50px !important;
+  }
+
+  .trip-note-btn {
+    right: 9px !important;
+    bottom: 9px !important;
+    width: 31px !important;
+    min-width: 31px !important;
+    max-width: 31px !important;
+    height: 31px !important;
+    min-height: 31px !important;
+  }
+
+  .trip-actions {
+    padding-right: 42px !important;
+  }
+}
+
+/* Mobil gezi listesi aksiyon satırı: Not solda, Yol Tarifi sağda */
+@media (max-width: 720px) {
+  .trip-item.has-note,
+  .trip-item.no-note {
+    padding-top: 10px !important;
+    padding-bottom: 10px !important;
+  }
+
+  .trip-content {
+    padding-right: 0 !important;
+  }
+
+  .trip-actions {
+    width: 100% !important;
+    padding-right: 0 !important;
+    display: flex !important;
+    flex-wrap: wrap !important;
+    align-items: center !important;
+    gap: 6px !important;
+  }
+
+  .trip-note-action-btn {
+    position: static !important;
+    top: auto !important;
+    right: auto !important;
+    bottom: auto !important;
+    width: 34px !important;
+    min-width: 34px !important;
+    max-width: 34px !important;
+    height: 32px !important;
+    min-height: 32px !important;
+    padding: 0 !important;
+    border-radius: 999px !important;
+    order: 0 !important;
+  }
+
+  .trip-note-action-btn .trip-note-icon {
+    width: 100% !important;
+    height: 100% !important;
+    font-size: 0.96rem !important;
+  }
+
+  .trip-actions .tiny-btn[data-action^="focus"] {
+    order: 1 !important;
+  }
+
+  .trip-actions .tiny-btn[data-action^="delete"] {
+    order: 2 !important;
+  }
+
+  .trip-actions .tiny-btn[data-action^="directions"] {
+    order: 10 !important;
+    margin-left: auto !important;
+  }
+
+  .trip-note-preview {
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin-top: 7px !important;
+    padding: 7px 9px !important;
+    font-size: 0.76rem !important;
+    line-height: 1.38 !important;
+    white-space: normal !important;
+    overflow-wrap: anywhere !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .trip-actions {
+    gap: 5px !important;
+  }
+
+  .trip-note-action-btn {
+    width: 32px !important;
+    min-width: 32px !important;
+    max-width: 32px !important;
+    height: 31px !important;
+    min-height: 31px !important;
+  }
+
+  .trip-actions .tiny-btn[data-action^="directions"] {
+    margin-left: auto !important;
+  }
+}
+
+/* Mobilde gezi listesi not alanı: kontrollü yükseklik + parmakla kaydırma */
+@media (max-width: 720px) {
+  .trip-note-preview {
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    max-height: 82px !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    -webkit-overflow-scrolling: touch !important;
+    overscroll-behavior: contain !important;
+    scrollbar-gutter: stable !important;
+    padding-right: 10px !important;
+    white-space: normal !important;
+    overflow-wrap: anywhere !important;
+  }
+
+  .trip-note-preview::-webkit-scrollbar {
+    width: 5px;
+  }
+
+  .trip-note-preview::-webkit-scrollbar-track {
+    background: rgba(245, 158, 11, 0.10);
+    border-radius: 999px;
+  }
+
+  .trip-note-preview::-webkit-scrollbar-thumb {
+    background: rgba(180, 83, 9, 0.38);
+    border-radius: 999px;
+  }
+}
+
+@media (max-width: 480px) {
+  .trip-note-preview {
+    max-height: 76px !important;
+    font-size: 0.75rem !important;
+    line-height: 1.38 !important;
+  }
+}
