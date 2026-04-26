@@ -997,3 +997,61 @@
     grid-column: 1 / -1 !important;
   }
 }
+
+/* Gezi listesi not ikonu: mobil ve tablet sağ alt */
+@media (max-width: 1024px) {
+  .trip-item.has-note,
+  .trip-item.no-note {
+    padding-top: 11px !important;
+    padding-bottom: 52px !important;
+  }
+
+  .trip-note-btn {
+    top: auto !important;
+    right: 10px !important;
+    bottom: 10px !important;
+    width: 32px !important;
+    min-width: 32px !important;
+    max-width: 32px !important;
+    height: 32px !important;
+    min-height: 32px !important;
+    padding: 0 !important;
+    border-radius: 13px !important;
+  }
+
+  .trip-note-icon {
+    width: 100% !important;
+    height: 100% !important;
+    font-size: 0.96rem !important;
+  }
+
+  .trip-content {
+    padding-right: 0 !important;
+  }
+
+  .trip-actions {
+    padding-right: 44px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .trip-item.has-note,
+  .trip-item.no-note {
+    padding-top: 10px !important;
+    padding-bottom: 50px !important;
+  }
+
+  .trip-note-btn {
+    right: 9px !important;
+    bottom: 9px !important;
+    width: 31px !important;
+    min-width: 31px !important;
+    max-width: 31px !important;
+    height: 31px !important;
+    min-height: 31px !important;
+  }
+
+  .trip-actions {
+    padding-right: 42px !important;
+  }
+}
