@@ -57,7 +57,8 @@ const state = {
   mapQuota: 1,
   lastScrollY: 0,
   appStartupSplash: null,
-  selectedPointColor: "#dc2626"
+  selectedPointColor: "#dc2626",
+  noteEditorTarget: null
 };
 
 const elements = {
@@ -122,7 +123,15 @@ const elements = {
   importExportPanel: document.getElementById("importExportPanel"),
   appStartupSplash: document.getElementById("appStartupSplash"),
   appStartupSplashText: document.getElementById("appStartupSplashText"),
-  mobileFloatingBackdrop: document.getElementById("mobileFloatingBackdrop")
+  mobileFloatingBackdrop: document.getElementById("mobileFloatingBackdrop"),
+  noteEditorOverlay: document.getElementById("noteEditorOverlay"),
+  noteEditorBackdrop: document.getElementById("noteEditorBackdrop"),
+  noteEditorTitle: document.getElementById("noteEditorTitle"),
+  noteEditorSubtitle: document.getElementById("noteEditorSubtitle"),
+  noteEditorText: document.getElementById("noteEditorText"),
+  btnCloseNoteEditor: document.getElementById("btnCloseNoteEditor"),
+  btnSaveNote: document.getElementById("btnSaveNote"),
+  btnDeleteNote: document.getElementById("btnDeleteNote")
 };
 
 const DEFAULT_POINT_COLOR = "#dc2626";
@@ -300,6 +309,248 @@ function escapeHtml(value) {
 
 function markDirty() {
   state.hasUnsavedChanges = true;
+}
+
+function normalizeNote(value) {
+  return String(value ?? "").trim();
+}
+
+function hasLocationNote(location) {
+  return normalizeNote(location?.note).length > 0;
+}
+
+function getNotePreview(note, maxLength = 86) {
+  const normalized = normalizeNote(note).replace(/\s+/g, " ");
+
+  if (!normalized) return "";
+
+  return normalized.length > maxLength
+    ? `${normalized.slice(0, maxLength - 1)}…`
+    : normalized;
+}
+
+function noteIconSvg() {
+  return `
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+      <path d="M14 2v6h6"></path>
+      <path d="M16.5 13.5 11 19l-3 .7.7-3 5.5-5.5a1.6 1.6 0 0 1 2.3 2.3z"></path>
+    </svg>`;
+}
+
+function renderNoteButton({ action, id = "", hasNote = false }) {
+  const noteClass = hasNote ? " has-note" : "";
+  const title = hasNote ? "Notu görüntüle / düzenle" : "Not ekle";
+  const dataId = id !== "" && id !== null && id !== undefined ? ` data-id="${escapeHtml(id)}"` : "";
+
+  return `
+    <button class="tiny-btn icon-note-btn${noteClass}" type="button" data-action="${action}"${dataId} aria-label="${title}" title="${title}">
+      ${noteIconSvg()}
+      <span class="note-state-dot" aria-hidden="true"></span>
+    </button>
+  `;
+}
+
+function renderNotePreview(location) {
+  if (!hasLocationNote(location)) return "";
+
+  const fullNote = normalizeNote(location.note);
+
+  return `
+    <span class="trip-note-preview" title="${escapeHtml(fullNote)}" tabindex="0" aria-label="Konum notu">
+      ${noteIconSvg()}
+      <span>${escapeHtml(fullNote)}</span>
+    </span>
+  `;
+}
+
+function getNoteTargetLocation(target = state.noteEditorTarget) {
+  if (!target) return null;
+
+  if (target.type === "start") {
+    return state.startPoint || null;
+  }
+
+  if (target.type === "end") {
+    return state.endPoint || null;
+  }
+
+  if (target.type === "point") {
+    return state.points.find((point) => String(point.id) === String(target.id)) || null;
+  }
+
+  return null;
+}
+
+function getPointDataForInfo(target) {
+  if (!target) return null;
+
+  if (target.type === "start" && state.startPoint) {
+    return {
+      ...state.startPoint,
+      orderLabel: "S"
+    };
+  }
+
+  if (target.type === "end" && state.endPoint) {
+    return {
+      ...state.endPoint,
+      orderLabel: "E"
+    };
+  }
+
+  if (target.type === "point") {
+    const pointIndex = state.points.findIndex(
+      (point) => String(point.id) === String(target.id)
+    );
+
+    if (pointIndex < 0) return null;
+
+    const point = state.points[pointIndex];
+
+    return {
+      ...point,
+      orderLabel: String(pointIndex + 1),
+      color: point.color || DEFAULT_POINT_COLOR
+    };
+  }
+
+  return null;
+}
+
+function getNoteTargetLabel(location, target = state.noteEditorTarget) {
+  if (!location) return "Konum";
+
+  if (target?.type === "start") return `Başlangıç · ${location.name || "İsimsiz"}`;
+  if (target?.type === "end") return `Bitiş noktası · ${location.name || "İsimsiz"}`;
+
+  const pointIndex = state.points.findIndex((point) => String(point.id) === String(location.id));
+  const prefix = pointIndex >= 0 ? `${pointIndex + 1}. konum` : "Konum";
+
+  return `${prefix} · ${location.name || "İsimsiz"}`;
+}
+
+function openNoteEditor(target) {
+  const location = getNoteTargetLocation(target);
+
+  if (!location || !elements.noteEditorOverlay || !elements.noteEditorText) return;
+
+  state.noteEditorTarget = {
+    type: target.type,
+    id: target.id ?? null,
+    reopenInfo: Boolean(target.reopenInfo)
+  };
+
+  if (elements.noteEditorTitle) {
+    elements.noteEditorTitle.textContent = hasLocationNote(location)
+      ? "Konum Notu"
+      : "Not Ekle";
+  }
+
+  if (elements.noteEditorSubtitle) {
+    elements.noteEditorSubtitle.textContent = getNoteTargetLabel(location, target);
+  }
+
+  elements.noteEditorText.value = normalizeNote(location.note);
+  elements.btnDeleteNote?.toggleAttribute("disabled", !hasLocationNote(location));
+
+  closeFloatingPanels();
+  closeMapMenu();
+  elements.noteEditorOverlay.classList.remove("hidden");
+  elements.noteEditorOverlay.setAttribute("aria-hidden", "false");
+
+  window.setTimeout(() => {
+    elements.noteEditorText?.focus();
+  }, 80);
+}
+
+function closeNoteEditor() {
+  elements.noteEditorOverlay?.classList.add("hidden");
+  elements.noteEditorOverlay?.setAttribute("aria-hidden", "true");
+  state.noteEditorTarget = null;
+}
+
+function applyNoteToLocation(note) {
+  const target = state.noteEditorTarget;
+  if (!target) return null;
+
+  const normalizedNote = normalizeNote(note);
+
+  if (target.type === "start" && state.startPoint) {
+    state.startPoint = {
+      ...state.startPoint,
+      note: normalizedNote
+    };
+    return state.startPoint;
+  }
+
+  if (target.type === "end" && state.endPoint) {
+    state.endPoint = {
+      ...state.endPoint,
+      note: normalizedNote
+    };
+    return state.endPoint;
+  }
+
+  if (target.type === "point") {
+    let updatedPoint = null;
+
+    state.points = state.points.map((point) => {
+      if (String(point.id) !== String(target.id)) return point;
+
+      updatedPoint = {
+        ...point,
+        note: normalizedNote
+      };
+
+      return updatedPoint;
+    });
+
+    return updatedPoint;
+  }
+
+  return null;
+}
+
+function handleSaveNote() {
+  const targetBeforeSave = state.noteEditorTarget
+    ? { ...state.noteEditorTarget }
+    : null;
+  const updatedLocation = applyNoteToLocation(elements.noteEditorText?.value || "");
+
+  if (!updatedLocation || !targetBeforeSave) return;
+
+  recomputeRoute();
+  markDirty();
+  closeNoteEditor();
+
+  elements.authStatus.textContent = hasLocationNote(updatedLocation)
+    ? `Not kaydedildi: ${updatedLocation.name || "Konum"}`
+    : `Not kaldırıldı: ${updatedLocation.name || "Konum"}`;
+
+  if (targetBeforeSave.reopenInfo) {
+    window.setTimeout(() => {
+      const pointData = getPointDataForInfo(targetBeforeSave);
+      if (pointData) openInfoForPoint(pointData);
+    }, 180);
+  }
+}
+
+function handleDeleteNote() {
+  if (!state.noteEditorTarget) return;
+  elements.noteEditorText.value = "";
+  handleSaveNote();
+}
+
+function handleMarkerNoteRequest(event) {
+  const pointData = event?.detail?.pointData;
+  if (!pointData) return;
+
+  openNoteEditor({
+    type: pointData.type === "start" ? "start" : pointData.type === "end" ? "end" : "point",
+    id: pointData.id ?? null,
+    reopenInfo: true
+  });
 }
 
 function markClean() {
@@ -487,6 +738,7 @@ function createPointFromPreviousStart(startPoint) {
     name: startPoint.name || "Eski Başlangıç",
     lat: Number(startPoint.lat),
     lng: Number(startPoint.lng),
+    note: startPoint.note || "",
     color: DEFAULT_POINT_COLOR,
     distanceFromPrevious: 0,
     type: "point"
@@ -499,6 +751,7 @@ function createPointFromPreviousEnd(endPoint) {
     name: endPoint.name || "Eski Bitiş",
     lat: Number(endPoint.lat),
     lng: Number(endPoint.lng),
+    note: endPoint.note || "",
     color: DEFAULT_POINT_COLOR,
     distanceFromPrevious: 0,
     type: "point"
@@ -556,8 +809,17 @@ function commitStartPoint() {
     return;
   }
 
+  const nextStartPoint = {
+    ...startPoint,
+    note:
+      promotedPoint?.note ||
+      (previousStartPoint && isSamePlace(previousStartPoint, startPoint)
+        ? previousStartPoint.note || ""
+        : "")
+  };
+
   state.points = nextPoints;
-  state.startPoint = startPoint;
+  state.startPoint = nextStartPoint;
   state.editingPointId = null;
 
   clearDraftMarker();
@@ -567,11 +829,11 @@ function commitStartPoint() {
   }
 
   showStartMarker({
-    lat: startPoint.lat,
-    lng: startPoint.lng,
-    title: startPoint.name,
+    lat: nextStartPoint.lat,
+    lng: nextStartPoint.lng,
+    title: nextStartPoint.name,
     pointData: {
-      ...startPoint,
+      ...nextStartPoint,
       orderLabel: "S"
     },
     onClick: fillPointFormFromMarker
@@ -638,8 +900,17 @@ function commitEndPoint() {
     return;
   }
 
+  const nextEndPoint = {
+    ...endPoint,
+    note:
+      promotedPoint?.note ||
+      (previousEndPoint && isSamePlace(previousEndPoint, endPoint)
+        ? previousEndPoint.note || ""
+        : "")
+  };
+
   state.points = nextPoints;
-  state.endPoint = endPoint;
+  state.endPoint = nextEndPoint;
   state.editingPointId = null;
 
   clearDraftMarker();
@@ -649,11 +920,11 @@ function commitEndPoint() {
   }
 
   showEndMarker({
-    lat: endPoint.lat,
-    lng: endPoint.lng,
-    title: endPoint.name,
+    lat: nextEndPoint.lat,
+    lng: nextEndPoint.lng,
+    title: nextEndPoint.name,
     pointData: {
-      ...endPoint,
+      ...nextEndPoint,
       orderLabel: "E"
     },
     onClick: fillPointFormFromMarker
@@ -776,13 +1047,15 @@ function renderSummary() {
 function renderTripList() {
   const startHtml = state.startPoint
     ? `
-      <div class="trip-item start">
+      <div class="trip-item start${hasLocationNote(state.startPoint) ? " has-note" : ""}">
         <div class="trip-order">S</div>
         <div class="trip-content">
           <strong>${escapeHtml(state.startPoint.name)}</strong>
           <span>Önceki mesafe: —</span>
+          ${renderNotePreview(state.startPoint)}
         </div>
         <div class="trip-actions">
+          ${renderNoteButton({ action: "note-start", hasNote: hasLocationNote(state.startPoint) })}
           <button class="tiny-btn" type="button" data-action="directions-start">Yol Tarifi</button>
           <button class="tiny-btn" type="button" data-action="focus-start">Odakla</button>
           <button class="tiny-btn" type="button" data-action="delete-start">Sil</button>
@@ -804,15 +1077,18 @@ function renderTripList() {
     .map((point, index) => {
       const pointColor = point.color || DEFAULT_POINT_COLOR;
       const pointShadow = `${pointColor}33`;
+      const pointHasNote = hasLocationNote(point);
 
       return `
-        <div class="trip-item">
+        <div class="trip-item${pointHasNote ? " has-note" : ""}">
           <div class="trip-order" style="background:${escapeHtml(pointColor)}; box-shadow: 0 12px 22px ${escapeHtml(pointShadow)}">${index + 1}</div>
           <div class="trip-content">
             <strong>${escapeHtml(point.name)}</strong>
             <span>Önceki mesafe: ${formatKm(point.distanceFromPrevious || 0)}</span>
+            ${renderNotePreview(point)}
           </div>
           <div class="trip-actions">
+            ${renderNoteButton({ action: "note-point", id: point.id, hasNote: pointHasNote })}
             <button class="tiny-btn" type="button" data-action="directions-point" data-id="${point.id}">Yol Tarifi</button>
             <button class="tiny-btn" type="button" data-action="focus-point" data-id="${point.id}">Odakla</button>
             <button class="tiny-btn" type="button" data-action="delete-point" data-id="${point.id}">Sil</button>
@@ -824,13 +1100,15 @@ function renderTripList() {
 
   const endHtml = state.endPoint
     ? `
-      <div class="trip-item end">
+      <div class="trip-item end${hasLocationNote(state.endPoint) ? " has-note" : ""}">
         <div class="trip-order end-order">E</div>
         <div class="trip-content">
           <strong>${escapeHtml(state.endPoint.name)}</strong>
           <span>Önceki mesafe: ${formatKm(state.endPoint.distanceFromPrevious || 0)}</span>
+          ${renderNotePreview(state.endPoint)}
         </div>
         <div class="trip-actions">
+          ${renderNoteButton({ action: "note-end", hasNote: hasLocationNote(state.endPoint) })}
           <button class="tiny-btn" type="button" data-action="directions-end">Yol Tarifi</button>
           <button class="tiny-btn" type="button" data-action="focus-end">Odakla</button>
           <button class="tiny-btn" type="button" data-action="delete-end">Sil</button>
@@ -840,6 +1118,24 @@ function renderTripList() {
     : "";
 
   elements.tripList.innerHTML = startHtml + pointHtml + endHtml;
+}
+
+function redrawStartMarker() {
+  if (!state.startPoint) {
+    clearStartMarker();
+    return;
+  }
+
+  showStartMarker({
+    lat: state.startPoint.lat,
+    lng: state.startPoint.lng,
+    title: state.startPoint.name,
+    pointData: {
+      ...state.startPoint,
+      orderLabel: "S"
+    },
+    onClick: fillPointFormFromMarker
+  });
 }
 
 function redrawPointMarkers() {
@@ -883,6 +1179,7 @@ function recomputeRoute() {
   if (!state.startPoint) {
     state.totalDistance = 0;
     clearRouteLines();
+    redrawStartMarker();
     renderSummary();
     renderTripList();
     redrawPointMarkers();
@@ -893,6 +1190,7 @@ function recomputeRoute() {
   if (!state.points.length && !state.endPoint) {
     state.totalDistance = 0;
     clearRouteLines();
+    redrawStartMarker();
     renderSummary();
     renderTripList();
     redrawPointMarkers();
@@ -910,6 +1208,7 @@ function recomputeRoute() {
   state.endPoint = result.endPoint;
   state.totalDistance = result.totalDistance;
 
+  redrawStartMarker();
   redrawPointMarkers();
   redrawEndMarker();
   drawRouteSegments(state.startPoint, state.points, state.endPoint);
@@ -1005,7 +1304,8 @@ function addOrUpdatePoint() {
             name,
             lat: Number(lat),
             lng: Number(lng),
-            color
+            color,
+            note: point.note || ""
           }
         : point
     );
@@ -1016,6 +1316,7 @@ function addOrUpdatePoint() {
       lat: Number(lat),
       lng: Number(lng),
       color,
+      note: "",
       distanceFromPrevious: 0,
       type: "point"
     });
@@ -1137,14 +1438,16 @@ function getMapPayload() {
       ? {
           name: state.startPoint.name,
           lat: state.startPoint.lat,
-          lng: state.startPoint.lng
+          lng: state.startPoint.lng,
+          note: state.startPoint.note || ""
         }
       : null,
     endPoint: state.endPoint
       ? {
           name: state.endPoint.name,
           lat: state.endPoint.lat,
-          lng: state.endPoint.lng
+          lng: state.endPoint.lng,
+          note: state.endPoint.note || ""
         }
       : null,
     points: state.points.map((point) => ({
@@ -1152,6 +1455,7 @@ function getMapPayload() {
       lat: point.lat,
       lng: point.lng,
       color: point.color || DEFAULT_POINT_COLOR,
+      note: point.note || "",
       type: "point"
     })),
     totalDistance: state.totalDistance,
@@ -1165,6 +1469,7 @@ async function refreshMapList() {
 }
 
 function resetMapEditor() {
+  closeNoteEditor();
   state.selectedMapId = null;
   state.startPoint = null;
   state.endPoint = null;
@@ -1181,7 +1486,6 @@ function resetMapEditor() {
   clearMarkers();
   clearDraftMarker();
   clearRouteLines();
-
   renderSummary();
   renderTripList();
   markClean();
@@ -1351,6 +1655,7 @@ async function handleMapListClick(event) {
           name: mapData.startPoint.name,
           lat: Number(mapData.startPoint.lat),
           lng: Number(mapData.startPoint.lng),
+          note: mapData.startPoint.note || "",
           type: "start"
         }
       : null;
@@ -1361,6 +1666,7 @@ async function handleMapListClick(event) {
           name: mapData.endPoint.name,
           lat: Number(mapData.endPoint.lat),
           lng: Number(mapData.endPoint.lng),
+          note: mapData.endPoint.note || "",
           type: "end"
         }
       : null;
@@ -1372,6 +1678,7 @@ async function handleMapListClick(event) {
           lat: Number(point.lat),
           lng: Number(point.lng),
           color: point.color || DEFAULT_POINT_COLOR,
+          note: point.note || "",
           distanceFromPrevious: 0,
           type: "point"
         }))
@@ -1532,6 +1839,23 @@ function handleTripListClick(event) {
 
   const action = target.dataset.action;
   if (!action) return;
+
+  if (action === "note-start") {
+    if (!state.startPoint) return;
+    openNoteEditor({ type: "start" });
+    return;
+  }
+
+  if (action === "note-end") {
+    if (!state.endPoint) return;
+    openNoteEditor({ type: "end" });
+    return;
+  }
+
+  if (action === "note-point") {
+    openNoteEditor({ type: "point", id: target.dataset.id });
+    return;
+  }
 
   if (action === "delete-point") {
     deletePoint(target.dataset.id);
@@ -1819,6 +2143,7 @@ function bindEvents() {
 
   window.addEventListener("routee:delete-point-request", handleMarkerDeleteRequest);
   window.addEventListener("routee:marker-color-request", handleMarkerColorRequest);
+  window.addEventListener("routee:marker-note-request", handleMarkerNoteRequest);
 
   elements.btnExport?.addEventListener("click", handleExport);
   elements.btnImport?.addEventListener("click", handleImport);
@@ -1900,6 +2225,13 @@ function bindEvents() {
   elements.btnCloseImportExportPanel?.addEventListener("click", closeFloatingPanels);
   elements.btnCloseMapListPanel?.addEventListener("click", closeSavedMapsOverlay);
   elements.savedMapsBackdrop?.addEventListener("click", closeSavedMapsOverlay);
+  elements.noteEditorBackdrop?.addEventListener("click", closeNoteEditor);
+  elements.btnCloseNoteEditor?.addEventListener("click", closeNoteEditor);
+  elements.btnSaveNote?.addEventListener("click", handleSaveNote);
+  elements.btnDeleteNote?.addEventListener("click", handleDeleteNote);
+  elements.noteEditorText?.addEventListener("input", () => {
+    elements.btnDeleteNote?.toggleAttribute("disabled", !normalizeNote(elements.noteEditorText.value));
+  });
   elements.mobileFloatingBackdrop?.addEventListener("click", closeFloatingPanels);
   document.addEventListener("click", handleShellClick);
   window.addEventListener("resize", syncMobilePanelState);
