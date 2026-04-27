@@ -256,6 +256,154 @@ function dispatchMarkerColorRequest(pointData, color) {
   );
 }
 
+function dispatchMarkerNoteRequest(pointData) {
+  if (!pointData) return;
+
+  window.dispatchEvent(
+    new CustomEvent("routee:marker-note-request", {
+      detail: { pointData }
+    })
+  );
+}
+
+function normalizeNote(value) {
+  return String(value ?? "").trim();
+}
+
+function hasPointNote(pointData) {
+  return normalizeNote(pointData?.note).length > 0;
+}
+
+function createNoteIconSvgElement() {
+  const svgNamespace = "http://www.w3.org/2000/svg";
+  const svg = document.createElementNS(svgNamespace, "svg");
+
+  svg.setAttribute("viewBox", "0 0 24 24");
+  svg.setAttribute("aria-hidden", "true");
+
+  const paths = [
+    "M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z",
+    "M14 2v6h6",
+    "M16.5 13.5 11 19l-3 .7.7-3 5.5-5.5a1.6 1.6 0 0 1 2.3 2.3z"
+  ];
+
+  paths.forEach((pathValue) => {
+    const path = document.createElementNS(svgNamespace, "path");
+    path.setAttribute("d", pathValue);
+    svg.appendChild(path);
+  });
+
+  return svg;
+}
+
+function createInfoNotePreview(pointData) {
+  const note = normalizeNote(pointData?.note);
+  if (!note) return null;
+
+  const preview = document.createElement("div");
+  preview.className = "custom-info-note-preview";
+  preview.title = note;
+  preview.tabIndex = 0;
+  preview.setAttribute("aria-label", "Konum notu");
+
+  const icon = document.createElement("span");
+  icon.setAttribute("aria-hidden", "true");
+  icon.textContent = "✎";
+
+  const text = document.createElement("span");
+  text.textContent = note;
+
+  preview.appendChild(icon);
+  preview.appendChild(text);
+
+  preview.style.display = "grid";
+  preview.style.gridTemplateColumns = "15px minmax(0, 1fr)";
+  preview.style.alignItems = "start";
+  preview.style.gap = "7px";
+  preview.style.maxHeight = "82px";
+  preview.style.overflowY = "scroll";
+  preview.style.overflowX = "hidden";
+  preview.style.scrollbarGutter = "stable";
+  preview.style.padding = "8px 9px";
+  preview.style.marginBottom = "10px";
+  preview.style.borderRadius = "14px";
+  preview.style.background = "rgba(37, 99, 235, 0.07)";
+  preview.style.border = "1px solid rgba(37, 99, 235, 0.18)";
+  preview.style.color = "#1e40af";
+  preview.style.fontSize = "11px";
+  preview.style.lineHeight = "1.35";
+  preview.style.wordBreak = "normal";
+  preview.style.overflowWrap = "anywhere";
+  text.style.whiteSpace = "pre-wrap";
+  text.style.minWidth = "0";
+
+  return preview;
+}
+
+function createNoteButton(pointData) {
+  const hasNote = hasPointNote(pointData);
+  const noteBtn = document.createElement("button");
+
+  noteBtn.type = "button";
+  noteBtn.className = `tiny-btn icon-note-btn${hasNote ? " has-note" : ""}`;
+  noteBtn.setAttribute(
+    "aria-label",
+    hasNote ? "Notu görüntüle / düzenle" : "Not ekle"
+  );
+  noteBtn.title = hasNote ? "Notu görüntüle / düzenle" : "Not ekle";
+
+  noteBtn.appendChild(createNoteIconSvgElement());
+
+  const dot = document.createElement("span");
+  dot.className = "note-state-dot";
+  dot.setAttribute("aria-hidden", "true");
+  noteBtn.appendChild(dot);
+
+  noteBtn.style.position = "relative";
+  noteBtn.style.width = "38px";
+  noteBtn.style.minWidth = "38px";
+  noteBtn.style.height = "38px";
+  noteBtn.style.minHeight = "38px";
+  noteBtn.style.padding = "0";
+  noteBtn.style.borderRadius = "12px";
+  noteBtn.style.display = "inline-grid";
+  noteBtn.style.placeItems = "center";
+  noteBtn.style.background = hasNote ? "rgba(37, 99, 235, 0.10)" : "#ffffff";
+  noteBtn.style.color = hasNote ? "#2563eb" : "#475569";
+  noteBtn.style.border = hasNote
+    ? "1px solid rgba(37, 99, 235, 0.30)"
+    : "1px solid rgba(203, 213, 225, 0.95)";
+  noteBtn.style.cursor = "pointer";
+
+  const svg = noteBtn.querySelector("svg");
+  if (svg) {
+    svg.style.width = "17px";
+    svg.style.height = "17px";
+    svg.style.fill = "none";
+    svg.style.stroke = "currentColor";
+    svg.style.strokeWidth = "1.9";
+    svg.style.strokeLinecap = "round";
+    svg.style.strokeLinejoin = "round";
+  }
+
+  dot.style.display = hasNote ? "block" : "none";
+  dot.style.position = "absolute";
+  dot.style.top = "6px";
+  dot.style.right = "6px";
+  dot.style.width = "7px";
+  dot.style.height = "7px";
+  dot.style.borderRadius = "999px";
+  dot.style.background = "#2563eb";
+  dot.style.boxShadow = "0 0 0 2px #ffffff";
+
+  noteBtn.addEventListener("click", () => {
+    dispatchMarkerNoteRequest(pointData);
+    activeInfoWindow?.close();
+  });
+
+  return noteBtn;
+}
+
 function getPointDisplayTitle(pointData) {
   if (!pointData) return "Seçilen Konum";
 
@@ -375,6 +523,11 @@ function createInfoWindowContent(pointData) {
     wrapper.appendChild(subtitle);
   }
 
+  const notePreview = createInfoNotePreview(pointData);
+  if (notePreview) {
+    wrapper.appendChild(notePreview);
+  }
+
   if (pointData?.type !== "start" && pointData?.type !== "end") {
     const paletteLabel = document.createElement("div");
     paletteLabel.textContent = "İşaret rengi";
@@ -433,6 +586,8 @@ function createInfoWindowContent(pointData) {
   actions.style.gap = "8px";
   actions.style.alignItems = "stretch";
 
+  const noteBtn = createNoteButton(pointData);
+
   const directionsBtn = document.createElement("button");
   directionsBtn.type = "button";
   directionsBtn.textContent = "Yol Tarifi Al";
@@ -472,6 +627,7 @@ function createInfoWindowContent(pointData) {
     activeInfoWindow?.close();
   });
 
+  actions.appendChild(noteBtn);
   actions.appendChild(directionsBtn);
   actions.appendChild(deleteBtn);
   wrapper.appendChild(actions);
