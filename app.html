@@ -297,6 +297,28 @@
       </aside>
     </main>
 
+    <div class="screen-overlay note-editor-overlay hidden" id="noteEditorOverlay" aria-hidden="true">
+      <div class="screen-overlay-backdrop" id="noteEditorBackdrop"></div>
+      <section class="note-editor-panel" role="dialog" aria-modal="true" aria-labelledby="noteEditorTitle">
+        <div class="card-title-row note-editor-title-row">
+          <div>
+            <h2 id="noteEditorTitle">Not Ekle</h2>
+            <p id="noteEditorSubtitle">Konum</p>
+          </div>
+          <button class="icon-close" id="btnCloseNoteEditor" type="button" aria-label="Kapat">×</button>
+        </div>
+        <div class="note-editor-body">
+          <label for="noteEditorText">Konum Notu</label>
+          <textarea id="noteEditorText" rows="7" maxlength="1200" placeholder="Bu konumla ilgili hatırlamak istediğiniz bilgileri yazın..."></textarea>
+          <p class="note-editor-hint">Notlar haritayla birlikte kaydedilir, CSV/XLSX dışa aktarımında da korunur.</p>
+        </div>
+        <div class="note-editor-actions">
+          <button class="small-btn danger-outline" id="btnDeleteNote" type="button">Notu Sil</button>
+          <button class="small-btn primary" id="btnSaveNote" type="button">Kaydet</button>
+        </div>
+      </section>
+    </div>
+
     <div class="screen-overlay hidden" id="savedMapsOverlay">
       <div class="screen-overlay-backdrop" id="savedMapsBackdrop"></div>
       <section class="screen-overlay-panel">
