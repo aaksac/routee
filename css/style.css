@@ -1227,3 +1227,65 @@ select:focus {
     min-height: 34px !important;
   }
 }
+/* Not butonu ve not önizleme alanı - tema uyum düzeltmesi */
+.icon-note-btn {
+  background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%) !important;
+  color: #334155 !important;
+  border: 1px solid rgba(203, 213, 225, 0.95) !important;
+  box-shadow: 0 6px 14px rgba(15, 23, 42, 0.06) !important;
+}
+
+.icon-note-btn:hover {
+  background: rgba(37, 99, 235, 0.08) !important;
+  color: #2563eb !important;
+  border-color: rgba(37, 99, 235, 0.28) !important;
+}
+
+.icon-note-btn.has-note {
+  background: linear-gradient(180deg, rgba(37, 99, 235, 0.12), rgba(37, 99, 235, 0.07)) !important;
+  color: #1d4ed8 !important;
+  border-color: rgba(37, 99, 235, 0.34) !important;
+  box-shadow: 0 8px 18px rgba(37, 99, 235, 0.13) !important;
+}
+
+.icon-note-btn svg {
+  width: 17px !important;
+  height: 17px !important;
+  fill: none !important;
+  stroke: currentColor !important;
+  stroke-width: 1.9 !important;
+  stroke-linecap: round !important;
+  stroke-linejoin: round !important;
+}
+
+.note-state-dot {
+  background: #2563eb !important;
+  box-shadow: 0 0 0 2px #ffffff !important;
+}
+
+/* Gezi listesindeki not önizleme kutusu */
+.trip-note-preview {
+  grid-template-columns: 17px minmax(0, 1fr) !important;
+  gap: 6px !important;
+  padding: 8px 11px 8px 10px !important;
+  background: rgba(37, 99, 235, 0.065) !important;
+  border: 1px solid rgba(37, 99, 235, 0.17) !important;
+  color: #1e40af !important;
+}
+
+.trip-note-preview svg {
+  width: 14px !important;
+  height: 14px !important;
+  margin-top: 1px !important;
+  fill: none !important;
+  stroke: currentColor !important;
+  stroke-width: 1.9 !important;
+  stroke-linecap: round !important;
+  stroke-linejoin: round !important;
+}
+
+.trip-note-preview span {
+  padding-right: 2px !important;
+  white-space: pre-wrap !important;
+  overflow-wrap: anywhere !important;
+}
