@@ -978,3 +978,96 @@
     max-height: 178px !important;
   }
 }
+/* Mobil not ikonu ve not önizleme düzeltmeleri */
+@media (max-width: 720px) {
+  .trip-actions .icon-note-btn,
+  .trip-actions .tiny-btn.icon-note-btn {
+    width: 34px !important;
+    min-width: 34px !important;
+    max-width: 34px !important;
+    height: 34px !important;
+    min-height: 34px !important;
+    padding: 0 !important;
+    border-radius: 12px !important;
+    display: inline-grid !important;
+    place-items: center !important;
+    flex: 0 0 34px !important;
+    background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%) !important;
+    color: #334155 !important;
+    border: 1px solid rgba(203, 213, 225, 0.95) !important;
+  }
+
+  .trip-actions .icon-note-btn.has-note,
+  .trip-actions .tiny-btn.icon-note-btn.has-note {
+    background: linear-gradient(180deg, rgba(37, 99, 235, 0.12), rgba(37, 99, 235, 0.07)) !important;
+    color: #1d4ed8 !important;
+    border-color: rgba(37, 99, 235, 0.34) !important;
+  }
+
+  .trip-actions .icon-note-btn svg,
+  .trip-actions .tiny-btn.icon-note-btn svg {
+    width: 16px !important;
+    height: 16px !important;
+    display: block !important;
+  }
+
+  .trip-note-preview {
+    grid-template-columns: 16px minmax(0, 1fr) !important;
+    gap: 6px !important;
+    max-height: 56px !important;
+    overflow-y: scroll !important;
+    overflow-x: hidden !important;
+    scrollbar-gutter: stable !important;
+    padding: 8px 10px 8px 10px !important;
+    border-radius: 13px !important;
+    font-size: 0.74rem !important;
+    line-height: 1.32 !important;
+  }
+
+  .trip-note-preview svg {
+    width: 13px !important;
+    height: 13px !important;
+    margin-top: 1px !important;
+  }
+
+  .custom-info-note-preview {
+    grid-template-columns: 16px minmax(0, 1fr) !important;
+    gap: 6px !important;
+    padding: 8px 10px !important;
+    max-height: 76px !important;
+    overflow-y: scroll !important;
+    overflow-x: hidden !important;
+    scrollbar-gutter: stable !important;
+    font-size: 10.5px !important;
+  }
+
+  .custom-info-note-preview svg {
+    width: 13px !important;
+    height: 13px !important;
+    margin-top: 1px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .trip-actions .icon-note-btn,
+  .trip-actions .tiny-btn.icon-note-btn {
+    width: 32px !important;
+    min-width: 32px !important;
+    max-width: 32px !important;
+    height: 32px !important;
+    min-height: 32px !important;
+    border-radius: 11px !important;
+  }
+
+  .trip-actions .icon-note-btn svg,
+  .trip-actions .tiny-btn.icon-note-btn svg {
+    width: 15px !important;
+    height: 15px !important;
+  }
+
+  .trip-note-preview {
+    max-height: 54px !important;
+    font-size: 0.72rem !important;
+    padding: 7px 10px !important;
+  }
+}
