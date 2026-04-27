@@ -383,10 +383,15 @@ function createNoteButton(pointData) {
   noteBtn.style.minHeight = "38px";
   noteBtn.style.padding = "0";
   noteBtn.style.borderRadius = "12px";
-  noteBtn.style.display = "inline-grid";
+  noteBtn.style.display = "inline-flex";
+  noteBtn.style.alignItems = "center";
+  noteBtn.style.justifyContent = "center";
   noteBtn.style.placeItems = "center";
+  noteBtn.style.lineHeight = "0";
+  noteBtn.style.verticalAlign = "middle";
   noteBtn.style.cursor = "pointer";
   noteBtn.style.boxSizing = "border-box";
+  noteBtn.style.flex = "0 0 38px";
 
   noteBtn.style.background = hasNote
     ? "linear-gradient(180deg, rgba(37, 99, 235, 0.12), rgba(37, 99, 235, 0.07))"
@@ -411,6 +416,10 @@ function createNoteButton(pointData) {
     svg.style.strokeWidth = "1.9";
     svg.style.strokeLinecap = "round";
     svg.style.strokeLinejoin = "round";
+    svg.style.display = "block";
+    svg.style.margin = "0";
+    svg.style.flex = "0 0 auto";
+    svg.style.pointerEvents = "none";
   }
 
   dot.style.display = hasNote ? "block" : "none";
