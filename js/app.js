@@ -338,6 +338,15 @@ function noteIconSvg() {
     </svg>`;
 }
 
+function directionsIconSvg() {
+  return `
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M7 17 17 7"></path>
+      <path d="M9 7h8v8"></path>
+      <path d="M5 19l2-2"></path>
+    </svg>`;
+}
+
 function renderNoteButton({ action, id = "", hasNote = false }) {
   const noteClass = hasNote ? " has-note" : "";
   const title = hasNote ? "Notu görüntüle / düzenle" : "Not ekle";
@@ -1056,7 +1065,7 @@ function renderTripList() {
         </div>
         <div class="trip-actions">
           ${renderNoteButton({ action: "note-start", hasNote: hasLocationNote(state.startPoint) })}
-          <button class="tiny-btn" type="button" data-action="directions-start">Yol Tarifi</button>
+          <button class="tiny-btn icon-route-btn" type="button" data-action="directions-start" aria-label="Yol Tarifi" title="Yol Tarifi">${directionsIconSvg()}</button>
           <button class="tiny-btn" type="button" data-action="focus-start">Odakla</button>
           <button class="tiny-btn" type="button" data-action="delete-start">Sil</button>
         </div>
@@ -1089,7 +1098,7 @@ function renderTripList() {
           </div>
           <div class="trip-actions">
             ${renderNoteButton({ action: "note-point", id: point.id, hasNote: pointHasNote })}
-            <button class="tiny-btn" type="button" data-action="directions-point" data-id="${point.id}">Yol Tarifi</button>
+            <button class="tiny-btn icon-route-btn" type="button" data-action="directions-point" data-id="${point.id}" aria-label="Yol Tarifi" title="Yol Tarifi">${directionsIconSvg()}</button>
             <button class="tiny-btn" type="button" data-action="focus-point" data-id="${point.id}">Odakla</button>
             <button class="tiny-btn" type="button" data-action="delete-point" data-id="${point.id}">Sil</button>
           </div>
@@ -1109,7 +1118,7 @@ function renderTripList() {
         </div>
         <div class="trip-actions">
           ${renderNoteButton({ action: "note-end", hasNote: hasLocationNote(state.endPoint) })}
-          <button class="tiny-btn" type="button" data-action="directions-end">Yol Tarifi</button>
+          <button class="tiny-btn icon-route-btn" type="button" data-action="directions-end" aria-label="Yol Tarifi" title="Yol Tarifi">${directionsIconSvg()}</button>
           <button class="tiny-btn" type="button" data-action="focus-end">Odakla</button>
           <button class="tiny-btn" type="button" data-action="delete-end">Sil</button>
         </div>
