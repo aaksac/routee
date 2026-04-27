@@ -1071,3 +1071,50 @@
     padding: 7px 10px !important;
   }
 }
+
+
+/* Mobilde mevcut düzeni koruyarak yeni yol tarifi ikonunu not butonuyla hizala */
+@media (max-width: 720px) {
+  .trip-actions .icon-route-btn,
+  .trip-actions .tiny-btn.icon-route-btn {
+    width: 34px !important;
+    min-width: 34px !important;
+    max-width: 34px !important;
+    height: 34px !important;
+    min-height: 34px !important;
+    padding: 0 !important;
+    border-radius: 12px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex: 0 0 34px !important;
+    line-height: 0 !important;
+  }
+
+  .trip-actions .icon-route-btn svg,
+  .trip-actions .tiny-btn.icon-route-btn svg {
+    width: 16px !important;
+    height: 16px !important;
+    display: block !important;
+    margin: 0 !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .trip-actions .icon-route-btn,
+  .trip-actions .tiny-btn.icon-route-btn {
+    width: 32px !important;
+    min-width: 32px !important;
+    max-width: 32px !important;
+    height: 32px !important;
+    min-height: 32px !important;
+    border-radius: 11px !important;
+    flex-basis: 32px !important;
+  }
+
+  .trip-actions .icon-route-btn svg,
+  .trip-actions .tiny-btn.icon-route-btn svg {
+    width: 15px !important;
+    height: 15px !important;
+  }
+}
