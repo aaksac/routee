@@ -306,36 +306,53 @@ function createInfoNotePreview(pointData) {
   preview.tabIndex = 0;
   preview.setAttribute("aria-label", "Konum notu");
 
-  const icon = document.createElement("span");
-  icon.setAttribute("aria-hidden", "true");
-  icon.textContent = "✎";
+  const iconWrap = document.createElement("span");
+  iconWrap.setAttribute("aria-hidden", "true");
+  iconWrap.style.display = "inline-flex";
+  iconWrap.style.alignItems = "flex-start";
+  iconWrap.style.justifyContent = "center";
+  iconWrap.style.minWidth = "14px";
+  iconWrap.style.marginTop = "1px";
+
+  const iconSvg = createNoteIconSvgElement();
+  iconSvg.style.width = "14px";
+  iconSvg.style.height = "14px";
+  iconSvg.style.fill = "none";
+  iconSvg.style.stroke = "currentColor";
+  iconSvg.style.strokeWidth = "1.9";
+  iconSvg.style.strokeLinecap = "round";
+  iconSvg.style.strokeLinejoin = "round";
+
+  iconWrap.appendChild(iconSvg);
 
   const text = document.createElement("span");
   text.textContent = note;
+  text.style.whiteSpace = "pre-wrap";
+  text.style.minWidth = "0";
+  text.style.paddingRight = "2px";
+  text.style.overflowWrap = "anywhere";
 
-  preview.appendChild(icon);
+  preview.appendChild(iconWrap);
   preview.appendChild(text);
 
   preview.style.display = "grid";
-  preview.style.gridTemplateColumns = "15px minmax(0, 1fr)";
+  preview.style.gridTemplateColumns = "17px minmax(0, 1fr)";
   preview.style.alignItems = "start";
-  preview.style.gap = "7px";
+  preview.style.gap = "6px";
   preview.style.maxHeight = "82px";
   preview.style.overflowY = "scroll";
   preview.style.overflowX = "hidden";
   preview.style.scrollbarGutter = "stable";
-  preview.style.padding = "8px 9px";
+  preview.style.padding = "8px 11px 8px 10px";
   preview.style.marginBottom = "10px";
   preview.style.borderRadius = "14px";
-  preview.style.background = "rgba(37, 99, 235, 0.07)";
-  preview.style.border = "1px solid rgba(37, 99, 235, 0.18)";
+  preview.style.background = "rgba(37, 99, 235, 0.065)";
+  preview.style.border = "1px solid rgba(37, 99, 235, 0.17)";
   preview.style.color = "#1e40af";
   preview.style.fontSize = "11px";
   preview.style.lineHeight = "1.35";
   preview.style.wordBreak = "normal";
   preview.style.overflowWrap = "anywhere";
-  text.style.whiteSpace = "pre-wrap";
-  text.style.minWidth = "0";
 
   return preview;
 }
@@ -368,12 +385,22 @@ function createNoteButton(pointData) {
   noteBtn.style.borderRadius = "12px";
   noteBtn.style.display = "inline-grid";
   noteBtn.style.placeItems = "center";
-  noteBtn.style.background = hasNote ? "rgba(37, 99, 235, 0.10)" : "#ffffff";
-  noteBtn.style.color = hasNote ? "#2563eb" : "#475569";
-  noteBtn.style.border = hasNote
-    ? "1px solid rgba(37, 99, 235, 0.30)"
-    : "1px solid rgba(203, 213, 225, 0.95)";
   noteBtn.style.cursor = "pointer";
+  noteBtn.style.boxSizing = "border-box";
+
+  noteBtn.style.background = hasNote
+    ? "linear-gradient(180deg, rgba(37, 99, 235, 0.12), rgba(37, 99, 235, 0.07))"
+    : "linear-gradient(180deg, #ffffff 0%, #f8fafc 100%)";
+
+  noteBtn.style.color = hasNote ? "#1d4ed8" : "#334155";
+
+  noteBtn.style.border = hasNote
+    ? "1px solid rgba(37, 99, 235, 0.34)"
+    : "1px solid rgba(203, 213, 225, 0.95)";
+
+  noteBtn.style.boxShadow = hasNote
+    ? "0 8px 18px rgba(37, 99, 235, 0.13)"
+    : "0 6px 14px rgba(15, 23, 42, 0.06)";
 
   const svg = noteBtn.querySelector("svg");
   if (svg) {
@@ -395,6 +422,22 @@ function createNoteButton(pointData) {
   dot.style.borderRadius = "999px";
   dot.style.background = "#2563eb";
   dot.style.boxShadow = "0 0 0 2px #ffffff";
+
+  noteBtn.addEventListener("mouseenter", () => {
+    if (hasNote) return;
+
+    noteBtn.style.background = "rgba(37, 99, 235, 0.08)";
+    noteBtn.style.color = "#2563eb";
+    noteBtn.style.borderColor = "rgba(37, 99, 235, 0.28)";
+  });
+
+  noteBtn.addEventListener("mouseleave", () => {
+    if (hasNote) return;
+
+    noteBtn.style.background = "linear-gradient(180deg, #ffffff 0%, #f8fafc 100%)";
+    noteBtn.style.color = "#334155";
+    noteBtn.style.borderColor = "rgba(203, 213, 225, 0.95)";
+  });
 
   noteBtn.addEventListener("click", () => {
     dispatchMarkerNoteRequest(pointData);
@@ -933,7 +976,11 @@ function focusMapToPoints(startPoint, points = [], endPoint = null) {
 
   const validPoints = [];
 
-  if (startPoint && Number.isFinite(startPoint.lat) && Number.isFinite(startPoint.lng)) {
+  if (
+    startPoint &&
+    Number.isFinite(Number(startPoint.lat)) &&
+    Number.isFinite(Number(startPoint.lng))
+  ) {
     validPoints.push({
       lat: Number(startPoint.lat),
       lng: Number(startPoint.lng)
@@ -941,7 +988,10 @@ function focusMapToPoints(startPoint, points = [], endPoint = null) {
   }
 
   points.forEach((point) => {
-    if (Number.isFinite(point.lat) && Number.isFinite(point.lng)) {
+    if (
+      Number.isFinite(Number(point.lat)) &&
+      Number.isFinite(Number(point.lng))
+    ) {
       validPoints.push({
         lat: Number(point.lat),
         lng: Number(point.lng)
@@ -949,7 +999,11 @@ function focusMapToPoints(startPoint, points = [], endPoint = null) {
     }
   });
 
-  if (endPoint && Number.isFinite(endPoint.lat) && Number.isFinite(endPoint.lng)) {
+  if (
+    endPoint &&
+    Number.isFinite(Number(endPoint.lat)) &&
+    Number.isFinite(Number(endPoint.lng))
+  ) {
     validPoints.push({
       lat: Number(endPoint.lat),
       lng: Number(endPoint.lng)
@@ -1095,8 +1149,8 @@ function drawRouteSegments(startPoint, orderedPoints, endPoint = null) {
     const point = routePoints[index];
 
     const path = [
-      { lat: previous.lat, lng: previous.lng },
-      { lat: point.lat, lng: point.lng }
+      { lat: Number(previous.lat), lng: Number(previous.lng) },
+      { lat: Number(point.lat), lng: Number(point.lng) }
     ];
 
     const polyline = new google.maps.Polyline({
@@ -1110,8 +1164,8 @@ function drawRouteSegments(startPoint, orderedPoints, endPoint = null) {
 
     routePolylines.push(polyline);
 
-    const midLat = (previous.lat + point.lat) / 2;
-    const midLng = (previous.lng + point.lng) / 2;
+    const midLat = (Number(previous.lat) + Number(point.lat)) / 2;
+    const midLng = (Number(previous.lng) + Number(point.lng)) / 2;
 
     const distanceValue = Number(point.distanceFromPrevious) || 0;
 
