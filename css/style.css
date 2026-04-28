@@ -1703,6 +1703,7 @@ select:focus {
   scrollbar-width: thin !important;
   scrollbar-color: rgba(100, 116, 139, 0.45) rgba(226, 232, 240, 0.65) !important;
 }
+
 /* =========================================================
    ROUTEE — WEB/MASAUSTU GEZI LISTEM BUTON HIZALAMA
    Masaustunde butonlar solda, mobilde mobile.css sagda kalir
@@ -1757,6 +1758,7 @@ select:focus {
     stroke-linejoin: round !important;
   }
 }
+
 /* =========================================================
    ROUTEE — WEB/MASAUSTU GEZI LISTEM BUTONLARI METIN HIZASINA ALMA
    Butonlar kartin en solundan degil, yer adinin basladigi hizadan baslar.
@@ -1782,7 +1784,6 @@ select:focus {
     min-width: 0 !important;
   }
 
-  /* Asıl düzeltme: buton satırı artık 1. kolondan değil, metin kolonundan başlar */
   .trip-item > .trip-actions {
     grid-column: 2 / -1 !important;
     grid-row: 2 !important;
@@ -1800,7 +1801,6 @@ select:focus {
     min-width: 0 !important;
   }
 
-  /* Başlangıç henüz eklenmediğinde tek başına duran pasif yol tarifi ikonunu da aynı hizaya al */
   .trip-item > button.icon-route-btn:last-child,
   .trip-item > button.tiny-btn:last-child {
     grid-column: 2 / -1 !important;
@@ -1863,229 +1863,135 @@ select:focus {
     margin: auto !important;
   }
 }
+
 /* =========================================================
-   ROUTEE — KONUM BILGISI NOT ALANI GENEL HIZA DUZELTMESI
-   Web ve masaüstünde de not kutusu dengeli görünür
+   ROUTEE — WEB/MASAUSTU KONUM BILGISI NOT ALANI FINAL DUZELTME
+   Sadece web ve masaustu bilgi kartindaki not kutusu boslugunu duzenler.
+   Mobil duzeni bozmaz.
    ========================================================= */
 
-.custom-info-card .custom-info-note-preview {
-  margin-top: 10px !important;
-  margin-bottom: 13px !important;
-
-  min-height: 42px !important;
-
-  display: grid !important;
-  grid-template-columns: 18px minmax(0, 1fr) !important;
-  align-items: center !important;
-  gap: 8px !important;
-
-  padding: 9px 12px !important;
-  border-radius: 15px !important;
-}
-
-.custom-info-card .custom-info-note-preview svg {
-  align-self: center !important;
-  margin: 0 !important;
-}
-
-.custom-info-card .custom-info-note-preview span,
-.custom-info-card .custom-info-note-preview span:last-child {
-  display: flex !important;
-  align-items: center !important;
-  margin: 0 !important;
-  padding: 0 !important;
-}
-/* =========================================================
-   ROUTEE — FINAL HARITA KONUM BILGISI NOT ALANI DUZELTMESI
-   Not: Harita bilgi kartı JS tarafında .custom-info-card sınıfı almıyor.
-   Bu yüzden hedefleme doğrudan .custom-info-note-preview üzerinden yapılır.
-   ========================================================= */
-
-.custom-info-note-preview {
-  width: 100% !important;
-  box-sizing: border-box !important;
-
-  min-height: 44px !important;
-  max-height: 78px !important;
-
-  margin-top: 10px !important;
-  margin-bottom: 20px !important;
-
-  padding: 10px 12px !important;
-  border-radius: 15px !important;
-
-  display: grid !important;
-  grid-template-columns: 18px minmax(0, 1fr) !important;
-  align-items: center !important;
-  align-content: center !important;
-  gap: 8px !important;
-
-  background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%) !important;
-  border: 1px solid rgba(203, 213, 225, 0.95) !important;
-
-  color: #334155 !important;
-  font-size: 0.78rem !important;
-  font-weight: 600 !important;
-  line-height: 1.34 !important;
-
-  word-break: normal !important;
-  overflow-wrap: anywhere !important;
-  white-space: normal !important;
-
-  overflow-y: auto !important;
-  overflow-x: hidden !important;
-  scrollbar-gutter: stable !important;
-
-  box-shadow:
-    inset 0 1px 1px rgba(255, 255, 255, 0.92),
-    0 6px 14px rgba(15, 23, 42, 0.045) !important;
-}
-
-.custom-info-note-preview > span:first-child {
-  width: 18px !important;
-  min-width: 18px !important;
-  height: 18px !important;
-
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  align-self: center !important;
-  justify-self: center !important;
-
-  margin: 0 !important;
-  padding: 0 !important;
-}
-
-.custom-info-note-preview > span:first-child svg,
-.custom-info-note-preview svg {
-  width: 15px !important;
-  height: 15px !important;
-  min-width: 15px !important;
-
-  display: block !important;
-  align-self: center !important;
-  justify-self: center !important;
-
-  margin: 0 !important;
-
-  color: #2563eb !important;
-
-  fill: none !important;
-  stroke: currentColor !important;
-  stroke-width: 1.9 !important;
-  stroke-linecap: round !important;
-  stroke-linejoin: round !important;
-}
-
-.custom-info-note-preview > span:last-child {
-  min-width: 0 !important;
-
-  display: flex !important;
-  align-items: center !important;
-
-  margin: 0 !important;
-  padding: 0 !important;
-
-  color: #334155 !important;
-  font-size: inherit !important;
-  font-weight: inherit !important;
-  line-height: 1.34 !important;
-
-  white-space: pre-wrap !important;
-  word-break: normal !important;
-  overflow-wrap: anywhere !important;
-}
-
-/* Not kutusundan hemen sonra gelen “İşaret rengi” başlığına ideal boşluk bırak. */
-.custom-info-note-preview + div {
-  margin-top: 0 !important;
-  margin-bottom: 10px !important;
-}
-
-/* Başlığın ardından gelen renk paleti ile başlık arası korunur. */
-.custom-info-note-preview + div + div {
-  margin-top: 0 !important;
-}
-
-@media (max-width: 720px) {
+@media (min-width: 721px) {
+  .gm-style .custom-info-note-preview,
+  .gm-style-iw .custom-info-note-preview,
   .custom-info-note-preview {
-    min-height: 44px !important;
-    max-height: 76px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
 
-    margin-top: 10px !important;
-    margin-bottom: 20px !important;
+    margin-top: 7px !important;
+    margin-bottom: 9px !important;
 
-    padding: 10px 12px !important;
+    min-height: 38px !important;
+    max-height: 66px !important;
 
-    grid-template-columns: 18px minmax(0, 1fr) !important;
-    gap: 8px !important;
+    padding: 8px 11px !important;
+    border-radius: 13px !important;
 
-    font-size: 0.78rem !important;
-    line-height: 1.34 !important;
-  }
+    display: grid !important;
+    grid-template-columns: 17px minmax(0, 1fr) !important;
+    align-items: center !important;
+    align-content: center !important;
+    gap: 7px !important;
 
-  .custom-info-note-preview > span:first-child {
-    width: 18px !important;
-    min-width: 18px !important;
-    height: 18px !important;
-  }
+    background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%) !important;
+    border: 1px solid rgba(203, 213, 225, 0.92) !important;
 
-  .custom-info-note-preview > span:first-child svg,
-  .custom-info-note-preview svg {
-    width: 15px !important;
-    height: 15px !important;
-    min-width: 15px !important;
-  }
-}
-
-@media (max-width: 390px) {
-  .custom-info-note-preview {
-    min-height: 42px !important;
-    max-height: 72px !important;
-
-    margin-top: 9px !important;
-    margin-bottom: 18px !important;
-
-    padding: 9px 11px !important;
-
+    color: #334155 !important;
     font-size: 0.74rem !important;
+    font-weight: 600 !important;
     line-height: 1.32 !important;
+
+    word-break: normal !important;
+    overflow-wrap: anywhere !important;
+    white-space: normal !important;
+
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    scrollbar-gutter: stable !important;
+
+    box-shadow:
+      inset 0 1px 1px rgba(255, 255, 255, 0.88),
+      0 5px 12px rgba(15, 23, 42, 0.04) !important;
   }
-}
-/* =========================================================
-   ROUTEE — KONUM BILGISI NOT ALANI BOSLUK DENGELEME
-   Fazla boslugu azaltir, "Isaret rengi" yazisini not kutusuna yapistirmadan dengeler
-   ========================================================= */
 
-.custom-info-note-preview {
-  margin-top: 8px !important;
-  margin-bottom: 10px !important;
+  .gm-style .custom-info-note-preview > span:first-child,
+  .gm-style-iw .custom-info-note-preview > span:first-child,
+  .custom-info-note-preview > span:first-child {
+    width: 17px !important;
+    min-width: 17px !important;
+    height: 17px !important;
 
-  min-height: 40px !important;
-  max-height: 72px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
 
-  padding: 8px 11px !important;
+    align-self: center !important;
+    justify-self: center !important;
 
-  display: grid !important;
-  grid-template-columns: 18px minmax(0, 1fr) !important;
-  align-items: center !important;
-  gap: 8px !important;
-}
+    margin: 0 !important;
+    padding: 0 !important;
+  }
 
-.custom-info-note-preview svg {
-  margin: 0 !important;
-  align-self: center !important;
-}
+  .gm-style .custom-info-note-preview svg,
+  .gm-style-iw .custom-info-note-preview svg,
+  .custom-info-note-preview svg {
+    width: 14px !important;
+    height: 14px !important;
+    min-width: 14px !important;
 
-.custom-info-note-preview span,
-.custom-info-note-preview span:last-child {
-  margin: 0 !important;
-  padding: 0 !important;
-  align-self: center !important;
-  line-height: 1.34 !important;
-}
+    display: block !important;
+    align-self: center !important;
+    justify-self: center !important;
 
-/* Not kutusundan sonra gelen İşaret rengi alanı fazla aşağı inmesin */
-.custom-info-note-preview + * {
-  margin-top: 0 !important;
+    margin: 0 !important;
+
+    color: #2563eb !important;
+
+    fill: none !important;
+    stroke: currentColor !important;
+    stroke-width: 1.9 !important;
+    stroke-linecap: round !important;
+    stroke-linejoin: round !important;
+  }
+
+  .gm-style .custom-info-note-preview > span:last-child,
+  .gm-style-iw .custom-info-note-preview > span:last-child,
+  .custom-info-note-preview > span:last-child {
+    min-width: 0 !important;
+
+    display: flex !important;
+    align-items: center !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    color: #334155 !important;
+    font-size: inherit !important;
+    font-weight: inherit !important;
+    line-height: 1.32 !important;
+
+    white-space: pre-wrap !important;
+    word-break: normal !important;
+    overflow-wrap: anywhere !important;
+  }
+
+  .gm-style .custom-info-note-preview + *,
+  .gm-style-iw .custom-info-note-preview + *,
+  .custom-info-note-preview + * {
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+  }
+
+  .gm-style .custom-info-note-preview + div,
+  .gm-style-iw .custom-info-note-preview + div,
+  .custom-info-note-preview + div {
+    margin-top: 0 !important;
+    margin-bottom: 6px !important;
+    padding-top: 0 !important;
+  }
+
+  .gm-style .custom-info-note-preview + div + div,
+  .gm-style-iw .custom-info-note-preview + div + div,
+  .custom-info-note-preview + div + div {
+    margin-top: 0 !important;
+  }
 }
