@@ -2151,3 +2151,289 @@ select:focus {
     max-width: 12px !important;
   }
 }
+/* =========================================================
+   ROUTEE — FINAL PROFESYONEL NOT GORUNUMU
+   Amaç:
+   - Not ikonu her zaman sol üstte dursun
+   - Uzun notlar üstten/alttan kırpılmasın
+   - Metin doğal paragraf gibi aksın
+   - Gezi Listem ve Harita Konum Bilgisi not alanları birlikte düzelsin
+   ========================================================= */
+
+/* Ortak not kutusu: Gezi Listem + Harita üzerindeki Konum Bilgisi */
+.trip-note-preview,
+.custom-info-note-preview,
+.gm-style .custom-info-note-preview,
+.gm-style-iw .custom-info-note-preview {
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+
+  display: grid !important;
+  grid-template-columns: 15px minmax(0, 1fr) !important;
+  align-items: start !important;
+  align-content: start !important;
+  gap: 5px !important;
+
+  padding: 8px 10px 8px 9px !important;
+  border-radius: 13px !important;
+
+  background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%) !important;
+  border: 1px solid rgba(203, 213, 225, 0.92) !important;
+
+  color: #334155 !important;
+  font-size: 0.75rem !important;
+  font-weight: 500 !important;
+  line-height: 1.42 !important;
+  letter-spacing: -0.01em !important;
+
+  white-space: normal !important;
+  word-break: normal !important;
+  overflow-wrap: anywhere !important;
+
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  scrollbar-gutter: stable !important;
+
+  box-shadow:
+    inset 0 1px 1px rgba(255, 255, 255, 0.9),
+    0 5px 12px rgba(15, 23, 42, 0.04) !important;
+}
+
+/* Gezi Listem içindeki not alanı: daha okunabilir önizleme */
+.trip-note-preview {
+  min-height: 38px !important;
+  max-height: 92px !important;
+  margin-top: 6px !important;
+  margin-bottom: 0 !important;
+}
+
+/* Harita üzerindeki konum bilgisi not alanı */
+.custom-info-note-preview,
+.gm-style .custom-info-note-preview,
+.gm-style-iw .custom-info-note-preview {
+  min-height: 38px !important;
+  max-height: 96px !important;
+  margin-top: 7px !important;
+  margin-bottom: 9px !important;
+}
+
+/* İkon alanı daima sol üstte kalsın */
+.trip-note-preview > span:first-child,
+.custom-info-note-preview > span:first-child,
+.gm-style .custom-info-note-preview > span:first-child,
+.gm-style-iw .custom-info-note-preview > span:first-child {
+  width: 15px !important;
+  min-width: 15px !important;
+  max-width: 15px !important;
+  height: 15px !important;
+
+  display: inline-flex !important;
+  align-items: flex-start !important;
+  justify-content: center !important;
+
+  align-self: start !important;
+  justify-self: center !important;
+
+  margin: 2px 0 0 0 !important;
+  padding: 0 !important;
+}
+
+/* SVG ikon sol üst hizaya otursun, ortalanmasın */
+.trip-note-preview svg,
+.custom-info-note-preview svg,
+.gm-style .custom-info-note-preview svg,
+.gm-style-iw .custom-info-note-preview svg,
+.trip-note-preview > span:first-child svg,
+.custom-info-note-preview > span:first-child svg,
+.gm-style .custom-info-note-preview > span:first-child svg,
+.gm-style-iw .custom-info-note-preview > span:first-child svg {
+  width: 13px !important;
+  height: 13px !important;
+  min-width: 13px !important;
+  max-width: 13px !important;
+
+  display: block !important;
+
+  align-self: start !important;
+  justify-self: center !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+
+  color: #2563eb !important;
+
+  fill: none !important;
+  stroke: currentColor !important;
+  stroke-width: 1.9 !important;
+  stroke-linecap: round !important;
+  stroke-linejoin: round !important;
+}
+
+/* Not metni kesinlikle dikey ortalanmasın; doğal blok metin gibi aksın */
+.trip-note-preview > span:last-child,
+.custom-info-note-preview > span:last-child,
+.gm-style .custom-info-note-preview > span:last-child,
+.gm-style-iw .custom-info-note-preview > span:last-child {
+  min-width: 0 !important;
+
+  display: block !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+
+  align-self: start !important;
+
+  color: #334155 !important;
+  font-size: inherit !important;
+  font-weight: inherit !important;
+  line-height: 1.42 !important;
+
+  white-space: pre-wrap !important;
+  word-break: normal !important;
+  overflow-wrap: anywhere !important;
+}
+
+/* Not kutusundan sonra gelen İşaret rengi alanı fazla uzaklaşmasın */
+.custom-info-note-preview + *,
+.gm-style .custom-info-note-preview + *,
+.gm-style-iw .custom-info-note-preview + * {
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+}
+
+/* Scrollbar daha sade ve profesyonel */
+.trip-note-preview::-webkit-scrollbar,
+.custom-info-note-preview::-webkit-scrollbar,
+.gm-style .custom-info-note-preview::-webkit-scrollbar,
+.gm-style-iw .custom-info-note-preview::-webkit-scrollbar {
+  width: 7px !important;
+}
+
+.trip-note-preview::-webkit-scrollbar-track,
+.custom-info-note-preview::-webkit-scrollbar-track,
+.gm-style .custom-info-note-preview::-webkit-scrollbar-track,
+.gm-style-iw .custom-info-note-preview::-webkit-scrollbar-track {
+  background: rgba(226, 232, 240, 0.58) !important;
+  border-radius: 999px !important;
+}
+
+.trip-note-preview::-webkit-scrollbar-thumb,
+.custom-info-note-preview::-webkit-scrollbar-thumb,
+.gm-style .custom-info-note-preview::-webkit-scrollbar-thumb,
+.gm-style-iw .custom-info-note-preview::-webkit-scrollbar-thumb {
+  background: rgba(100, 116, 139, 0.42) !important;
+  border-radius: 999px !important;
+  border: 2px solid rgba(248, 250, 252, 0.94) !important;
+}
+
+/* Mobilde not kutusu okunur kalsın, kırpılmasın */
+@media (max-width: 720px) {
+  .trip-note-preview,
+  .custom-info-note-preview,
+  .gm-style .custom-info-note-preview,
+  .gm-style-iw .custom-info-note-preview {
+    grid-template-columns: 15px minmax(0, 1fr) !important;
+    gap: 5px !important;
+
+    padding: 8px 10px 8px 9px !important;
+
+    font-size: 0.73rem !important;
+    line-height: 1.4 !important;
+
+    align-items: start !important;
+    align-content: start !important;
+  }
+
+  .trip-note-preview {
+    min-height: 38px !important;
+    max-height: 88px !important;
+  }
+
+  .custom-info-note-preview,
+  .gm-style .custom-info-note-preview,
+  .gm-style-iw .custom-info-note-preview {
+    min-height: 38px !important;
+    max-height: 90px !important;
+    margin-bottom: 8px !important;
+  }
+
+  .trip-note-preview > span:first-child,
+  .custom-info-note-preview > span:first-child,
+  .gm-style .custom-info-note-preview > span:first-child,
+  .gm-style-iw .custom-info-note-preview > span:first-child {
+    width: 15px !important;
+    min-width: 15px !important;
+    max-width: 15px !important;
+    height: 15px !important;
+
+    align-items: flex-start !important;
+    align-self: start !important;
+
+    margin-top: 2px !important;
+  }
+
+  .trip-note-preview svg,
+  .custom-info-note-preview svg,
+  .gm-style .custom-info-note-preview svg,
+  .gm-style-iw .custom-info-note-preview svg {
+    width: 13px !important;
+    height: 13px !important;
+    min-width: 13px !important;
+    max-width: 13px !important;
+  }
+
+  .trip-note-preview > span:last-child,
+  .custom-info-note-preview > span:last-child,
+  .gm-style .custom-info-note-preview > span:last-child,
+  .gm-style-iw .custom-info-note-preview > span:last-child {
+    display: block !important;
+    align-self: start !important;
+    line-height: 1.4 !important;
+  }
+}
+
+/* Küçük telefonlarda alanı koru ama metni kırpma */
+@media (max-width: 390px) {
+  .trip-note-preview,
+  .custom-info-note-preview,
+  .gm-style .custom-info-note-preview,
+  .gm-style-iw .custom-info-note-preview {
+    grid-template-columns: 14px minmax(0, 1fr) !important;
+    gap: 4px !important;
+
+    padding: 7px 9px 7px 8px !important;
+
+    font-size: 0.71rem !important;
+    line-height: 1.38 !important;
+  }
+
+  .trip-note-preview {
+    max-height: 84px !important;
+  }
+
+  .custom-info-note-preview,
+  .gm-style .custom-info-note-preview,
+  .gm-style-iw .custom-info-note-preview {
+    max-height: 86px !important;
+  }
+
+  .trip-note-preview > span:first-child,
+  .custom-info-note-preview > span:first-child,
+  .gm-style .custom-info-note-preview > span:first-child,
+  .gm-style-iw .custom-info-note-preview > span:first-child {
+    width: 14px !important;
+    min-width: 14px !important;
+    max-width: 14px !important;
+  }
+
+  .trip-note-preview svg,
+  .custom-info-note-preview svg,
+  .gm-style .custom-info-note-preview svg,
+  .gm-style-iw .custom-info-note-preview svg {
+    width: 12px !important;
+    height: 12px !important;
+    min-width: 12px !important;
+    max-width: 12px !important;
+  }
+}
