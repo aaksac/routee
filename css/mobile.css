@@ -1103,22 +1103,22 @@
 .trip-panel .trip-item > .trip-actions {
   grid-column: 2 / -1 !important;
   grid-row: 2 !important;
-  width: 100% !important;
+  width: auto !important;
   max-width: 100% !important;
   margin-top: 2px !important;
   display: inline-flex !important;
   flex-wrap: nowrap !important;
   align-items: center !important;
-  justify-content: flex-end !important;
+  justify-content: flex-start !important;
   gap: 6px !important;
-  justify-self: stretch !important;
+  justify-self: start !important;
   align-self: start !important;
   min-width: 0 !important;
   white-space: nowrap !important;
 }
 
 .trip-panel .trip-actions {
-  justify-content: flex-end !important;
+  justify-content: flex-start !important;
   align-items: center !important;
   gap: 6px !important;
 }
