@@ -1078,7 +1078,7 @@ function renderTripList() {
           <strong>Başlangıç</strong>
           <span>Henüz eklenmedi</span>
         </div>
-        <button class="tiny-btn" type="button" disabled>Yol Tarifi</button>
+        <button class="tiny-btn icon-route-btn" type="button" disabled aria-label="Yol Tarifi" title="Yol Tarifi">${directionsIconSvg()}</button>
       </div>
     `;
 
