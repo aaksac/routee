@@ -840,287 +840,10 @@
   border-color: #fecaca !important;
   color: #b91c1c !important;
 }
-/* Mobil not özelliği uyum düzeltmeleri */
-@media (max-width: 720px) {
-  .trip-actions .icon-note-btn,
-  .trip-actions .tiny-btn.icon-note-btn {
-    width: 34px !important;
-    min-width: 34px !important;
-    max-width: 34px !important;
-    height: 34px !important;
-    min-height: 34px !important;
-    padding: 0 !important;
-    border-radius: 12px !important;
-    display: inline-grid !important;
-    place-items: center !important;
-    flex: 0 0 34px !important;
-  }
 
-  .trip-actions .icon-note-btn svg,
-  .trip-actions .tiny-btn.icon-note-btn svg {
-    width: 16px !important;
-    height: 16px !important;
-    display: block !important;
-  }
-
-  .trip-actions .icon-note-btn .note-state-dot {
-    top: 5px !important;
-    right: 5px !important;
-    width: 7px !important;
-    height: 7px !important;
-  }
-
-  .trip-note-preview {
-    max-height: 56px !important;
-    overflow-y: scroll !important;
-    overflow-x: hidden !important;
-    scrollbar-gutter: stable !important;
-    padding: 7px 8px !important;
-    border-radius: 13px !important;
-    font-size: 0.74rem !important;
-    line-height: 1.3 !important;
-  }
-
-  .trip-note-preview svg {
-    width: 13px !important;
-    height: 13px !important;
-  }
-
-  .note-editor-overlay {
-    z-index: 1600 !important;
-  }
-
-  .note-editor-panel {
-    position: fixed !important;
-    left: 50% !important;
-    top: 50% !important;
-    transform: translate(-50%, -50%) !important;
-    width: min(92vw, 380px) !important;
-    max-height: min(84vh, 640px) !important;
-    margin: 0 !important;
-    overflow: auto !important;
-    padding: 16px !important;
-    border-radius: 24px !important;
-  }
-
-  .note-editor-body textarea {
-    height: 186px !important;
-    min-height: 186px !important;
-    max-height: 186px !important;
-    resize: none !important;
-    overflow-y: scroll !important;
-    overflow-x: hidden !important;
-    scrollbar-gutter: stable !important;
-  }
-
-  .note-editor-actions {
-    display: grid !important;
-    grid-template-columns: 1fr 1fr !important;
-    gap: 10px !important;
-  }
-
-  .note-editor-actions .small-btn {
-    min-height: 42px !important;
-    height: 42px !important;
-    font-size: 0.84rem !important;
-    border-radius: 999px !important;
-  }
-
-  .custom-info-note-preview {
-    max-height: 76px !important;
-    overflow-y: scroll !important;
-    overflow-x: hidden !important;
-    scrollbar-gutter: stable !important;
-    font-size: 10.5px !important;
-  }
-
-  .custom-info-card .icon-note-btn {
-    width: 38px !important;
-    min-width: 38px !important;
-    height: 38px !important;
-    min-height: 38px !important;
-    padding: 0 !important;
-    border-radius: 12px !important;
-  }
-}
-
-@media (max-width: 480px) {
-  .trip-actions .icon-note-btn,
-  .trip-actions .tiny-btn.icon-note-btn {
-    width: 32px !important;
-    min-width: 32px !important;
-    max-width: 32px !important;
-    height: 32px !important;
-    min-height: 32px !important;
-    border-radius: 11px !important;
-  }
-
-  .trip-actions .icon-note-btn svg,
-  .trip-actions .tiny-btn.icon-note-btn svg {
-    width: 15px !important;
-    height: 15px !important;
-  }
-
-  .trip-note-preview {
-    max-height: 54px !important;
-    font-size: 0.72rem !important;
-  }
-
-  .note-editor-panel {
-    width: min(94vw, 360px) !important;
-    padding: 14px !important;
-    border-radius: 22px !important;
-  }
-
-  .note-editor-body textarea {
-    height: 178px !important;
-    min-height: 178px !important;
-    max-height: 178px !important;
-  }
-}
-/* Mobil not ikonu ve not önizleme düzeltmeleri */
-@media (max-width: 720px) {
-  .trip-actions .icon-note-btn,
-  .trip-actions .tiny-btn.icon-note-btn {
-    width: 34px !important;
-    min-width: 34px !important;
-    max-width: 34px !important;
-    height: 34px !important;
-    min-height: 34px !important;
-    padding: 0 !important;
-    border-radius: 12px !important;
-    display: inline-grid !important;
-    place-items: center !important;
-    flex: 0 0 34px !important;
-    background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%) !important;
-    color: #334155 !important;
-    border: 1px solid rgba(203, 213, 225, 0.95) !important;
-  }
-
-  .trip-actions .icon-note-btn.has-note,
-  .trip-actions .tiny-btn.icon-note-btn.has-note {
-    background: linear-gradient(180deg, rgba(37, 99, 235, 0.12), rgba(37, 99, 235, 0.07)) !important;
-    color: #1d4ed8 !important;
-    border-color: rgba(37, 99, 235, 0.34) !important;
-  }
-
-  .trip-actions .icon-note-btn svg,
-  .trip-actions .tiny-btn.icon-note-btn svg {
-    width: 16px !important;
-    height: 16px !important;
-    display: block !important;
-  }
-
-  .trip-note-preview {
-    grid-template-columns: 16px minmax(0, 1fr) !important;
-    gap: 6px !important;
-    max-height: 56px !important;
-    overflow-y: scroll !important;
-    overflow-x: hidden !important;
-    scrollbar-gutter: stable !important;
-    padding: 8px 10px 8px 10px !important;
-    border-radius: 13px !important;
-    font-size: 0.74rem !important;
-    line-height: 1.32 !important;
-  }
-
-  .trip-note-preview svg {
-    width: 13px !important;
-    height: 13px !important;
-    margin-top: 1px !important;
-  }
-
-  .custom-info-note-preview {
-    grid-template-columns: 16px minmax(0, 1fr) !important;
-    gap: 6px !important;
-    padding: 8px 10px !important;
-    max-height: 76px !important;
-    overflow-y: scroll !important;
-    overflow-x: hidden !important;
-    scrollbar-gutter: stable !important;
-    font-size: 10.5px !important;
-  }
-
-  .custom-info-note-preview svg {
-    width: 13px !important;
-    height: 13px !important;
-    margin-top: 1px !important;
-  }
-}
-
-@media (max-width: 480px) {
-  .trip-actions .icon-note-btn,
-  .trip-actions .tiny-btn.icon-note-btn {
-    width: 32px !important;
-    min-width: 32px !important;
-    max-width: 32px !important;
-    height: 32px !important;
-    min-height: 32px !important;
-    border-radius: 11px !important;
-  }
-
-  .trip-actions .icon-note-btn svg,
-  .trip-actions .tiny-btn.icon-note-btn svg {
-    width: 15px !important;
-    height: 15px !important;
-  }
-
-  .trip-note-preview {
-    max-height: 54px !important;
-    font-size: 0.72rem !important;
-    padding: 7px 10px !important;
-  }
-}
-
-
-/* Mobilde mevcut düzeni koruyarak yeni yol tarifi ikonunu not butonuyla hizala */
-@media (max-width: 720px) {
-  .trip-actions .icon-route-btn,
-  .trip-actions .tiny-btn.icon-route-btn {
-    width: 34px !important;
-    min-width: 34px !important;
-    max-width: 34px !important;
-    height: 34px !important;
-    min-height: 34px !important;
-    padding: 0 !important;
-    border-radius: 12px !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    flex: 0 0 34px !important;
-    line-height: 0 !important;
-  }
-
-  .trip-actions .icon-route-btn svg,
-  .trip-actions .tiny-btn.icon-route-btn svg {
-    width: 16px !important;
-    height: 16px !important;
-    display: block !important;
-    margin: 0 !important;
-  }
-}
-
-@media (max-width: 480px) {
-  .trip-actions .icon-route-btn,
-  .trip-actions .tiny-btn.icon-route-btn {
-    width: 32px !important;
-    min-width: 32px !important;
-    max-width: 32px !important;
-    height: 32px !important;
-    min-height: 32px !important;
-    border-radius: 11px !important;
-    flex-basis: 32px !important;
-  }
-
-  .trip-actions .icon-route-btn svg,
-  .trip-actions .tiny-btn.icon-route-btn svg {
-    width: 15px !important;
-    height: 15px !important;
-  }
-}
 /* =========================================================
-   ROUTEE — MOBIL GEZI LISTEM BUTON IDEAL BOYUT DUZELTMESI
-   Yol Tarifi, Not, Odakla, Sil butonlari mobilde rahat görünür
+   ROUTEE — FINAL MOBIL DUZELTME
+   Mobilde butonlar ideal dokunma boyutunda, not gorunumu sade ve ayni.
    ========================================================= */
 
 @media (max-width: 720px) {
@@ -1138,6 +861,7 @@
     min-width: 42px !important;
     border-radius: 14px !important;
     font-size: 0.98rem !important;
+    line-height: 1 !important;
   }
 
   .trip-content {
@@ -1157,7 +881,6 @@
     overflow-wrap: anywhere !important;
   }
 
-  /* Butonlari kartin altinda tek satir ve rahat dokunulabilir yap */
   .trip-item > .trip-actions {
     grid-column: 1 / -1 !important;
     width: 100% !important;
@@ -1183,7 +906,6 @@
     white-space: nowrap !important;
   }
 
-  /* Yol tarifi ve not ikon butonlari küçük kalmasın */
   .trip-actions .icon-route-btn,
   .trip-actions .tiny-btn.icon-route-btn,
   .trip-actions .icon-note-btn,
@@ -1211,7 +933,6 @@
     margin: auto !important;
   }
 
-  /* Odakla ve Sil butonlari ezilmesin, kalan alani dengeli paylaşsın */
   .trip-actions .tiny-btn:not(.icon-route-btn):not(.icon-note-btn) {
     flex: 1 1 0 !important;
     min-width: 0 !important;
@@ -1219,41 +940,112 @@
     padding: 0 10px !important;
   }
 
-  .trip-actions .tiny-btn[data-action^="focus"] {
-    background: linear-gradient(135deg, #0f172a, #334155) !important;
-    border-color: #334155 !important;
-    color: #ffffff !important;
-  }
-
-  .trip-actions .tiny-btn[data-action^="delete"] {
-    background: #fff5f5 !important;
-    border-color: #fecaca !important;
-    color: #b91c1c !important;
-  }
-
-  .trip-actions .tiny-btn.icon-route-btn,
-  .trip-actions .icon-route-btn {
-    background: linear-gradient(135deg, #2563eb, #1d4ed8) !important;
-    border-color: #1d4ed8 !important;
-    color: #ffffff !important;
-  }
-
-  .trip-actions .tiny-btn.icon-note-btn,
-  .trip-actions .icon-note-btn {
-    background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%) !important;
+  .trip-note-preview,
+  .custom-info-note-preview {
+    grid-template-columns: 17px minmax(0, 1fr) !important;
+    gap: 6px !important;
+    margin-top: 6px !important;
+    padding: 7px 9px !important;
+    border-radius: 12px !important;
+    border: 1px solid rgba(203, 213, 225, 0.85) !important;
+    background: linear-gradient(180deg, rgba(248, 250, 252, 0.96), rgba(241, 245, 249, 0.92)) !important;
     color: #334155 !important;
-    border: 1px solid rgba(203, 213, 225, 0.95) !important;
+    font-size: 0.73rem !important;
+    font-weight: 500 !important;
+    line-height: 1.34 !important;
+    max-height: 56px !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    scrollbar-gutter: stable !important;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.78),
+      0 6px 14px rgba(15, 23, 42, 0.045) !important;
   }
 
-  .trip-actions .tiny-btn.icon-note-btn.has-note,
-  .trip-actions .icon-note-btn.has-note {
-    background: linear-gradient(180deg, rgba(37, 99, 235, 0.12), rgba(37, 99, 235, 0.07)) !important;
-    color: #1d4ed8 !important;
-    border-color: rgba(37, 99, 235, 0.34) !important;
+  .trip-note-preview svg,
+  .custom-info-note-preview svg {
+    width: 13px !important;
+    height: 13px !important;
+    min-width: 13px !important;
+    margin-top: 2px !important;
+    color: #2563eb !important;
+  }
+
+  .trip-note-preview span,
+  .custom-info-note-preview span,
+  .trip-note-preview span:last-child,
+  .custom-info-note-preview span:last-child {
+    color: #334155 !important;
+    white-space: pre-wrap !important;
+    overflow-wrap: anywhere !important;
+    word-break: normal !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  .custom-info-card .custom-info-note-preview {
+    margin-top: 7px !important;
+    margin-bottom: 8px !important;
+  }
+
+  .custom-info-card {
+    padding: 13px 13px 12px !important;
+  }
+
+  .custom-info-card h3 {
+    font-size: 15px !important;
+    margin-bottom: 9px !important;
+    line-height: 1.28 !important;
+  }
+
+  .note-editor-panel {
+    width: min(92vw, 380px) !important;
+    padding: 15px !important;
+    border-radius: 22px !important;
+  }
+
+  .note-editor-title-row {
+    margin-bottom: 10px !important;
+  }
+
+  .note-editor-title-row h2 {
+    font-size: 0.98rem !important;
+  }
+
+  .note-editor-title-row p {
+    font-size: 0.76rem !important;
+  }
+
+  .note-editor-body label {
+    font-size: 0.78rem !important;
+  }
+
+  .note-editor-body textarea {
+    height: 164px !important;
+    min-height: 164px !important;
+    max-height: 164px !important;
+    padding: 11px 12px !important;
+    border-radius: 16px !important;
+    font-size: 0.84rem !important;
+    line-height: 1.43 !important;
+  }
+
+  .note-editor-hint {
+    font-size: 0.72rem !important;
+  }
+
+  .note-editor-actions {
+    margin-top: 12px !important;
+    gap: 8px !important;
+  }
+
+  .note-editor-actions .small-btn {
+    min-height: 39px !important;
+    height: 39px !important;
+    font-size: 0.78rem !important;
   }
 }
 
-/* Daha küçük telefonlarda da taşmadan ideal görünüm */
 @media (max-width: 390px) {
   .trip-item {
     padding: 11px !important;
@@ -1294,5 +1086,25 @@
   .route-directions-icon {
     width: 17px !important;
     height: 17px !important;
+  }
+
+  .trip-note-preview,
+  .custom-info-note-preview {
+    font-size: 0.7rem !important;
+    line-height: 1.32 !important;
+    padding: 7px 8px !important;
+    max-height: 52px !important;
+  }
+
+  .note-editor-panel {
+    width: min(94vw, 360px) !important;
+    padding: 14px !important;
+  }
+
+  .note-editor-body textarea {
+    height: 158px !important;
+    min-height: 158px !important;
+    max-height: 158px !important;
+    font-size: 0.82rem !important;
   }
 }
