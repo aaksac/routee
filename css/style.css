@@ -1703,3 +1703,57 @@ select:focus {
   scrollbar-width: thin !important;
   scrollbar-color: rgba(100, 116, 139, 0.45) rgba(226, 232, 240, 0.65) !important;
 }
+/* =========================================================
+   ROUTEE — WEB/MASAUSTU GEZI LISTEM BUTON HIZALAMA
+   Masaustunde butonlar solda, mobilde mobile.css sagda kalir
+   ========================================================= */
+
+@media (min-width: 721px) {
+  .trip-item > .trip-actions {
+    justify-content: flex-start !important;
+    justify-self: start !important;
+    align-self: start !important;
+    width: 100% !important;
+  }
+
+  .trip-actions {
+    justify-content: flex-start !important;
+    align-items: center !important;
+  }
+
+  .trip-actions .icon-route-btn,
+  .trip-actions .tiny-btn.icon-route-btn {
+    width: 36px !important;
+    min-width: 36px !important;
+    max-width: 36px !important;
+    height: 34px !important;
+    min-height: 34px !important;
+    flex: 0 0 36px !important;
+    padding: 0 !important;
+    border-radius: 12px !important;
+
+    display: inline-grid !important;
+    place-items: center !important;
+
+    line-height: 1 !important;
+    text-indent: 0 !important;
+
+    background: linear-gradient(135deg, #2563eb, #1d4ed8) !important;
+    border: 1px solid #1d4ed8 !important;
+    color: #ffffff !important;
+  }
+
+  .trip-actions .icon-route-btn svg,
+  .trip-actions .tiny-btn.icon-route-btn svg,
+  .route-directions-icon {
+    width: 16px !important;
+    height: 16px !important;
+    display: block !important;
+    margin: auto !important;
+    fill: none !important;
+    stroke: currentColor !important;
+    stroke-width: 2.1 !important;
+    stroke-linecap: round !important;
+    stroke-linejoin: round !important;
+  }
+}
