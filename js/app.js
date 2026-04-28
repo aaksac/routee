@@ -867,6 +867,12 @@ function commitStartPoint() {
   }
 
   const previousStartPoint = state.startPoint ? { ...state.startPoint } : null;
+  const endWillBeConvertedToStart =
+    Boolean(state.endPoint) && isSamePlace(state.endPoint, startPoint);
+  const convertedEndPoint = endWillBeConvertedToStart
+    ? { ...state.endPoint }
+    : null;
+
   const promotedPointId = state.editingPointId;
   const promotedPointCandidate = promotedPointId
     ? state.points.find((point) => String(point.id) === String(promotedPointId))
@@ -897,7 +903,7 @@ function commitStartPoint() {
   }
 
   const nextLocationCount =
-    nextPoints.length + 1 + (state.endPoint ? 1 : 0);
+    nextPoints.length + 1 + (state.endPoint && !endWillBeConvertedToStart ? 1 : 0);
 
   if (!isPremiumAccessActive() && nextLocationCount > state.locationQuota) {
     alert(`Başlangıç dahil en fazla ${state.locationQuota} konum eklenebilir.`);
@@ -908,10 +914,17 @@ function commitStartPoint() {
     ...startPoint,
     note:
       promotedPoint?.note ||
+      convertedEndPoint?.note ||
       (previousStartPoint && isSamePlace(previousStartPoint, startPoint)
         ? previousStartPoint.note || ""
         : "")
   };
+
+  if (endWillBeConvertedToStart) {
+    state.endPoint = null;
+    clearEndMarker();
+    setEndForm(null);
+  }
 
   state.points = nextPoints;
   state.startPoint = nextStartPoint;
@@ -937,9 +950,13 @@ function commitStartPoint() {
   recomputeRoute();
   markDirty();
 
-  elements.authStatus.textContent = previousStartPoint
-    ? `Başlangıç değiştirildi. Eski başlangıç konum olarak rotaya eklendi: ${startPoint.name}`
-    : `Başlangıç eklendi: ${startPoint.name}`;
+  if (endWillBeConvertedToStart) {
+    elements.authStatus.textContent = `Bitiş noktası kaldırıldı. Son seçim başlangıç olarak kaydedildi: ${startPoint.name}`;
+  } else {
+    elements.authStatus.textContent = previousStartPoint
+      ? `Başlangıç değiştirildi. Eski başlangıç konum olarak rotaya eklendi: ${startPoint.name}`
+      : `Başlangıç eklendi: ${startPoint.name}`;
+  }
 
   closeFloatingPanels();
 }
