@@ -1757,3 +1757,109 @@ select:focus {
     stroke-linejoin: round !important;
   }
 }
+/* =========================================================
+   ROUTEE — WEB/MASAUSTU GEZI LISTEM BUTONLARI METIN HIZASINA ALMA
+   Butonlar kartin en solundan degil, yer adinin basladigi hizadan baslar.
+   Mobil duzeni bozmaz.
+   ========================================================= */
+
+@media (min-width: 721px) {
+  .trip-item {
+    grid-template-columns: 46px minmax(0, 1fr) !important;
+    align-items: start !important;
+    column-gap: 11px !important;
+    row-gap: 10px !important;
+  }
+
+  .trip-order {
+    grid-column: 1 !important;
+    grid-row: 1 !important;
+  }
+
+  .trip-content {
+    grid-column: 2 !important;
+    grid-row: 1 !important;
+    min-width: 0 !important;
+  }
+
+  /* Asıl düzeltme: buton satırı artık 1. kolondan değil, metin kolonundan başlar */
+  .trip-item > .trip-actions {
+    grid-column: 2 / -1 !important;
+    grid-row: 2 !important;
+
+    width: 100% !important;
+    margin-top: 0 !important;
+
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+
+    gap: 7px !important;
+    justify-self: start !important;
+    min-width: 0 !important;
+  }
+
+  /* Başlangıç henüz eklenmediğinde tek başına duran pasif yol tarifi ikonunu da aynı hizaya al */
+  .trip-item > button.icon-route-btn:last-child,
+  .trip-item > button.tiny-btn:last-child {
+    grid-column: 2 / -1 !important;
+    grid-row: 2 !important;
+    justify-self: start !important;
+    align-self: start !important;
+    margin-top: 0 !important;
+  }
+
+  .trip-actions .tiny-btn {
+    flex: 0 0 auto !important;
+    white-space: nowrap !important;
+  }
+
+  .trip-actions .tiny-btn:not(.icon-route-btn):not(.icon-note-btn) {
+    height: 34px !important;
+    min-height: 34px !important;
+    min-width: 62px !important;
+    padding: 0 11px !important;
+
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    border-radius: 999px !important;
+    font-size: 0.76rem !important;
+    font-weight: 750 !important;
+    line-height: 1 !important;
+  }
+
+  .trip-actions .icon-route-btn,
+  .trip-actions .tiny-btn.icon-route-btn,
+  .trip-actions .icon-note-btn,
+  .trip-actions .tiny-btn.icon-note-btn,
+  .trip-item > button.icon-route-btn:last-child {
+    width: 36px !important;
+    min-width: 36px !important;
+    max-width: 36px !important;
+    height: 34px !important;
+    min-height: 34px !important;
+
+    flex: 0 0 36px !important;
+    padding: 0 !important;
+    border-radius: 12px !important;
+
+    display: inline-grid !important;
+    place-items: center !important;
+    line-height: 1 !important;
+  }
+
+  .trip-actions .icon-route-btn svg,
+  .trip-actions .tiny-btn.icon-route-btn svg,
+  .trip-actions .icon-note-btn svg,
+  .trip-actions .tiny-btn.icon-note-btn svg,
+  .trip-item > button.icon-route-btn:last-child svg,
+  .route-directions-icon {
+    width: 16px !important;
+    height: 16px !important;
+    display: block !important;
+    margin: auto !important;
+  }
+}
