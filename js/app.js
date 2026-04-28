@@ -123,6 +123,7 @@ const elements = {
   importExportPanel: document.getElementById("importExportPanel"),
   appStartupSplash: document.getElementById("appStartupSplash"),
   appStartupSplashText: document.getElementById("appStartupSplashText"),
+  routeeNativeSplash: document.getElementById("routeeNativeSplash"),
   mobileFloatingBackdrop: document.getElementById("mobileFloatingBackdrop"),
   noteEditorOverlay: document.getElementById("noteEditorOverlay"),
   noteEditorBackdrop: document.getElementById("noteEditorBackdrop"),
@@ -270,6 +271,18 @@ async function closeAppStartupSplash(splashState) {
   elements.appStartupSplash.setAttribute("aria-hidden", "true");
   document.documentElement.classList.remove("show-app-startup-splash");
   clearAppStartupSplashSession();
+}
+
+function hideNativeSplash() {
+  const splash = elements.routeeNativeSplash || document.getElementById("routeeNativeSplash");
+  if (!splash) return;
+
+  splash.classList.add("routee-native-splash-hidden");
+  splash.setAttribute("aria-hidden", "true");
+
+  window.setTimeout(() => {
+    splash.remove();
+  }, 220);
 }
 
 function formatKm(value) {
@@ -2517,6 +2530,7 @@ function init() {
   initAuthWatcher();
 
   window.requestAnimationFrame(() => {
+    hideNativeSplash();
     bootstrapMapFeatures();
   });
 }
