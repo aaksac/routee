@@ -1100,28 +1100,28 @@
     min-width: 0 !important;
   }
 
-  .trip-panel .trip-item > .trip-actions {
-    grid-column: 2 / -1 !important;
-    grid-row: 2 !important;
-    width: auto !important;
-    max-width: 100% !important;
-    margin-top: 2px !important;
-    display: inline-flex !important;
-    flex-wrap: nowrap !important;
-    align-items: center !important;
-    justify-content: flex-start !important;
-    gap: 6px !important;
-    justify-self: start !important;
-    align-self: start !important;
-    min-width: 0 !important;
-    white-space: nowrap !important;
-  }
+.trip-panel .trip-item > .trip-actions {
+  grid-column: 2 / -1 !important;
+  grid-row: 2 !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  margin-top: 2px !important;
+  display: inline-flex !important;
+  flex-wrap: nowrap !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  gap: 6px !important;
+  justify-self: stretch !important;
+  align-self: start !important;
+  min-width: 0 !important;
+  white-space: nowrap !important;
+}
 
-  .trip-panel .trip-actions {
-    justify-content: flex-start !important;
-    align-items: center !important;
-    gap: 6px !important;
-  }
+.trip-panel .trip-actions {
+  justify-content: flex-end !important;
+  align-items: center !important;
+  gap: 6px !important;
+}
 
   .trip-panel .trip-actions .tiny-btn {
     height: 40px !important;
