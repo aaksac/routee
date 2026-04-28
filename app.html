@@ -14,6 +14,73 @@
   <link rel="apple-touch-icon" sizes="180x180" href="./icons/apple-touch-icon.png" />
   <link rel="manifest" href="./manifest.webmanifest" />
 
+  <style id="routee-critical-splash-style">
+    html, body { background: #0f172a; }
+    .startup-splash, #routeeNativeSplash {
+      position: fixed;
+      inset: 0;
+      z-index: 999999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      background: radial-gradient(circle at top, rgba(37,99,235,.26), transparent 36%), linear-gradient(180deg, #0f172a 0%, #111827 100%);
+      color: #fff;
+      font-family: Inter, Arial, sans-serif;
+    }
+    .startup-splash:not(.is-visible):not(.app-startup-splash), .app-startup-splash:not(.is-visible) { opacity: 0; visibility: hidden; pointer-events: none; }
+    .startup-splash.is-visible, .show-app-startup-splash .app-startup-splash, #routeeNativeSplash { opacity: 1; visibility: visible; pointer-events: auto; }
+    #routeeNativeSplash.routee-native-splash-hidden { opacity: 0; visibility: hidden; pointer-events: none; transition: opacity 180ms ease, visibility 180ms ease; }
+    .startup-splash-card, .routee-native-splash-card {
+      position: relative;
+      width: min(84vw, 340px);
+      display: grid;
+      justify-items: center;
+      gap: 14px;
+      padding: 28px 24px 24px;
+      border-radius: 28px;
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.14);
+      box-shadow: 0 28px 80px rgba(0,0,0,.32);
+      -webkit-backdrop-filter: blur(18px);
+      backdrop-filter: blur(18px);
+      text-align: center;
+      overflow: hidden;
+    }
+    .startup-splash-orb, .routee-native-splash-orb {
+      position: absolute;
+      top: -42px;
+      width: 160px;
+      height: 160px;
+      border-radius: 999px;
+      background: radial-gradient(circle, rgba(96,165,250,.36), rgba(96,165,250,0));
+      filter: blur(10px);
+      z-index: -1;
+    }
+    .startup-splash-logo, .routee-native-splash-logo {
+      width: 74px;
+      height: 74px;
+      border-radius: 24px;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(135deg, #2563eb, #0f172a);
+      color: #fff;
+      font-size: 1.9rem;
+      font-weight: 900;
+      box-shadow: 0 18px 38px rgba(37,99,235,.28);
+      overflow: hidden;
+    }
+    .startup-splash-logo img { display: block; width: 100%; height: 100%; object-fit: cover; }
+    .startup-splash-copy, .routee-native-splash-copy { display: grid; gap: 7px; }
+    .startup-splash-copy strong, .routee-native-splash-copy strong { color: #fff; font-size: 1.16rem; letter-spacing: -.01em; }
+    .startup-splash-copy span, .routee-native-splash-copy span { color: rgba(255,255,255,.76); font-size: .92rem; line-height: 1.45; }
+    .startup-splash-loader, .routee-native-splash-loader { display: inline-flex; align-items: center; gap: 8px; }
+    .startup-splash-loader span, .routee-native-splash-loader span { width: 8px; height: 8px; border-radius: 999px; background: rgba(255,255,255,.92); animation: routeeCriticalSplashPulse 1s infinite ease-in-out; }
+    .startup-splash-loader span:nth-child(2), .routee-native-splash-loader span:nth-child(2) { animation-delay: .16s; }
+    .startup-splash-loader span:nth-child(3), .routee-native-splash-loader span:nth-child(3) { animation-delay: .32s; }
+    @keyframes routeeCriticalSplashPulse { 0%, 80%, 100% { opacity: .35; transform: scale(.82); } 40% { opacity: 1; transform: scale(1); } }
+  </style>
+
   <script type="module" src="./js/version-guard.js"></script>
 
   <link rel="stylesheet" href="./css/style.css" />
@@ -33,6 +100,18 @@
   </script>
 </head>
 <body>
+  <div id="routeeNativeSplash" aria-label="Rota yükleniyor" aria-hidden="false">
+    <div class="routee-native-splash-card">
+      <div class="routee-native-splash-orb" aria-hidden="true"></div>
+      <div class="routee-native-splash-logo" aria-hidden="true">R</div>
+      <div class="routee-native-splash-copy">
+        <strong>Rota</strong>
+        <span>Haritanız hazırlanıyor...</span>
+      </div>
+      <div class="routee-native-splash-loader" aria-hidden="true"><span></span><span></span><span></span></div>
+    </div>
+  </div>
+
   <div class="startup-splash app-startup-splash" id="appStartupSplash" aria-hidden="true">
     <div class="startup-splash-card">
       <div class="startup-splash-orb" aria-hidden="true"></div>
