@@ -1863,3 +1863,35 @@ select:focus {
     margin: auto !important;
   }
 }
+/* =========================================================
+   ROUTEE — KONUM BILGISI NOT ALANI GENEL HIZA DUZELTMESI
+   Web ve masaüstünde de not kutusu dengeli görünür
+   ========================================================= */
+
+.custom-info-card .custom-info-note-preview {
+  margin-top: 10px !important;
+  margin-bottom: 13px !important;
+
+  min-height: 42px !important;
+
+  display: grid !important;
+  grid-template-columns: 18px minmax(0, 1fr) !important;
+  align-items: center !important;
+  gap: 8px !important;
+
+  padding: 9px 12px !important;
+  border-radius: 15px !important;
+}
+
+.custom-info-card .custom-info-note-preview svg {
+  align-self: center !important;
+  margin: 0 !important;
+}
+
+.custom-info-card .custom-info-note-preview span,
+.custom-info-card .custom-info-note-preview span:last-child {
+  display: flex !important;
+  align-items: center !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
