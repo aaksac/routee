@@ -741,6 +741,92 @@ function isSamePlace(a, b) {
   return Math.abs(aLat - bLat) < 0.000001 && Math.abs(aLng - bLng) < 0.000001;
 }
 
+const START_POINT_REMOVED_MESSAGE =
+  "Başlangıç noktası silindi. Hesaplama için yeni bir başlangıç noktası seçiniz.";
+
+function notifyStartPointRemoved(showAlert = true) {
+  elements.authStatus.textContent = START_POINT_REMOVED_MESSAGE;
+
+  if (showAlert) {
+    alert(START_POINT_REMOVED_MESSAGE);
+  }
+}
+
+function detachStartPoint() {
+  if (!state.startPoint) return null;
+
+  const removedStartPoint = { ...state.startPoint };
+
+  state.startPoint = null;
+  clearStartMarker();
+  clearRouteLines();
+  setStartForm(null);
+
+  return removedStartPoint;
+}
+
+function findDuplicatePointByPlace(location, excludeId = null) {
+  if (!location) return null;
+
+  const duplicates = state.points.filter((point) => {
+    const isExcluded =
+      excludeId !== null &&
+      excludeId !== undefined &&
+      String(point.id) === String(excludeId);
+
+    return !isExcluded && isSamePlace(point, location);
+  });
+
+  return duplicates.length ? duplicates[duplicates.length - 1] : null;
+}
+
+function removeDuplicatePointsByPlace(location, excludeId = null) {
+  if (!location) return null;
+
+  const duplicatePoint = findDuplicatePointByPlace(location, excludeId);
+
+  state.points = state.points.filter((point) => {
+    const isExcluded =
+      excludeId !== null &&
+      excludeId !== undefined &&
+      String(point.id) === String(excludeId);
+
+    if (isExcluded) return true;
+
+    return !isSamePlace(point, location);
+  });
+
+  return duplicatePoint;
+}
+
+function keepLastPointPerPlace(points = []) {
+  const uniquePoints = [];
+
+  points.forEach((point) => {
+    const existingIndex = uniquePoints.findIndex((item) =>
+      isSamePlace(item, point)
+    );
+
+    if (existingIndex >= 0) {
+      const previousPoint = uniquePoints[existingIndex];
+
+      uniquePoints.splice(existingIndex, 1);
+
+      uniquePoints.push({
+        ...point,
+        note: point.note || previousPoint.note || "",
+        color: point.color || previousPoint.color || DEFAULT_POINT_COLOR
+      });
+
+      return;
+    }
+
+    uniquePoints.push(point);
+  });
+
+  return uniquePoints;
+}
+
 function createPointFromPreviousStart(startPoint) {
   return {
     id: Date.now() + Math.random(),
@@ -872,6 +958,11 @@ function commitEndPoint() {
   }
 
   const previousEndPoint = state.endPoint ? { ...state.endPoint } : null;
+  const startWillBeConvertedToEnd =
+    Boolean(state.startPoint) && isSamePlace(state.startPoint, endPoint);
+  const convertedStartPoint = startWillBeConvertedToEnd
+    ? { ...state.startPoint }
+    : null;
 
   const selectedPointCandidate = state.editingPointId
     ? state.points.find((point) => String(point.id) === String(state.editingPointId))
@@ -902,7 +993,7 @@ function commitEndPoint() {
   }
 
   const nextLocationCount =
-    nextPoints.length + (state.startPoint ? 1 : 0) + 1;
+    nextPoints.length + (state.startPoint && !startWillBeConvertedToEnd ? 1 : 0) + 1;
 
   if (!isPremiumAccessActive() && nextLocationCount > state.locationQuota) {
     alert(`Başlangıç dahil en fazla ${state.locationQuota} konum eklenebilir.`);
@@ -913,10 +1004,15 @@ function commitEndPoint() {
     ...endPoint,
     note:
       promotedPoint?.note ||
+      convertedStartPoint?.note ||
       (previousEndPoint && isSamePlace(previousEndPoint, endPoint)
         ? previousEndPoint.note || ""
         : "")
   };
+
+  if (startWillBeConvertedToEnd) {
+    detachStartPoint();
+  }
 
   state.points = nextPoints;
   state.endPoint = nextEndPoint;
@@ -942,7 +1038,9 @@ function commitEndPoint() {
   recomputeRoute();
   markDirty();
 
-  if (promotedPoint) {
+  if (startWillBeConvertedToEnd) {
+    notifyStartPointRemoved(true);
+  } else if (promotedPoint) {
     elements.authStatus.textContent = `Konum bitiş noktası olarak ayarlandı: ${endPoint.name}`;
   } else if (previousEndPoint) {
     elements.authStatus.textContent = `Bitiş noktası değiştirildi: ${endPoint.name}`;
@@ -953,16 +1051,18 @@ function commitEndPoint() {
   closeFloatingPanels();
 }
 
-function clearStartPoint() {
-  state.startPoint = null;
-  clearStartMarker();
-  clearRouteLines();
-  setStartForm(null);
+function clearStartPoint(options = {}) {
+  const { showAlert = true } = options;
+  const removedStartPoint = detachStartPoint();
+
   renderSummary();
   renderTripList();
   recomputeRoute();
   markDirty();
-  elements.authStatus.textContent = "Başlangıç kaldırıldı.";
+
+  if (removedStartPoint) {
+    notifyStartPointRemoved(showAlert);
+  }
 }
 
 function clearEndPoint() {
@@ -1185,6 +1285,8 @@ function redrawEndMarker() {
 }
 
 function recomputeRoute() {
+  state.points = keepLastPointPerPlace(state.points);
+
   if (!state.startPoint) {
     state.totalDistance = 0;
     clearRouteLines();
@@ -1299,36 +1401,71 @@ function addOrUpdatePoint() {
     return;
   }
 
+  const pointLocation = {
+    id: state.editingPointId || null,
+    name,
+    lat: Number(lat),
+    lng: Number(lng),
+    color,
+    type: "point"
+  };
+
+  const duplicatePoint = findDuplicatePointByPlace(
+    pointLocation,
+    state.editingPointId
+  );
+  const startWillBeConvertedToPoint =
+    Boolean(state.startPoint) && isSamePlace(state.startPoint, pointLocation);
+  const convertedStartPoint = startWillBeConvertedToPoint
+    ? { ...state.startPoint }
+    : null;
+
   const isNewPoint = !state.editingPointId;
-  if (isNewPoint && !canAddMoreLocations(1)) {
+  const willAddNewLocationSlot =
+    isNewPoint && !duplicatePoint && !startWillBeConvertedToPoint;
+
+  if (willAddNewLocationSlot && !canAddMoreLocations(1)) {
     alert(`Başlangıç dahil en fazla ${state.locationQuota} konum eklenebilir.`);
     return;
   }
 
   if (state.editingPointId) {
+    const removedDuplicatePoint = removeDuplicatePointsByPlace(
+      pointLocation,
+      state.editingPointId
+    );
+
     state.points = state.points.map((point) =>
-      point.id === state.editingPointId
+      String(point.id) === String(state.editingPointId)
         ? {
             ...point,
             name,
             lat: Number(lat),
             lng: Number(lng),
             color,
-            note: point.note || ""
+            note: point.note || removedDuplicatePoint?.note || convertedStartPoint?.note || ""
           }
         : point
     );
   } else {
+    const removedDuplicatePoint = removeDuplicatePointsByPlace(pointLocation);
+
     state.points.push({
       id: Date.now() + Math.random(),
       name,
       lat: Number(lat),
       lng: Number(lng),
       color,
-      note: "",
+      note: removedDuplicatePoint?.note || convertedStartPoint?.note || "",
       distanceFromPrevious: 0,
       type: "point"
     });
+  }
+
+  state.points = keepLastPointPerPlace(state.points);
+
+  if (startWillBeConvertedToPoint) {
+    detachStartPoint();
   }
 
   clearDraftMarker();
@@ -1336,6 +1473,14 @@ function addOrUpdatePoint() {
   recomputeRoute();
   markDirty();
   closeFloatingPanels();
+
+  if (startWillBeConvertedToPoint) {
+    notifyStartPointRemoved(true);
+  } else {
+    elements.authStatus.textContent = duplicatePoint
+      ? `Aynı konum güncellendi: ${name}`
+      : `Konum eklendi: ${name}`;
+  }
 }
 
 function deletePoint(pointId) {
@@ -1390,7 +1535,8 @@ function handleMarkerColorRequest(event) {
 }
 
 function applyImportedData(startPoint, points, endPoint = null) {
-  const importedCount = points.length + (startPoint ? 1 : 0) + (endPoint ? 1 : 0);
+  const uniqueImportedPoints = keepLastPointPerPlace(points);
+  const importedCount = uniqueImportedPoints.length + (startPoint ? 1 : 0) + (endPoint ? 1 : 0);
   if (!isPremiumAccessActive() && importedCount > state.locationQuota) {
     alert(`İçe aktarılan veride başlangıç dahil en fazla ${state.locationQuota} konum olabilir.`);
     return false;
@@ -1398,7 +1544,7 @@ function applyImportedData(startPoint, points, endPoint = null) {
 
   state.startPoint = startPoint;
   state.endPoint = endPoint;
-  state.points = points;
+  state.points = uniqueImportedPoints;
   state.editingPointId = null;
 
   setStartForm(startPoint);
