@@ -876,7 +876,7 @@
     overflow-x: hidden !important;
     scrollbar-gutter: stable !important;
     padding: 7px 8px !important;
-    border-radius: 13px !important;
+    border-radius: 12px !important;
     font-size: 0.74rem !important;
     line-height: 1.3 !important;
   }
@@ -1019,7 +1019,7 @@
     overflow-x: hidden !important;
     scrollbar-gutter: stable !important;
     padding: 8px 10px 8px 10px !important;
-    border-radius: 13px !important;
+    border-radius: 12px !important;
     font-size: 0.74rem !important;
     line-height: 1.32 !important;
   }
@@ -1129,7 +1129,7 @@
     display: inline-flex !important;
     align-items: center !important;
     justify-content: center !important;
-    border-radius: 13px !important;
+    border-radius: 12px !important;
     font-size: 0.76rem !important;
     font-weight: 750 !important;
     line-height: 1 !important;
@@ -1148,7 +1148,7 @@
     min-height: 40px !important;
     flex: 0 0 40px !important;
     padding: 0 !important;
-    border-radius: 13px !important;
+    border-radius: 12px !important;
     display: inline-grid !important;
     place-items: center !important;
   }
@@ -1198,14 +1198,14 @@
     align-items: start !important;
     align-content: start !important;
     gap: 5px !important;
-    padding: 8px 10px 8px 9px !important;
-    border-radius: 13px !important;
+    padding: 7px 9px 7px 8px !important;
+    border-radius: 12px !important;
     background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%) !important;
     border: 1px solid rgba(203, 213, 225, 0.92) !important;
     color: #334155 !important;
-    font-size: 0.73rem !important;
+    font-size: 0.71rem !important;
     font-weight: 500 !important;
-    line-height: 1.4 !important;
+    line-height: 1.34 !important;
     letter-spacing: -0.01em !important;
     white-space: normal !important;
     word-break: normal !important;
@@ -1219,19 +1219,19 @@
   }
 
   .trip-note-preview {
-    min-height: 38px !important;
-    max-height: 88px !important;
-    margin-top: 6px !important;
+    min-height: 34px !important;
+    max-height: 68px !important;
+    margin-top: 5px !important;
     margin-bottom: 0 !important;
   }
 
   .custom-info-note-preview,
   .gm-style .custom-info-note-preview,
   .gm-style-iw .custom-info-note-preview {
-    min-height: 38px !important;
-    max-height: 90px !important;
-    margin-top: 7px !important;
-    margin-bottom: 8px !important;
+    min-height: 34px !important;
+    max-height: 72px !important;
+    margin-top: 6px !important;
+    margin-bottom: 7px !important;
   }
 
   .trip-note-preview > span:first-child,
@@ -1288,7 +1288,7 @@
     color: #334155 !important;
     font-size: inherit !important;
     font-weight: inherit !important;
-    line-height: 1.4 !important;
+    line-height: 1.34 !important;
     white-space: pre-wrap !important;
     word-break: normal !important;
     overflow-wrap: anywhere !important;
@@ -1367,18 +1367,18 @@
     grid-template-columns: 14px minmax(0, 1fr) !important;
     gap: 4px !important;
     padding: 7px 9px 7px 8px !important;
-    font-size: 0.71rem !important;
-    line-height: 1.38 !important;
+    font-size: 0.70rem !important;
+    line-height: 1.32 !important;
   }
 
   .trip-note-preview {
-    max-height: 84px !important;
+    max-height: 64px !important;
   }
 
   .custom-info-note-preview,
   .gm-style .custom-info-note-preview,
   .gm-style-iw .custom-info-note-preview {
-    max-height: 86px !important;
+    max-height: 68px !important;
   }
 
   .trip-note-preview > span:first-child,
