@@ -1400,3 +1400,202 @@
     padding: 7px 10px !important;
   }
 }
+/* =========================================================
+   ROUTEE — FINAL MOBIL GEZI LISTEM BUTON OPTIMIZASYONU
+   Amaç:
+   - Buton satırı konum adının başladığı hizadan başlasın
+   - Yol tarifi ve not ikonları sabit, dengeli ölçüde kalsın
+   - Odakla ve Sil yazıya göre ideal genişlikte olsun
+   - Butonlar arası mesafe profesyonel ve kompakt görünsün
+   - Mobil dışındaki sürümlere dokunmasın
+   ========================================================= */
+
+@media (max-width: 720px) {
+  .trip-item {
+    grid-template-columns: 42px minmax(0, 1fr) !important;
+    align-items: start !important;
+    column-gap: 10px !important;
+    row-gap: 8px !important;
+  }
+
+  .trip-order {
+    grid-column: 1 !important;
+    grid-row: 1 !important;
+  }
+
+  .trip-content {
+    grid-column: 2 !important;
+    grid-row: 1 !important;
+    min-width: 0 !important;
+  }
+
+  /* Buton satırı kartın en solundan değil, konum adının hizasından başlar */
+  .trip-item > .trip-actions {
+    grid-column: 2 / -1 !important;
+    grid-row: 2 !important;
+
+    width: auto !important;
+    max-width: 100% !important;
+
+    margin-top: 1px !important;
+
+    display: inline-flex !important;
+    flex-wrap: nowrap !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+
+    gap: 5px !important;
+
+    justify-self: start !important;
+    align-self: start !important;
+
+    min-width: 0 !important;
+    white-space: nowrap !important;
+  }
+
+  .trip-actions {
+    justify-content: flex-start !important;
+    align-items: center !important;
+    gap: 5px !important;
+  }
+
+  .trip-actions .tiny-btn {
+    height: 36px !important;
+    min-height: 36px !important;
+
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    border-radius: 12px !important;
+    font-size: 0.74rem !important;
+    font-weight: 750 !important;
+    line-height: 1 !important;
+    white-space: nowrap !important;
+
+    flex: 0 0 auto !important;
+  }
+
+  /* Yol tarifi ve not ikonları sabit ölçüde */
+  .trip-actions .icon-route-btn,
+  .trip-actions .tiny-btn.icon-route-btn,
+  .trip-actions .icon-note-btn,
+  .trip-actions .tiny-btn.icon-note-btn {
+    width: 36px !important;
+    min-width: 36px !important;
+    max-width: 36px !important;
+
+    height: 36px !important;
+    min-height: 36px !important;
+
+    flex: 0 0 36px !important;
+
+    padding: 0 !important;
+    border-radius: 12px !important;
+
+    display: inline-grid !important;
+    place-items: center !important;
+  }
+
+  .trip-actions .icon-route-btn svg,
+  .trip-actions .tiny-btn.icon-route-btn svg,
+  .trip-actions .icon-note-btn svg,
+  .trip-actions .tiny-btn.icon-note-btn svg,
+  .route-directions-icon {
+    width: 16px !important;
+    height: 16px !important;
+    display: block !important;
+    margin: auto !important;
+  }
+
+  /* Önceki genişleten flex kuralını kesin olarak iptal eder */
+  .trip-actions .tiny-btn:not(.icon-route-btn):not(.icon-note-btn) {
+    flex: 0 0 auto !important;
+    width: auto !important;
+    max-width: none !important;
+    min-width: auto !important;
+
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+
+    letter-spacing: -0.01em !important;
+  }
+
+  /* Odakla yazısına göre ideal buton */
+  .trip-actions .tiny-btn[data-action^="focus"] {
+    min-width: 58px !important;
+    padding-left: 11px !important;
+    padding-right: 11px !important;
+  }
+
+  /* Sil daha kısa olduğu için daha kompakt */
+  .trip-actions .tiny-btn[data-action^="delete"] {
+    min-width: 40px !important;
+    padding-left: 10px !important;
+    padding-right: 10px !important;
+  }
+
+  /* Başlangıç henüz eklenmemişse tek ikon buton da metin hizasında kalsın */
+  .trip-item > button.icon-route-btn:last-child,
+  .trip-item > button.tiny-btn:last-child {
+    grid-column: 2 / -1 !important;
+    grid-row: 2 !important;
+    justify-self: start !important;
+    align-self: start !important;
+  }
+}
+
+@media (max-width: 390px) {
+  .trip-item {
+    grid-template-columns: 40px minmax(0, 1fr) !important;
+    column-gap: 9px !important;
+    row-gap: 7px !important;
+  }
+
+  .trip-item > .trip-actions {
+    gap: 4px !important;
+  }
+
+  .trip-actions .tiny-btn {
+    height: 34px !important;
+    min-height: 34px !important;
+    font-size: 0.71rem !important;
+    border-radius: 11px !important;
+  }
+
+  .trip-actions .icon-route-btn,
+  .trip-actions .tiny-btn.icon-route-btn,
+  .trip-actions .icon-note-btn,
+  .trip-actions .tiny-btn.icon-note-btn {
+    width: 34px !important;
+    min-width: 34px !important;
+    max-width: 34px !important;
+
+    height: 34px !important;
+    min-height: 34px !important;
+
+    flex-basis: 34px !important;
+    border-radius: 11px !important;
+  }
+
+  .trip-actions .icon-route-btn svg,
+  .trip-actions .tiny-btn.icon-route-btn svg,
+  .trip-actions .icon-note-btn svg,
+  .trip-actions .tiny-btn.icon-note-btn svg,
+  .route-directions-icon {
+    width: 15px !important;
+    height: 15px !important;
+  }
+
+  .trip-actions .tiny-btn[data-action^="focus"] {
+    min-width: 54px !important;
+    padding-left: 9px !important;
+    padding-right: 9px !important;
+  }
+
+  .trip-actions .tiny-btn[data-action^="delete"] {
+    min-width: 36px !important;
+    padding-left: 8px !important;
+    padding-right: 8px !important;
+  }
+}
