@@ -1995,3 +1995,159 @@ select:focus {
     margin-top: 0 !important;
   }
 }
+/* =========================================================
+   ROUTEE — FINAL NOT IKONU VE METIN BOSLUGU OPTIMIZASYONU
+   Amaç:
+   - Gezi Listem not kutusunda ikon ile metin arası gereksiz boşluğu azaltmak
+   - Harita Konum Bilgisi / İşaret rengi üstündeki not kutusunda aynı sıkılığı sağlamak
+   - Kullanılabilir metin alanını genişletmek
+   - Mobil, web ve masaüstünde aynı profesyonel görünümü korumak
+   ========================================================= */
+
+/* Ortak not kutuları: Gezi Listem + Harita üzerindeki Konum Bilgisi */
+.trip-note-preview,
+.custom-info-note-preview,
+.gm-style .custom-info-note-preview,
+.gm-style-iw .custom-info-note-preview {
+  grid-template-columns: 14px minmax(0, 1fr) !important;
+  gap: 4px !important;
+
+  padding-left: 9px !important;
+  padding-right: 10px !important;
+
+  align-items: center !important;
+  align-content: center !important;
+}
+
+/* İkonu taşıyan ilk alan gereksiz genişlik almasın */
+.trip-note-preview > span:first-child,
+.custom-info-note-preview > span:first-child,
+.gm-style .custom-info-note-preview > span:first-child,
+.gm-style-iw .custom-info-note-preview > span:first-child {
+  width: 14px !important;
+  min-width: 14px !important;
+  max-width: 14px !important;
+  height: 14px !important;
+
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  align-self: center !important;
+  justify-self: center !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* SVG ikonun kendisi daha kompakt ama okunur kalsın */
+.trip-note-preview svg,
+.custom-info-note-preview svg,
+.gm-style .custom-info-note-preview svg,
+.gm-style-iw .custom-info-note-preview svg {
+  width: 13px !important;
+  height: 13px !important;
+  min-width: 13px !important;
+  max-width: 13px !important;
+
+  display: block !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+
+  align-self: center !important;
+  justify-self: center !important;
+
+  color: #2563eb !important;
+
+  fill: none !important;
+  stroke: currentColor !important;
+  stroke-width: 1.9 !important;
+  stroke-linecap: round !important;
+  stroke-linejoin: round !important;
+}
+
+/* Not metni ikon tarafına fazla uzak başlamasın */
+.trip-note-preview > span:last-child,
+.custom-info-note-preview > span:last-child,
+.gm-style .custom-info-note-preview > span:last-child,
+.gm-style-iw .custom-info-note-preview > span:last-child {
+  min-width: 0 !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+  padding-left: 0 !important;
+
+  display: block !important;
+
+  color: #334155 !important;
+  line-height: 1.33 !important;
+
+  white-space: pre-wrap !important;
+  word-break: normal !important;
+  overflow-wrap: anywhere !important;
+}
+
+/* Gezi Listem içindeki not kutusu biraz daha kompakt */
+.trip-content .trip-note-preview {
+  margin-top: 5px !important;
+  padding-top: 7px !important;
+  padding-bottom: 7px !important;
+  min-height: 34px !important;
+  max-height: 58px !important;
+}
+
+/* Harita üzerindeki not kutusu: İşaret rengi üstünde dengeli kalsın */
+.custom-info-note-preview,
+.gm-style .custom-info-note-preview,
+.gm-style-iw .custom-info-note-preview {
+  margin-top: 7px !important;
+  margin-bottom: 8px !important;
+
+  padding-top: 8px !important;
+  padding-bottom: 8px !important;
+
+  min-height: 38px !important;
+  max-height: 66px !important;
+}
+
+/* Not kutusundan sonra gelen İşaret rengi başlığı yukarı yapışmasın ama fazla da uzaklaşmasın */
+.custom-info-note-preview + *,
+.gm-style .custom-info-note-preview + *,
+.gm-style-iw .custom-info-note-preview + * {
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+}
+
+/* Daha küçük telefonlarda metin alanını daha da koru */
+@media (max-width: 390px) {
+  .trip-note-preview,
+  .custom-info-note-preview,
+  .gm-style .custom-info-note-preview,
+  .gm-style-iw .custom-info-note-preview {
+    grid-template-columns: 13px minmax(0, 1fr) !important;
+    gap: 3px !important;
+
+    padding-left: 8px !important;
+    padding-right: 9px !important;
+  }
+
+  .trip-note-preview > span:first-child,
+  .custom-info-note-preview > span:first-child,
+  .gm-style .custom-info-note-preview > span:first-child,
+  .gm-style-iw .custom-info-note-preview > span:first-child {
+    width: 13px !important;
+    min-width: 13px !important;
+    max-width: 13px !important;
+  }
+
+  .trip-note-preview svg,
+  .custom-info-note-preview svg,
+  .gm-style .custom-info-note-preview svg,
+  .gm-style-iw .custom-info-note-preview svg {
+    width: 12px !important;
+    height: 12px !important;
+    min-width: 12px !important;
+    max-width: 12px !important;
+  }
+}
