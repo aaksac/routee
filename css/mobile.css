@@ -1108,3 +1108,17 @@
     font-size: 0.82rem !important;
   }
 }
+/* =========================================================
+   ROUTEE — MOBILDE GEZI LISTEM BUTONLARI SAGDA KALSIN
+   ========================================================= */
+
+@media (max-width: 720px) {
+  .trip-item > .trip-actions {
+    justify-content: flex-end !important;
+    justify-self: end !important;
+  }
+
+  .trip-actions {
+    justify-content: flex-end !important;
+  }
+}
