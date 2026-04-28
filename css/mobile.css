@@ -1118,3 +1118,181 @@
     height: 15px !important;
   }
 }
+/* =========================================================
+   ROUTEE — MOBIL GEZI LISTEM BUTON IDEAL BOYUT DUZELTMESI
+   Yol Tarifi, Not, Odakla, Sil butonlari mobilde rahat görünür
+   ========================================================= */
+
+@media (max-width: 720px) {
+  .trip-item {
+    grid-template-columns: 42px minmax(0, 1fr) !important;
+    align-items: start !important;
+    row-gap: 10px !important;
+    column-gap: 10px !important;
+    padding: 12px !important;
+  }
+
+  .trip-order {
+    width: 42px !important;
+    height: 42px !important;
+    min-width: 42px !important;
+    border-radius: 14px !important;
+    font-size: 0.98rem !important;
+  }
+
+  .trip-content {
+    min-width: 0 !important;
+    padding-top: 1px !important;
+  }
+
+  .trip-content strong {
+    font-size: 0.94rem !important;
+    line-height: 1.28 !important;
+    overflow-wrap: anywhere !important;
+  }
+
+  .trip-content span {
+    font-size: 0.78rem !important;
+    line-height: 1.32 !important;
+    overflow-wrap: anywhere !important;
+  }
+
+  /* Butonlari kartin altinda tek satir ve rahat dokunulabilir yap */
+  .trip-item > .trip-actions {
+    grid-column: 1 / -1 !important;
+    width: 100% !important;
+    margin-top: 2px !important;
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    align-items: center !important;
+    justify-content: stretch !important;
+    gap: 8px !important;
+    min-width: 0 !important;
+  }
+
+  .trip-actions .tiny-btn {
+    height: 40px !important;
+    min-height: 40px !important;
+    border-radius: 13px !important;
+    font-size: 0.78rem !important;
+    font-weight: 750 !important;
+    line-height: 1 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    white-space: nowrap !important;
+  }
+
+  /* Yol tarifi ve not ikon butonlari küçük kalmasın */
+  .trip-actions .icon-route-btn,
+  .trip-actions .tiny-btn.icon-route-btn,
+  .trip-actions .icon-note-btn,
+  .trip-actions .tiny-btn.icon-note-btn {
+    width: 42px !important;
+    min-width: 42px !important;
+    max-width: 42px !important;
+    height: 40px !important;
+    min-height: 40px !important;
+    flex: 0 0 42px !important;
+    padding: 0 !important;
+    border-radius: 13px !important;
+    display: inline-grid !important;
+    place-items: center !important;
+  }
+
+  .trip-actions .icon-route-btn svg,
+  .trip-actions .tiny-btn.icon-route-btn svg,
+  .trip-actions .icon-note-btn svg,
+  .trip-actions .tiny-btn.icon-note-btn svg,
+  .route-directions-icon {
+    width: 18px !important;
+    height: 18px !important;
+    display: block !important;
+    margin: auto !important;
+  }
+
+  /* Odakla ve Sil butonlari ezilmesin, kalan alani dengeli paylaşsın */
+  .trip-actions .tiny-btn:not(.icon-route-btn):not(.icon-note-btn) {
+    flex: 1 1 0 !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    padding: 0 10px !important;
+  }
+
+  .trip-actions .tiny-btn[data-action^="focus"] {
+    background: linear-gradient(135deg, #0f172a, #334155) !important;
+    border-color: #334155 !important;
+    color: #ffffff !important;
+  }
+
+  .trip-actions .tiny-btn[data-action^="delete"] {
+    background: #fff5f5 !important;
+    border-color: #fecaca !important;
+    color: #b91c1c !important;
+  }
+
+  .trip-actions .tiny-btn.icon-route-btn,
+  .trip-actions .icon-route-btn {
+    background: linear-gradient(135deg, #2563eb, #1d4ed8) !important;
+    border-color: #1d4ed8 !important;
+    color: #ffffff !important;
+  }
+
+  .trip-actions .tiny-btn.icon-note-btn,
+  .trip-actions .icon-note-btn {
+    background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%) !important;
+    color: #334155 !important;
+    border: 1px solid rgba(203, 213, 225, 0.95) !important;
+  }
+
+  .trip-actions .tiny-btn.icon-note-btn.has-note,
+  .trip-actions .icon-note-btn.has-note {
+    background: linear-gradient(180deg, rgba(37, 99, 235, 0.12), rgba(37, 99, 235, 0.07)) !important;
+    color: #1d4ed8 !important;
+    border-color: rgba(37, 99, 235, 0.34) !important;
+  }
+}
+
+/* Daha küçük telefonlarda da taşmadan ideal görünüm */
+@media (max-width: 390px) {
+  .trip-item {
+    padding: 11px !important;
+    row-gap: 9px !important;
+  }
+
+  .trip-item > .trip-actions {
+    gap: 6px !important;
+  }
+
+  .trip-actions .icon-route-btn,
+  .trip-actions .tiny-btn.icon-route-btn,
+  .trip-actions .icon-note-btn,
+  .trip-actions .tiny-btn.icon-note-btn {
+    width: 40px !important;
+    min-width: 40px !important;
+    max-width: 40px !important;
+    height: 39px !important;
+    min-height: 39px !important;
+    flex-basis: 40px !important;
+  }
+
+  .trip-actions .tiny-btn {
+    height: 39px !important;
+    min-height: 39px !important;
+    font-size: 0.74rem !important;
+    border-radius: 12px !important;
+  }
+
+  .trip-actions .tiny-btn:not(.icon-route-btn):not(.icon-note-btn) {
+    padding: 0 7px !important;
+  }
+
+  .trip-actions .icon-route-btn svg,
+  .trip-actions .tiny-btn.icon-route-btn svg,
+  .trip-actions .icon-note-btn svg,
+  .trip-actions .tiny-btn.icon-note-btn svg,
+  .route-directions-icon {
+    width: 17px !important;
+    height: 17px !important;
+  }
+}
