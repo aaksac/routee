@@ -75,27 +75,20 @@
 
           <div class="map-overlay top-left">
             <div class="stack-row compact-buttons">
-              <button class="overlay-btn icon-only-btn" id="btnOpenStartPanel" type="button" aria-label="Başlangıç Ekle" title="Başlangıç Ekle">
-                <svg viewBox="0 0 24 24" aria-hidden="true">
-                  <path d="M5 3v18"></path>
-                  <path d="M7 4h9l-2.4 3L16 10H7z"></path>
-                </svg>
-              </button>
+              <div class="location-actions-wrapper">
+                <button class="overlay-btn icon-only-btn" id="btnOpenLocationActions" type="button" aria-label="Konum Ekle" title="Konum Ekle" aria-haspopup="true" aria-expanded="false">
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M12 21s-5-4.8-5-9a5 5 0 1 1 10 0c0 4.2-5 9-5 9z"></path>
+                    <circle cx="12" cy="12" r="1.8"></circle>
+                  </svg>
+                </button>
 
-              <button class="overlay-btn icon-only-btn" id="btnOpenPointPanel" type="button" aria-label="Konum Ekle" title="Konum Ekle">
-                <svg viewBox="0 0 24 24" aria-hidden="true">
-                  <path d="M12 21s-5-4.8-5-9a5 5 0 1 1 10 0c0 4.2-5 9-5 9z"></path>
-                  <circle cx="12" cy="12" r="1.8"></circle>
-                </svg>
-              </button>
-
-              <button class="overlay-btn icon-only-btn" id="btnOpenEndPanel" type="button" aria-label="Bitiş Noktası Ekle" title="Bitiş Noktası Ekle">
-                <svg viewBox="0 0 24 24" aria-hidden="true">
-                  <path d="M5 4v16"></path>
-                  <path d="M7 5h10l-2.4 3L17 11H7z"></path>
-                  <path d="M7 15h8"></path>
-                </svg>
-              </button>
+                <div class="floating-menu location-actions-menu hidden" id="locationActionsMenu" role="menu" aria-label="Konum ekleme seçenekleri">
+                  <button class="menu-item location-action-item" id="btnOpenStartPanel" type="button" role="menuitem">Başlangıç Ekle</button>
+                  <button class="menu-item location-action-item" id="btnOpenPointPanel" type="button" role="menuitem">Durak Ekle</button>
+                  <button class="menu-item location-action-item" id="btnOpenEndPanel" type="button" role="menuitem">Bitiş Ekle</button>
+                </div>
+              </div>
             </div>
 
             <section class="floating-card hidden" id="startPanel">
