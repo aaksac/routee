@@ -26,4 +26,4 @@ const appCheck = initializeAppCheck(app, {
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-export { app, auth, db, appCheck };
+export { app, auth, db, appCheck, firebaseConfig };
