@@ -1309,13 +1309,6 @@ function enableMapClickPicker(callback) {
 
     showDraftMarker(clickedLat, clickedLng);
 
-    callback({
-      lat: clickedLat,
-      lng: clickedLng,
-      name: getMapClickFallbackName(clickedLat, clickedLng),
-      source: "map-click"
-    });
-
     if (event.placeId) {
       resolveMapClickWithPlaceDetails(
         event.placeId,
@@ -1326,6 +1319,13 @@ function enableMapClickPicker(callback) {
       );
       return;
     }
+
+    callback({
+      lat: clickedLat,
+      lng: clickedLng,
+      name: getMapClickFallbackName(clickedLat, clickedLng),
+      source: "map-click"
+    });
 
     handleProgressiveMapClickFocus(clickedLat, clickedLng);
     resolveMapClickWithReverseGeocode(clickedLat, clickedLng, requestId, callback);
