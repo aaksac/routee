@@ -113,6 +113,7 @@ const elements = {
   mapMenu: document.getElementById("mapMenu"),
   btnOpenSavePanel: document.getElementById("btnOpenSavePanel"),
   btnOpenSavePanelTrip: document.getElementById("btnOpenSavePanelTrip"),
+  btnOpenMapListPanelTrip: document.getElementById("btnOpenMapListPanelTrip"),
   btnOpenImportExportPanel: document.getElementById("btnOpenImportExportPanel"),
   btnOpenMapListPanel: document.getElementById("btnOpenMapListPanel"),
   btnCloseSavePanel: document.getElementById("btnCloseSavePanel"),
@@ -2540,6 +2541,7 @@ function bindEvents() {
   elements.btnToggleMenu?.addEventListener("click", () => toggleMapMenu());
   elements.btnOpenSavePanel?.addEventListener("click", () => openFloatingPanel("save"));
   elements.btnOpenSavePanelTrip?.addEventListener("click", () => openFloatingPanel("save"));
+  elements.btnOpenMapListPanelTrip?.addEventListener("click", openSavedMapsOverlay);
   elements.btnOpenImportExportPanel?.addEventListener("click", () => openFloatingPanel("importExport"));
   elements.btnOpenMapListPanel?.addEventListener("click", openSavedMapsOverlay);
   elements.btnCloseSavePanel?.addEventListener("click", closeFloatingPanels);
