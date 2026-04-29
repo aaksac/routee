@@ -1058,12 +1058,28 @@ function showCurrentLocationMarker(lat, lng) {
 function showDraftMarker(lat, lng) {
   if (!map) return;
 
+  const normalizedLat = Number(lat);
+  const normalizedLng = Number(lng);
+
+  if (!Number.isFinite(normalizedLat) || !Number.isFinite(normalizedLng)) return;
+
+  const position = {
+    lat: normalizedLat,
+    lng: normalizedLng
+  };
+
   if (draftMarker) {
-    draftMarker.setMap(null);
+    draftMarker.setPosition(position);
+
+    if (!draftMarker.getMap()) {
+      draftMarker.setMap(map);
+    }
+
+    return;
   }
 
   draftMarker = new google.maps.Marker({
-    position: { lat, lng },
+    position,
     map,
     title: "Seçilen Nokta",
     icon: createCircleSymbol("#facc15", "#92400e", 14)
