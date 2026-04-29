@@ -1297,11 +1297,6 @@ function clearPlaceSearchInput({ keepFocus = true } = {}) {
   hideSearchDropdown();
   clearAutocompleteSession();
 
-  if (searchMarker) {
-    searchMarker.setMap(null);
-    searchMarker = null;
-  }
-
   updateSearchClearButtonVisibility();
 
   if (keepFocus) {
