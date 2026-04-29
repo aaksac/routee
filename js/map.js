@@ -496,8 +496,8 @@ function getPointSubtitle(pointData) {
 
 function createInfoWindowContent(pointData) {
   const wrapper = document.createElement("div");
-  wrapper.style.width = "236px";
-  wrapper.style.maxWidth = "236px";
+  wrapper.style.width = "min(260px, calc(100vw - 72px))";
+  wrapper.style.maxWidth = "260px";
   wrapper.style.boxSizing = "border-box";
   wrapper.style.padding = "12px";
   wrapper.style.borderRadius = "16px";
@@ -565,8 +565,16 @@ function createInfoWindowContent(pointData) {
   title.style.fontWeight = "800";
   title.style.lineHeight = "1.25";
   title.style.color = "#0f172a";
-  title.style.wordBreak = "break-word";
-  title.style.paddingRight = "30px";
+  title.style.display = "block";
+  title.style.width = "100%";
+  title.style.maxWidth = "100%";
+  title.style.boxSizing = "border-box";
+  title.style.textAlign = "left";
+  title.style.whiteSpace = "normal";
+  title.style.wordBreak = "normal";
+  title.style.overflowWrap = "break-word";
+  title.style.hyphens = "none";
+  title.style.paddingRight = "0";
   title.style.marginBottom = "8px";
 
   wrapper.appendChild(closeBtn);
@@ -743,7 +751,7 @@ function openMarkerInfo(marker, pointData) {
 
   activeInfoWindow.setContent(createInfoWindowContent(pointData));
   activeInfoWindow.setOptions({
-    maxWidth: 248,
+    maxWidth: 272,
     pixelOffset: new google.maps.Size(0, -8),
     zIndex: 9999,
     disableAutoPan: false
