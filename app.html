@@ -166,7 +166,15 @@
 
           <div class="map-overlay top-right">
             <div class="stack-row right-tools">
-              <input id="placeSearch" class="map-search-input" type="text" placeholder="Haritada yer ara" />
+              <div class="map-search-wrapper">
+                <input id="placeSearch" class="map-search-input" type="text" placeholder="Haritada yer ara" autocomplete="off" />
+                <button class="map-search-clear hidden" id="btnClearPlaceSearch" type="button" aria-label="Arama alanını temizle" title="Temizle">
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M6 6l12 12"></path>
+                    <path d="M18 6L6 18"></path>
+                  </svg>
+                </button>
+              </div>
               <div class="menu-wrapper">
                 <button class="overlay-btn menu-trigger icon-only-btn" id="btnToggleMenu" type="button" aria-label="Menü" title="Menü">
                   <svg viewBox="0 0 24 24" aria-hidden="true">
