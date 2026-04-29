@@ -186,19 +186,7 @@
                 <div class="floating-menu hidden" id="mapMenu">
                   <button class="menu-item" id="btnOpenSavePanel" type="button">Haritayı Kaydet</button>
                   <button class="menu-item" id="btnOpenImportExportPanel" type="button">İçe / Dışa Aktar</button>
-                  <button class="menu-item menu-item-with-icon" id="btnOpenMapListPanel" type="button">
-                    <span class="menu-item-icon" aria-hidden="true">
-                      <svg viewBox="0 0 24 24" aria-hidden="true">
-                        <path d="M5 6.5h14"></path>
-                        <path d="M5 12h14"></path>
-                        <path d="M5 17.5h14"></path>
-                        <circle cx="7" cy="6.5" r="1"></circle>
-                        <circle cx="7" cy="12" r="1"></circle>
-                        <circle cx="7" cy="17.5" r="1"></circle>
-                      </svg>
-                    </span>
-                    <span class="menu-item-label">Harita Listelerim</span>
-                  </button>
+                  <button class="menu-item" id="btnOpenMapListPanel" type="button">Harita Listelerim</button>
                 </div>
               </div>
             </div>
@@ -295,14 +283,26 @@
             <div>
               <h2>Gezi Listesi</h2>
             </div>
-            <button class="trip-save-icon-btn icon-only-btn" id="btnOpenSavePanelTrip" type="button" aria-label="Haritayı kaydet" title="Haritayı kaydet">
-              <svg viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M5 4.5H17.5L19 6V19.5H5V4.5Z"></path>
-                <path d="M8 4.5V10H16V4.5"></path>
-                <path d="M8 19.5V14H16V19.5"></path>
-                <path d="M10 7.25H14"></path>
-              </svg>
-            </button>
+            <div class="trip-header-actions">
+              <button class="trip-map-list-icon-btn icon-only-btn" id="btnOpenMapListPanelTrip" type="button" aria-label="Harita Listelerim" title="Harita Listelerim">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M8.5 5H18"></path>
+                  <path d="M8.5 12H18"></path>
+                  <path d="M8.5 19H18"></path>
+                  <circle cx="5.5" cy="5" r="1"></circle>
+                  <circle cx="5.5" cy="12" r="1"></circle>
+                  <circle cx="5.5" cy="19" r="1"></circle>
+                </svg>
+              </button>
+              <button class="trip-save-icon-btn icon-only-btn" id="btnOpenSavePanelTrip" type="button" aria-label="Haritayı kaydet" title="Haritayı kaydet">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M5 4.5H17.5L19 6V19.5H5V4.5Z"></path>
+                  <path d="M8 4.5V10H16V4.5"></path>
+                  <path d="M8 19.5V14H16V19.5"></path>
+                  <path d="M10 7.25H14"></path>
+                </svg>
+              </button>
+            </div>
           </div>
           <div id="tripList" class="trip-list">
             <div class="trip-item start">
