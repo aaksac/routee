@@ -1499,39 +1499,6 @@
 }
 
 
-.menu-item-with-icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-}
-
-.menu-item-icon {
-  width: 18px;
-  height: 18px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  flex: 0 0 18px;
-}
-
-.menu-item-icon svg {
-  width: 18px;
-  height: 18px;
-  stroke: currentColor;
-  fill: none;
-  stroke-width: 1.9;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-
-.menu-item-label {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-}
-
-
 .trip-header-actions {
   display: inline-flex;
   align-items: center;
@@ -1554,3 +1521,25 @@
 .trip-map-list-icon-btn:hover svg {
   stroke: var(--primary);
 }
+
+/* Mobilde Gezi Listesi başlığındaki iki ikon aynı ölçüde tutulur */
+@media (max-width: 720px) {
+  .trip-header-actions .trip-map-list-icon-btn,
+  .trip-header-actions .trip-save-icon-btn {
+    width: 48px !important;
+    min-width: 48px !important;
+    max-width: 48px !important;
+    height: 48px !important;
+    min-height: 48px !important;
+    max-height: 48px !important;
+    border-radius: 15px !important;
+    flex: 0 0 48px !important;
+  }
+
+  .trip-header-actions .trip-map-list-icon-btn svg,
+  .trip-header-actions .trip-save-icon-btn svg {
+    width: 22px !important;
+    height: 22px !important;
+  }
+}
+
