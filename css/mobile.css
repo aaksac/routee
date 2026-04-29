@@ -1562,6 +1562,12 @@
     border-radius: 10px !important;
   }
 
+  .trip-web-search-btn::before,
+  .trip-web-search-btn::after {
+    content: none !important;
+    display: none !important;
+  }
+
   .trip-web-search-btn svg {
     width: 15px !important;
     height: 15px !important;
