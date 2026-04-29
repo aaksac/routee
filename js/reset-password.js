@@ -1,5 +1,5 @@
 import {
-  checkActionCode,
+  verifyPasswordResetCode,
   confirmPasswordReset
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
@@ -61,12 +61,13 @@ async function validateLink() {
   }
 
   try {
-    await checkActionCode(auth, actionCode);
+    await verifyPasswordResetCode(auth, actionCode);
     setMessage("Bağlantı doğrulandı. Yeni şifreni girip işlemi tamamlayabilirsin.");
     elements.resetForm.hidden = false;
   } catch (error) {
+    console.error("Şifre sıfırlama bağlantısı doğrulanamadı:", error);
     setMessage(
-      "Bu bağlantının süresi dolmuş olabilir veya bağlantı daha önce kullanılmış olabilir. Lütfen uygulamadan yeni bir şifre sıfırlama maili iste.",
+      "Bu bağlantının süresi dolmuş, hatalı veya daha önce kullanılmış olabilir. Lütfen uygulamadan yeni bir şifre sıfırlama maili iste.",
       "error"
     );
   }
@@ -96,8 +97,9 @@ async function handleSubmit(event) {
       window.location.href = continueUrl;
     }, 1200);
   } catch (error) {
+    console.error("Şifre güncellenemedi:", error);
     setMessage(
-      "Şifre güncellenemedi. Bağlantı süresi dolmuş olabilir. Lütfen yeniden şifre sıfırlama maili iste.",
+      "Şifre güncellenemedi. Bağlantı süresi dolmuş veya kullanılmış olabilir. Lütfen yeniden şifre sıfırlama maili iste.",
       "error"
     );
   }
