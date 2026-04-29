@@ -1622,26 +1622,28 @@ select:focus {
 .location-actions-menu {
   left: 0;
   right: auto;
-  width: 176px;
-  min-width: 176px;
+  width: max-content;
+  min-width: 0;
   max-width: calc(100vw - 36px);
-  padding: 8px;
-  gap: 7px;
+  padding: 6px;
+  gap: 6px;
   z-index: 12;
+  align-items: center;
   box-sizing: border-box;
 }
 
 .location-actions-menu .location-action-item {
-  width: 100%;
-  min-width: 0;
-  max-width: none;
-  min-height: 44px;
-  padding: 0 14px;
+  width: 138px;
+  min-width: 138px;
+  max-width: 138px;
+  min-height: 40px;
+  padding: 0 10px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   text-align: center;
   white-space: nowrap;
   line-height: 1;
+  font-size: 0.86rem;
   box-sizing: border-box;
 }
