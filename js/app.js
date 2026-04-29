@@ -1974,7 +1974,16 @@ async function handleXlsxFileChange(event) {
 
 async function handleCurrentLocationClick() {
   try {
-    await locateAndShowUser();
+    const coords = await locateAndShowUser();
+    const lat = Number(coords?.lat);
+    const lng = Number(coords?.lng);
+
+    if (Number.isFinite(lat) && Number.isFinite(lng)) {
+      fillBothFormsFromMap(lat, lng, "Mevcut Konumunuz");
+      state.editingPointId = null;
+      markDirty();
+    }
+
     elements.authStatus.textContent = "Mevcut konum haritada gösterildi.";
   } catch (error) {
     elements.authStatus.textContent = `Konum alınamadı: ${error.message}`;
