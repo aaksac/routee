@@ -1245,6 +1245,7 @@ function resolveMapClickWithReverseGeocode(lat, lng, requestId, callback) {
 
 function resolveMapClickWithPlaceDetails(placeId, clickedLat, clickedLng, requestId, callback) {
   if (!placeId || !map) {
+    handleProgressiveMapClickFocus(clickedLat, clickedLng);
     resolveMapClickWithReverseGeocode(clickedLat, clickedLng, requestId, callback);
     return;
   }
@@ -1262,6 +1263,7 @@ function resolveMapClickWithPlaceDetails(placeId, clickedLat, clickedLng, reques
       if (requestId !== mapClickDetailsRequestId) return;
 
       if (status !== google.maps.places.PlacesServiceStatus.OK || !place) {
+        handleProgressiveMapClickFocus(clickedLat, clickedLng);
         resolveMapClickWithReverseGeocode(clickedLat, clickedLng, requestId, callback);
         return;
       }
@@ -1306,7 +1308,6 @@ function enableMapClickPicker(callback) {
     }
 
     showDraftMarker(clickedLat, clickedLng);
-    handleProgressiveMapClickFocus(clickedLat, clickedLng);
 
     callback({
       lat: clickedLat,
@@ -1326,6 +1327,7 @@ function enableMapClickPicker(callback) {
       return;
     }
 
+    handleProgressiveMapClickFocus(clickedLat, clickedLng);
     resolveMapClickWithReverseGeocode(clickedLat, clickedLng, requestId, callback);
   });
 }
