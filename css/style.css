@@ -484,12 +484,62 @@ select:focus {
   margin-bottom: 6px;
 }
 
-.map-search-input {
+.map-search-wrapper {
+  position: relative;
   width: min(260px, 40vw);
+  min-width: 0;
+  flex: 0 0 auto;
+}
+
+.map-search-input {
+  width: 100%;
   min-height: 42px;
+  padding-right: 44px;
   border-radius: 999px;
   background: var(--panel-soft);
   box-shadow: var(--shadow-soft);
+}
+
+.map-search-clear {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  z-index: 4;
+  width: 28px;
+  height: 28px;
+  min-width: 28px;
+  min-height: 28px;
+  padding: 0;
+  transform: translateY(-50%);
+  border: 1px solid rgba(148, 163, 184, 0.28);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.86);
+  color: #64748b;
+  box-shadow: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.18s ease, color 0.18s ease, border-color 0.18s ease, transform 0.18s ease;
+}
+
+.map-search-clear:hover,
+.map-search-clear:focus-visible {
+  background: #fff;
+  color: #0f172a;
+  border-color: rgba(37, 99, 235, 0.28);
+  transform: translateY(-50%) scale(1.04);
+}
+
+.map-search-clear svg {
+  width: 15px;
+  height: 15px;
+  stroke: currentColor;
+  stroke-width: 2.3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  fill: none;
+  pointer-events: none;
 }
 
 .fab-btn {
@@ -759,10 +809,16 @@ select:focus {
     gap: 10px;
   }
 
-  .map-search-input {
+  .map-search-wrapper {
     width: 250px;
     min-width: 250px;
     max-width: 250px;
+  }
+
+  .map-search-input {
+    width: 100%;
+    min-width: 0;
+    max-width: none;
   }
 }
 
