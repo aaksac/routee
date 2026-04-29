@@ -25,19 +25,20 @@ function watchAuth(callback) {
   return onAuthStateChanged(auth, callback);
 }
 
+function buildContinueUrl() {
+  return new URL("./index.html?reset=success", window.location.href).toString();
+}
+
 function sendReset(email) {
-  const normalizedEmail = String(email || "").trim().toLowerCase();
-
-  if (!normalizedEmail) {
-    return Promise.reject({ code: "auth/missing-email" });
-  }
-
-  return sendPasswordResetEmail(auth, normalizedEmail);
+  return sendPasswordResetEmail(auth, email, {
+    url: buildContinueUrl(),
+    handleCodeInApp: false
+  });
 }
 
 async function getUserClaims(user) {
   if (!user) return {};
-  const tokenResult = await getIdTokenResult(user);
+  const tokenResult = await getIdTokenResult(user, true);
   return tokenResult.claims || {};
 }
 
