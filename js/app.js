@@ -1436,10 +1436,18 @@ function addOrUpdatePoint() {
   const convertedStartPoint = startWillBeConvertedToPoint
     ? { ...state.startPoint }
     : null;
+  const endWillBeConvertedToPoint =
+    Boolean(state.endPoint) && isSamePlace(state.endPoint, pointLocation);
+  const convertedEndPoint = endWillBeConvertedToPoint
+    ? { ...state.endPoint }
+    : null;
 
   const isNewPoint = !state.editingPointId;
   const willAddNewLocationSlot =
-    isNewPoint && !duplicatePoint && !startWillBeConvertedToPoint;
+    isNewPoint &&
+    !duplicatePoint &&
+    !startWillBeConvertedToPoint &&
+    !endWillBeConvertedToPoint;
 
   if (willAddNewLocationSlot && !canAddMoreLocations(1)) {
     alert(`Başlangıç dahil en fazla ${state.locationQuota} konum eklenebilir.`);
@@ -1460,7 +1468,12 @@ function addOrUpdatePoint() {
             lat: Number(lat),
             lng: Number(lng),
             color,
-            note: point.note || removedDuplicatePoint?.note || convertedStartPoint?.note || ""
+            note:
+              point.note ||
+              removedDuplicatePoint?.note ||
+              convertedStartPoint?.note ||
+              convertedEndPoint?.note ||
+              ""
           }
         : point
     );
@@ -1473,7 +1486,11 @@ function addOrUpdatePoint() {
       lat: Number(lat),
       lng: Number(lng),
       color,
-      note: removedDuplicatePoint?.note || convertedStartPoint?.note || "",
+      note:
+        removedDuplicatePoint?.note ||
+        convertedStartPoint?.note ||
+        convertedEndPoint?.note ||
+        "",
       distanceFromPrevious: 0,
       type: "point"
     });
@@ -1485,6 +1502,12 @@ function addOrUpdatePoint() {
     detachStartPoint();
   }
 
+  if (endWillBeConvertedToPoint) {
+    state.endPoint = null;
+    clearEndMarker();
+    setEndForm(null);
+  }
+
   clearDraftMarker();
   clearPointForm();
   recomputeRoute();
@@ -1493,6 +1516,8 @@ function addOrUpdatePoint() {
 
   if (startWillBeConvertedToPoint) {
     notifyStartPointRemoved(true);
+  } else if (endWillBeConvertedToPoint) {
+    elements.authStatus.textContent = `Bitiş noktası normal konuma dönüştürüldü: ${name}`;
   } else {
     elements.authStatus.textContent = duplicatePoint
       ? `Aynı konum güncellendi: ${name}`
