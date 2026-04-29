@@ -269,7 +269,15 @@ function dispatchMarkerNoteRequest(pointData) {
 }
 
 function normalizeNote(value) {
-  return String(value ?? "").trim();
+  return String(value ?? "")
+    .replace(/\u0000/g, "")
+    .replace(/<\s*\/?\s*script\b[^>]*>/gi, "")
+    .replace(/<[^>]*>/g, "")
+    .replace(/\bjavascript\s*:/gi, "")
+    .replace(/\bdata\s*:\s*text\/html/gi, "")
+    .replace(/\bon[a-z]+\s*=/gi, "")
+    .replace(/[<>\x60]/g, "")
+    .trim();
 }
 
 function hasPointNote(pointData) {
