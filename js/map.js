@@ -99,6 +99,23 @@ function scrollMapAreaIntoViewOnMobile() {
   });
 }
 
+function blurActiveControlForStableMapSelection() {
+  const activeElement = document.activeElement;
+
+  if (!activeElement || activeElement === document.body) return;
+
+  const tagName = String(activeElement.tagName || "").toLowerCase();
+  const isEditableElement =
+    tagName === "input" ||
+    tagName === "textarea" ||
+    tagName === "select" ||
+    activeElement.isContentEditable === true;
+
+  if (!isEditableElement || typeof activeElement.blur !== "function") return;
+
+  activeElement.blur();
+}
+
 function getProgressiveClickTargetZoom(currentZoom) {
   const normalizedZoom = getCurrentMapZoom();
   const sourceZoom = Number.isFinite(Number(currentZoom))
@@ -1261,6 +1278,7 @@ function resolveMapClickWithReverseGeocode(lat, lng, requestId, callback) {
 
 function resolveMapClickWithPlaceDetails(placeId, clickedLat, clickedLng, requestId, callback) {
   if (!placeId || !map) {
+    showDraftMarker(clickedLat, clickedLng);
     handleProgressiveMapClickFocus(clickedLat, clickedLng);
     resolveMapClickWithReverseGeocode(clickedLat, clickedLng, requestId, callback);
     return;
@@ -1279,6 +1297,7 @@ function resolveMapClickWithPlaceDetails(placeId, clickedLat, clickedLng, reques
       if (requestId !== mapClickDetailsRequestId) return;
 
       if (status !== google.maps.places.PlacesServiceStatus.OK || !place) {
+        showDraftMarker(clickedLat, clickedLng);
         handleProgressiveMapClickFocus(clickedLat, clickedLng);
         resolveMapClickWithReverseGeocode(clickedLat, clickedLng, requestId, callback);
         return;
@@ -1289,14 +1308,20 @@ function resolveMapClickWithPlaceDetails(placeId, clickedLat, clickedLng, reques
       const lng = typeof location?.lng === "function" ? location.lng() : clickedLng;
       const name = String(place.name || "").trim() || getMapClickFallbackName(lat, lng);
 
+      // Place Details başarılı olduğunda marker yalnızca bir kez, nihai koordinata basılır.
+      // Böylece tıklanan pikselden POI merkezine taşınma kaynaklı sağa-sola oynama olmaz.
       showDraftMarker(lat, lng);
 
-      callback({
-        lat,
-        lng,
-        name,
-        placeId: place.place_id || placeId,
-        source: "map-place-details"
+      window.requestAnimationFrame(() => {
+        if (requestId !== mapClickDetailsRequestId) return;
+
+        callback({
+          lat,
+          lng,
+          name,
+          placeId: place.place_id || placeId,
+          source: "map-place-details"
+        });
       });
     }
   );
@@ -1314,6 +1339,9 @@ function enableMapClickPicker(callback) {
     const clickedLng = event.latLng.lng();
     const requestId = ++mapClickDetailsRequestId;
 
+    cancelSmoothZoom();
+    blurActiveControlForStableMapSelection();
+
     if (event.placeId && typeof event.stop === "function") {
       event.stop();
     }
@@ -1322,8 +1350,6 @@ function enableMapClickPicker(callback) {
       searchMarker.setMap(null);
       searchMarker = null;
     }
-
-    showDraftMarker(clickedLat, clickedLng);
 
     if (event.placeId) {
       resolveMapClickWithPlaceDetails(
@@ -1335,6 +1361,8 @@ function enableMapClickPicker(callback) {
       );
       return;
     }
+
+    showDraftMarker(clickedLat, clickedLng);
 
     callback({
       lat: clickedLat,
