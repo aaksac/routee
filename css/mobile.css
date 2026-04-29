@@ -1467,3 +1467,33 @@
     border-radius: 14px;
   }
 }
+
+/* Mobilde Gezi Listesi hızlı kaydetme butonunu mavi sabitle */
+@media (max-width: 720px) {
+  .trip-save-icon-btn {
+    width: 42px !important;
+    min-width: 42px !important;
+    max-width: 42px !important;
+    height: 42px !important;
+    min-height: 42px !important;
+    border-radius: 14px !important;
+    background: linear-gradient(180deg, #2563eb, #1d4ed8) !important;
+    border: 1px solid rgba(37, 99, 235, 0.75) !important;
+    box-shadow: 0 12px 24px rgba(37, 99, 235, 0.24), inset 0 1px 0 rgba(255, 255, 255, 0.24) !important;
+  }
+
+  .trip-save-icon-btn svg {
+    width: 20px !important;
+    height: 20px !important;
+    stroke: #ffffff !important;
+  }
+
+  .trip-save-icon-btn:hover {
+    background: linear-gradient(180deg, #1d4ed8, #1e40af) !important;
+    border-color: rgba(29, 78, 216, 0.9) !important;
+  }
+
+  .trip-save-icon-btn:hover svg {
+    stroke: #ffffff !important;
+  }
+}
