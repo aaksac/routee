@@ -1611,3 +1611,22 @@ select:focus {
   border-radius: 999px !important;
   border: 2px solid rgba(248, 250, 252, 0.94) !important;
 }
+
+/* Tek konum menüsü: Başlangıç / Durak / Bitiş seçenekleri */
+.location-actions-wrapper {
+  position: relative;
+  display: inline-flex;
+  align-items: flex-start;
+}
+
+.location-actions-menu {
+  left: 0;
+  right: auto;
+  min-width: 158px;
+  z-index: 12;
+}
+
+.location-action-item {
+  justify-content: flex-start;
+  text-align: left;
+}
