@@ -1288,6 +1288,23 @@ function updateSearchClearButtonVisibility() {
   searchClearButtonEl.classList.toggle("hidden", !hasSearchText);
 }
 
+function focusPlaceSearchInput() {
+  if (!searchInputEl) return;
+
+  try {
+    searchInputEl.focus({ preventScroll: true });
+  } catch (error) {
+    searchInputEl.focus();
+  }
+
+  try {
+    const cursorPosition = searchInputEl.value.length;
+    searchInputEl.setSelectionRange(cursorPosition, cursorPosition);
+  } catch (error) {
+    // Bazı mobil tarayıcılar belirli input durumlarında seçim aralığını desteklemeyebilir.
+  }
+}
+
 function clearPlaceSearchInput({ keepFocus = true } = {}) {
   if (!searchInputEl) return;
 
@@ -1300,10 +1317,10 @@ function clearPlaceSearchInput({ keepFocus = true } = {}) {
   updateSearchClearButtonVisibility();
 
   if (keepFocus) {
-    searchInputEl.focus();
+    focusPlaceSearchInput();
+    window.requestAnimationFrame(() => focusPlaceSearchInput());
+    window.setTimeout(() => focusPlaceSearchInput(), 40);
   }
-
-  resetPageZoomAfterSearch();
 }
 
 function ensureAutocompleteSessionToken() {
