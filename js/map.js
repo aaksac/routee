@@ -14,8 +14,10 @@ let searchService = null;
 let geocoder = null;
 let searchDropdown = null;
 let searchInputEl = null;
+let searchClearButtonEl = null;
 let searchSelectHandlerBound = false;
 let searchInputHandlerBound = false;
+let searchClearHandlerBound = false;
 let searchBlurHandlerBound = false;
 let searchFocusHandlerBound = false;
 let isInteractingWithSearchDropdown = false;
@@ -1271,6 +1273,44 @@ function hideSearchDropdown() {
   currentPredictions = [];
 }
 
+function getSearchClearButton(inputElement) {
+  return (
+    document.getElementById("btnClearPlaceSearch") ||
+    inputElement?.parentElement?.querySelector(".map-search-clear") ||
+    null
+  );
+}
+
+function updateSearchClearButtonVisibility() {
+  if (!searchClearButtonEl || !searchInputEl) return;
+
+  const hasSearchText = searchInputEl.value.trim().length > 0;
+  searchClearButtonEl.classList.toggle("hidden", !hasSearchText);
+}
+
+function clearPlaceSearchInput({ keepFocus = true } = {}) {
+  if (!searchInputEl) return;
+
+  searchInputEl.value = "";
+  window.clearTimeout(searchDebounceTimer);
+  lastPredictionRequestId += 1;
+  hideSearchDropdown();
+  clearAutocompleteSession();
+
+  if (searchMarker) {
+    searchMarker.setMap(null);
+    searchMarker = null;
+  }
+
+  updateSearchClearButtonVisibility();
+
+  if (keepFocus) {
+    searchInputEl.focus();
+  }
+
+  resetPageZoomAfterSearch();
+}
+
 function ensureAutocompleteSessionToken() {
   if (!activeAutocompleteSessionToken) {
     activeAutocompleteSessionToken = new google.maps.places.AutocompleteSessionToken();
@@ -1393,6 +1433,7 @@ function renderPredictions(predictions, onPlaceSelected) {
 
         if (searchInputEl) {
           searchInputEl.value = selectedName;
+          updateSearchClearButtonVisibility();
         }
 
         hideSearchDropdown();
@@ -1418,15 +1459,33 @@ function initPlaceSearch(inputElement, onPlaceSelected) {
   if (!inputElement || !map || !searchService) return;
 
   searchInputEl = inputElement;
+  searchClearButtonEl = getSearchClearButton(inputElement);
   ensureSearchDropdown(inputElement);
+  updateSearchClearButtonVisibility();
+
+  if (searchClearButtonEl && !searchClearHandlerBound) {
+    searchClearButtonEl.addEventListener("pointerdown", (event) => {
+      event.preventDefault();
+    });
+
+    searchClearButtonEl.addEventListener("click", (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      clearPlaceSearchInput({ keepFocus: true });
+    });
+
+    searchClearHandlerBound = true;
+  }
 
   if (!searchInputHandlerBound) {
     inputElement.addEventListener("input", () => {
       const query = inputElement.value.trim();
 
+      updateSearchClearButtonVisibility();
       window.clearTimeout(searchDebounceTimer);
 
       if (query.length < MIN_SEARCH_LENGTH) {
+        lastPredictionRequestId += 1;
         hideSearchDropdown();
         clearAutocompleteSession();
         return;
@@ -1467,6 +1526,7 @@ function initPlaceSearch(inputElement, onPlaceSelected) {
 
   if (!searchFocusHandlerBound) {
     inputElement.addEventListener("focus", () => {
+      updateSearchClearButtonVisibility();
       const query = inputElement.value.trim();
       if (query.length >= MIN_SEARCH_LENGTH && currentPredictions.length) {
         searchDropdown.style.display = "block";
