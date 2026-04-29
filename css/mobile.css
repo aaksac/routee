@@ -1457,3 +1457,13 @@
     box-sizing: border-box !important;
   }
 }
+
+@media (max-width: 720px) {
+  .trip-save-icon-btn {
+    width: 42px;
+    min-width: 42px;
+    height: 42px;
+    min-height: 42px;
+    border-radius: 14px;
+  }
+}
