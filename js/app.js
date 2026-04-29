@@ -397,6 +397,36 @@ function directionsIconSvg() {
     </svg>`;
 }
 
+function webSearchIconSvg() {
+  return `
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <circle cx="11" cy="11" r="6.5"></circle>
+      <path d="m16 16 4.2 4.2"></path>
+    </svg>`;
+}
+
+function openWebSearchForLocation(location) {
+  const query = String(location?.name ?? "").trim();
+  if (!query) return;
+
+  const url = `https://www.google.com/search?q=${encodeURIComponent(query)}`;
+  const openedWindow = window.open(url, "_blank", "noopener,noreferrer");
+
+  if (openedWindow) {
+    openedWindow.opener = null;
+    return;
+  }
+
+  const link = document.createElement("a");
+  link.href = url;
+  link.target = "_blank";
+  link.rel = "noopener noreferrer";
+  link.style.display = "none";
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+}
+
 function renderNoteButton({ action, id = "", hasNote = false }) {
   const noteClass = hasNote ? " has-note" : "";
   const title = hasNote ? "Notu görüntüle / düzenle" : "Not ekle";
@@ -1226,6 +1256,7 @@ function renderTripList() {
   const startHtml = state.startPoint
     ? `
       <div class="trip-item start${hasLocationNote(state.startPoint) ? " has-note" : ""}">
+        <button class="trip-web-search-btn" type="button" data-action="web-search-start" aria-label="Web’de ara" title="Web’de ara">${webSearchIconSvg()}</button>
         <div class="trip-order">S</div>
         <div class="trip-content">
           <strong>${escapeHtml(state.startPoint.name)}</strong>
@@ -1259,6 +1290,7 @@ function renderTripList() {
 
       return `
         <div class="trip-item${pointHasNote ? " has-note" : ""}">
+          <button class="trip-web-search-btn" type="button" data-action="web-search-point" data-id="${point.id}" aria-label="Web’de ara" title="Web’de ara">${webSearchIconSvg()}</button>
           <div class="trip-order" style="background:${escapeHtml(pointColor)}; box-shadow: 0 12px 22px ${escapeHtml(pointShadow)}">${index + 1}</div>
           <div class="trip-content">
             <strong>${escapeHtml(point.name)}</strong>
@@ -1279,6 +1311,7 @@ function renderTripList() {
   const endHtml = state.endPoint
     ? `
       <div class="trip-item end${hasLocationNote(state.endPoint) ? " has-note" : ""}">
+        <button class="trip-web-search-btn" type="button" data-action="web-search-end" aria-label="Web’de ara" title="Web’de ara">${webSearchIconSvg()}</button>
         <div class="trip-order end-order">E</div>
         <div class="trip-content">
           <strong>${escapeHtml(state.endPoint.name)}</strong>
@@ -2108,6 +2141,25 @@ function handleTripListClick(event) {
 
   const action = target.dataset.action;
   if (!action) return;
+
+  if (action === "web-search-start") {
+    if (!state.startPoint) return;
+    openWebSearchForLocation(state.startPoint);
+    return;
+  }
+
+  if (action === "web-search-end") {
+    if (!state.endPoint) return;
+    openWebSearchForLocation(state.endPoint);
+    return;
+  }
+
+  if (action === "web-search-point") {
+    const point = state.points.find((item) => String(item.id) === String(target.dataset.id));
+    if (!point) return;
+    openWebSearchForLocation(point);
+    return;
+  }
 
   if (action === "note-start") {
     if (!state.startPoint) return;
