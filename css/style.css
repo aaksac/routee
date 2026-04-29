@@ -1712,9 +1712,24 @@ select:focus {
   min-height: 40px;
   border-radius: 14px;
   flex: 0 0 auto;
+  background: linear-gradient(180deg, #2563eb, #1d4ed8);
+  border: 1px solid rgba(37, 99, 235, 0.75);
+  box-shadow:
+    0 12px 24px rgba(37, 99, 235, 0.24),
+    inset 0 1px 0 rgba(255, 255, 255, 0.24);
 }
 
 .trip-save-icon-btn svg {
   width: 20px;
   height: 20px;
+  stroke: #ffffff;
+}
+
+.trip-save-icon-btn:hover {
+  background: linear-gradient(180deg, #1d4ed8, #1e40af);
+  border-color: rgba(29, 78, 216, 0.9);
+}
+
+.trip-save-icon-btn:hover svg {
+  stroke: #ffffff;
 }
