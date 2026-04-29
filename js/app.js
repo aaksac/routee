@@ -400,31 +400,54 @@ function directionsIconSvg() {
 function webSearchIconSvg() {
   return `
     <svg viewBox="0 0 24 24" aria-hidden="true">
-      <circle cx="11" cy="11" r="6.5"></circle>
-      <path d="m16 16 4.2 4.2"></path>
+      <circle cx="10.8" cy="10.8" r="5.8"></circle>
+      <path d="m15.2 15.2 3.2 3.2"></path>
+      <path d="M15.2 5.6h3.2v3.2"></path>
+      <path d="m18.4 5.6-4.1 4.1"></path>
     </svg>`;
+}
+
+const WEB_SEARCH_WINDOW_NAME = "routee_web_search_window";
+const WEB_SEARCH_CLICK_GUARD_MS = 900;
+let lastWebSearchOpen = { url: "", time: 0 };
+
+function buildWebSearchUrl(query) {
+  return `https://www.google.com/search?q=${encodeURIComponent(query)}`;
 }
 
 function openWebSearchForLocation(location) {
   const query = String(location?.name ?? "").trim();
   if (!query) return;
 
-  const url = `https://www.google.com/search?q=${encodeURIComponent(query)}`;
-  const openedWindow = window.open(url, "_blank", "noopener,noreferrer");
+  const url = buildWebSearchUrl(query);
+  const now = Date.now();
 
-  if (openedWindow) {
-    openedWindow.opener = null;
+  if (lastWebSearchOpen.url === url && now - lastWebSearchOpen.time < WEB_SEARCH_CLICK_GUARD_MS) {
     return;
   }
 
-  const link = document.createElement("a");
-  link.href = url;
-  link.target = "_blank";
-  link.rel = "noopener noreferrer";
-  link.style.display = "none";
-  document.body.appendChild(link);
-  link.click();
-  link.remove();
+  lastWebSearchOpen = { url, time: now };
+
+  try {
+    const openedWindow = window.open(url, WEB_SEARCH_WINDOW_NAME);
+
+    if (openedWindow) {
+      try {
+        openedWindow.opener = null;
+      } catch {}
+
+      try {
+        openedWindow.focus();
+      } catch {}
+
+      return;
+    }
+  } catch {}
+
+  if (elements?.authStatus) {
+    elements.authStatus.textContent =
+      "Tarayıcı web aramasını engelledi. Lütfen tarayıcı açılır pencere iznini kontrol edin.";
+  }
 }
 
 function renderNoteButton({ action, id = "", hasNote = false }) {
@@ -2143,18 +2166,24 @@ function handleTripListClick(event) {
   if (!action) return;
 
   if (action === "web-search-start") {
+    event.preventDefault();
+    event.stopPropagation();
     if (!state.startPoint) return;
     openWebSearchForLocation(state.startPoint);
     return;
   }
 
   if (action === "web-search-end") {
+    event.preventDefault();
+    event.stopPropagation();
     if (!state.endPoint) return;
     openWebSearchForLocation(state.endPoint);
     return;
   }
 
   if (action === "web-search-point") {
+    event.preventDefault();
+    event.stopPropagation();
     const point = state.points.find((item) => String(item.id) === String(target.dataset.id));
     if (!point) return;
     openWebSearchForLocation(point);
