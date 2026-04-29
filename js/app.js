@@ -399,11 +399,9 @@ function directionsIconSvg() {
 
 function webSearchIconSvg() {
   return `
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <circle cx="10.8" cy="10.8" r="5.8"></circle>
-      <path d="m15.2 15.2 3.2 3.2"></path>
-      <path d="M15.2 5.6h3.2v3.2"></path>
-      <path d="m18.4 5.6-4.1 4.1"></path>
+    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <path d="M10.9 17.2a6.3 6.3 0 1 1 0-12.6 6.3 6.3 0 0 1 0 12.6Z"></path>
+      <path d="M15.6 15.6 20 20"></path>
     </svg>`;
 }
 
