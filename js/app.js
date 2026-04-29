@@ -41,6 +41,7 @@ const state = {
   tripPanelOpen: true,
   activeFloatingPanel: null,
   mapMenuOpen: false,
+  locationActionsMenuOpen: false,
   points: [],
   totalDistance: 0,
   currentUser: null,
@@ -100,6 +101,8 @@ const elements = {
   authStatus: document.getElementById("authStatus"),
   mapList: document.getElementById("mapList"),
   placeSearch: document.getElementById("placeSearch"),
+  btnOpenLocationActions: document.getElementById("btnOpenLocationActions"),
+  locationActionsMenu: document.getElementById("locationActionsMenu"),
   btnOpenStartPanel: document.getElementById("btnOpenStartPanel"),
   btnOpenPointPanel: document.getElementById("btnOpenPointPanel"),
   btnOpenEndPanel: document.getElementById("btnOpenEndPanel"),
@@ -2176,6 +2179,43 @@ function handleTripListClick(event) {
   }
 }
 
+function closeLocationActionMenu() {
+  state.locationActionsMenuOpen = false;
+  elements.locationActionsMenu?.classList.add("hidden");
+  elements.btnOpenLocationActions?.setAttribute("aria-expanded", "false");
+}
+
+function closeFloatingPanelsOnly() {
+  [
+    elements.startPanel,
+    elements.pointPanel,
+    elements.endPanel,
+    elements.savePanel,
+    elements.importExportPanel
+  ].forEach((panel) => {
+    panel?.classList.add("hidden");
+  });
+
+  state.activeFloatingPanel = null;
+  syncMobilePanelState();
+}
+
+function toggleLocationActionMenu(forceValue) {
+  state.locationActionsMenuOpen =
+    typeof forceValue === "boolean" ? forceValue : !state.locationActionsMenuOpen;
+
+  if (state.locationActionsMenuOpen) {
+    closeMapMenu();
+    closeFloatingPanelsOnly();
+  }
+
+  elements.locationActionsMenu?.classList.toggle("hidden", !state.locationActionsMenuOpen);
+  elements.btnOpenLocationActions?.setAttribute(
+    "aria-expanded",
+    state.locationActionsMenuOpen ? "true" : "false"
+  );
+}
+
 function closeMapMenu() {
   state.mapMenuOpen = false;
   elements.mapMenu?.classList.add("hidden");
@@ -2234,6 +2274,11 @@ function syncMobilePanelState() {
 
 function toggleMapMenu(forceValue) {
   state.mapMenuOpen = typeof forceValue === "boolean" ? forceValue : !state.mapMenuOpen;
+
+  if (state.mapMenuOpen) {
+    closeLocationActionMenu();
+  }
+
   elements.mapMenu?.classList.toggle("hidden", !state.mapMenuOpen);
 }
 
@@ -2248,6 +2293,7 @@ function closeFloatingPanels() {
     panel?.classList.add("hidden");
   });
   state.activeFloatingPanel = null;
+  closeLocationActionMenu();
   syncMobilePanelState();
 }
 
@@ -2266,6 +2312,7 @@ function openFloatingPanel(panelName) {
   const isOpen = !panel.classList.contains("hidden");
   closeFloatingPanels();
   closeMapMenu();
+  closeLocationActionMenu();
 
   if (!isOpen) {
     panel.classList.remove("hidden");
@@ -2278,6 +2325,7 @@ function openFloatingPanel(panelName) {
 function openSavedMapsOverlay() {
   closeFloatingPanels();
   closeMapMenu();
+  closeLocationActionMenu();
   elements.savedMapsOverlay?.classList.remove("hidden");
 }
 
@@ -2287,13 +2335,15 @@ function closeSavedMapsOverlay() {
 
 function handleShellClick(event) {
   const insideMenu = event.target.closest(".menu-wrapper");
+  const insideLocationActions = event.target.closest(".location-actions-wrapper");
   const insideFloatingCard = event.target.closest(".floating-card");
-  const startTrigger = event.target.closest("#btnOpenStartPanel");
-  const pointTrigger = event.target.closest("#btnOpenPointPanel");
-  const endTrigger = event.target.closest("#btnOpenEndPanel");
 
-  if (!insideMenu && !insideFloatingCard && !startTrigger && !pointTrigger && !endTrigger) {
+  if (!insideMenu) {
     closeMapMenu();
+  }
+
+  if (!insideLocationActions && !insideFloatingCard) {
+    closeLocationActionMenu();
   }
 }
 
@@ -2392,6 +2442,11 @@ function bindEvents() {
   });
 
   elements.btnLogoutTop?.addEventListener("click", handleLogout);
+
+  elements.btnOpenLocationActions?.addEventListener("click", (event) => {
+    event.stopPropagation();
+    toggleLocationActionMenu();
+  });
 
   elements.btnOpenStartPanel?.addEventListener("click", () => {
     if (window.innerWidth <= 720 && !hasDraftCoordinates()) {
