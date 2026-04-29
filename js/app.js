@@ -1157,6 +1157,7 @@ function fillStartFormFromMap(lat, lng, suggestedName = "") {
 function fillPointFormFromMap(lat, lng, suggestedName = "") {
   elements.pointLat.value = lat.toFixed(6);
   elements.pointLng.value = lng.toFixed(6);
+  setSelectedPointColor(DEFAULT_POINT_COLOR);
 
   if (suggestedName) {
     elements.pointName.value = suggestedName;
