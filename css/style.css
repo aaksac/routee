@@ -1777,3 +1777,54 @@ select:focus {
   height: 21px;
 }
 
+
+/* Gezi Listem: her ekli yer için sağ üst Web’de Ara ikonu */
+.trip-item {
+  position: relative !important;
+  padding-right: 50px !important;
+}
+
+.trip-web-search-btn {
+  position: absolute !important;
+  top: 10px !important;
+  right: 10px !important;
+  z-index: 3 !important;
+  width: 30px !important;
+  min-width: 30px !important;
+  max-width: 30px !important;
+  height: 30px !important;
+  min-height: 30px !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border-radius: 10px !important;
+  border: 1px solid rgba(37, 99, 235, 0.24) !important;
+  background: rgba(239, 246, 255, 0.96) !important;
+  color: #1d4ed8 !important;
+  display: inline-grid !important;
+  place-items: center !important;
+  cursor: pointer !important;
+  box-shadow: 0 8px 18px rgba(37, 99, 235, 0.12) !important;
+  transition: transform 0.16s ease, box-shadow 0.16s ease, background 0.16s ease, color 0.16s ease !important;
+}
+
+.trip-web-search-btn svg {
+  width: 15px !important;
+  height: 15px !important;
+  display: block !important;
+  fill: none !important;
+  stroke: currentColor !important;
+  stroke-width: 2.1 !important;
+  stroke-linecap: round !important;
+  stroke-linejoin: round !important;
+}
+
+.trip-web-search-btn:hover {
+  transform: translateY(-1px) !important;
+  background: #2563eb !important;
+  color: #ffffff !important;
+  box-shadow: 0 10px 22px rgba(37, 99, 235, 0.24) !important;
+}
+
+.trip-web-search-btn:active {
+  transform: translateY(0) scale(0.98) !important;
+}
