@@ -407,47 +407,26 @@ function webSearchIconSvg() {
     </svg>`;
 }
 
-const WEB_SEARCH_WINDOW_NAME = "routee_web_search_window";
-const WEB_SEARCH_CLICK_GUARD_MS = 900;
-let lastWebSearchOpen = { url: "", time: 0 };
+const WEB_SEARCH_TARGET_NAME = "routee_web_search";
 
 function buildWebSearchUrl(query) {
-  return `https://www.google.com/search?q=${encodeURIComponent(query)}`;
+  const cleanQuery = String(query ?? "").trim();
+  return cleanQuery ? `https://www.google.com/search?q=${encodeURIComponent(cleanQuery)}` : "#";
 }
 
-function openWebSearchForLocation(location) {
+function renderWebSearchLink(location) {
   const query = String(location?.name ?? "").trim();
-  if (!query) return;
+  if (!query) return "";
 
-  const url = buildWebSearchUrl(query);
-  const now = Date.now();
+  const href = escapeHtml(buildWebSearchUrl(query));
 
-  if (lastWebSearchOpen.url === url && now - lastWebSearchOpen.time < WEB_SEARCH_CLICK_GUARD_MS) {
-    return;
-  }
-
-  lastWebSearchOpen = { url, time: now };
-
-  try {
-    const openedWindow = window.open(url, WEB_SEARCH_WINDOW_NAME);
-
-    if (openedWindow) {
-      try {
-        openedWindow.opener = null;
-      } catch {}
-
-      try {
-        openedWindow.focus();
-      } catch {}
-
-      return;
-    }
-  } catch {}
-
-  if (elements?.authStatus) {
-    elements.authStatus.textContent =
-      "Tarayıcı web aramasını engelledi. Lütfen tarayıcı açılır pencere iznini kontrol edin.";
-  }
+  return `
+    <a class="trip-web-search-btn"
+       href="${href}"
+       target="${WEB_SEARCH_TARGET_NAME}"
+       rel="external"
+       aria-label="Web’de ara"
+       title="Web’de ara">${webSearchIconSvg()}</a>`;
 }
 
 function renderNoteButton({ action, id = "", hasNote = false }) {
@@ -1279,7 +1258,7 @@ function renderTripList() {
   const startHtml = state.startPoint
     ? `
       <div class="trip-item start${hasLocationNote(state.startPoint) ? " has-note" : ""}">
-        <button class="trip-web-search-btn" type="button" data-action="web-search-start" aria-label="Web’de ara" title="Web’de ara">${webSearchIconSvg()}</button>
+        ${renderWebSearchLink(state.startPoint)}
         <div class="trip-order">S</div>
         <div class="trip-content">
           <strong>${escapeHtml(state.startPoint.name)}</strong>
@@ -1313,7 +1292,7 @@ function renderTripList() {
 
       return `
         <div class="trip-item${pointHasNote ? " has-note" : ""}">
-          <button class="trip-web-search-btn" type="button" data-action="web-search-point" data-id="${point.id}" aria-label="Web’de ara" title="Web’de ara">${webSearchIconSvg()}</button>
+          ${renderWebSearchLink(point)}
           <div class="trip-order" style="background:${escapeHtml(pointColor)}; box-shadow: 0 12px 22px ${escapeHtml(pointShadow)}">${index + 1}</div>
           <div class="trip-content">
             <strong>${escapeHtml(point.name)}</strong>
@@ -1334,7 +1313,7 @@ function renderTripList() {
   const endHtml = state.endPoint
     ? `
       <div class="trip-item end${hasLocationNote(state.endPoint) ? " has-note" : ""}">
-        <button class="trip-web-search-btn" type="button" data-action="web-search-end" aria-label="Web’de ara" title="Web’de ara">${webSearchIconSvg()}</button>
+        ${renderWebSearchLink(state.endPoint)}
         <div class="trip-order end-order">E</div>
         <div class="trip-content">
           <strong>${escapeHtml(state.endPoint.name)}</strong>
@@ -2165,30 +2144,6 @@ function handleTripListClick(event) {
   const action = target.dataset.action;
   if (!action) return;
 
-  if (action === "web-search-start") {
-    event.preventDefault();
-    event.stopPropagation();
-    if (!state.startPoint) return;
-    openWebSearchForLocation(state.startPoint);
-    return;
-  }
-
-  if (action === "web-search-end") {
-    event.preventDefault();
-    event.stopPropagation();
-    if (!state.endPoint) return;
-    openWebSearchForLocation(state.endPoint);
-    return;
-  }
-
-  if (action === "web-search-point") {
-    event.preventDefault();
-    event.stopPropagation();
-    const point = state.points.find((item) => String(item.id) === String(target.dataset.id));
-    if (!point) return;
-    openWebSearchForLocation(point);
-    return;
-  }
 
   if (action === "note-start") {
     if (!state.startPoint) return;
