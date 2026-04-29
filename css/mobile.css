@@ -1530,3 +1530,27 @@
   align-items: center;
   justify-content: center;
 }
+
+
+.trip-header-actions {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.trip-map-list-icon-btn {
+  background: #ffffff;
+}
+
+.trip-map-list-icon-btn svg {
+  stroke: #0f172a;
+}
+
+.trip-map-list-icon-btn:hover {
+  background: #f8fafc;
+}
+
+.trip-map-list-icon-btn:hover svg {
+  stroke: var(--primary);
+}
