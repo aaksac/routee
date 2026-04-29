@@ -1804,9 +1804,19 @@ select:focus {
   place-items: center !important;
   cursor: pointer !important;
   text-decoration: none !important;
+  outline: none !important;
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  list-style: none !important;
   -webkit-tap-highlight-color: transparent !important;
   box-shadow: 0 8px 18px rgba(37, 99, 235, 0.12) !important;
   transition: transform 0.16s ease, box-shadow 0.16s ease, background 0.16s ease, color 0.16s ease !important;
+}
+
+.trip-web-search-btn::before,
+.trip-web-search-btn::after {
+  content: none !important;
+  display: none !important;
 }
 
 .trip-web-search-btn svg {
