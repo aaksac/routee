@@ -193,43 +193,43 @@ function setOfflineStatus() {
   setStatus("Lütfen internet bağlantınızı kontrol edin.", "offline");
 }
 
+function withErrorCode(message, error) {
+  const code = String(error?.code || "").trim();
+  return code ? `${message} Hata kodu: ${code}` : message;
+}
+
 function getPasswordResetErrorMessage(error) {
   const code = String(error?.code || "").toLowerCase();
-  const detailMessage = String(error?.details?.error?.message || error?.message || "");
 
   if (code.includes("auth/invalid-email")) {
-    return "E-posta adresi geçerli görünmüyor. Lütfen adresi kontrol edip tekrar dene.";
+    return withErrorCode("E-posta adresi geçerli görünmüyor. Lütfen adresi kontrol edip tekrar dene.", error);
   }
 
   if (code.includes("auth/user-not-found")) {
-    return "Bu e-posta adresiyle kayıtlı bir kullanıcı bulunamadı. Firebase Authentication > Users kısmında bu mailin kayıtlı olduğundan emin ol.";
+    return withErrorCode("Bu e-posta adresiyle kayıtlı bir kullanıcı bulunamadı.", error);
   }
 
   if (code.includes("auth/missing-email")) {
-    return "Şifre sıfırlama için e-posta adresi gir.";
+    return withErrorCode("Şifre sıfırlama için e-posta adresi gir.", error);
   }
 
   if (code.includes("auth/too-many-requests")) {
-    return "Kısa sürede çok fazla deneme yapıldı. Bir süre bekleyip tekrar dene.";
+    return withErrorCode("Kısa sürede çok fazla deneme yapıldı. Bir süre bekleyip tekrar dene.", error);
   }
 
   if (code.includes("auth/unauthorized-continue-uri")) {
-    return "Şifre sıfırlama bağlantısı için domain yetkisi eksik. Firebase Authentication > Settings > Authorized domains kısmına site domainini ekle.";
+    return withErrorCode("Şifre sıfırlama bağlantısı için domain yetkisi eksik. Firebase Authorized domains ayarını kontrol et.", error);
   }
 
   if (code.includes("auth/network-request-failed")) {
-    return "İnternet bağlantısı nedeniyle şifre sıfırlama maili gönderilemedi.";
+    return withErrorCode("İnternet bağlantısı nedeniyle şifre sıfırlama maili gönderilemedi.", error);
   }
 
-  if (code.includes("auth/configuration-not-found")) {
-    return "Firebase Authentication yapılandırması doğrulanamadı. Projede Email/Password giriş yönteminin açık olduğundan emin ol.";
+  if (code.includes("auth/operation-not-allowed")) {
+    return withErrorCode("Firebase Authentication tarafında e-posta/şifre girişi kapalı görünüyor. Sign-in method ayarını kontrol et.", error);
   }
 
-  if (code.includes("auth/password-reset-rest-failed")) {
-    return `Şifre sıfırlama maili gönderilemedi. Firebase cevabı: ${detailMessage || "Bilinmeyen hata"}`;
-  }
-
-  return `Şifre sıfırlama maili gönderilemedi. Hata: ${detailMessage || code || "Bilinmeyen hata"}`;
+  return withErrorCode("Şifre sıfırlama maili gönderilemedi. E-posta adresini, Firebase Authentication kullanıcı listesini ve mail şablonunu kontrol et.", error);
 }
 
 function hasInternetConnection() {
@@ -294,7 +294,7 @@ async function routeAfterLogin(user, options = {}) {
 }
 
 async function handleLogin() {
-  const email = elements.loginEmail.value.trim();
+  const email = elements.loginEmail.value.trim().toLowerCase();
   const password = elements.loginPassword.value.trim();
 
   if (!email || !password) {
@@ -336,7 +336,7 @@ function handleRegisterNavigation() {
 }
 
 async function handleReset() {
-  const email = elements.loginEmail.value.trim();
+  const email = elements.loginEmail.value.trim().toLowerCase();
 
   if (!email) {
     setStatus("Şifre sıfırlama için e-posta gir.");
@@ -359,11 +359,10 @@ async function handleReset() {
 
   try {
     const { sendReset } = await loadAuthModule({ allowRetryIfStale: true });
-    const result = await sendReset(email);
-    const providerNote = result?.provider === "firebase-rest" ? " Yedek gönderim yolu kullanıldı." : "";
+    await sendReset(email);
 
     setStatus(
-      `Firebase şifre sıfırlama isteğini kabul etti.${providerNote} Gelen kutusunu, spam ve gereksiz klasörünü kontrol et. Mail görünmüyorsa bu e-posta Firebase Authentication > Users içinde kayıtlı olmayabilir veya Firebase e-posta şablonu/gönderici ayarı engelleniyor olabilir.`,
+      "Şifre sıfırlama maili gönderildi. Gelen kutusunu, spam ve gereksiz klasörünü kontrol et.",
       "success"
     );
     setButtonsDisabled(false);
