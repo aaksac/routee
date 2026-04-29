@@ -314,8 +314,53 @@ function markDirty() {
   state.hasUnsavedChanges = true;
 }
 
+function sanitizeNoteText(value, options = {}) {
+  const rawText = String(value ?? "");
+  const shouldTrim = options.trim !== false;
+
+  const cleanedText = rawText
+    .replace(/\u0000/g, "")
+    .replace(/<\s*\/?\s*script\b[^>]*>/gi, "")
+    .replace(/<[^>]*>/g, "")
+    .replace(/\bjavascript\s*:/gi, "")
+    .replace(/\bdata\s*:\s*text\/html/gi, "")
+    .replace(/\bon[a-z]+\s*=/gi, "")
+    .replace(/[<>`]/g, "");
+
+  return shouldTrim ? cleanedText.trim() : cleanedText;
+}
+
 function normalizeNote(value) {
-  return String(value ?? "").trim();
+  return sanitizeNoteText(value);
+}
+
+function sanitizeNoteEditorInput(showStatus = true) {
+  const textarea = elements.noteEditorText;
+  if (!textarea) return "";
+
+  const originalValue = textarea.value;
+  const sanitizedValue = sanitizeNoteText(originalValue, { trim: false });
+
+  if (originalValue !== sanitizedValue) {
+    const selectionStart = textarea.selectionStart ?? originalValue.length;
+    const selectionEnd = textarea.selectionEnd ?? originalValue.length;
+    const nextSelectionStart = sanitizeNoteText(originalValue.slice(0, selectionStart), {
+      trim: false
+    }).length;
+    const nextSelectionEnd = sanitizeNoteText(originalValue.slice(0, selectionEnd), {
+      trim: false
+    }).length;
+
+    textarea.value = sanitizedValue;
+    textarea.setSelectionRange(nextSelectionStart, nextSelectionEnd);
+
+    if (showStatus && elements.authStatus) {
+      elements.authStatus.textContent =
+        "Güvenlik için not alanındaki kod/HTML benzeri ifadeler temizlendi.";
+    }
+  }
+
+  return sanitizedValue;
 }
 
 function hasLocationNote(location) {
@@ -528,7 +573,8 @@ function handleSaveNote() {
   const targetBeforeSave = state.noteEditorTarget
     ? { ...state.noteEditorTarget }
     : null;
-  const updatedLocation = applyNoteToLocation(elements.noteEditorText?.value || "");
+  const safeNoteValue = sanitizeNoteEditorInput(false);
+  const updatedLocation = applyNoteToLocation(safeNoteValue);
 
   if (!updatedLocation || !targetBeforeSave) return;
 
@@ -836,7 +882,7 @@ function createPointFromPreviousStart(startPoint) {
     name: startPoint.name || "Eski Başlangıç",
     lat: Number(startPoint.lat),
     lng: Number(startPoint.lng),
-    note: startPoint.note || "",
+    note: normalizeNote(startPoint.note),
     color: DEFAULT_POINT_COLOR,
     distanceFromPrevious: 0,
     type: "point"
@@ -849,7 +895,7 @@ function createPointFromPreviousEnd(endPoint) {
     name: endPoint.name || "Eski Bitiş",
     lat: Number(endPoint.lat),
     lng: Number(endPoint.lng),
-    note: endPoint.note || "",
+    note: normalizeNote(endPoint.note),
     color: DEFAULT_POINT_COLOR,
     distanceFromPrevious: 0,
     type: "point"
@@ -1587,21 +1633,32 @@ function applyImportedData(startPoint, points, endPoint = null) {
     return false;
   }
 
-  state.startPoint = startPoint;
-  state.endPoint = endPoint;
-  state.points = uniqueImportedPoints;
+  const safeStartPoint = startPoint
+    ? { ...startPoint, note: normalizeNote(startPoint.note) }
+    : null;
+  const safeEndPoint = endPoint
+    ? { ...endPoint, note: normalizeNote(endPoint.note) }
+    : null;
+  const safeImportedPoints = uniqueImportedPoints.map((point) => ({
+    ...point,
+    note: normalizeNote(point.note)
+  }));
+
+  state.startPoint = safeStartPoint;
+  state.endPoint = safeEndPoint;
+  state.points = safeImportedPoints;
   state.editingPointId = null;
 
-  setStartForm(startPoint);
-  setEndForm(endPoint);
+  setStartForm(safeStartPoint);
+  setEndForm(safeEndPoint);
 
-  if (startPoint) {
+  if (safeStartPoint) {
     showStartMarker({
-      lat: startPoint.lat,
-      lng: startPoint.lng,
-      title: startPoint.name,
+      lat: safeStartPoint.lat,
+      lng: safeStartPoint.lng,
+      title: safeStartPoint.name,
       pointData: {
-        ...startPoint,
+        ...safeStartPoint,
         orderLabel: "S"
       },
       onClick: fillPointFormFromMarker
@@ -1610,13 +1667,13 @@ function applyImportedData(startPoint, points, endPoint = null) {
     clearStartMarker();
   }
 
-  if (endPoint) {
+  if (safeEndPoint) {
     showEndMarker({
-      lat: endPoint.lat,
-      lng: endPoint.lng,
-      title: endPoint.name,
+      lat: safeEndPoint.lat,
+      lng: safeEndPoint.lng,
+      title: safeEndPoint.name,
       pointData: {
-        ...endPoint,
+        ...safeEndPoint,
         orderLabel: "E"
       },
       onClick: fillPointFormFromMarker
@@ -1639,7 +1696,7 @@ function getMapPayload() {
           name: state.startPoint.name,
           lat: state.startPoint.lat,
           lng: state.startPoint.lng,
-          note: state.startPoint.note || ""
+          note: normalizeNote(state.startPoint.note)
         }
       : null,
     endPoint: state.endPoint
@@ -1647,7 +1704,7 @@ function getMapPayload() {
           name: state.endPoint.name,
           lat: state.endPoint.lat,
           lng: state.endPoint.lng,
-          note: state.endPoint.note || ""
+          note: normalizeNote(state.endPoint.note)
         }
       : null,
     points: state.points.map((point) => ({
@@ -1655,7 +1712,7 @@ function getMapPayload() {
       lat: point.lat,
       lng: point.lng,
       color: point.color || DEFAULT_POINT_COLOR,
-      note: point.note || "",
+      note: normalizeNote(point.note),
       type: "point"
     })),
     totalDistance: state.totalDistance,
@@ -1855,7 +1912,7 @@ async function handleMapListClick(event) {
           name: mapData.startPoint.name,
           lat: Number(mapData.startPoint.lat),
           lng: Number(mapData.startPoint.lng),
-          note: mapData.startPoint.note || "",
+          note: normalizeNote(mapData.startPoint.note),
           type: "start"
         }
       : null;
@@ -1866,7 +1923,7 @@ async function handleMapListClick(event) {
           name: mapData.endPoint.name,
           lat: Number(mapData.endPoint.lat),
           lng: Number(mapData.endPoint.lng),
-          note: mapData.endPoint.note || "",
+          note: normalizeNote(mapData.endPoint.note),
           type: "end"
         }
       : null;
@@ -1878,7 +1935,7 @@ async function handleMapListClick(event) {
           lat: Number(point.lat),
           lng: Number(point.lng),
           color: point.color || DEFAULT_POINT_COLOR,
-          note: point.note || "",
+          note: normalizeNote(point.note),
           distanceFromPrevious: 0,
           type: "point"
         }))
@@ -2491,7 +2548,8 @@ function bindEvents() {
   elements.btnSaveNote?.addEventListener("click", handleSaveNote);
   elements.btnDeleteNote?.addEventListener("click", handleDeleteNote);
   elements.noteEditorText?.addEventListener("input", () => {
-    elements.btnDeleteNote?.toggleAttribute("disabled", !normalizeNote(elements.noteEditorText.value));
+    const safeValue = sanitizeNoteEditorInput();
+    elements.btnDeleteNote?.toggleAttribute("disabled", !normalizeNote(safeValue));
   });
   elements.mobileFloatingBackdrop?.addEventListener("click", closeFloatingPanels);
   document.addEventListener("click", handleShellClick);
