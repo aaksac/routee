@@ -494,10 +494,54 @@ function getPointSubtitle(pointData) {
   return String(raw).trim();
 }
 
+const MAP_INFO_WEB_SEARCH_TARGET_NAME = "routee_web_search";
+
+function buildMapInfoWebSearchUrl(query) {
+  const cleanQuery = String(query ?? "").trim();
+  return cleanQuery ? `https://www.google.com/search?q=${encodeURIComponent(cleanQuery)}` : "#";
+}
+
+function mapInfoWebSearchIconSvg() {
+  return `
+    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <path d="M10.9 17.2a6.3 6.3 0 1 1 0-12.6 6.3 6.3 0 0 1 0 12.6Z"></path>
+      <path d="M15.6 15.6 20 20"></path>
+    </svg>`;
+}
+
+function getPointWebSearchQuery(pointData) {
+  const name = String(pointData?.name ?? "").trim();
+  if (name) return name;
+
+  const subtitle = getPointSubtitle(pointData);
+  if (subtitle) return subtitle;
+
+  return String(getPointDisplayTitle(pointData) || "").trim();
+}
+
+function createMapInfoWebSearchLink(pointData) {
+  const query = getPointWebSearchQuery(pointData);
+  if (!query) return null;
+
+  const link = document.createElement("a");
+  link.className = "map-info-web-search-btn";
+  link.href = buildMapInfoWebSearchUrl(query);
+  link.target = MAP_INFO_WEB_SEARCH_TARGET_NAME;
+  link.rel = "external";
+  link.setAttribute("aria-label", "Web’de ara");
+  link.title = "Web’de ara";
+  link.innerHTML = mapInfoWebSearchIconSvg();
+  link.addEventListener("click", (event) => {
+    event.stopPropagation();
+  });
+
+  return link;
+}
+
 function createInfoWindowContent(pointData) {
   const wrapper = document.createElement("div");
-  wrapper.style.width = "236px";
-  wrapper.style.maxWidth = "236px";
+  wrapper.style.width = "260px";
+  wrapper.style.maxWidth = "calc(100vw - 56px)";
   wrapper.style.boxSizing = "border-box";
   wrapper.style.padding = "12px";
   wrapper.style.borderRadius = "16px";
@@ -557,20 +601,40 @@ function createInfoWindowContent(pointData) {
       : "rgba(37, 99, 235, 0.10)";
   badge.style.padding = "5px 8px";
   badge.style.borderRadius = "999px";
-  badge.style.marginBottom = "8px";
+  badge.style.marginBottom = "0";
+  badge.style.flex = "0 1 auto";
+  badge.style.maxWidth = "100%";
+  badge.style.whiteSpace = "nowrap";
+
+  const headerRow = document.createElement("div");
+  headerRow.className = "map-info-header-row";
+
+  headerRow.appendChild(badge);
+  const webSearchLink = createMapInfoWebSearchLink(pointData);
+  if (webSearchLink) {
+    headerRow.appendChild(webSearchLink);
+  }
 
   const title = document.createElement("div");
   title.textContent = getPointDisplayTitle(pointData);
+  title.style.display = "block";
+  title.style.width = "100%";
+  title.style.maxWidth = "100%";
+  title.style.boxSizing = "border-box";
   title.style.fontSize = "14px";
   title.style.fontWeight = "800";
-  title.style.lineHeight = "1.25";
+  title.style.lineHeight = "1.32";
   title.style.color = "#0f172a";
-  title.style.wordBreak = "break-word";
-  title.style.paddingRight = "30px";
+  title.style.textAlign = "left";
+  title.style.whiteSpace = "normal";
+  title.style.overflowWrap = "break-word";
+  title.style.wordBreak = "normal";
+  title.style.hyphens = "auto";
+  title.style.paddingRight = "0";
   title.style.marginBottom = "8px";
 
   wrapper.appendChild(closeBtn);
-  wrapper.appendChild(badge);
+  wrapper.appendChild(headerRow);
   wrapper.appendChild(title);
 
   const subtitleText = getPointSubtitle(pointData);
