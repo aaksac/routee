@@ -114,16 +114,30 @@
     width: 100%;
   }
 
+  .map-search-wrapper {
+    width: 100%;
+    min-width: 0;
+    max-width: none;
+  }
+
   .map-search-input {
     width: 100%;
     min-width: 0;
     max-width: none;
     min-height: 52px;
     height: 52px;
-    padding: 12px 17px;
+    padding: 12px 46px 12px 17px;
     font-size: 0.9rem;
     line-height: 1.1;
     border-radius: 17px;
+  }
+
+  .map-search-clear {
+    right: 9px;
+    width: 31px;
+    height: 31px;
+    min-width: 31px;
+    min-height: 31px;
   }
 
   .menu-wrapper {
@@ -608,15 +622,29 @@
     gap: 8px;
   }
 
+  .map-search-wrapper {
+    width: 100%;
+    min-width: 0;
+    max-width: none;
+  }
+
   .map-search-input {
     width: 100%;
     min-width: 0;
     max-width: none;
     min-height: 48px;
     height: 48px;
-    padding: 11px 15px;
+    padding: 11px 44px 11px 15px;
     font-size: 0.84rem;
     border-radius: 15px;
+  }
+
+  .map-search-clear {
+    right: 8px;
+    width: 29px;
+    height: 29px;
+    min-width: 29px;
+    min-height: 29px;
   }
 
   .floating-menu {
