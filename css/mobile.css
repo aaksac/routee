@@ -1573,3 +1573,33 @@
     height: 15px !important;
   }
 }
+
+/* Mobilde harita konum bilgisi penceresi: Web'de ara ikonu */
+@media (max-width: 720px) {
+  .map-info-header-row {
+    gap: 6px !important;
+    max-width: calc(100% - 34px) !important;
+    margin-bottom: 8px !important;
+  }
+
+  .map-info-web-search-btn {
+    width: 25px !important;
+    min-width: 25px !important;
+    max-width: 25px !important;
+    height: 25px !important;
+    min-height: 25px !important;
+    max-height: 25px !important;
+    border-radius: 9px !important;
+  }
+
+  .map-info-web-search-btn::before,
+  .map-info-web-search-btn::after {
+    content: none !important;
+    display: none !important;
+  }
+
+  .map-info-web-search-btn svg {
+    width: 13px !important;
+    height: 13px !important;
+  }
+}
