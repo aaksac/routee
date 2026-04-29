@@ -11,6 +11,7 @@ let distanceOverlays = [];
 let activeInfoWindow = null;
 
 let searchService = null;
+let placesDetailsService = null;
 let geocoder = null;
 let searchDropdown = null;
 let searchInputEl = null;
@@ -21,6 +22,7 @@ let searchFocusHandlerBound = false;
 let isInteractingWithSearchDropdown = false;
 let lastPredictionRequestId = 0;
 let currentPredictions = [];
+let mapClickDetailsRequestId = 0;
 
 let activeAutocompleteSessionToken = null;
 let searchDebounceTimer = null;
@@ -204,7 +206,7 @@ function initMap() {
     streetViewControl: false,
     fullscreenControl: false,
     gestureHandling: "greedy",
-    clickableIcons: false
+    clickableIcons: true
   });
 
   activeInfoWindow = new google.maps.InfoWindow({
@@ -213,6 +215,7 @@ function initMap() {
 
   geocoder = new google.maps.Geocoder();
   searchService = new google.maps.places.AutocompleteService();
+  placesDetailsService = new google.maps.places.PlacesService(map);
 
   return map;
 }
@@ -1190,6 +1193,97 @@ function drawRouteSegments(startPoint, orderedPoints, endPoint = null) {
   }
 }
 
+function getMapClickFallbackName(lat, lng) {
+  const safeLat = Number.isFinite(Number(lat)) ? Number(lat).toFixed(6) : "";
+  const safeLng = Number.isFinite(Number(lng)) ? Number(lng).toFixed(6) : "";
+
+  if (safeLat && safeLng) {
+    return `İşaretli Konum (${safeLat}, ${safeLng})`;
+  }
+
+  return "İşaretli Konum";
+}
+
+function getReadableGeocodeName(result) {
+  if (!result) return "";
+
+  const address = String(result.formatted_address || "").trim();
+  if (address) return address;
+
+  const firstComponent = result.address_components?.[0]?.long_name;
+  return String(firstComponent || "").trim();
+}
+
+function resolveMapClickWithReverseGeocode(lat, lng, requestId, callback) {
+  if (!geocoder) {
+    geocoder = new google.maps.Geocoder();
+  }
+
+  geocoder.geocode(
+    {
+      location: { lat, lng }
+    },
+    (results, status) => {
+      if (requestId !== mapClickDetailsRequestId) return;
+
+      const readableName =
+        status === google.maps.GeocoderStatus.OK &&
+        Array.isArray(results) &&
+        results.length
+          ? getReadableGeocodeName(results[0])
+          : "";
+
+      callback({
+        lat,
+        lng,
+        name: readableName || getMapClickFallbackName(lat, lng),
+        source: "map-reverse-geocode"
+      });
+    }
+  );
+}
+
+function resolveMapClickWithPlaceDetails(placeId, clickedLat, clickedLng, requestId, callback) {
+  if (!placeId || !map) {
+    resolveMapClickWithReverseGeocode(clickedLat, clickedLng, requestId, callback);
+    return;
+  }
+
+  if (!placesDetailsService) {
+    placesDetailsService = new google.maps.places.PlacesService(map);
+  }
+
+  placesDetailsService.getDetails(
+    {
+      placeId,
+      fields: ["name", "geometry", "place_id"]
+    },
+    (place, status) => {
+      if (requestId !== mapClickDetailsRequestId) return;
+
+      if (status !== google.maps.places.PlacesServiceStatus.OK || !place) {
+        resolveMapClickWithReverseGeocode(clickedLat, clickedLng, requestId, callback);
+        return;
+      }
+
+      const location = place.geometry?.location;
+      const lat = typeof location?.lat === "function" ? location.lat() : clickedLat;
+      const lng = typeof location?.lng === "function" ? location.lng() : clickedLng;
+      const name = String(place.name || "").trim() || getMapClickFallbackName(lat, lng);
+
+      showDraftMarker(lat, lng);
+
+      callback({
+        lat,
+        lng,
+        name,
+        placeId: place.place_id || placeId,
+        source: "map-place-details"
+      });
+    }
+  );
+}
+
 function enableMapClickPicker(callback) {
   if (!map) return;
 
@@ -1198,22 +1292,41 @@ function enableMapClickPicker(callback) {
   }
 
   mapClickListener = map.addListener("click", (event) => {
-    const lat = event.latLng.lat();
-    const lng = event.latLng.lng();
+    const clickedLat = event.latLng.lat();
+    const clickedLng = event.latLng.lng();
+    const requestId = ++mapClickDetailsRequestId;
+
+    if (event.placeId && typeof event.stop === "function") {
+      event.stop();
+    }
 
     if (searchMarker) {
       searchMarker.setMap(null);
       searchMarker = null;
     }
 
-    showDraftMarker(lat, lng);
-    handleProgressiveMapClickFocus(lat, lng);
+    showDraftMarker(clickedLat, clickedLng);
+    handleProgressiveMapClickFocus(clickedLat, clickedLng);
 
     callback({
-      lat,
-      lng,
-      name: "İşaretli Konum"
+      lat: clickedLat,
+      lng: clickedLng,
+      name: getMapClickFallbackName(clickedLat, clickedLng),
+      source: "map-click"
     });
+
+    if (event.placeId) {
+      resolveMapClickWithPlaceDetails(
+        event.placeId,
+        clickedLat,
+        clickedLng,
+        requestId,
+        callback
+      );
+      return;
+    }
+
+    resolveMapClickWithReverseGeocode(clickedLat, clickedLng, requestId, callback);
   });
 }
 
