@@ -193,6 +193,36 @@ function setOfflineStatus() {
   setStatus("Lütfen internet bağlantınızı kontrol edin.", "offline");
 }
 
+function getPasswordResetErrorMessage(error) {
+  const code = String(error?.code || "").toLowerCase();
+
+  if (code.includes("auth/invalid-email")) {
+    return "E-posta adresi geçerli görünmüyor. Lütfen adresi kontrol edip tekrar dene.";
+  }
+
+  if (code.includes("auth/user-not-found")) {
+    return "Bu e-posta adresiyle kayıtlı bir kullanıcı bulunamadı.";
+  }
+
+  if (code.includes("auth/missing-email")) {
+    return "Şifre sıfırlama için e-posta adresi gir.";
+  }
+
+  if (code.includes("auth/too-many-requests")) {
+    return "Kısa sürede çok fazla deneme yapıldı. Bir süre bekleyip tekrar dene.";
+  }
+
+  if (code.includes("auth/unauthorized-continue-uri")) {
+    return "Şifre sıfırlama bağlantısı için domain yetkisi eksik. Firebase Authorized domains ayarını kontrol et.";
+  }
+
+  if (code.includes("auth/network-request-failed")) {
+    return "İnternet bağlantısı nedeniyle şifre sıfırlama maili gönderilemedi.";
+  }
+
+  return "Şifre sıfırlama maili gönderilemedi. E-posta adresini ve Firebase Authentication ayarlarını kontrol et.";
+}
+
 function hasInternetConnection() {
   return navigator.onLine;
 }
@@ -304,8 +334,13 @@ async function handleReset() {
     return;
   }
 
+  if (!/^\S+@\S+\.\S+$/.test(email)) {
+    setStatus("E-posta adresi geçerli görünmüyor. Lütfen adresi kontrol et.");
+    return;
+  }
+
   setButtonsDisabled(true);
-  setStatus("Sıfırlama bağlantısı hazırlanıyor...", "normal");
+  setStatus("Sıfırlama maili gönderiliyor...", "normal");
 
   if (!hasInternetConnection()) {
     setButtonsDisabled(false);
@@ -318,7 +353,7 @@ async function handleReset() {
     await sendReset(email);
 
     setStatus(
-      "Şifre sıfırlama maili gönderildi. Maildeki bağlantı yeni sıfırlama sayfasını açacak.",
+      "Şifre sıfırlama maili gönderildi. Gelen kutusunu ve spam klasörünü kontrol et.",
       "success"
     );
     setButtonsDisabled(false);
@@ -330,7 +365,8 @@ async function handleReset() {
       return;
     }
 
-    setStatus(`Şifre sıfırlama hatası: ${error.message}`);
+    console.error("Şifre sıfırlama hatası:", error);
+    setStatus(getPasswordResetErrorMessage(error));
   }
 }
 
