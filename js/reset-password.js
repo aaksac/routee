@@ -1,5 +1,5 @@
 import {
-  verifyPasswordResetCode,
+  checkActionCode,
   confirmPasswordReset
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
@@ -15,8 +15,7 @@ const elements = {
 const params = new URLSearchParams(window.location.search);
 const mode = params.get("mode");
 const actionCode = params.get("oobCode");
-const DEFAULT_CONTINUE_URL = "./index.html?reset=success";
-const continueUrl = getSafeContinueUrl(params.get("continueUrl"));
+const continueUrl = params.get("continueUrl") || "./index.html?reset=success";
 
 function setMessage(message, type = "info") {
   elements.resetInfo.textContent = message;
@@ -35,41 +34,18 @@ function isValidPassword(password) {
   return typeof password === "string" && password.length >= 6;
 }
 
-function getSafeContinueUrl(rawUrl) {
-  if (!rawUrl) return DEFAULT_CONTINUE_URL;
-
-  try {
-    const targetUrl = new URL(rawUrl, window.location.origin);
-
-    if (targetUrl.origin !== window.location.origin) {
-      return DEFAULT_CONTINUE_URL;
-    }
-
-    return `${targetUrl.pathname}${targetUrl.search}${targetUrl.hash}`;
-  } catch (error) {
-    return DEFAULT_CONTINUE_URL;
-  }
-}
-
 async function validateLink() {
   if (mode !== "resetPassword" || !actionCode) {
-    setMessage(
-      "Bu şifre yenileme bağlantısı geçersiz görünüyor. Lütfen yeniden şifre sıfırlama maili iste.",
-      "error"
-    );
+    setMessage("Bu şifre yenileme bağlantısı geçersiz görünüyor. Lütfen yeniden şifre sıfırlama maili iste.", "error");
     return;
   }
 
   try {
-    await verifyPasswordResetCode(auth, actionCode);
+    await checkActionCode(auth, actionCode);
     setMessage("Bağlantı doğrulandı. Yeni şifreni girip işlemi tamamlayabilirsin.");
     elements.resetForm.hidden = false;
   } catch (error) {
-    console.error("Şifre sıfırlama bağlantısı doğrulanamadı:", error);
-    setMessage(
-      "Bu bağlantının süresi dolmuş, hatalı veya daha önce kullanılmış olabilir. Lütfen uygulamadan yeni bir şifre sıfırlama maili iste.",
-      "error"
-    );
+    setMessage("Bu bağlantının süresi dolmuş olabilir veya bağlantı daha önce kullanılmış olabilir. Lütfen uygulamadan yeni bir şifre sıfırlama maili iste.", "error");
   }
 }
 
@@ -97,11 +73,7 @@ async function handleSubmit(event) {
       window.location.href = continueUrl;
     }, 1200);
   } catch (error) {
-    console.error("Şifre güncellenemedi:", error);
-    setMessage(
-      "Şifre güncellenemedi. Bağlantı süresi dolmuş veya kullanılmış olabilir. Lütfen yeniden şifre sıfırlama maili iste.",
-      "error"
-    );
+    setMessage("Şifre güncellenemedi. Bağlantı süresi dolmuş olabilir. Lütfen yeniden şifre sıfırlama maili iste.", "error");
   }
 }
 
