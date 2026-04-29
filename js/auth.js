@@ -25,15 +25,9 @@ function watchAuth(callback) {
   return onAuthStateChanged(auth, callback);
 }
 
-function buildContinueUrl() {
-  return new URL("./index.html?reset=success", window.location.href).toString();
-}
-
 function sendReset(email) {
-  return sendPasswordResetEmail(auth, email, {
-    url: buildContinueUrl(),
-    handleCodeInApp: false
-  });
+  const normalizedEmail = String(email || "").trim();
+  return sendPasswordResetEmail(auth, normalizedEmail);
 }
 
 async function getUserClaims(user) {
