@@ -387,10 +387,10 @@ function createNoteButton(pointData) {
   noteBtn.appendChild(dot);
 
   noteBtn.style.position = "relative";
-  noteBtn.style.width = "38px";
-  noteBtn.style.minWidth = "38px";
-  noteBtn.style.height = "38px";
-  noteBtn.style.minHeight = "38px";
+  noteBtn.style.width = "36px";
+  noteBtn.style.minWidth = "36px";
+  noteBtn.style.height = "36px";
+  noteBtn.style.minHeight = "36px";
   noteBtn.style.padding = "0";
   noteBtn.style.borderRadius = "12px";
   noteBtn.style.display = "inline-flex";
@@ -401,7 +401,7 @@ function createNoteButton(pointData) {
   noteBtn.style.verticalAlign = "middle";
   noteBtn.style.cursor = "pointer";
   noteBtn.style.boxSizing = "border-box";
-  noteBtn.style.flex = "0 0 38px";
+  noteBtn.style.flex = "0 0 36px";
 
   noteBtn.style.background = hasNote
     ? "linear-gradient(180deg, rgba(37, 99, 235, 0.12), rgba(37, 99, 235, 0.07))"
@@ -496,10 +496,10 @@ function getPointSubtitle(pointData) {
 
 function createInfoWindowContent(pointData) {
   const wrapper = document.createElement("div");
-  wrapper.style.width = "min(260px, calc(100vw - 72px))";
-  wrapper.style.maxWidth = "260px";
+  wrapper.style.width = "min(206px, calc(100vw - 56px))";
+  wrapper.style.maxWidth = "206px";
   wrapper.style.boxSizing = "border-box";
-  wrapper.style.padding = "12px";
+  wrapper.style.padding = "10px";
   wrapper.style.borderRadius = "16px";
   wrapper.style.background = "#ffffff";
   wrapper.style.border = "1px solid rgba(226, 232, 240, 0.95)";
@@ -653,16 +653,23 @@ function createInfoWindowContent(pointData) {
 
   const actions = document.createElement("div");
   actions.style.display = "flex";
-  actions.style.gap = "8px";
+  actions.style.gap = "6px";
   actions.style.alignItems = "stretch";
+  actions.style.justifyContent = "center";
 
   const noteBtn = createNoteButton(pointData);
 
   const directionsBtn = document.createElement("button");
   directionsBtn.type = "button";
   directionsBtn.textContent = "Yol Tarifi Al";
-  directionsBtn.style.flex = "1";
-  directionsBtn.style.height = "38px";
+  directionsBtn.style.flex = "0 0 102px";
+  directionsBtn.style.width = "102px";
+  directionsBtn.style.height = "36px";
+  directionsBtn.style.padding = "0 10px";
+  directionsBtn.style.boxSizing = "border-box";
+  directionsBtn.style.display = "inline-flex";
+  directionsBtn.style.alignItems = "center";
+  directionsBtn.style.justifyContent = "center";
   directionsBtn.style.border = "none";
   directionsBtn.style.borderRadius = "12px";
   directionsBtn.style.background = "linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)";
@@ -681,8 +688,11 @@ function createInfoWindowContent(pointData) {
   const deleteBtn = document.createElement("button");
   deleteBtn.type = "button";
   deleteBtn.textContent = "Sil";
-  deleteBtn.style.height = "38px";
-  deleteBtn.style.padding = "0 14px";
+  deleteBtn.style.width = "36px";
+  deleteBtn.style.minWidth = "36px";
+  deleteBtn.style.height = "36px";
+  deleteBtn.style.padding = "0";
+  deleteBtn.style.boxSizing = "border-box";
   deleteBtn.style.border = "1px solid #fecaca";
   deleteBtn.style.borderRadius = "12px";
   deleteBtn.style.background = "#fef2f2";
