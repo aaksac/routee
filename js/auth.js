@@ -30,7 +30,9 @@ function buildContinueUrl() {
 }
 
 function sendReset(email) {
-  return sendPasswordResetEmail(auth, email, {
+  const normalizedEmail = String(email || "").trim();
+
+  return sendPasswordResetEmail(auth, normalizedEmail, {
     url: buildContinueUrl(),
     handleCodeInApp: false
   });
