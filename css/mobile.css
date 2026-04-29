@@ -1543,3 +1543,27 @@
   }
 }
 
+
+/* Mobilde Gezi Listem sağ üst Web’de Ara ikonu */
+@media (max-width: 720px) {
+  .trip-item {
+    position: relative !important;
+    padding-right: 48px !important;
+  }
+
+  .trip-web-search-btn {
+    top: 9px !important;
+    right: 9px !important;
+    width: 30px !important;
+    min-width: 30px !important;
+    max-width: 30px !important;
+    height: 30px !important;
+    min-height: 30px !important;
+    border-radius: 10px !important;
+  }
+
+  .trip-web-search-btn svg {
+    width: 15px !important;
+    height: 15px !important;
+  }
+}
