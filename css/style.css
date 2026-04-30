@@ -1777,3 +1777,24 @@ select:focus {
   height: 21px;
 }
 
+
+/* iPad / tablet düzeltmesi: Harita altına düşen gezi listesi haritayla aynı genişlikte görünür. */
+@media (min-width: 721px) and (max-width: 1100px) {
+  .app-layout {
+    align-items: stretch !important;
+  }
+
+  .trip-column {
+    width: 100% !important;
+    max-width: none !important;
+    justify-self: stretch !important;
+  }
+
+  .trip-panel {
+    width: 100% !important;
+    max-width: none !important;
+    min-width: 0 !important;
+    justify-self: stretch !important;
+    min-height: auto !important;
+  }
+}
