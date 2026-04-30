@@ -1,23 +1,44 @@
 const SW_VERSION = new URL(self.location.href).searchParams.get("v") || "dev";
 const CACHE_NAME = `routee-shell-${SW_VERSION}`;
-const NETWORK_TIMEOUT_DOCUMENT_MS = 1800;
-const NETWORK_TIMEOUT_CODE_MS = 2200;
+const NETWORK_TIMEOUT_MS = 1200;
 
 const APP_SHELL = [
   "./",
   "./index.html",
+  "./app.html",
+  "./chooser.html",
   "./manifest.webmanifest",
   "./css/style.css",
+  "./css/mobile.css",
   "./css/auth.css",
   "./js/firebase-config.js",
   "./js/auth.js",
   "./js/firestore.js",
   "./js/login-page.js",
+  "./js/app.js",
+  "./js/map.js",
+  "./js/route.js",
+  "./js/location.js",
+  "./js/import-export.js",
+  "./js/chooser.js",
   "./js/version-guard.js",
   "./icons/favicon-32.png",
   "./icons/icon-192.png",
   "./icons/icon-512.png",
-  "./icons/apple-touch-icon.png"
+  "./icons/apple-touch-icon.png",
+  "./icons/splash-640x1136.png",
+  "./icons/splash-750x1334.png",
+  "./icons/splash-828x1792.png",
+  "./icons/splash-1125x2436.png",
+  "./icons/splash-1170x2532.png",
+  "./icons/splash-1242x2208.png",
+  "./icons/splash-1242x2688.png",
+  "./icons/splash-1284x2778.png",
+  "./icons/splash-1290x2796.png",
+  "./icons/splash-1536x2048.png",
+  "./icons/splash-1668x2224.png",
+  "./icons/splash-1668x2388.png",
+  "./icons/splash-2048x2732.png"
 ];
 
 self.addEventListener("install", (event) => {
@@ -45,7 +66,7 @@ self.addEventListener("activate", (event) => {
   );
 });
 
-async function fetchWithTimeout(request, options = {}, timeoutMs = NETWORK_TIMEOUT_CODE_MS) {
+async function fetchWithTimeout(request, options = {}, timeoutMs = NETWORK_TIMEOUT_MS) {
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
 
@@ -59,18 +80,66 @@ async function fetchWithTimeout(request, options = {}, timeoutMs = NETWORK_TIMEO
   }
 }
 
-async function networkFirst(request) {
+function normalizeAppShellKey(pathname) {
+  if (pathname.endsWith("/")) return "./index.html";
+  if (pathname.endsWith("/index.html")) return "./index.html";
+  if (pathname.endsWith("/app.html")) return "./app.html";
+  if (pathname.endsWith("/chooser.html")) return "./chooser.html";
+  return null;
+}
+
+async function matchCached(request) {
   const cache = await caches.open(CACHE_NAME);
-  const cachedResponse = await cache.match(request);
-  const isNavigationRequest = request.mode === "navigate" || request.destination === "document";
-  const timeoutMs = isNavigationRequest ? NETWORK_TIMEOUT_DOCUMENT_MS : NETWORK_TIMEOUT_CODE_MS;
+  const directMatch = await cache.match(request, { ignoreSearch: true });
+  if (directMatch) return directMatch;
+
+  const url = new URL(request.url);
+  const shellKey = normalizeAppShellKey(url.pathname);
+  if (shellKey) {
+    return await cache.match(shellKey);
+  }
+
+  return null;
+}
+
+async function updateCache(request) {
+  const cache = await caches.open(CACHE_NAME);
+  const response = await fetch(request, { cache: "no-store" });
+
+  if (response && response.status === 200) {
+    await cache.put(request, response.clone());
+  }
+
+  return response;
+}
+
+async function cacheFirstWithBackgroundUpdate(request) {
+  const cachedResponse = await matchCached(request);
+
+  if (cachedResponse) {
+    eventlessUpdate(request);
+    return cachedResponse;
+  }
+
+  return await updateCache(request);
+}
+
+function eventlessUpdate(request) {
+  updateCache(request).catch(() => {
+    // Sessiz bırakılır. Açılışta kullanıcıya hata göstermemek için cache cevabı korunur.
+  });
+}
+
+async function networkFirstWithFastFallback(request) {
+  const cachedResponse = await matchCached(request);
 
   try {
     const response = cachedResponse
-      ? await fetchWithTimeout(request, { cache: "no-store" }, timeoutMs)
+      ? await fetchWithTimeout(request, { cache: "no-store" })
       : await fetch(request, { cache: "no-store" });
 
     if (response && response.status === 200) {
+      const cache = await caches.open(CACHE_NAME);
       await cache.put(request, response.clone());
     }
 
@@ -81,16 +150,10 @@ async function networkFirst(request) {
   }
 }
 
-async function cacheFirst(request) {
-  const cache = await caches.open(CACHE_NAME);
-  const cachedResponse = await cache.match(request);
+async function staticCacheFirst(request) {
+  const cachedResponse = await matchCached(request);
   if (cachedResponse) return cachedResponse;
-
-  const response = await fetch(request);
-  if (response && response.status === 200) {
-    await cache.put(request, response.clone());
-  }
-  return response;
+  return await updateCache(request);
 }
 
 self.addEventListener("fetch", (event) => {
@@ -129,15 +192,25 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  if (isAppDocument || isCodeAsset) {
+  if (isAppDocument) {
     event.respondWith(
-      networkFirst(request).catch(async () => {
+      cacheFirstWithBackgroundUpdate(request).catch(async () => {
         if (isNavigationRequest) {
           const cache = await caches.open(CACHE_NAME);
           return (await cache.match("./index.html")) || Response.error();
         }
 
-        const cachedResponse = await caches.match(request);
+        const cachedResponse = await matchCached(request);
+        return cachedResponse || Response.error();
+      })
+    );
+    return;
+  }
+
+  if (isCodeAsset) {
+    event.respondWith(
+      cacheFirstWithBackgroundUpdate(request).catch(async () => {
+        const cachedResponse = await matchCached(request);
         return cachedResponse || Response.error();
       })
     );
@@ -146,8 +219,8 @@ self.addEventListener("fetch", (event) => {
 
   if (isStaticAsset) {
     event.respondWith(
-      cacheFirst(request).catch(async () => {
-        const cachedResponse = await caches.match(request);
+      staticCacheFirst(request).catch(async () => {
+        const cachedResponse = await matchCached(request);
         return cachedResponse || Response.error();
       })
     );
@@ -155,8 +228,8 @@ self.addEventListener("fetch", (event) => {
   }
 
   event.respondWith(
-    fetch(request).catch(async () => {
-      const cachedResponse = await caches.match(request);
+    networkFirstWithFastFallback(request).catch(async () => {
+      const cachedResponse = await matchCached(request);
       return cachedResponse || Response.error();
     })
   );
