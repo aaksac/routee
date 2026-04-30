@@ -81,6 +81,29 @@ body {
   font-family: Inter, Arial, sans-serif;
 }
 
+/* iOS PWA üst güvenli alan/status bar rengi: not paneli, modal veya overlay açıldığında beyaza dönmesini engeller. */
+html {
+  background: #0f172a;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: env(safe-area-inset-top, 0px);
+  background: #0f172a;
+  z-index: 2147483647;
+  pointer-events: none;
+}
+
+@supports (height: constant(safe-area-inset-top)) {
+  body::before {
+    height: constant(safe-area-inset-top);
+  }
+}
+
 body {
   min-height: 100vh;
 }
