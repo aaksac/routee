@@ -892,9 +892,9 @@
 
   .trip-note-preview {
     max-height: 56px !important;
-    overflow-y: scroll !important;
+    overflow-y: auto !important;
     overflow-x: hidden !important;
-    scrollbar-gutter: stable !important;
+    scrollbar-gutter: auto !important;
     padding: 7px 8px !important;
     border-radius: 12px !important;
     font-size: 0.74rem !important;
@@ -928,9 +928,9 @@
     min-height: 186px !important;
     max-height: 186px !important;
     resize: none !important;
-    overflow-y: scroll !important;
+    overflow-y: auto !important;
     overflow-x: hidden !important;
-    scrollbar-gutter: stable !important;
+    scrollbar-gutter: auto !important;
   }
 
   .note-editor-actions {
@@ -948,9 +948,9 @@
 
   .custom-info-note-preview {
     max-height: 76px !important;
-    overflow-y: scroll !important;
+    overflow-y: auto !important;
     overflow-x: hidden !important;
-    scrollbar-gutter: stable !important;
+    scrollbar-gutter: auto !important;
     font-size: 10.5px !important;
   }
 
@@ -1035,9 +1035,9 @@
     grid-template-columns: 16px minmax(0, 1fr) !important;
     gap: 6px !important;
     max-height: 56px !important;
-    overflow-y: scroll !important;
+    overflow-y: auto !important;
     overflow-x: hidden !important;
-    scrollbar-gutter: stable !important;
+    scrollbar-gutter: auto !important;
     padding: 8px 10px 8px 10px !important;
     border-radius: 12px !important;
     font-size: 0.74rem !important;
@@ -1055,9 +1055,9 @@
     gap: 6px !important;
     padding: 8px 10px !important;
     max-height: 76px !important;
-    overflow-y: scroll !important;
+    overflow-y: auto !important;
     overflow-x: hidden !important;
-    scrollbar-gutter: stable !important;
+    scrollbar-gutter: auto !important;
     font-size: 10.5px !important;
   }
 
@@ -1232,7 +1232,7 @@
     overflow-wrap: anywhere !important;
     overflow-y: auto !important;
     overflow-x: hidden !important;
-    scrollbar-gutter: stable !important;
+    scrollbar-gutter: auto !important;
     box-shadow:
       inset 0 1px 1px rgba(255, 255, 255, 0.9),
       0 5px 12px rgba(15, 23, 42, 0.04) !important;
@@ -1543,3 +1543,98 @@
   }
 }
 
+/* =========================================================
+   ROUTEE - PROFESSIONAL MOBILE SCROLLBAR NORMALIZER
+   Amac: Mobilde native app hissi verir; kaydirma calisir ama scrollbar gorunmez.
+   Not: Masaustundeki profesyonel scrollbar gorunumu korunur.
+   ========================================================= */
+@media (max-width: 720px), (hover: none) and (pointer: coarse) {
+  html,
+  body {
+    -ms-overflow-style: none !important;
+    scrollbar-width: none !important;
+    scrollbar-color: transparent transparent !important;
+    overscroll-behavior-y: none;
+  }
+
+  html::-webkit-scrollbar,
+  body::-webkit-scrollbar {
+    width: 0 !important;
+    height: 0 !important;
+    background: transparent !important;
+  }
+
+  .trip-list,
+  .screen-overlay-panel,
+  .note-editor-panel,
+  .note-editor-body textarea,
+  .trip-note-preview,
+  .custom-info-note-preview,
+  .floating-menu,
+  .location-actions-menu,
+  #startPanel,
+  #pointPanel,
+  #endPanel,
+  #savePanel,
+  #importExportPanel,
+  .pac-container {
+    -webkit-overflow-scrolling: touch !important;
+    -ms-overflow-style: none !important;
+    scrollbar-width: none !important;
+    scrollbar-color: transparent transparent !important;
+    scrollbar-gutter: auto !important;
+    overscroll-behavior: contain !important;
+  }
+
+  .trip-list::-webkit-scrollbar,
+  .screen-overlay-panel::-webkit-scrollbar,
+  .note-editor-panel::-webkit-scrollbar,
+  .note-editor-body textarea::-webkit-scrollbar,
+  .trip-note-preview::-webkit-scrollbar,
+  .custom-info-note-preview::-webkit-scrollbar,
+  .floating-menu::-webkit-scrollbar,
+  .location-actions-menu::-webkit-scrollbar,
+  #startPanel::-webkit-scrollbar,
+  #pointPanel::-webkit-scrollbar,
+  #endPanel::-webkit-scrollbar,
+  #savePanel::-webkit-scrollbar,
+  #importExportPanel::-webkit-scrollbar,
+  .pac-container::-webkit-scrollbar {
+    width: 0 !important;
+    height: 0 !important;
+    background: transparent !important;
+  }
+
+  .trip-list::-webkit-scrollbar-track,
+  .screen-overlay-panel::-webkit-scrollbar-track,
+  .note-editor-panel::-webkit-scrollbar-track,
+  .note-editor-body textarea::-webkit-scrollbar-track,
+  .trip-note-preview::-webkit-scrollbar-track,
+  .custom-info-note-preview::-webkit-scrollbar-track,
+  .floating-menu::-webkit-scrollbar-track,
+  .location-actions-menu::-webkit-scrollbar-track,
+  #startPanel::-webkit-scrollbar-track,
+  #pointPanel::-webkit-scrollbar-track,
+  #endPanel::-webkit-scrollbar-track,
+  #savePanel::-webkit-scrollbar-track,
+  #importExportPanel::-webkit-scrollbar-track,
+  .pac-container::-webkit-scrollbar-track,
+  .trip-list::-webkit-scrollbar-thumb,
+  .screen-overlay-panel::-webkit-scrollbar-thumb,
+  .note-editor-panel::-webkit-scrollbar-thumb,
+  .note-editor-body textarea::-webkit-scrollbar-thumb,
+  .trip-note-preview::-webkit-scrollbar-thumb,
+  .custom-info-note-preview::-webkit-scrollbar-thumb,
+  .floating-menu::-webkit-scrollbar-thumb,
+  .location-actions-menu::-webkit-scrollbar-thumb,
+  #startPanel::-webkit-scrollbar-thumb,
+  #pointPanel::-webkit-scrollbar-thumb,
+  #endPanel::-webkit-scrollbar-thumb,
+  #savePanel::-webkit-scrollbar-thumb,
+  #importExportPanel::-webkit-scrollbar-thumb,
+  .pac-container::-webkit-scrollbar-thumb {
+    background: transparent !important;
+    border: 0 !important;
+    box-shadow: none !important;
+  }
+}
