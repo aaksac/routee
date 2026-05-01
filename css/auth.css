@@ -409,7 +409,7 @@ body.auth-booting {
   --routee-startup-safe-right: env(safe-area-inset-right, 0px);
   --routee-startup-safe-bottom: env(safe-area-inset-bottom, 0px);
   --routee-startup-safe-left: env(safe-area-inset-left, 0px);
-  --routee-startup-bg: radial-gradient(circle at top, rgba(37, 99, 235, 0.18), transparent 34%), linear-gradient(180deg, rgba(8, 15, 30, 0.98) 0%, rgba(15, 23, 42, 0.98) 100%);
+  --routee-startup-bg: radial-gradient(circle at top, rgba(37, 99, 235, 0.18), transparent 34%), linear-gradient(180deg, #08101f 0%, #0f172a 100%);
 }
 
 @supports (top: constant(safe-area-inset-top)) {
@@ -424,20 +424,33 @@ body.auth-booting {
 html.show-app-startup-splash,
 html.show-app-startup-splash body,
 body.auth-booting {
+  margin: 0 !important;
+  padding: 0 !important;
   background: #0f172a !important;
   overflow: hidden !important;
+  overscroll-behavior: none !important;
+}
+
+html.show-app-startup-splash #app {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
 }
 
 .startup-splash,
 .app-startup-splash {
   position: fixed !important;
+  top: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  left: 0 !important;
   inset: 0 !important;
-  z-index: 9999 !important;
-  width: 100vw !important;
-  height: 100vh !important;
-  height: 100svh !important;
+  z-index: 2147483000 !important;
+  width: auto !important;
+  height: auto !important;
+  min-width: 100vw !important;
   min-height: 100vh !important;
-  min-height: 100svh !important;
+  min-height: 100dvh !important;
   display: grid !important;
   place-items: center !important;
   box-sizing: border-box !important;
@@ -445,7 +458,9 @@ body.auth-booting {
   padding-right: max(20px, calc(var(--routee-startup-safe-right) + 16px)) !important;
   padding-bottom: max(24px, calc(var(--routee-startup-safe-bottom) + 20px)) !important;
   padding-left: max(20px, calc(var(--routee-startup-safe-left) + 16px)) !important;
-  background: var(--routee-startup-bg) !important;
+  overflow: hidden !important;
+  background: #0f172a !important;
+  background-image: var(--routee-startup-bg) !important;
   color: #fff !important;
   opacity: 0;
   visibility: hidden;
@@ -454,6 +469,13 @@ body.auth-booting {
   transform: translateZ(0);
   -webkit-transform: translateZ(0);
   contain: layout paint;
+}
+
+@supports (-webkit-touch-callout: none) {
+  .startup-splash,
+  .app-startup-splash {
+    min-height: -webkit-fill-available !important;
+  }
 }
 
 .startup-splash.is-visible,
@@ -470,7 +492,7 @@ body.auth-booting {
   align-content: center !important;
   justify-items: center !important;
   gap: 16px !important;
-  max-height: calc(100svh - var(--routee-startup-safe-top) - var(--routee-startup-safe-bottom) - 48px) !important;
+  max-height: calc(100dvh - var(--routee-startup-safe-top) - var(--routee-startup-safe-bottom) - 48px) !important;
   overflow: hidden !important;
   transform: translateZ(0);
   -webkit-transform: translateZ(0);
