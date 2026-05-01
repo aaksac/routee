@@ -32,16 +32,17 @@
   </script>
 
   <style id="routee-app-critical-splash-css">
-    html.show-app-startup-splash,
-    html.show-app-startup-splash body {
+    html.show-app-startup-splash {
       margin: 0;
       min-height: 100%;
       background: #0f172a;
-      overflow: hidden;
     }
 
-    html.show-app-startup-splash #app {
-      visibility: hidden;
+    html.show-app-startup-splash body {
+      margin: 0;
+      min-height: 100%;
+      background: var(--bg, #f4f7fb);
+      overflow: hidden;
     }
 
     html.show-app-startup-splash .app-startup-splash {
