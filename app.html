@@ -183,32 +183,6 @@
     }
   </style>
 
-  <script>
-    (function () {
-      try {
-        var mobileQuery = "(max-width: 720px), (hover: none) and (pointer: coarse)";
-        var isMobile = false;
-
-        try {
-          isMobile = window.matchMedia && window.matchMedia(mobileQuery).matches;
-        } catch (queryError) {
-          isMobile = false;
-        }
-
-        if (!isMobile) {
-          isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
-            window.navigator.userAgent || ""
-          );
-        }
-
-        if (isMobile || sessionStorage.getItem("routeeStartupSplash") === "1") {
-          document.documentElement.classList.add("show-app-startup-splash", "routee-mobile-splash-active", "routee-mobile-splash-image");
-        }
-      } catch (error) {
-        console.warn("Startup splash session kontrolü başarısız:", error);
-      }
-    })();
-  </script>
 </head>
 <body>
   <div class="startup-splash app-startup-splash" id="appStartupSplash" aria-hidden="true">
