@@ -37,9 +37,6 @@ import {
   convertImportedRowsToState
 } from "./import-export.js";
 
-window.__routeeAppModuleStarted = true;
-window.__routeeAppModuleReady = false;
-
 const state = {
   tripPanelOpen: true,
   activeFloatingPanel: null,
@@ -62,7 +59,6 @@ const state = {
   lastScrollY: 0,
   appStartupSplash: null,
   appStartupRevealTimer: null,
-  appStartupMapGraceTimer: null,
   appAuthReadyForReveal: false,
   appMapReadyForReveal: false,
   selectedPointColor: "#dc2626",
@@ -151,7 +147,7 @@ const GOOGLE_MAPS_BOOT_TIMEOUT_MS = 12000;
 let mapFeaturesInitialized = false;
 let mapsBootPromise = null;
 const MOBILE_STARTUP_QUERY = "(max-width: 720px), (hover: none) and (pointer: coarse)";
-const APP_STARTUP_REVEAL_TIMEOUT_MS = 8000;
+const APP_STARTUP_REVEAL_TIMEOUT_MS = 12000;
 
 function isMobileStartupMode() {
   try {
@@ -258,11 +254,6 @@ function goToLogin() {
 function hydrateAppStartupSplash() {
   if (!elements.appStartupSplash) return null;
 
-  if (window.__routeeAppSplashHardReleased === true) {
-    clearAppStartupSplashSession();
-    return null;
-  }
-
   try {
     const hasSessionSplash = sessionStorage.getItem("routeeStartupSplash") === "1";
     const shouldUseMobileSplash = hasSessionSplash || isMobileStartupMode();
@@ -319,38 +310,17 @@ async function closeAppStartupSplash(splashState) {
     state.appStartupRevealTimer = null;
   }
 
-  if (state.appStartupMapGraceTimer) {
-    window.clearTimeout(state.appStartupMapGraceTimer);
-    state.appStartupMapGraceTimer = null;
-  }
-
-  window.__routeeAppSplashResolved = true;
   elements.appStartupSplash.classList.remove("is-visible");
   elements.appStartupSplash.setAttribute("aria-hidden", "true");
-  document.documentElement.classList.remove("show-app-startup-splash", "routee-mobile-splash-active", "routee-mobile-splash-image", "routee-mobile-splash-message");
-  document.body?.classList.remove("routee-app-startup-active", "routee-mobile-splash-active", "routee-mobile-splash-image", "routee-mobile-splash-message");
+  document.documentElement.classList.remove("show-app-startup-splash", "routee-mobile-splash-active", "routee-mobile-splash-image");
+  document.body?.classList.remove("routee-app-startup-active", "routee-mobile-splash-active", "routee-mobile-splash-image");
   clearAppStartupSplashSession();
 }
 
 async function closeAppStartupSplashWhenReady() {
   if (!state.appStartupSplash) return;
   if (!isMobileStartupMode()) return;
-  if (!state.appAuthReadyForReveal) return;
-
-  const elapsed = Date.now() - Number(state.appStartupSplash.startedAt || Date.now());
-
-  // Splash artık Google Maps cevabına süresiz bağlı değil.
-  // Auth tamamlandıysa ve harita hâlâ gecikiyorsa kullanıcı uygulama arayüzünü görür;
-  // harita yükleme/bağlantı uyarısı status alanında devam eder.
-  if (!state.appMapReadyForReveal && elapsed < 1800) {
-    if (!state.appStartupMapGraceTimer) {
-      state.appStartupMapGraceTimer = window.setTimeout(() => {
-        state.appStartupMapGraceTimer = null;
-        void closeAppStartupSplashWhenReady();
-      }, Math.max(0, 1800 - elapsed));
-    }
-    return;
-  }
+  if (!state.appAuthReadyForReveal || !state.appMapReadyForReveal) return;
 
   await closeAppStartupSplash(state.appStartupSplash);
   state.appStartupSplash = null;
@@ -2726,19 +2696,9 @@ function initAuthWatcher() {
 
         elements.authStatus.textContent = `Aktif kullanıcı: ${user.email}`;
 
-        // Arayüzü claims/profil/harita listesi beklemeden aç.
-        // Yetki ve kota bilgileri aşağıda arka planda yüklenir; splash bu kontrollere bağlı kalmaz.
-        state.appAuthReadyForReveal = true;
-        await closeAppStartupSplashWhenReady();
-
-        try {
-          await ensureUserProfile(user.uid, user.email);
-          await loadAccessModel(user);
-          elements.authStatus.textContent = `Aktif kullanıcı: ${user.email} · ${getAccessStatusText()}`;
-        } catch (accessError) {
-          console.warn("Kullanıcı erişim modeli geç yükleniyor veya alınamadı:", accessError);
-          elements.authStatus.textContent = `Aktif kullanıcı: ${user.email} · Erişim bilgileri yükleniyor...`;
-        }
+        await ensureUserProfile(user.uid, user.email);
+        await loadAccessModel(user);
+        elements.authStatus.textContent = `Aktif kullanıcı: ${user.email} · ${getAccessStatusText()}`;
 
         const loadMapsTask = async () => {
           try {
@@ -2747,6 +2707,9 @@ function initAuthWatcher() {
             console.warn("Harita listesi yüklenemedi:", error);
           }
         };
+
+        state.appAuthReadyForReveal = true;
+        await closeAppStartupSplashWhenReady();
 
         if ("requestIdleCallback" in window) {
           window.requestIdleCallback(() => {
@@ -2781,7 +2744,6 @@ function initAuthWatcher() {
 function init() {
   state.appStartupSplash = hydrateAppStartupSplash();
   armAppStartupSplashFallback();
-  window.__routeeAppModuleReady = true;
 
   renderSummary();
   renderTripList();
