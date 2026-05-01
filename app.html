@@ -180,6 +180,118 @@
       }
     }
   </style>
+      <!-- ROUTEE_MOBILE_SINGLE_IMAGE_LOCK_START -->
+      <style>
+
+/* ROUTEE — MOBILE SINGLE IMAGE LOCK
+   Mobilde native splash, giriş splash'i ve app splash'i aynı cihaz görseliyle eşitlenir. */
+@media (max-width: 720px), (hover: none) and (pointer: coarse) {
+  :root {
+    --routee-single-splash-image: url("./icons/splash-1170x2532.png");
+  }
+}
+@media (device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait) {
+  :root {
+    --routee-single-splash-image: url("./icons/splash-640x1136.png");
+  }
+}
+@media (device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait) {
+  :root {
+    --routee-single-splash-image: url("./icons/splash-750x1334.png");
+  }
+}
+@media (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait) {
+  :root {
+    --routee-single-splash-image: url("./icons/splash-828x1792.png");
+  }
+}
+@media (device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait) {
+  :root {
+    --routee-single-splash-image: url("./icons/splash-1125x2436.png");
+  }
+}
+@media (device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait) {
+  :root {
+    --routee-single-splash-image: url("./icons/splash-1170x2532.png");
+  }
+}
+@media (device-width: 414px) and (device-height: 736px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait) {
+  :root {
+    --routee-single-splash-image: url("./icons/splash-1242x2208.png");
+  }
+}
+@media (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait) {
+  :root {
+    --routee-single-splash-image: url("./icons/splash-1242x2688.png");
+  }
+}
+@media (device-width: 428px) and (device-height: 926px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait) {
+  :root {
+    --routee-single-splash-image: url("./icons/splash-1284x2778.png");
+  }
+}
+@media (device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait) {
+  :root {
+    --routee-single-splash-image: url("./icons/splash-1290x2796.png");
+  }
+}
+@media (device-width: 768px) and (device-height: 1024px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait) {
+  :root {
+    --routee-single-splash-image: url("./icons/splash-1536x2048.png");
+  }
+}
+@media (device-width: 834px) and (device-height: 1112px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait) {
+  :root {
+    --routee-single-splash-image: url("./icons/splash-1668x2224.png");
+  }
+}
+@media (device-width: 834px) and (device-height: 1194px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait) {
+  :root {
+    --routee-single-splash-image: url("./icons/splash-1668x2388.png");
+  }
+}
+@media (device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait) {
+  :root {
+    --routee-single-splash-image: url("./icons/splash-2048x2732.png");
+  }
+}
+@media (max-width: 720px), (hover: none) and (pointer: coarse) {
+  html.routee-mobile-splash-active .startup-splash,
+  body.routee-mobile-splash-active .startup-splash,
+  html.routee-mobile-entry-splash .startup-splash,
+  body.routee-mobile-entry-splash .startup-splash,
+  html.routee-mobile-routing-splash .startup-splash,
+  body.routee-mobile-routing-splash .startup-splash,
+  html.show-app-startup-splash .app-startup-splash,
+  body.routee-app-startup-active .app-startup-splash,
+  .app-startup-splash.is-visible {
+    background-color: #0b1222 !important;
+    background-image: var(--routee-single-splash-image) !important;
+    background-position: center center !important;
+    background-size: cover !important;
+    background-repeat: no-repeat !important;
+  }
+
+  html.routee-mobile-splash-active .startup-splash-card,
+  body.routee-mobile-splash-active .startup-splash-card,
+  html.routee-mobile-entry-splash .startup-splash-card,
+  body.routee-mobile-entry-splash .startup-splash-card,
+  html.routee-mobile-routing-splash .startup-splash-card,
+  body.routee-mobile-routing-splash .startup-splash-card,
+  html.routee-mobile-splash-message .startup-splash-card,
+  body.routee-mobile-splash-message .startup-splash-card,
+  html.show-app-startup-splash .startup-splash-card,
+  body.routee-app-startup-active .startup-splash-card,
+  .app-startup-splash .startup-splash-card,
+  .app-startup-splash .app-startup-splash-image,
+  .app-startup-splash > * {
+    display: none !important;
+  }
+}
+
+      </style>
+      <!-- ROUTEE_MOBILE_SINGLE_IMAGE_LOCK_END -->
+
 
 </head>
 <body>
