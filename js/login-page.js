@@ -62,19 +62,12 @@ function setMobileStartupPhase(phase) {
     );
   });
 
+  // Mobilde tek görsel mantığı: giriş, yönlendirme ve app açılışında kartlı ikinci splash gösterilmez.
   // phase boş/null ise splash tamamen kapatılır.
-  // Önceki sürümde null phase mobilde routee-mobile-splash-active sınıfını tekrar ekliyordu.
-  // Bu da login ekranını gizli bırakıp splash donmuş gibi gösteriyordu.
   if (!phase || !isMobileStartupMode()) return;
 
   targets.forEach((target) => {
-    target.classList.add("routee-mobile-splash-active");
-
-    if (phase === "routing") {
-      target.classList.add("routee-mobile-splash-message");
-    } else {
-      target.classList.add("routee-mobile-splash-image");
-    }
+    target.classList.add("routee-mobile-splash-active", "routee-mobile-splash-image");
   });
 }
 
