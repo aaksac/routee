@@ -37,7 +37,8 @@ import {
   convertImportedRowsToState
 } from "./import-export.js";
 
-window.__routeeAppModuleReady = true;
+window.__routeeAppModuleStarted = true;
+window.__routeeAppModuleReady = false;
 
 const state = {
   tripPanelOpen: true,
@@ -150,7 +151,7 @@ const GOOGLE_MAPS_BOOT_TIMEOUT_MS = 12000;
 let mapFeaturesInitialized = false;
 let mapsBootPromise = null;
 const MOBILE_STARTUP_QUERY = "(max-width: 720px), (hover: none) and (pointer: coarse)";
-const APP_STARTUP_REVEAL_TIMEOUT_MS = 12000;
+const APP_STARTUP_REVEAL_TIMEOUT_MS = 8000;
 
 function isMobileStartupMode() {
   try {
@@ -2773,6 +2774,7 @@ function initAuthWatcher() {
 function init() {
   state.appStartupSplash = hydrateAppStartupSplash();
   armAppStartupSplashFallback();
+  window.__routeeAppModuleReady = true;
 
   renderSummary();
   renderTripList();
