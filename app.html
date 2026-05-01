@@ -11,10 +11,27 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="Rota" />
 
+  <script id="routee-mobile-app-splash-early-lock">
+    (function () {
+      try {
+        var mobileQuery = "(max-width: 720px), (hover: none) and (pointer: coarse)";
+        var isMobile = false;
+        try { isMobile = window.matchMedia && window.matchMedia(mobileQuery).matches; } catch (queryError) { isMobile = false; }
+        if (!isMobile) {
+          isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(window.navigator.userAgent || "");
+        }
+        if (isMobile || sessionStorage.getItem("routeeStartupSplash") === "1") {
+          document.documentElement.classList.add("show-app-startup-splash");
+        }
+      } catch (error) {}
+    })();
+  </script>
+
   <link rel="icon" type="image/png" sizes="32x32" href="./icons/favicon-32.png" />
   <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png" />
   <link rel="apple-touch-icon" sizes="180x180" href="./icons/apple-touch-icon.png" />
   <link rel="manifest" href="./manifest.webmanifest" />
+  <link rel="preload" as="image" href="./icons/splash-1170x2532.png" media="(max-width: 720px), (hover: none) and (pointer: coarse)" />
 
   <script type="module" src="./js/version-guard.js"></script>
   <script src="./js/status-bar.js"></script>
