@@ -337,92 +337,185 @@ body.auth-booting {
   }
 }
 
+
 /* =========================================================
-   ROUTEE — MOBILE-ONLY SINGLE SPLASH FLOW
-   Mobilde ilk açılışta tek splash görseli; manuel girişte aynı perde üzerinde
-   yalnızca “Oturumunuz açılıyor...” kartı görünür. Masaüstü/web etkilenmez.
+   ROUTEE — MOBILE-ONLY SPLASH FLOW
+   Mobilde giriş ekranı veya harita hazır olana kadar PWA splash görseli kullanılır.
+   Web/masaüstü sürüme dokunmaz.
    ========================================================= */
 @media (max-width: 720px), (hover: none) and (pointer: coarse) {
-  html.routee-mobile-startup-active,
-  html.routee-mobile-startup-active body,
-  body.routee-mobile-startup-active {
-    overflow: hidden !important;
-    background: #0f172a !important;
-  }
-
-  html.routee-mobile-entry-splash .login-page,
-  body.routee-mobile-entry-splash .login-page,
-  html.routee-mobile-routing-splash .login-page,
-  body.routee-mobile-routing-splash .login-page {
-    opacity: 0 !important;
-    visibility: hidden !important;
-    pointer-events: none !important;
-  }
-
-  html.routee-mobile-startup-active .startup-splash,
-  body.routee-mobile-startup-active .startup-splash {
-    position: fixed !important;
-    inset: 0 !important;
-    z-index: 2147483000 !important;
-    width: 100vw !important;
-    height: 100vh !important;
-    min-height: 100vh !important;
-    min-height: 100dvh !important;
-    display: grid !important;
-    place-items: center !important;
-    padding: max(24px, env(safe-area-inset-top, 0px)) max(20px, env(safe-area-inset-right, 0px)) max(24px, env(safe-area-inset-bottom, 0px)) max(20px, env(safe-area-inset-left, 0px)) !important;
+  body.routee-mobile-entry-splash .startup-splash {
     background: #0f172a url("../icons/splash-1170x2532.png") center center / cover no-repeat !important;
-    opacity: 1 !important;
-    visibility: visible !important;
-    pointer-events: auto !important;
   }
 
-  @supports (-webkit-touch-callout: none) {
-    html.routee-mobile-startup-active .startup-splash,
-    body.routee-mobile-startup-active .startup-splash {
-      min-height: -webkit-fill-available !important;
-    }
-  }
-
-  html.routee-mobile-entry-splash .startup-splash-card,
-  body.routee-mobile-entry-splash .startup-splash-card,
-  body.routee-app-startup-active .app-startup-splash .startup-splash-card {
+  body.routee-mobile-entry-splash .startup-splash-card {
     display: none !important;
   }
 
-  html.routee-mobile-routing-splash .startup-splash-card,
+  body.routee-mobile-routing-splash .startup-splash {
+    background: #0f172a url("../icons/splash-1170x2532.png") center center / cover no-repeat !important;
+  }
+
   body.routee-mobile-routing-splash .startup-splash-card {
     display: grid !important;
-    width: min(320px, calc(100vw - 40px)) !important;
-    min-height: 198px !important;
-    padding: 22px 18px 18px !important;
-    border-radius: 24px !important;
-    background: rgba(15, 23, 42, 0.58) !important;
-    border: 1px solid rgba(255, 255, 255, 0.14) !important;
-    box-shadow: 0 20px 48px rgba(0, 0, 0, 0.22) !important;
-    backdrop-filter: blur(16px) !important;
-    -webkit-backdrop-filter: blur(16px) !important;
+    width: min(320px, calc(100vw - 40px));
+    min-height: 198px;
+    padding: 22px 18px 18px;
+    border-radius: 24px;
+    background: rgba(15, 23, 42, 0.58);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    box-shadow: 0 20px 48px rgba(0, 0, 0, 0.22);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
   }
 
-  html.routee-mobile-routing-splash .startup-splash-logo,
-  body.routee-mobile-routing-splash .startup-splash-logo {
-    display: grid !important;
-    width: 74px !important;
-    height: 74px !important;
-    border-radius: 23px !important;
-    background: rgba(255, 255, 255, 0.08) !important;
-    border: 1px solid rgba(255, 255, 255, 0.16) !important;
-    box-shadow: 0 16px 34px rgba(37, 99, 235, 0.18) !important;
-  }
-
-  html.routee-mobile-routing-splash .startup-splash-copy,
   body.routee-mobile-routing-splash .startup-splash-copy,
-  html.routee-mobile-routing-splash .startup-splash-copy strong,
-  html.routee-mobile-routing-splash .startup-splash-copy span,
   body.routee-mobile-routing-splash .startup-splash-copy strong,
   body.routee-mobile-routing-splash .startup-splash-copy span {
     display: block !important;
     visibility: visible !important;
     opacity: 1 !important;
+  }
+
+  body.routee-app-startup-active .app-startup-splash .startup-splash-card {
+    display: none !important;
+  }
+
+  body.routee-mobile-routing-splash .startup-splash-logo {
+    display: grid !important;
+    width: 74px;
+    height: 74px;
+    border-radius: 23px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    box-shadow: 0 16px 34px rgba(37, 99, 235, 0.18);
+  }
+
+  body.routee-mobile-routing-splash .startup-splash-orb {
+    display: block !important;
+  }
+
+}
+
+
+/* =========================================================
+   ROUTEE — MOBILE SINGLE SPLASH AUTHORITATIVE OVERRIDE
+   Tek splash kaynağı: ilk açılışta yalnızca görsel, manuel girişte aynı görsel üstünde "Oturumunuz açılıyor...".
+   ========================================================= */
+@media (max-width: 720px), (hover: none) and (pointer: coarse) {
+  html.routee-mobile-splash-active,
+  html.routee-mobile-splash-active body,
+  body.routee-mobile-splash-active,
+  html.routee-mobile-entry-splash,
+  html.routee-mobile-entry-splash body,
+  body.routee-mobile-entry-splash,
+  html.routee-mobile-routing-splash,
+  html.routee-mobile-routing-splash body,
+  body.routee-mobile-routing-splash,
+  html.show-app-startup-splash,
+  html.show-app-startup-splash body,
+  body.routee-app-startup-active {
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 100svh !important;
+    min-height: 100dvh !important;
+    margin: 0 !important;
+    overflow: hidden !important;
+    background: #0b1222 !important;
+    overscroll-behavior: none !important;
+  }
+
+  html.routee-mobile-splash-active .login-page,
+  body.routee-mobile-splash-active .login-page,
+  html.routee-mobile-entry-splash .login-page,
+  body.routee-mobile-entry-splash .login-page,
+  html.routee-mobile-routing-splash .login-page,
+  body.routee-mobile-routing-splash .login-page,
+  html.show-app-startup-splash #app,
+  body.routee-app-startup-active #app,
+  html.show-app-startup-splash .new-map-mobile-fab,
+  body.routee-app-startup-active .new-map-mobile-fab {
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+  }
+
+  html.routee-mobile-splash-active .startup-splash,
+  body.routee-mobile-splash-active .startup-splash,
+  html.routee-mobile-entry-splash .startup-splash,
+  body.routee-mobile-entry-splash .startup-splash,
+  html.routee-mobile-routing-splash .startup-splash,
+  body.routee-mobile-routing-splash .startup-splash,
+  html.show-app-startup-splash .app-startup-splash,
+  body.routee-app-startup-active .app-startup-splash,
+  .app-startup-splash.is-visible {
+    position: fixed !important;
+    inset: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    height: 100svh !important;
+    height: 100dvh !important;
+    min-height: -webkit-fill-available !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    display: grid !important;
+    place-items: center !important;
+    overflow: hidden !important;
+    background-color: #0b1222 !important;
+    background-image: url("../icons/splash-1170x2532.png") !important;
+    background-position: center center !important;
+    background-size: cover !important;
+    background-repeat: no-repeat !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+    z-index: 2147483646 !important;
+    transform: translateZ(0) !important;
+    -webkit-transform: translateZ(0) !important;
+    backface-visibility: hidden !important;
+    -webkit-backface-visibility: hidden !important;
+  }
+
+  html.routee-mobile-splash-image .startup-splash-card,
+  body.routee-mobile-splash-image .startup-splash-card,
+  html.routee-mobile-entry-splash .startup-splash-card,
+  body.routee-mobile-entry-splash .startup-splash-card,
+  .app-startup-splash .app-startup-splash-image,
+  .app-startup-splash .startup-splash-card,
+  .app-startup-splash > * {
+    display: none !important;
+  }
+
+  html.routee-mobile-splash-message .startup-splash-card,
+  body.routee-mobile-splash-message .startup-splash-card {
+    display: grid !important;
+    width: min(318px, calc(100vw - 40px)) !important;
+    min-height: 158px !important;
+    padding: 22px 18px 18px !important;
+    border-radius: 24px !important;
+    background: rgba(15, 23, 42, 0.62) !important;
+    border: 1px solid rgba(255, 255, 255, 0.14) !important;
+    box-shadow: 0 20px 48px rgba(0, 0, 0, 0.24) !important;
+    backdrop-filter: blur(16px) !important;
+    -webkit-backdrop-filter: blur(16px) !important;
+  }
+
+  html.routee-mobile-splash-message .startup-splash-copy,
+  html.routee-mobile-splash-message .startup-splash-copy strong,
+  html.routee-mobile-splash-message .startup-splash-copy span,
+  body.routee-mobile-splash-message .startup-splash-copy,
+  body.routee-mobile-splash-message .startup-splash-copy strong,
+  body.routee-mobile-splash-message .startup-splash-copy span {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+
+  html.routee-mobile-splash-message .startup-splash-logo,
+  body.routee-mobile-splash-message .startup-splash-logo {
+    display: grid !important;
+    width: 60px !important;
+    height: 60px !important;
+    border-radius: 18px !important;
   }
 }
