@@ -177,7 +177,7 @@ function revealLoginScreen() {
   setStatus(initialStatus.message, initialStatus.type);
 }
 
-function setAppStartupSplash(message = "Haritanız yükleniyor...") {
+function setAppStartupSplash(message = "Haritanız hazırlanıyor...") {
   try {
     sessionStorage.setItem("routeeStartupSplash", "1");
     sessionStorage.setItem("routeeStartupSplashText", message);
@@ -300,7 +300,7 @@ async function routeAfterLogin(user, options = {}) {
     showStartupSplash(splashTitle, splashMessage, { phase: "routing" });
 
     if (!isAdmin) {
-      setAppStartupSplash("Haritanız yükleniyor...");
+      setAppStartupSplash("Haritanız hazırlanıyor...");
     } else {
       clearAppStartupSplash();
     }
