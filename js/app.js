@@ -260,8 +260,8 @@ function hydrateAppStartupSplash() {
       return null;
     }
 
-    document.documentElement.classList.add("show-app-startup-splash");
-    document.body?.classList.add("routee-app-startup-active");
+    document.documentElement.classList.add("show-app-startup-splash", "routee-mobile-splash-active", "routee-mobile-splash-image");
+    document.body?.classList.add("routee-app-startup-active", "routee-mobile-splash-active", "routee-mobile-splash-image");
 
     const startedAt = Number(sessionStorage.getItem("routeeStartupSplashAt")) || Date.now();
 
@@ -276,8 +276,8 @@ function hydrateAppStartupSplash() {
     console.warn("Startup splash verisi okunamadı:", error);
 
     if (isMobileStartupMode()) {
-      document.documentElement.classList.add("show-app-startup-splash");
-      document.body?.classList.add("routee-app-startup-active");
+      document.documentElement.classList.add("show-app-startup-splash", "routee-mobile-splash-active", "routee-mobile-splash-image");
+      document.body?.classList.add("routee-app-startup-active", "routee-mobile-splash-active", "routee-mobile-splash-image");
       elements.appStartupSplash.classList.add("is-visible");
       elements.appStartupSplash.setAttribute("aria-hidden", "false");
       return { startedAt: Date.now() };
@@ -305,8 +305,8 @@ async function closeAppStartupSplash(splashState) {
 
   elements.appStartupSplash.classList.remove("is-visible");
   elements.appStartupSplash.setAttribute("aria-hidden", "true");
-  document.documentElement.classList.remove("show-app-startup-splash");
-  document.body?.classList.remove("routee-app-startup-active");
+  document.documentElement.classList.remove("show-app-startup-splash", "routee-mobile-splash-active", "routee-mobile-splash-image", "routee-mobile-splash-message");
+  document.body?.classList.remove("routee-app-startup-active", "routee-mobile-splash-active", "routee-mobile-splash-image", "routee-mobile-splash-message");
   clearAppStartupSplashSession();
 }
 
