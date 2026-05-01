@@ -6,7 +6,7 @@
 
 :root {
   --routee-splash-bg: #0b1222;
-  --routee-splash-image: url("../icons/splash-1170x2532.png?v=20260501-cover");
+  --routee-splash-image: url("../icons/splash-1170x2532.png?v=20260501-next");
 }
 
 @media (max-width: 720px), (hover: none) and (pointer: coarse) {
