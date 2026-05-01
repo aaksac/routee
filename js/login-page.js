@@ -47,22 +47,27 @@ function isMobileStartupMode() {
 }
 
 function setMobileStartupPhase(phase) {
-  if (!document.body) return;
+  const targets = [document.documentElement, document.body].filter(Boolean);
 
-  document.body.classList.remove(
-    "routee-mobile-entry-splash",
-    "routee-mobile-routing-splash",
-    "routee-mobile-startup-active"
-  );
+  targets.forEach((target) => {
+    target.classList.remove(
+      "routee-mobile-entry-splash",
+      "routee-mobile-routing-splash",
+      "routee-mobile-startup-active"
+    );
+  });
 
   if (!isMobileStartupMode()) return;
 
-  if (phase === "entry") {
-    document.body.classList.add("routee-mobile-startup-active", "routee-mobile-entry-splash");
-  } else if (phase === "routing") {
-    document.body.classList.add("routee-mobile-startup-active", "routee-mobile-routing-splash");
-  }
+  targets.forEach((target) => {
+    if (phase === "entry") {
+      target.classList.add("routee-mobile-startup-active", "routee-mobile-entry-splash");
+    } else if (phase === "routing") {
+      target.classList.add("routee-mobile-startup-active", "routee-mobile-routing-splash");
+    }
+  });
 }
+
 
 function clearAuthModulePromise() {
   authModulePromise = null;
