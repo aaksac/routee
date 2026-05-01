@@ -706,3 +706,35 @@ body.auth-booting .auth-card {
     line-height: 17.5px !important;
   }
 }
+
+/* =========================================================
+   ROUTEE — LOGIN SONRASI APP REVEAL KİLİDİ
+   Splash kapanmadan önce ana uygulamayı arkada sessizce layout'a sokar.
+   Böylece login sonrası #app görünür olurken topbar/map yeniden ölçüm sıçraması görünmez.
+   ========================================================= */
+html.routee-app-reveal-lock,
+html.routee-app-reveal-lock body,
+body.routee-app-reveal-lock {
+  overflow: hidden !important;
+  overscroll-behavior: none !important;
+  scroll-behavior: auto !important;
+}
+
+html.routee-app-reveal-lock.show-app-startup-splash #app {
+  opacity: 1 !important;
+  visibility: visible !important;
+  pointer-events: none !important;
+}
+
+html.routee-app-reveal-lock .topbar {
+  transform: none !important;
+  opacity: 1 !important;
+  transition: none !important;
+}
+
+html.routee-app-reveal-lock .map-canvas,
+html.routee-app-reveal-lock .map-shell,
+html.routee-app-reveal-lock .app-layout {
+  transition: none !important;
+  animation: none !important;
+}
