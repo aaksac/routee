@@ -297,12 +297,23 @@ async function routeAfterLogin(user, options = {}) {
     const isAdmin = claims.adminPanel === true;
     const targetUrl = isAdmin ? "./chooser.html" : "./app.html";
 
-    const splashTitle = isAdmin ? "Yönetim paneli açılıyor" : "Rota";
-    const splashMessage = isAdmin
-      ? "Yetkileriniz doğrulanıyor..."
-      : "Oturumunuz açılıyor...";
+    const keepExistingMobileSplash =
+      options.keepExistingMobileSplash === true &&
+      !isAdmin &&
+      isMobileStartupMode();
 
-    showStartupSplash(splashTitle, splashMessage, { phase: "routing" });
+    if (keepExistingMobileSplash) {
+      // Oturumu zaten açık olan mobil kullanıcıda ikinci/metinli splash üretme.
+      // İlk açılıştaki aynı splash görseli app.html harita hazır olana kadar devam eder.
+      showStartupSplash("Rota", "", { phase: "entry" });
+    } else {
+      const splashTitle = isAdmin ? "Yönetim paneli açılıyor" : "Rota";
+      const splashMessage = isAdmin
+        ? "Yetkileriniz doğrulanıyor..."
+        : "Oturumunuz açılıyor...";
+
+      showStartupSplash(splashTitle, splashMessage, { phase: "routing" });
+    }
 
     if (!isAdmin) {
       setAppStartupSplash();
@@ -422,7 +433,8 @@ async function initAuthWatcher() {
       if (user) {
         await routeAfterLogin(user, {
           message: "Oturumunuz açılıyor...",
-          delay: false
+          delay: false,
+          keepExistingMobileSplash: true
         });
         return;
       }
