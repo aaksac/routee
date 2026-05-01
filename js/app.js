@@ -2693,6 +2693,11 @@ function initAuthWatcher() {
           }, 0);
         }
       } else {
+        if (isMobileStartupMode() && state.appStartupSplash) {
+          goToLogin();
+          return;
+        }
+
         await closeAppStartupSplash(state.appStartupSplash);
         state.appStartupSplash = null;
         goToLogin();
