@@ -306,6 +306,16 @@ async function closeAppStartupSplash(splashState) {
 
   await waitForStablePaint();
 
+  try {
+    window.scrollTo(0, 0);
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+  } catch (error) {
+    // Kaydırma sıfırlama görsel stabilite içindir; hata verirse uygulama akışı kesilmez.
+  }
+
+  await waitForStablePaint();
+
   elements.appStartupSplash.classList.remove("is-visible");
   elements.appStartupSplash.setAttribute("aria-hidden", "true");
   document.documentElement.classList.remove("show-app-startup-splash");
