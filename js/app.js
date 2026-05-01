@@ -248,7 +248,13 @@ function ensureMapFeaturesBootstrapped() {
 
   return state.mapBootPromise;
 }
-
+function waitForStablePaint() {
+  return new Promise((resolve) => {
+    window.requestAnimationFrame(() => {
+      window.requestAnimationFrame(resolve);
+    });
+  });
+}
 async function closeAppStartupSplashAfterMapReady() {
   const splashState = state.appStartupSplash;
 
@@ -257,15 +263,18 @@ async function closeAppStartupSplashAfterMapReady() {
     return;
   }
 
-  await ensureMapFeaturesBootstrapped();
+  const mapReady = await ensureMapFeaturesBootstrapped();
 
-  const startedAt = Number(splashState.startedAt) || Date.now();
-  const elapsed = Date.now() - startedAt;
-  const minimumVisibleMs = 280;
-
-  if (elapsed < minimumVisibleMs) {
-    await wait(minimumVisibleMs - elapsed);
+  if (!mapReady) {
+    return;
   }
+
+  /*
+    Google Maps hazır olduktan sonra harita canvas'ının
+    son yerleşimini tamamlaması için iki frame beklenir.
+    Bu yapay hız kaybı oluşturmaz; sadece görsel zıplamayı engeller.
+  */
+  await waitForStablePaint();
 
   await closeAppStartupSplash(splashState);
   state.appStartupSplash = null;
@@ -314,8 +323,18 @@ async function closeAppStartupSplash(splashState) {
     return;
   }
 
-  elements.appStartupSplash.classList.remove("is-visible");
-  elements.appStartupSplash.setAttribute("aria-hidden", "true");
+  const splash = elements.appStartupSplash;
+
+  splash.style.transition = "opacity 140ms ease";
+  splash.style.opacity = "0";
+
+  await wait(140);
+
+  splash.classList.remove("is-visible");
+  splash.setAttribute("aria-hidden", "true");
+  splash.style.transition = "";
+  splash.style.opacity = "";
+
   document.documentElement.classList.remove("show-app-startup-splash");
   clearAppStartupSplashSession();
 }
