@@ -3,10 +3,21 @@
 
   var STATUS_COLOR = "#0f172a";
   var APPLE_STATUS_STYLE = "black-translucent";
-  var STYLE_ID = "routee-statusbar-minimal-fix-style";
 
-  function upsertMeta(name, content) {
-    var meta = document.querySelector('meta[name="' + name + '"]');
+  function isIOSDevice() {
+    var ua = window.navigator.userAgent || "";
+    var platform = window.navigator.platform || "";
+    return /iPad|iPhone|iPod/.test(ua) || (platform === "MacIntel" && window.navigator.maxTouchPoints > 1);
+  }
+
+  function isStandaloneMode() {
+    return window.navigator.standalone === true ||
+      (window.matchMedia && window.matchMedia("(display-mode: standalone)").matches);
+  }
+
+  function ensureMeta(name, content, extraAttrs) {
+    var selector = 'meta[name="' + name + '"]';
+    var meta = document.head.querySelector(selector);
 
     if (!meta) {
       meta = document.createElement("meta");
@@ -18,156 +29,87 @@
       meta.setAttribute("content", content);
     }
 
+    if (extraAttrs) {
+      Object.keys(extraAttrs).forEach(function (key) {
+        if (meta.getAttribute(key) !== extraAttrs[key]) {
+          meta.setAttribute(key, extraAttrs[key]);
+        }
+      });
+    }
+
     return meta;
   }
 
-  function installMinimalStatusStyle() {
-    if (!document.head) return;
+  function applyStatusBarLock() {
+    ensureMeta("theme-color", STATUS_COLOR);
+    ensureMeta("msapplication-navbutton-color", STATUS_COLOR);
+    ensureMeta("apple-mobile-web-app-capable", "yes");
+    ensureMeta("apple-mobile-web-app-status-bar-style", APPLE_STATUS_STYLE);
+    ensureMeta("apple-mobile-web-app-title", "Rota");
+    ensureMeta("color-scheme", "light only");
 
-    var style = document.getElementById(STYLE_ID);
+    var root = document.documentElement;
+    root.classList.add("routee-statusbar-locked");
+    root.style.setProperty("--routee-system-status-bg", STATUS_COLOR);
+    root.style.backgroundColor = STATUS_COLOR;
 
-    if (!style) {
-      style = document.createElement("style");
-      style.id = STYLE_ID;
-      document.head.appendChild(style);
+    if (isIOSDevice()) {
+      root.classList.add("routee-ios");
     }
 
-    style.textContent = `
-:root {
-  --routee-statusbar-color: ${STATUS_COLOR};
-  --routee-safe-top: env(safe-area-inset-top, 0px);
-  --routee-safe-bottom: env(safe-area-inset-bottom, 0px);
-}
+    if (document.body) {
+      document.body.classList.add("routee-statusbar-locked");
+      document.body.style.setProperty("--routee-system-status-bg", STATUS_COLOR);
 
-@supports (padding-top: constant(safe-area-inset-top)) {
-  :root {
-    --routee-safe-top: constant(safe-area-inset-top);
-    --routee-safe-bottom: constant(safe-area-inset-bottom);
-  }
-}
+      if (isIOSDevice()) {
+        document.body.classList.add("routee-ios");
+      }
 
-/* Sayfanın ana arka planı uygulamanın kendi rengi olarak kalır.
-   Böylece ilk açılışta altta lacivert blok görünmez. */
-html {
-  background-color: ${STATUS_COLOR} !important;
-  color-scheme: light only !important;
-}
-
-body {
-  background-color: var(--bg, #f4f7fb) !important;
-}
-
-/* Önceki yüksek z-index'li status bar katmanı ikonların üstüne biniyordu.
-   Bunu tamamen kapatıyoruz. */
-html::before,
-body::before {
-  content: none !important;
-  display: none !important;
-}
-
-/* Üst sistem alanı iPhone'da beyaza dönmesin diye yalnızca çok ince,
-   içerik üstüne binmeyen ve tıklamayı engellemeyen arka plan katmanı. */
-.routee-status-safe-bg {
-  position: fixed;
-  left: 0;
-  right: 0;
-  top: 0;
-  height: var(--routee-safe-top);
-  background: ${STATUS_COLOR};
-  pointer-events: none;
-  z-index: 1;
-}
-
-/* Topbar, rota ikonu ve premium yazısı her zaman üstte kalır. */
-.topbar,
-.status-strip,
-.brand-area,
-.brand-icon,
-.brand-icon img,
-.brand-icon svg {
-  position: relative;
-}
-
-.topbar {
-  z-index: 50;
-}
-
-.status-strip {
-  z-index: 2;
-}
-
-.brand-area,
-.brand-icon,
-.brand-icon img,
-.brand-icon svg {
-  z-index: 3;
-}
-
-.brand-icon {
-  overflow: visible !important;
-  flex-shrink: 0 !important;
-}
-
-/* Harita Listelerim paneli mobilde çok yukarı yapışmasın.
-   Splash, giriş ve harita işlevlerine dokunmaz. */
-@media (max-width: 720px) {
-  .screen-overlay-panel {
-    margin-top: calc(64px + var(--routee-safe-top)) !important;
-    max-height: calc(100svh - 96px - var(--routee-safe-top)) !important;
-  }
-}
-
-@media (max-width: 480px) {
-  .screen-overlay-panel {
-    margin-top: calc(58px + var(--routee-safe-top)) !important;
-    max-height: calc(100svh - 88px - var(--routee-safe-top)) !important;
-  }
-}
-`;
-
-    if (style.parentNode && style.parentNode.lastElementChild !== style) {
-      document.head.appendChild(style);
+      document.body.classList.toggle("routee-ios-standalone", isIOSDevice() && isStandaloneMode());
     }
   }
 
-  function ensureSafeBgElement() {
-    if (!document.body) return;
-
-    var safeBg = document.getElementById("routeeStatusSafeBg");
-
-    if (!safeBg) {
-      safeBg = document.createElement("div");
-      safeBg.id = "routeeStatusSafeBg";
-      safeBg.className = "routee-status-safe-bg";
-      safeBg.setAttribute("aria-hidden", "true");
-      document.body.insertBefore(safeBg, document.body.firstChild);
-    }
-  }
-
-  function lockStatusBar() {
-    upsertMeta("theme-color", STATUS_COLOR);
-    upsertMeta("msapplication-navbutton-color", STATUS_COLOR);
-    upsertMeta("apple-mobile-web-app-capable", "yes");
-    upsertMeta("apple-mobile-web-app-status-bar-style", APPLE_STATUS_STYLE);
-    upsertMeta("apple-mobile-web-app-title", "Rota");
-    upsertMeta("color-scheme", "light only");
-
-    document.documentElement.style.backgroundColor = STATUS_COLOR;
-    document.documentElement.classList.add("routee-statusbar-locked");
-
-    installMinimalStatusStyle();
-    ensureSafeBgElement();
-  }
-
-  lockStatusBar();
+  applyStatusBarLock();
 
   if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", lockStatusBar, { passive: true });
+    document.addEventListener("DOMContentLoaded", applyStatusBarLock, { once: true });
   } else {
-    lockStatusBar();
+    applyStatusBarLock();
   }
 
-  window.addEventListener("pageshow", lockStatusBar, { passive: true });
-  window.addEventListener("focus", lockStatusBar, { passive: true });
-  document.addEventListener("visibilitychange", lockStatusBar, { passive: true });
+  window.addEventListener("pageshow", applyStatusBarLock);
+  window.addEventListener("focus", applyStatusBarLock);
+  document.addEventListener("visibilitychange", applyStatusBarLock);
+
+  if (window.matchMedia) {
+    try {
+      var standaloneQuery = window.matchMedia("(display-mode: standalone)");
+      if (standaloneQuery && typeof standaloneQuery.addEventListener === "function") {
+        standaloneQuery.addEventListener("change", applyStatusBarLock);
+      } else if (standaloneQuery && typeof standaloneQuery.addListener === "function") {
+        standaloneQuery.addListener(applyStatusBarLock);
+      }
+    } catch (error) {
+      // Status bar kilidi kritik olmayan bir iyileştirmedir; uygulama akışını kesmemelidir.
+    }
+  }
+
+  if (document.head && window.MutationObserver) {
+    var scheduled = false;
+    var observer = new MutationObserver(function () {
+      if (scheduled) return;
+      scheduled = true;
+      window.requestAnimationFrame(function () {
+        scheduled = false;
+        applyStatusBarLock();
+      });
+    });
+
+    observer.observe(document.head, {
+      childList: true,
+      subtree: true,
+      attributes: true,
+      attributeFilter: ["content", "name", "media"]
+    });
+  }
 })();
