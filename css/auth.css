@@ -480,9 +480,7 @@ body.auth-booting {
   body.routee-mobile-splash-image .startup-splash-card,
   html.routee-mobile-entry-splash .startup-splash-card,
   body.routee-mobile-entry-splash .startup-splash-card,
-  .app-startup-splash .app-startup-splash-image,
-  .app-startup-splash .startup-splash-card,
-  .app-startup-splash > * {
+  .app-startup-splash .startup-splash-card {
     display: none !important;
   }
 
