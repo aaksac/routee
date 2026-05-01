@@ -28,7 +28,7 @@ let initialStatus = {
 };
 
 const STARTUP_SPLASH_MIN_MS = 300;
-const AUTH_BOOT_TIMEOUT_MS = 2600;
+const AUTH_BOOT_TIMEOUT_MS = 900;
 const AUTH_ACTION_TIMEOUT_MS = 12000;
 const USER_CLAIMS_TIMEOUT_MS = 4500;
 const STALE_MODULE_RETRY_MS = AUTH_BOOT_TIMEOUT_MS - 100;
@@ -323,6 +323,23 @@ async function routeAfterLogin(user, options = {}) {
   setButtonsDisabled(true);
 
   try {
+    const shouldOpenAppImmediately = options.openAppImmediately === true;
+
+    if (shouldOpenAppImmediately) {
+      // Manuel girişten sonra yetki/profil kontrolleri app.html içinde yapılır.
+      // Böylece kullanıcı auth/claims beklerken splash'te kilitli kalmaz.
+      showStartupSplash("Rota", "", { phase: "routing" });
+      setAppStartupSplash();
+
+      const shouldDelay = options.delay !== false;
+      if (shouldDelay) {
+        await wait(STARTUP_SPLASH_MIN_MS);
+      }
+
+      window.location.replace("./app.html");
+      return;
+    }
+
     const { getUserClaims } = await withTimeout(
       loadAuthModule({ allowRetryIfStale: true }),
       AUTH_ACTION_TIMEOUT_MS,
@@ -403,7 +420,8 @@ async function handleLogin() {
     );
 
     await routeAfterLogin(result.user, {
-      message: "Oturumunuz açılıyor..."
+      message: "Oturumunuz açılıyor...",
+      openAppImmediately: true
     });
   } catch (error) {
     isRouting = false;
@@ -546,13 +564,10 @@ function init() {
   // Bu emniyet sadece donmayı önler; cevap zamanında gelirse hiçbir görsel ara geçiş üretmez.
   bootFallbackTimer = window.setTimeout(() => {
     if (bootResolved || isRouting) return;
+
+    // Profesyonel mobil akış: oturum kontrolü gecikirse kullanıcı splash'te bekletilmez.
+    // Giriş arayüzü açılır; Firebase auth cevabı arkada gelirse watchAuth yine otomatik yönlendirir.
     revealLoginScreen();
-    setStatus(
-      hasInternetConnection()
-        ? "Oturum kontrolü gecikti. Giriş bilgilerinle devam edebilirsin."
-        : "Lütfen internet bağlantınızı kontrol edin.",
-      hasInternetConnection() ? "normal" : "offline"
-    );
   }, AUTH_BOOT_TIMEOUT_MS);
 
   window.addEventListener("offline", () => {
