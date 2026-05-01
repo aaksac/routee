@@ -256,14 +256,20 @@ function hydrateAppStartupSplash() {
 
   try {
     const hasSessionSplash = sessionStorage.getItem("routeeStartupSplash") === "1";
-    const shouldUseMobileSplash = hasSessionSplash || isMobileStartupMode();
+    const isMobileSplash = isMobileStartupMode();
+    const shouldUseStartupSplash = hasSessionSplash || isMobileSplash;
 
-    if (!shouldUseMobileSplash) {
+    if (!shouldUseStartupSplash) {
       return null;
     }
 
-    document.documentElement.classList.add("show-app-startup-splash", "routee-mobile-splash-active", "routee-mobile-splash-image");
-    document.body?.classList.add("routee-app-startup-active", "routee-mobile-splash-active", "routee-mobile-splash-image");
+    document.documentElement.classList.add("show-app-startup-splash");
+    document.body?.classList.add("routee-app-startup-active");
+
+    if (isMobileSplash) {
+      document.documentElement.classList.add("routee-mobile-splash-active", "routee-mobile-splash-image");
+      document.body?.classList.add("routee-mobile-splash-active", "routee-mobile-splash-image");
+    }
 
     const startedAt = Number(sessionStorage.getItem("routeeStartupSplashAt")) || Date.now();
 
@@ -319,7 +325,6 @@ async function closeAppStartupSplash(splashState) {
 
 async function closeAppStartupSplashWhenReady() {
   if (!state.appStartupSplash) return;
-  if (!isMobileStartupMode()) return;
   if (!state.appAuthReadyForReveal || !state.appMapReadyForReveal) return;
 
   await closeAppStartupSplash(state.appStartupSplash);
@@ -327,7 +332,7 @@ async function closeAppStartupSplashWhenReady() {
 }
 
 function armAppStartupSplashFallback() {
-  if (!state.appStartupSplash || !isMobileStartupMode()) return;
+  if (!state.appStartupSplash) return;
 
   if (state.appStartupRevealTimer) {
     window.clearTimeout(state.appStartupRevealTimer);
@@ -2690,11 +2695,6 @@ function initAuthWatcher() {
 
     try {
       if (user) {
-        if (!isMobileStartupMode()) {
-          await closeAppStartupSplash(state.appStartupSplash);
-          state.appStartupSplash = null;
-        }
-
         elements.authStatus.textContent = `Aktif kullanıcı: ${user.email}`;
 
         await ensureUserProfile(user.uid, user.email);
