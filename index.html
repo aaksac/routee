@@ -36,218 +36,37 @@
 
 
     <style id="routee-critical-boot-css">
-      :root { --routee-startup-safe-top: env(safe-area-inset-top, 0px); --routee-startup-safe-right: env(safe-area-inset-right, 0px); --routee-startup-safe-bottom: env(safe-area-inset-bottom, 0px); --routee-startup-safe-left: env(safe-area-inset-left, 0px); --routee-startup-bg: radial-gradient(circle at top, rgba(37,99,235,.18), transparent 34%), linear-gradient(180deg, rgba(8,15,30,.98) 0%, rgba(15,23,42,.98) 100%); }
-      @supports (top: constant(safe-area-inset-top)) { :root { --routee-startup-safe-top: constant(safe-area-inset-top); --routee-startup-safe-right: constant(safe-area-inset-right); --routee-startup-safe-bottom: constant(safe-area-inset-bottom); --routee-startup-safe-left: constant(safe-area-inset-left); } }
       html, body { margin: 0; min-height: 100%; background: #0f172a; }
-      body.auth-booting { overflow: hidden !important; background: #0f172a !important; }
-      .startup-splash { position: fixed; inset: 0; z-index: 9999; width: 100vw; height: 100vh; height: 100svh; min-height: 100vh; min-height: 100svh; display: grid; place-items: center; box-sizing: border-box; padding-top: max(24px, calc(var(--routee-startup-safe-top) + 20px)); padding-right: max(20px, calc(var(--routee-startup-safe-right) + 16px)); padding-bottom: max(24px, calc(var(--routee-startup-safe-bottom) + 20px)); padding-left: max(20px, calc(var(--routee-startup-safe-left) + 16px)); background: var(--routee-startup-bg); color: #fff; opacity: 0; visibility: hidden; pointer-events: none; transition: opacity .20s ease, visibility .20s ease; transform: translateZ(0); -webkit-transform: translateZ(0); contain: layout paint; }
+      body.auth-booting { overflow: hidden; background: #0f172a; }
+      .startup-splash { position: fixed; inset: 0; z-index: 9999; display: flex; align-items: center; justify-content: center; box-sizing: border-box; padding: max(24px, env(safe-area-inset-top)) max(24px, env(safe-area-inset-right)) max(24px, env(safe-area-inset-bottom)) max(24px, env(safe-area-inset-left)); background: radial-gradient(circle at top, rgba(37,99,235,.18), transparent 34%), linear-gradient(180deg, rgba(8,15,30,.98) 0%, rgba(15,23,42,.98) 100%); color: #fff; opacity: 0; visibility: hidden; pointer-events: none; }
       .startup-splash.is-visible, .show-app-startup-splash .app-startup-splash { opacity: 1; visibility: visible; pointer-events: auto; }
-      .startup-splash-card { position: relative; isolation: isolate; width: min(360px, calc(100vw - 40px)); min-height: 254px; display: grid; align-content: center; justify-items: center; gap: 16px; box-sizing: border-box; padding: 30px 24px 26px; border-radius: 30px; border: 1px solid rgba(255,255,255,.10); background: linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.06)); box-shadow: 0 28px 70px rgba(0,0,0,.24); text-align: center; overflow: hidden; max-height: calc(100svh - var(--routee-startup-safe-top) - var(--routee-startup-safe-bottom) - 48px); transform: translateZ(0); -webkit-transform: translateZ(0); }
-      .startup-splash-card::before { content: ""; position: absolute; inset: 1px; border-radius: inherit; background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.02)); z-index: -1; }
-      .startup-splash-orb { position: absolute; top: -42px; width: 160px; height: 160px; border-radius: 999px; background: radial-gradient(circle, rgba(96,165,250,.38), rgba(96,165,250,0)); filter: blur(10px); z-index: -1; }
+      .startup-splash-card { position: relative; width: min(360px, 100%); display: grid; justify-items: center; gap: 16px; box-sizing: border-box; padding: 30px 24px 26px; border-radius: 30px; border: 1px solid rgba(255,255,255,.10); background: linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.06)); box-shadow: 0 28px 70px rgba(0,0,0,.24); text-align: center; overflow: hidden; }
+      .startup-splash-orb { position: absolute; top: -42px; width: 160px; height: 160px; border-radius: 999px; background: radial-gradient(circle, rgba(96,165,250,.38), rgba(96,165,250,0)); filter: blur(10px); }
       .startup-splash-logo { width: 82px; height: 82px; border-radius: 26px; display: grid; place-items: center; background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.10); box-shadow: 0 18px 36px rgba(37,99,235,.16); overflow: hidden; }
       .startup-splash-logo img { display: block; width: 100%; height: 100%; object-fit: cover; }
       .startup-splash-copy { display: grid; gap: 7px; font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
       .startup-splash-copy strong { color: #fff; font-size: 1.2rem; letter-spacing: .01em; }
-      .startup-splash-copy span { display: block; min-height: 1.55em; color: rgba(255,255,255,.78); font-size: .96rem; line-height: 1.55; }
+      .startup-splash-copy span { color: rgba(255,255,255,.78); font-size: .96rem; line-height: 1.55; }
       .startup-splash-loader { display: inline-flex; align-items: center; gap: 8px; }
       .startup-splash-loader span { width: 9px; height: 9px; border-radius: 999px; background: rgba(255,255,255,.92); animation: startupSplashPulse 1s infinite ease-in-out; }
       .startup-splash-loader span:nth-child(2) { animation-delay: .16s; }
       .startup-splash-loader span:nth-child(3) { animation-delay: .32s; }
       @keyframes startupSplashPulse { 0%, 80%, 100% { opacity: .35; transform: scale(.82); } 40% { opacity: 1; transform: scale(1); } }
-      @media (max-width: 640px) { .startup-splash-card { width: min(320px, calc(100vw - 40px)); min-height: 236px; padding: 24px 18px 22px; border-radius: 24px; } .startup-splash-logo { width: 72px; height: 72px; border-radius: 22px; } .startup-splash-copy strong { font-size: 1.08rem; } .startup-splash-copy span { font-size: .92rem; } }
+      @media (max-width: 640px) { .startup-splash-card { width: min(320px, 100%); padding: 24px 18px 22px; border-radius: 24px; } .startup-splash-logo { width: 72px; height: 72px; border-radius: 22px; } }
+
+      /* Mobilde giriş ekranı hazır olana kadar gerçek splash görseli gösterilir. Masaüstü etkilenmez. */
+      @media (max-width: 720px), (hover: none) and (pointer: coarse) {
+        body.routee-mobile-entry-splash .startup-splash {
+          background: #0f172a url("./icons/splash-1170x2532.png") center center / cover no-repeat !important;
+        }
+        body.routee-mobile-entry-splash .startup-splash-card {
+          display: none !important;
+        }
+        body.routee-mobile-routing-splash .startup-splash {
+          background: #0f172a url("./icons/splash-1170x2532.png") center center / cover no-repeat !important;
+        }
+      }
     </style>
-    <style id="routee-locked-startup-handoff-css">
-
-/* =========================================================
-   ROUTEE — LOCKED STARTUP HANDOFF PATCH
-   iOS/PWA'da "Oturumunuz kontrol ediliyor" -> "Haritanız hazırlanıyor"
-   geçişindeki titreşimi önlemek için splash kartının bütün metriklerini sabitler.
-   ========================================================= */
-:root {
-  --routee-boot-card-width: min(360px, calc(100vw - 40px));
-  --routee-boot-card-height: 254px;
-  --routee-boot-logo-size: 82px;
-  --routee-boot-logo-radius: 26px;
-  --routee-boot-card-padding-y: 30px 24px 26px;
-}
-
-html.show-app-startup-splash,
-html.show-app-startup-splash body,
-body.auth-booting {
-  width: 100% !important;
-  min-width: 100% !important;
-  min-height: 100% !important;
-  background-color: #0f172a !important;
-  overflow: hidden !important;
-  overscroll-behavior: none !important;
-  -webkit-overflow-scrolling: auto !important;
-}
-
-.startup-splash,
-.app-startup-splash {
-  position: fixed !important;
-  inset: 0 !important;
-  width: 100vw !important;
-  height: 100vh !important;
-  min-height: 100vh !important;
-  height: 100dvh !important;
-  min-height: 100dvh !important;
-  display: grid !important;
-  place-items: center !important;
-  justify-items: center !important;
-  align-items: center !important;
-  padding-top: max(24px, calc(var(--routee-startup-safe-top, env(safe-area-inset-top, 0px)) + 20px)) !important;
-  padding-right: max(20px, calc(var(--routee-startup-safe-right, env(safe-area-inset-right, 0px)) + 16px)) !important;
-  padding-bottom: max(24px, calc(var(--routee-startup-safe-bottom, env(safe-area-inset-bottom, 0px)) + 20px)) !important;
-  padding-left: max(20px, calc(var(--routee-startup-safe-left, env(safe-area-inset-left, 0px)) + 16px)) !important;
-  box-sizing: border-box !important;
-  overflow: clip !important;
-  transform: translate3d(0, 0, 0) !important;
-  -webkit-transform: translate3d(0, 0, 0) !important;
-  backface-visibility: hidden !important;
-  -webkit-backface-visibility: hidden !important;
-  contain: strict !important;
-}
-
-@supports not (overflow: clip) {
-  .startup-splash,
-  .app-startup-splash {
-    overflow: hidden !important;
-  }
-}
-
-@supports (-webkit-touch-callout: none) {
-  .startup-splash,
-  .app-startup-splash {
-    height: -webkit-fill-available !important;
-    min-height: -webkit-fill-available !important;
-  }
-}
-
-.startup-splash-card {
-  width: var(--routee-boot-card-width) !important;
-  min-width: 0 !important;
-  height: var(--routee-boot-card-height) !important;
-  min-height: var(--routee-boot-card-height) !important;
-  max-height: var(--routee-boot-card-height) !important;
-  display: grid !important;
-  grid-template-rows: var(--routee-boot-logo-size) 66px 14px !important;
-  align-content: center !important;
-  justify-items: center !important;
-  gap: 16px !important;
-  box-sizing: border-box !important;
-  padding: var(--routee-boot-card-padding-y) !important;
-  overflow: hidden !important;
-  transform: translate3d(0, 0, 0) !important;
-  -webkit-transform: translate3d(0, 0, 0) !important;
-  backface-visibility: hidden !important;
-  -webkit-backface-visibility: hidden !important;
-  contain: layout paint style !important;
-}
-
-.startup-splash-logo {
-  width: var(--routee-boot-logo-size) !important;
-  height: var(--routee-boot-logo-size) !important;
-  min-width: var(--routee-boot-logo-size) !important;
-  min-height: var(--routee-boot-logo-size) !important;
-  max-width: var(--routee-boot-logo-size) !important;
-  max-height: var(--routee-boot-logo-size) !important;
-  border-radius: var(--routee-boot-logo-radius) !important;
-  align-self: center !important;
-  justify-self: center !important;
-  flex: 0 0 var(--routee-boot-logo-size) !important;
-}
-
-.startup-splash-copy {
-  width: 100% !important;
-  height: 66px !important;
-  min-height: 66px !important;
-  max-height: 66px !important;
-  display: grid !important;
-  grid-template-rows: 24px 36px !important;
-  align-content: center !important;
-  justify-items: center !important;
-  gap: 6px !important;
-  overflow: hidden !important;
-}
-
-.startup-splash-copy strong {
-  display: block !important;
-  height: 24px !important;
-  min-height: 24px !important;
-  max-height: 24px !important;
-  line-height: 24px !important;
-  overflow: hidden !important;
-}
-
-.startup-splash-copy span {
-  width: 100% !important;
-  max-width: 100% !important;
-  height: 36px !important;
-  min-height: 36px !important;
-  max-height: 36px !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  text-align: center !important;
-  line-height: 18px !important;
-  overflow: hidden !important;
-  white-space: normal !important;
-  text-wrap: balance;
-}
-
-.startup-splash-loader {
-  height: 14px !important;
-  min-height: 14px !important;
-  max-height: 14px !important;
-  align-self: center !important;
-}
-
-html.show-app-startup-splash *,
-body.auth-booting .login-page,
-body.auth-booting .auth-card {
-  scroll-behavior: auto !important;
-}
-
-@media (max-width: 640px) {
-  :root {
-    --routee-boot-card-width: min(320px, calc(100vw - 40px));
-    --routee-boot-card-height: 236px;
-    --routee-boot-logo-size: 72px;
-    --routee-boot-logo-radius: 22px;
-    --routee-boot-card-padding-y: 24px 18px 22px;
-  }
-
-  .startup-splash-card {
-    grid-template-rows: 72px 64px 14px !important;
-    gap: 15px !important;
-  }
-
-  .startup-splash-copy {
-    height: 64px !important;
-    min-height: 64px !important;
-    max-height: 64px !important;
-    grid-template-rows: 23px 35px !important;
-  }
-
-  .startup-splash-copy strong {
-    height: 23px !important;
-    min-height: 23px !important;
-    max-height: 23px !important;
-    line-height: 23px !important;
-  }
-
-  .startup-splash-copy span {
-    height: 35px !important;
-    min-height: 35px !important;
-    max-height: 35px !important;
-    line-height: 17.5px !important;
-  }
-}
-
-</style>
-
 
     <script type="module" src="./js/version-guard.js"></script>
   <script src="./js/status-bar.js"></script>
