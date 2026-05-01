@@ -41,7 +41,7 @@
   <link rel="stylesheet" href="./css/auth.css" />
 
   <style id="routee-mobile-splash-image-css">
-    /* Mobilde app arayüzü hazır olana kadar aynı splash görseli korunur. Masaüstü/web etkilenmez. */
+    /* Sadece mobil açılış geçişi: masaüstü/web davranışına dokunmaz. */
     @media (max-width: 720px), (hover: none) and (pointer: coarse) {
       html.show-app-startup-splash,
       html.show-app-startup-splash body,
@@ -96,6 +96,24 @@
         pointer-events: auto !important;
       }
 
+      .app-startup-splash-image {
+        position: absolute !important;
+        inset: 0 !important;
+        width: 100% !important;
+        height: 100% !important;
+        object-fit: cover !important;
+        object-position: center center !important;
+        display: block !important;
+        z-index: 0 !important;
+        transform: translateZ(0);
+        -webkit-transform: translateZ(0);
+      }
+
+      .app-startup-splash > *:not(.app-startup-splash-image) {
+        position: relative;
+        z-index: 1;
+      }
+
       .app-startup-splash .startup-splash-card {
         display: none !important;
       }
@@ -131,6 +149,7 @@
 </head>
 <body>
   <div class="startup-splash app-startup-splash" id="appStartupSplash" aria-hidden="true">
+    <img class="app-startup-splash-image" src="./icons/splash-1170x2532.png" alt="" aria-hidden="true" decoding="async" />
     <div class="startup-splash-card">
       <div class="startup-splash-orb" aria-hidden="true"></div>
       <div class="startup-splash-logo">
