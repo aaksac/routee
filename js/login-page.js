@@ -302,7 +302,11 @@ async function routeAfterLogin(user, options = {}) {
       Böylece “Haritanız hazırlanıyor...” ekranı iki defa çizilmez
       ve tek seferlik kesiklik oluşmaz.
     */
-    clearAppStartupSplash();
+    if (!isAdmin) {
+      setAppStartupSplash(splashMessage);
+    } else {
+      clearAppStartupSplash();
+    }
 
     const shouldDelay = options.delay !== false;
 
