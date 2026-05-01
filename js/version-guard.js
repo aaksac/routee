@@ -32,6 +32,16 @@ function removeVersionQueryParam() {
   }
 }
 
+function reloadWithVersion(version) {
+  try {
+    const url = new URL(window.location.href);
+    url.searchParams.set("_v", version);
+    window.location.replace(url.toString());
+  } catch (error) {
+    window.location.reload();
+  }
+}
+
 async function requestPersistentStorage() {
   if (!navigator.storage || !navigator.storage.persist) return;
 
@@ -100,8 +110,8 @@ async function enforceLatestVersion() {
 
   if (localVersion && localVersion !== remoteVersion) {
     safeStorageSet(VERSION_STORAGE_KEY, remoteVersion);
-    removeVersionQueryParam();
     await registerServiceWorker(remoteVersion);
+    reloadWithVersion(remoteVersion);
     return;
   }
 
