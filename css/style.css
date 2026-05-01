@@ -25,28 +25,32 @@
 }
 
 html {
-  background: var(--routee-system-status-bg) !important;
+  background: var(--bg);
 }
 
 body {
   background-color: var(--bg);
 }
 
-html::before {
-  content: "";
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: env(safe-area-inset-top);
-  background: var(--routee-system-status-bg);
-  pointer-events: none;
-  z-index: 2147483647;
-}
-
-@supports (height: constant(safe-area-inset-top)) {
+/* Yalnızca mobil/PWA güvenli üst alanı lacivert tutulur.
+   Masaüstü ve web geniş ekran davranışı etkilenmez; alt safe-area boyanmaz. */
+@media (max-width: 720px), (hover: none) and (pointer: coarse) {
   html::before {
-    height: constant(safe-area-inset-top);
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: env(safe-area-inset-top);
+    background: var(--routee-system-status-bg);
+    pointer-events: none;
+    z-index: 2147483647;
+  }
+
+  @supports (height: constant(safe-area-inset-top)) {
+    html::before {
+      height: constant(safe-area-inset-top);
+    }
   }
 }
 
