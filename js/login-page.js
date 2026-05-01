@@ -30,6 +30,39 @@ let initialStatus = {
 const STARTUP_SPLASH_MIN_MS = 300;
 const AUTH_BOOT_TIMEOUT_MS = 2600;
 const STALE_MODULE_RETRY_MS = AUTH_BOOT_TIMEOUT_MS - 100;
+const MOBILE_STARTUP_QUERY = "(max-width: 720px), (hover: none) and (pointer: coarse)";
+
+function isMobileStartupMode() {
+  try {
+    if (window.matchMedia && window.matchMedia(MOBILE_STARTUP_QUERY).matches) {
+      return true;
+    }
+  } catch (error) {
+    // Mobil başlangıç tespiti desteklenmeyen tarayıcıda normal masaüstü akışına düşer.
+  }
+
+  return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+    window.navigator.userAgent || ""
+  );
+}
+
+function setMobileStartupPhase(phase) {
+  if (!document.body) return;
+
+  document.body.classList.remove(
+    "routee-mobile-entry-splash",
+    "routee-mobile-routing-splash",
+    "routee-mobile-startup-active"
+  );
+
+  if (!isMobileStartupMode()) return;
+
+  if (phase === "entry") {
+    document.body.classList.add("routee-mobile-startup-active", "routee-mobile-entry-splash");
+  } else if (phase === "routing") {
+    document.body.classList.add("routee-mobile-startup-active", "routee-mobile-routing-splash");
+  }
+}
 
 function clearAuthModulePromise() {
   authModulePromise = null;
@@ -102,8 +135,10 @@ function setButtonsDisabled(disabled) {
   });
 }
 
-function showStartupSplash(title = "Rota", message = "Oturumunuz kontrol ediliyor...") {
+function showStartupSplash(title = "Rota", message = "Oturumunuz kontrol ediliyor...", options = {}) {
   if (!elements.startupSplash) return;
+
+  setMobileStartupPhase(options.phase || "routing");
 
   if (elements.startupSplashTitle) {
     elements.startupSplashTitle.textContent = title;
@@ -122,6 +157,7 @@ function hideStartupSplash() {
   if (!elements.startupSplash) return;
   elements.startupSplash.classList.remove("is-visible");
   elements.startupSplash.setAttribute("aria-hidden", "true");
+  setMobileStartupPhase(null);
 }
 
 function revealLoginScreen() {
@@ -141,7 +177,7 @@ function revealLoginScreen() {
   setStatus(initialStatus.message, initialStatus.type);
 }
 
-function setAppStartupSplash(message = "Haritanız hazırlanıyor...") {
+function setAppStartupSplash(message = "Haritanız yükleniyor...") {
   try {
     sessionStorage.setItem("routeeStartupSplash", "1");
     sessionStorage.setItem("routeeStartupSplashText", message);
@@ -250,23 +286,23 @@ async function routeAfterLogin(user, options = {}) {
   window.clearTimeout(bootFallbackTimer);
   setButtonsDisabled(true);
 
-  // Başarılı girişten sonra login kartının status/claim kontrolü sırasında yeniden
-  // ölçülmesini kullanıcıya göstermemek için splash'i en başta kilitle.
-  const immediateMessage = options.message || "Oturumunuz kontrol ediliyor...";
-  showStartupSplash("Rota", immediateMessage);
-  elements.loginPage?.classList.add("login-page--hidden");
-  elements.loginPage?.setAttribute("aria-hidden", "true");
-  setAppStartupSplash("Haritanız hazırlanıyor...");
-
   try {
     const { getUserClaims } = await loadAuthModule({ allowRetryIfStale: true });
     const claims = await getUserClaims(user);
     const isAdmin = claims.adminPanel === true;
     const targetUrl = isAdmin ? "./chooser.html" : "./app.html";
 
-    if (isAdmin) {
+    const splashTitle = isAdmin ? "Yönetim paneli açılıyor" : "Rota";
+    const splashMessage = isAdmin
+      ? "Yetkileriniz doğrulanıyor..."
+      : options.message || "Oturumunuz açılıyor...";
+
+    showStartupSplash(splashTitle, splashMessage, { phase: "routing" });
+
+    if (!isAdmin) {
+      setAppStartupSplash("Haritanız yükleniyor...");
+    } else {
       clearAppStartupSplash();
-      showStartupSplash("Yönetim paneli açılıyor", "Yetkileriniz doğrulanıyor...");
     }
 
     const shouldDelay = options.delay !== false;
@@ -306,8 +342,9 @@ async function handleLogin() {
     const { login } = await loadAuthModule({ allowRetryIfStale: true });
     const result = await login(email, password);
 
+    showStartupSplash("Rota", "Girişiniz doğrulanıyor...", { phase: "routing" });
     await routeAfterLogin(result.user, {
-      message: "Oturumunuz kontrol ediliyor..."
+      message: "Girişiniz doğrulanıyor..."
     });
   } catch (error) {
     setButtonsDisabled(false);
@@ -416,7 +453,7 @@ function applyQueryStatus() {
 function init() {
   bindEvents();
   applyQueryStatus();
-  showStartupSplash("Rota", "Oturumunuz kontrol ediliyor...");
+  showStartupSplash("Rota", "Oturumunuz kontrol ediliyor...", { phase: "entry" });
   setButtonsDisabled(true);
   initAuthWatcher();
 
