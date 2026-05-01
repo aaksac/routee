@@ -2726,9 +2726,19 @@ function initAuthWatcher() {
 
         elements.authStatus.textContent = `Aktif kullanıcı: ${user.email}`;
 
-        await ensureUserProfile(user.uid, user.email);
-        await loadAccessModel(user);
-        elements.authStatus.textContent = `Aktif kullanıcı: ${user.email} · ${getAccessStatusText()}`;
+        // Arayüzü claims/profil/harita listesi beklemeden aç.
+        // Yetki ve kota bilgileri aşağıda arka planda yüklenir; splash bu kontrollere bağlı kalmaz.
+        state.appAuthReadyForReveal = true;
+        await closeAppStartupSplashWhenReady();
+
+        try {
+          await ensureUserProfile(user.uid, user.email);
+          await loadAccessModel(user);
+          elements.authStatus.textContent = `Aktif kullanıcı: ${user.email} · ${getAccessStatusText()}`;
+        } catch (accessError) {
+          console.warn("Kullanıcı erişim modeli geç yükleniyor veya alınamadı:", accessError);
+          elements.authStatus.textContent = `Aktif kullanıcı: ${user.email} · Erişim bilgileri yükleniyor...`;
+        }
 
         const loadMapsTask = async () => {
           try {
@@ -2737,9 +2747,6 @@ function initAuthWatcher() {
             console.warn("Harita listesi yüklenemedi:", error);
           }
         };
-
-        state.appAuthReadyForReveal = true;
-        await closeAppStartupSplashWhenReady();
 
         if ("requestIdleCallback" in window) {
           window.requestIdleCallback(() => {
