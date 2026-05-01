@@ -342,8 +342,9 @@ function armAppStartupSplashFallback() {
       return;
     }
 
-    await closeAppStartupSplash(state.appStartupSplash);
-    state.appStartupSplash = null;
+    // Mobilde splash, harita ve oturum hazır olmadan kapatılmaz.
+    // Bu fallback yalnızca doğrudan app.html açılıp oturum yoksa login'e döndürür.
+    await closeAppStartupSplashWhenReady();
   }, APP_STARTUP_REVEAL_TIMEOUT_MS);
 }
 
