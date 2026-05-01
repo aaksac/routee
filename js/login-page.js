@@ -53,17 +53,22 @@ function setMobileStartupPhase(phase) {
     target.classList.remove(
       "routee-mobile-entry-splash",
       "routee-mobile-routing-splash",
-      "routee-mobile-startup-active"
+      "routee-mobile-startup-active",
+      "routee-mobile-splash-active",
+      "routee-mobile-splash-image",
+      "routee-mobile-splash-message"
     );
   });
 
   if (!isMobileStartupMode()) return;
 
   targets.forEach((target) => {
-    if (phase === "entry") {
-      target.classList.add("routee-mobile-startup-active", "routee-mobile-entry-splash");
-    } else if (phase === "routing") {
-      target.classList.add("routee-mobile-startup-active", "routee-mobile-routing-splash");
+    target.classList.add("routee-mobile-splash-active");
+
+    if (phase === "routing") {
+      target.classList.add("routee-mobile-splash-message");
+    } else {
+      target.classList.add("routee-mobile-splash-image");
     }
   });
 }
@@ -473,7 +478,7 @@ function applyQueryStatus() {
 function init() {
   bindEvents();
   applyQueryStatus();
-  showStartupSplash("Rota", "Oturumunuz kontrol ediliyor...", { phase: "entry" });
+  showStartupSplash("Rota", "", { phase: "entry" });
   setButtonsDisabled(true);
   initAuthWatcher();
 
