@@ -357,6 +357,7 @@ body.auth-booting {
   }
 
   body.routee-mobile-routing-splash .startup-splash-card {
+    display: grid !important;
     width: min(320px, calc(100vw - 40px));
     min-height: 198px;
     padding: 22px 18px 18px;
@@ -366,6 +367,14 @@ body.auth-booting {
     box-shadow: 0 20px 48px rgba(0, 0, 0, 0.22);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
+  }
+
+  body.routee-mobile-routing-splash .startup-splash-copy,
+  body.routee-mobile-routing-splash .startup-splash-copy strong,
+  body.routee-mobile-routing-splash .startup-splash-copy span {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
   }
 
   body.routee-app-startup-active .app-startup-splash .startup-splash-card {
