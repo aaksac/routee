@@ -31,7 +31,7 @@
   <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png" />
   <link rel="apple-touch-icon" sizes="180x180" href="./icons/apple-touch-icon.png" />
   <link rel="manifest" href="./manifest.webmanifest" />
-  <link rel="preload" as="image" href="./icons/splash-1170x2532.png?v=20260501-pro-light" media="(max-width: 720px), (hover: none) and (pointer: coarse)" />
+  <link rel="preload" as="image" href="./icons/splash-1170x2532.png?v=20260501-pro-light" />
 
   <script type="module" src="./js/version-guard.js"></script>
   <script src="./js/status-bar.js"></script>
@@ -50,7 +50,56 @@
     body {
       margin: 0;
       min-height: 100%;
+    }
+
+    html.show-app-startup-splash,
+    html.show-app-startup-splash body,
+    body.routee-app-startup-active {
       background: var(--routee-splash-bg);
+    }
+
+    .app-startup-splash {
+      position: fixed !important;
+      inset: 0 !important;
+      z-index: 2147483646 !important;
+      width: 100vw !important;
+      height: 100vh !important;
+      min-height: 100vh !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      display: block !important;
+      overflow: hidden !important;
+      background-color: var(--routee-splash-bg) !important;
+      background-image: var(--routee-splash-image) !important;
+      background-position: center center !important;
+      background-size: contain !important;
+      background-repeat: no-repeat !important;
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transform: translateZ(0);
+      -webkit-transform: translateZ(0);
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+    }
+
+    html.show-app-startup-splash .app-startup-splash,
+    body.routee-app-startup-active .app-startup-splash,
+    .app-startup-splash.is-visible {
+      opacity: 1 !important;
+      visibility: visible !important;
+      pointer-events: auto !important;
+    }
+
+    html.show-app-startup-splash #app,
+    body.routee-app-startup-active #app {
+      opacity: 0 !important;
+      visibility: hidden !important;
+      pointer-events: none !important;
+    }
+
+    .app-startup-splash > * {
+      display: none !important;
     }
 
     @media (max-width: 720px), (hover: none) and (pointer: coarse) {
