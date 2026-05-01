@@ -21,13 +21,64 @@
 
 
   <style id="routee-app-critical-splash-css">
-    :root { --routee-startup-safe-top: env(safe-area-inset-top, 0px); --routee-startup-safe-right: env(safe-area-inset-right, 0px); --routee-startup-safe-bottom: env(safe-area-inset-bottom, 0px); --routee-startup-safe-left: env(safe-area-inset-left, 0px); }
-    html.show-app-startup-splash, html.show-app-startup-splash body { background: #0f172a; overflow: hidden; }
-    .app-startup-splash { position: fixed; inset: 0; z-index: 9999; width: 100vw; height: 100vh; height: 100svh; display: grid; place-items: center; box-sizing: border-box; padding-top: max(24px, calc(var(--routee-startup-safe-top) + 20px)); padding-right: max(20px, calc(var(--routee-startup-safe-right) + 16px)); padding-bottom: max(24px, calc(var(--routee-startup-safe-bottom) + 20px)); padding-left: max(20px, calc(var(--routee-startup-safe-left) + 16px)); background: radial-gradient(circle at top, rgba(37,99,235,.18), transparent 34%), linear-gradient(180deg, rgba(8,15,30,.98) 0%, rgba(15,23,42,.98) 100%); opacity: 0; visibility: hidden; pointer-events: none; }
+    :root {
+      --routee-startup-safe-top: env(safe-area-inset-top, 0px);
+      --routee-startup-safe-right: env(safe-area-inset-right, 0px);
+      --routee-startup-safe-bottom: env(safe-area-inset-bottom, 0px);
+      --routee-startup-safe-left: env(safe-area-inset-left, 0px);
+      --routee-startup-bg: radial-gradient(circle at top, rgba(37,99,235,.18), transparent 34%), linear-gradient(180deg, #08101f 0%, #0f172a 100%);
+    }
+    html.show-app-startup-splash,
+    html.show-app-startup-splash body {
+      margin: 0 !important;
+      padding: 0 !important;
+      background: #0f172a !important;
+      overflow: hidden !important;
+      overscroll-behavior: none !important;
+    }
+    html.show-app-startup-splash #app {
+      opacity: 0 !important;
+      visibility: hidden !important;
+      pointer-events: none !important;
+    }
+    .app-startup-splash {
+      position: fixed !important;
+      top: 0 !important;
+      right: 0 !important;
+      bottom: 0 !important;
+      left: 0 !important;
+      inset: 0 !important;
+      z-index: 2147483000 !important;
+      width: auto !important;
+      height: auto !important;
+      min-width: 100vw !important;
+      min-height: 100vh !important;
+      min-height: 100dvh !important;
+      display: grid !important;
+      place-items: center !important;
+      box-sizing: border-box !important;
+      overflow: hidden !important;
+      padding-top: max(24px, calc(var(--routee-startup-safe-top) + 20px));
+      padding-right: max(20px, calc(var(--routee-startup-safe-right) + 16px));
+      padding-bottom: max(24px, calc(var(--routee-startup-safe-bottom) + 20px));
+      padding-left: max(20px, calc(var(--routee-startup-safe-left) + 16px));
+      background: #0f172a !important;
+      background-image: var(--routee-startup-bg) !important;
+      color: #fff;
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transform: translateZ(0);
+      -webkit-transform: translateZ(0);
+    }
+    @supports (-webkit-touch-callout: none) {
+      .app-startup-splash { min-height: -webkit-fill-available !important; }
+    }
     .show-app-startup-splash .app-startup-splash { opacity: 1; visibility: visible; pointer-events: auto; }
     .app-startup-splash .startup-splash-card { width: min(360px, calc(100vw - 40px)); min-height: 254px; box-sizing: border-box; display: grid; align-content: center; justify-items: center; }
     @media (max-width: 640px) { .app-startup-splash .startup-splash-card { width: min(320px, calc(100vw - 40px)); min-height: 236px; } }
   </style>
+
   <link rel="stylesheet" href="./css/style.css" />
   <link rel="stylesheet" href="./css/mobile.css" />
   <link rel="stylesheet" href="./css/auth.css" />
