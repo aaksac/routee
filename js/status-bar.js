@@ -3,21 +3,10 @@
 
   var STATUS_COLOR = "#0f172a";
   var APPLE_STATUS_STYLE = "black-translucent";
+  var STYLE_ID = "routee-ios-statusbar-stable-style";
 
-  function isIOSDevice() {
-    var ua = window.navigator.userAgent || "";
-    var platform = window.navigator.platform || "";
-    return /iPad|iPhone|iPod/.test(ua) || (platform === "MacIntel" && window.navigator.maxTouchPoints > 1);
-  }
-
-  function isStandaloneMode() {
-    return window.navigator.standalone === true ||
-      (window.matchMedia && window.matchMedia("(display-mode: standalone)").matches);
-  }
-
-  function ensureMeta(name, content, extraAttrs) {
-    var selector = 'meta[name="' + name + '"]';
-    var meta = document.head.querySelector(selector);
+  function upsertMeta(name, content) {
+    var meta = document.querySelector('meta[name="' + name + '"]');
 
     if (!meta) {
       meta = document.createElement("meta");
@@ -29,79 +18,224 @@
       meta.setAttribute("content", content);
     }
 
-    if (extraAttrs) {
-      Object.keys(extraAttrs).forEach(function (key) {
-        if (meta.getAttribute(key) !== extraAttrs[key]) {
-          meta.setAttribute(key, extraAttrs[key]);
-        }
-      });
-    }
-
     return meta;
   }
 
-  function applyStatusBarLock() {
-    ensureMeta("theme-color", STATUS_COLOR);
-    ensureMeta("msapplication-navbutton-color", STATUS_COLOR);
-    ensureMeta("apple-mobile-web-app-capable", "yes");
-    ensureMeta("apple-mobile-web-app-status-bar-style", APPLE_STATUS_STYLE);
-    ensureMeta("apple-mobile-web-app-title", "Rota");
-    ensureMeta("color-scheme", "light only");
+  function installStableStatusStyle() {
+    if (!document.head) return;
 
-    var root = document.documentElement;
-    root.classList.add("routee-statusbar-locked");
-    root.style.setProperty("--routee-system-status-bg", STATUS_COLOR);
-    root.style.backgroundColor = STATUS_COLOR;
+    var style = document.getElementById(STYLE_ID);
 
-    if (isIOSDevice()) {
-      root.classList.add("routee-ios");
+    if (!style) {
+      style = document.createElement("style");
+      style.id = STYLE_ID;
+      document.head.appendChild(style);
     }
+
+    style.textContent = `
+:root {
+  --routee-statusbar-color: ${STATUS_COLOR};
+  --routee-safe-top: env(safe-area-inset-top, 0px);
+  --routee-safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+@supports (padding-top: constant(safe-area-inset-top)) {
+  :root {
+    --routee-safe-top: constant(safe-area-inset-top);
+    --routee-safe-bottom: constant(safe-area-inset-bottom);
+  }
+}
+
+html {
+  background-color: var(--routee-statusbar-color) !important;
+  color-scheme: light only !important;
+  overflow-x: hidden !important;
+}
+
+body {
+  min-height: 100vh !important;
+  min-height: 100svh !important;
+  overflow-x: hidden !important;
+  background:
+    linear-gradient(
+      to bottom,
+      var(--routee-statusbar-color) 0,
+      var(--routee-statusbar-color) var(--routee-safe-top),
+      var(--bg, #f8fafc) var(--routee-safe-top),
+      var(--bg, #f8fafc) 100%
+    ) !important;
+}
+
+/* Eski status-bar katmanını kapatır.
+   Rota ikonu ve premium yazısı üstten kesilmez. */
+html::before,
+body::before {
+  content: none !important;
+  display: none !important;
+}
+
+/* Topbar safe-area kadar aşağı iner.
+   Üst ince alan Odakla butonu renginde kalır. */
+.topbar {
+  padding-top: calc(18px + var(--routee-safe-top)) !important;
+  background:
+    linear-gradient(
+      to bottom,
+      var(--routee-statusbar-color) 0,
+      var(--routee-statusbar-color) var(--routee-safe-top),
+      rgba(255, 255, 255, 0.94) var(--routee-safe-top),
+      rgba(255, 255, 255, 0.94) 100%
+    ) !important;
+  box-sizing: border-box !important;
+  transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
+}
+
+@media (max-width: 720px) {
+  .topbar {
+    padding-top: calc(12px + var(--routee-safe-top)) !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .topbar {
+    padding-top: calc(10px + var(--routee-safe-top)) !important;
+  }
+}
+
+.brand-area,
+.brand-icon,
+.brand-icon img,
+.brand-icon svg {
+  position: relative !important;
+  z-index: 3 !important;
+}
+
+.brand-icon {
+  overflow: visible !important;
+  flex-shrink: 0 !important;
+}
+
+.status-strip {
+  position: relative !important;
+  z-index: 2 !important;
+}
+
+/* Splash ekranı sabitlenir:
+   iPhone viewport değişiminde yukarı-aşağı zıplamaz. */
+.startup-splash,
+.app-startup-splash,
+#startupSplash,
+#appStartupSplash,
+.loading-splash,
+.splash-screen {
+  position: fixed !important;
+  inset: 0 !important;
+  width: 100vw !important;
+  height: 100svh !important;
+  min-height: 100svh !important;
+  display: grid !important;
+  place-items: center !important;
+  padding:
+    calc(24px + var(--routee-safe-top))
+    max(20px, env(safe-area-inset-right, 0px))
+    calc(24px + var(--routee-safe-bottom))
+    max(20px, env(safe-area-inset-left, 0px)) !important;
+  box-sizing: border-box !important;
+  transform: translate3d(0, 0, 0) !important;
+  backface-visibility: hidden !important;
+  contain: layout paint size !important;
+  overflow: hidden !important;
+}
+
+.startup-splash-card,
+.app-startup-splash > *,
+#startupSplash > *,
+#appStartupSplash > *,
+.loading-splash > *,
+.splash-screen > * {
+  max-width: min(92vw, 420px) !important;
+  transform: translate3d(0, 0, 0) !important;
+  backface-visibility: hidden !important;
+}
+
+body.auth-booting,
+body.show-app-startup-splash,
+body.show-login-startup-splash,
+body.is-loading,
+body.is-auth-loading {
+  min-height: 100svh !important;
+  overflow: hidden !important;
+}
+
+@supports (-webkit-touch-callout: none) {
+  html,
+  body {
+    min-height: -webkit-fill-available !important;
+  }
+
+  body {
+    -webkit-text-size-adjust: 100% !important;
+  }
+
+  .topbar,
+  .startup-splash,
+  .app-startup-splash,
+  #startupSplash,
+  #appStartupSplash,
+  .loading-splash,
+  .splash-screen {
+    -webkit-transform: translate3d(0, 0, 0) !important;
+  }
+}
+`;
+
+    if (style.parentNode && style.parentNode.lastElementChild !== style) {
+      document.head.appendChild(style);
+    }
+  }
+
+  function lockStatusBar() {
+    upsertMeta("theme-color", STATUS_COLOR);
+    upsertMeta("msapplication-navbutton-color", STATUS_COLOR);
+    upsertMeta("apple-mobile-web-app-capable", "yes");
+    upsertMeta("apple-mobile-web-app-status-bar-style", APPLE_STATUS_STYLE);
+    upsertMeta("apple-mobile-web-app-title", "Rota");
+    upsertMeta("color-scheme", "light only");
+
+    document.documentElement.style.backgroundColor = STATUS_COLOR;
+    document.documentElement.classList.add("routee-statusbar-locked");
 
     if (document.body) {
       document.body.classList.add("routee-statusbar-locked");
-      document.body.style.setProperty("--routee-system-status-bg", STATUS_COLOR);
-
-      if (isIOSDevice()) {
-        document.body.classList.add("routee-ios");
-      }
-
-      document.body.classList.toggle("routee-ios-standalone", isIOSDevice() && isStandaloneMode());
     }
+
+    installStableStatusStyle();
   }
 
-  applyStatusBarLock();
+  lockStatusBar();
 
   if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", applyStatusBarLock, { once: true });
+    document.addEventListener("DOMContentLoaded", lockStatusBar, { passive: true });
   } else {
-    applyStatusBarLock();
+    lockStatusBar();
   }
 
-  window.addEventListener("pageshow", applyStatusBarLock);
-  window.addEventListener("focus", applyStatusBarLock);
-  document.addEventListener("visibilitychange", applyStatusBarLock);
+  window.addEventListener("pageshow", lockStatusBar, { passive: true });
+  window.addEventListener("focus", lockStatusBar, { passive: true });
+  document.addEventListener("visibilitychange", lockStatusBar, { passive: true });
 
-  if (window.matchMedia) {
-    try {
-      var standaloneQuery = window.matchMedia("(display-mode: standalone)");
-      if (standaloneQuery && typeof standaloneQuery.addEventListener === "function") {
-        standaloneQuery.addEventListener("change", applyStatusBarLock);
-      } else if (standaloneQuery && typeof standaloneQuery.addListener === "function") {
-        standaloneQuery.addListener(applyStatusBarLock);
-      }
-    } catch (error) {
-      // Status bar kilidi kritik olmayan bir iyileştirmedir; uygulama akışını kesmemelidir.
-    }
-  }
-
-  if (document.head && window.MutationObserver) {
+  if (window.MutationObserver && document.head) {
     var scheduled = false;
+
     var observer = new MutationObserver(function () {
       if (scheduled) return;
+
       scheduled = true;
+
       window.requestAnimationFrame(function () {
         scheduled = false;
-        applyStatusBarLock();
+        lockStatusBar();
       });
     });
 
