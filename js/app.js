@@ -58,6 +58,7 @@ const state = {
   mapQuota: 1,
   lastScrollY: 0,
   appStartupSplash: null,
+  mapBootPromise: null,
   selectedPointColor: "#dc2626",
   noteEditorTarget: null
 };
@@ -214,18 +215,60 @@ function waitForGoogleMaps() {
 }
 
 async function bootstrapMapFeatures() {
-  if (initializeMapFeatures()) return;
+  if (initializeMapFeatures()) {
+    return true;
+  }
 
-  elements.authStatus.textContent = "Harita servisi yükleniyor...";
+  if (elements.authStatus) {
+    elements.authStatus.textContent = "Harita servisi yükleniyor...";
+  }
 
   try {
     await waitForGoogleMaps();
-    initializeMapFeatures();
+    return initializeMapFeatures();
   } catch (error) {
     console.warn(error);
-    elements.authStatus.textContent =
-      "Harita servisine bağlanılamadı. İnternet bağlantınızı kontrol edip sayfayı yenileyin.";
+
+    if (elements.authStatus) {
+      elements.authStatus.textContent =
+        "Harita servisine bağlanılamadı. İnternet bağlantınızı kontrol edip sayfayı yenileyin.";
+    }
+
+    return false;
   }
+}
+
+function ensureMapFeaturesBootstrapped() {
+  if (!state.mapBootPromise) {
+    state.mapBootPromise = bootstrapMapFeatures().catch((error) => {
+      state.mapBootPromise = null;
+      throw error;
+    });
+  }
+
+  return state.mapBootPromise;
+}
+
+async function closeAppStartupSplashAfterMapReady() {
+  const splashState = state.appStartupSplash;
+
+  if (!splashState || !elements.appStartupSplash) {
+    clearAppStartupSplashSession();
+    return;
+  }
+
+  await ensureMapFeaturesBootstrapped();
+
+  const startedAt = Number(splashState.startedAt) || Date.now();
+  const elapsed = Date.now() - startedAt;
+  const minimumVisibleMs = 280;
+
+  if (elapsed < minimumVisibleMs) {
+    await wait(minimumVisibleMs - elapsed);
+  }
+
+  await closeAppStartupSplash(splashState);
+  state.appStartupSplash = null;
 }
 
 function goToLogin() {
@@ -2619,14 +2662,24 @@ function initAuthWatcher() {
 
     try {
       if (user) {
-        await closeAppStartupSplash(state.appStartupSplash);
-        state.appStartupSplash = null;
-
-        elements.authStatus.textContent = `Aktif kullanıcı: ${user.email}`;
+        if (elements.authStatus) {
+          elements.authStatus.textContent = `Aktif kullanıcı: ${user.email}`;
+        }
 
         await ensureUserProfile(user.uid, user.email);
         await loadAccessModel(user);
-        elements.authStatus.textContent = `Aktif kullanıcı: ${user.email} · ${getAccessStatusText()}`;
+
+        if (elements.authStatus) {
+          elements.authStatus.textContent = `Aktif kullanıcı: ${user.email} · ${getAccessStatusText()}`;
+        }
+
+        /*
+          Kritik nokta:
+          Splash burada kapanır.
+          Kullanıcı doğrulandıktan, erişim modeli yüklendikten
+          ve Google Maps gerçekten hazırlandıktan sonra.
+        */
+        await closeAppStartupSplashAfterMapReady();
 
         const loadMapsTask = async () => {
           try {
@@ -2653,7 +2706,10 @@ function initAuthWatcher() {
     } catch (error) {
       await closeAppStartupSplash(state.appStartupSplash);
       state.appStartupSplash = null;
-      elements.authStatus.textContent = `Oturum başlatılamadı: ${error.message}`;
+
+      if (elements.authStatus) {
+        elements.authStatus.textContent = `Oturum başlatılamadı: ${error.message}`;
+      }
     }
   });
 }
@@ -2666,11 +2722,17 @@ function init() {
   bindEvents();
   syncMobilePanelState();
   initMobileTopbarAutoHide();
-  initAuthWatcher();
 
+  /*
+    Harita yüklemesini hemen başlatıyoruz.
+    Bu hız kaybı oluşturmaz; aksine auth kontrolüyle paralel çalışır.
+    Splash ise ancak harita hazır olunca kapanır.
+  */
   window.requestAnimationFrame(() => {
-    bootstrapMapFeatures();
+    ensureMapFeaturesBootstrapped();
   });
+
+  initAuthWatcher();
 }
 
 document.addEventListener("DOMContentLoaded", init);
