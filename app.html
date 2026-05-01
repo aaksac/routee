@@ -175,9 +175,7 @@
         -webkit-backface-visibility: hidden !important;
       }
 
-      .app-startup-splash .app-startup-splash-image,
-      .app-startup-splash .startup-splash-card,
-      .app-startup-splash > * {
+      .app-startup-splash .startup-splash-card {
         display: none !important;
       }
     }
@@ -536,7 +534,7 @@
   <script>
     (function () {
       var MOBILE_QUERY = "(max-width: 720px), (hover: none) and (pointer: coarse)";
-      var APP_MODULE_TIMEOUT_MS = 14000;
+      var APP_MODULE_TIMEOUT_MS = 9000;
 
       function isMobileStartupMode() {
         try {
@@ -597,6 +595,21 @@
       }
 
       window.__routeeClearFrozenAppSplash = clearAppStartupSplash;
+
+      window.addEventListener("error", function (event) {
+        if (!isMobileStartupMode()) return;
+        if (window.__routeeAppModuleReady) return;
+        var filename = String(event && event.filename ? event.filename : "");
+        if (filename.indexOf("/js/app.js") !== -1 || filename.indexOf("app.js") !== -1) {
+          clearAppStartupSplash("module-error");
+        }
+      });
+
+      window.addEventListener("unhandledrejection", function () {
+        if (!isMobileStartupMode()) return;
+        if (window.__routeeAppModuleReady) return;
+        clearAppStartupSplash("module-error");
+      });
 
       window.setTimeout(function () {
         if (!isMobileStartupMode()) return;
