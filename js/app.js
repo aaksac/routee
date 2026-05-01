@@ -265,7 +265,7 @@ function hydrateAppStartupSplash() {
 
     const message =
       sessionStorage.getItem("routeeStartupSplashText") ||
-      "Haritanız yükleniyor...";
+      "Haritanız hazırlanıyor...";
     const startedAt = Number(sessionStorage.getItem("routeeStartupSplashAt")) || Date.now();
 
     if (elements.appStartupSplashText) {
