@@ -19,11 +19,6 @@
   <script type="module" src="./js/version-guard.js"></script>
   <script src="./js/status-bar.js"></script>
 
-  <link rel="stylesheet" href="./css/style.css" />
-  <link rel="stylesheet" href="./css/mobile.css" />
-  <link rel="stylesheet" href="./css/safe-area.css" />
-  <link rel="stylesheet" href="./css/auth.css" />
-
   <script>
     (function () {
       try {
@@ -35,6 +30,175 @@
       }
     })();
   </script>
+
+  <style id="routee-app-critical-splash-css">
+    html.show-app-startup-splash,
+    html.show-app-startup-splash body {
+      margin: 0;
+      min-height: 100%;
+      background: #0f172a;
+      overflow: hidden;
+    }
+
+    html.show-app-startup-splash #app {
+      visibility: hidden;
+    }
+
+    html.show-app-startup-splash .app-startup-splash {
+      position: fixed;
+      inset: 0;
+      z-index: 2147483000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-sizing: border-box;
+      padding:
+        max(24px, env(safe-area-inset-top, 0px))
+        max(24px, env(safe-area-inset-right, 0px))
+        max(24px, env(safe-area-inset-bottom, 0px))
+        max(24px, env(safe-area-inset-left, 0px));
+      background:
+        radial-gradient(circle at top, rgba(37, 99, 235, 0.18), transparent 34%),
+        linear-gradient(180deg, rgba(8, 15, 30, 0.98) 0%, rgba(15, 23, 42, 0.98) 100%);
+      color: #ffffff;
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+    }
+
+    html.show-app-startup-splash .startup-splash-card {
+      position: relative;
+      width: min(360px, 100%);
+      min-height: 254px;
+      display: grid;
+      justify-items: center;
+      align-content: center;
+      gap: 16px;
+      box-sizing: border-box;
+      padding: 30px 24px 26px;
+      border-radius: 30px;
+      border: 1px solid rgba(255, 255, 255, 0.10);
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.10), rgba(255, 255, 255, 0.06));
+      box-shadow: 0 28px 70px rgba(0, 0, 0, 0.24);
+      text-align: center;
+      overflow: hidden;
+      transform: translateZ(0);
+      -webkit-transform: translateZ(0);
+    }
+
+    html.show-app-startup-splash .startup-splash-orb {
+      position: absolute;
+      top: -42px;
+      width: 160px;
+      height: 160px;
+      border-radius: 999px;
+      background: radial-gradient(circle, rgba(96, 165, 250, 0.38), rgba(96, 165, 250, 0));
+      filter: blur(10px);
+    }
+
+    html.show-app-startup-splash .startup-splash-logo {
+      width: 82px;
+      height: 82px;
+      border-radius: 26px;
+      display: grid;
+      place-items: center;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.10);
+      box-shadow: 0 18px 36px rgba(37, 99, 235, 0.16);
+      overflow: hidden;
+    }
+
+    html.show-app-startup-splash .startup-splash-logo img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    html.show-app-startup-splash .startup-splash-copy {
+      min-height: 58px;
+      display: grid;
+      align-content: center;
+      gap: 7px;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    html.show-app-startup-splash .startup-splash-copy strong {
+      min-height: 24px;
+      color: #ffffff;
+      font-size: 1.2rem;
+      line-height: 1.2;
+      letter-spacing: 0.01em;
+    }
+
+    html.show-app-startup-splash .startup-splash-copy span {
+      min-height: 24px;
+      display: block;
+      color: rgba(255, 255, 255, 0.78);
+      font-size: 0.96rem;
+      line-height: 1.45;
+    }
+
+    html.show-app-startup-splash .startup-splash-loader {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    html.show-app-startup-splash .startup-splash-loader span {
+      width: 9px;
+      height: 9px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.92);
+      animation: routeeAppStartupPulse 1s infinite ease-in-out;
+    }
+
+    html.show-app-startup-splash .startup-splash-loader span:nth-child(2) {
+      animation-delay: 0.16s;
+    }
+
+    html.show-app-startup-splash .startup-splash-loader span:nth-child(3) {
+      animation-delay: 0.32s;
+    }
+
+    @keyframes routeeAppStartupPulse {
+      0%,
+      80%,
+      100% {
+        opacity: 0.35;
+        transform: scale(0.82);
+      }
+
+      40% {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    @media (max-width: 640px) {
+      html.show-app-startup-splash .startup-splash-card {
+        width: min(320px, 100%);
+        min-height: 232px;
+        padding: 24px 18px 22px;
+        border-radius: 24px;
+      }
+
+      html.show-app-startup-splash .startup-splash-logo {
+        width: 72px;
+        height: 72px;
+        border-radius: 22px;
+      }
+
+      html.show-app-startup-splash .startup-splash-copy {
+        min-height: 54px;
+      }
+    }
+  </style>
+
+  <link rel="stylesheet" href="./css/style.css" />
+  <link rel="stylesheet" href="./css/mobile.css" />
+  <link rel="stylesheet" href="./css/safe-area.css" />
+  <link rel="stylesheet" href="./css/auth.css" />
 </head>
 <body>
   <div class="startup-splash app-startup-splash" id="appStartupSplash" aria-hidden="true">
@@ -149,8 +313,8 @@
                 <button class="icon-close" id="btnCloseEndPanel" type="button" aria-label="Kapat">×</button>
               </div>
               <div class="field-group">
-              <label for="endName">İsim</label>
-              <input id="endName" type="text" placeholder="Bitiş noktası adı" />
+                <label for="endName">İsim</label>
+                <input id="endName" type="text" placeholder="Bitiş noktası adı" />
               </div>
               <div class="field-row">
                 <div class="field-group">
@@ -264,18 +428,18 @@
           <div class="map-overlay top-center desktop-only-inline">
             <div class="map-badges">
               <span class="badge" id="badgeDistance">Toplam: 0.00 km</span>
-<button class="badge new-map-inline-btn" id="btnNewMapInline" type="button" aria-label="Yeni harita oluştur" title="Yeni harita oluştur">
-  <span class="new-map-btn-icon" aria-hidden="true">
-    <svg viewBox="0 0 24 24">
-      <path d="M4 6.5L8.5 4.5L15.5 6.5L20 4.5V17.5L15.5 19.5L8.5 17.5L4 19.5V6.5Z"></path>
-      <path d="M8.5 4.5V17.5"></path>
-      <path d="M15.5 6.5V19.5"></path>
-      <path d="M18.25 8.25V14.25"></path>
-      <path d="M15.25 11.25H21.25"></path>
-    </svg>
-  </span>
-  <span>Yeni</span>
-</button>
+              <button class="badge new-map-inline-btn" id="btnNewMapInline" type="button" aria-label="Yeni harita oluştur" title="Yeni harita oluştur">
+                <span class="new-map-btn-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24">
+                    <path d="M4 6.5L8.5 4.5L15.5 6.5L20 4.5V17.5L15.5 19.5L8.5 17.5L4 19.5V6.5Z"></path>
+                    <path d="M8.5 4.5V17.5"></path>
+                    <path d="M15.5 6.5V19.5"></path>
+                    <path d="M18.25 8.25V14.25"></path>
+                    <path d="M15.25 11.25H21.25"></path>
+                  </svg>
+                </span>
+                <span>Yeni</span>
+              </button>
             </div>
           </div>
         </div>
