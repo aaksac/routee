@@ -3,7 +3,7 @@
 
   var STATUS_COLOR = "#0f172a";
   var APPLE_STATUS_STYLE = "black-translucent";
-  var STYLE_ID = "routee-ios-statusbar-stable-style";
+  var STYLE_ID = "routee-statusbar-minimal-fix-style";
 
   function upsertMeta(name, content) {
     var meta = document.querySelector('meta[name="' + name + '"]');
@@ -21,7 +21,7 @@
     return meta;
   }
 
-  function installStableStatusStyle() {
+  function installMinimalStatusStyle() {
     if (!document.head) return;
 
     var style = document.getElementById(STYLE_ID);
@@ -46,69 +46,61 @@
   }
 }
 
+/* Sayfanın ana arka planı uygulamanın kendi rengi olarak kalır.
+   Böylece ilk açılışta altta lacivert blok görünmez. */
 html {
-  background-color: var(--routee-statusbar-color) !important;
+  background-color: ${STATUS_COLOR} !important;
   color-scheme: light only !important;
-  overflow-x: hidden !important;
 }
 
 body {
-  min-height: 100vh !important;
-  min-height: 100svh !important;
-  overflow-x: hidden !important;
-  background:
-    linear-gradient(
-      to bottom,
-      var(--routee-statusbar-color) 0,
-      var(--routee-statusbar-color) var(--routee-safe-top),
-      var(--bg, #f8fafc) var(--routee-safe-top),
-      var(--bg, #f8fafc) 100%
-    ) !important;
+  background-color: var(--bg, #f4f7fb) !important;
 }
 
-/* Eski status-bar katmanını kapatır.
-   Rota ikonu ve premium yazısı üstten kesilmez. */
+/* Önceki yüksek z-index'li status bar katmanı ikonların üstüne biniyordu.
+   Bunu tamamen kapatıyoruz. */
 html::before,
 body::before {
   content: none !important;
   display: none !important;
 }
 
-/* Topbar safe-area kadar aşağı iner.
-   Üst ince alan Odakla butonu renginde kalır. */
+/* Üst sistem alanı iPhone'da beyaza dönmesin diye yalnızca çok ince,
+   içerik üstüne binmeyen ve tıklamayı engellemeyen arka plan katmanı. */
+.routee-status-safe-bg {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: var(--routee-safe-top);
+  background: ${STATUS_COLOR};
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Topbar, rota ikonu ve premium yazısı her zaman üstte kalır. */
+.topbar,
+.status-strip,
+.brand-area,
+.brand-icon,
+.brand-icon img,
+.brand-icon svg {
+  position: relative;
+}
+
 .topbar {
-  padding-top: calc(18px + var(--routee-safe-top)) !important;
-  background:
-    linear-gradient(
-      to bottom,
-      var(--routee-statusbar-color) 0,
-      var(--routee-statusbar-color) var(--routee-safe-top),
-      rgba(255, 255, 255, 0.94) var(--routee-safe-top),
-      rgba(255, 255, 255, 0.94) 100%
-    ) !important;
-  box-sizing: border-box !important;
-  transform: translate3d(0, 0, 0);
-  backface-visibility: hidden;
+  z-index: 50;
 }
 
-@media (max-width: 720px) {
-  .topbar {
-    padding-top: calc(12px + var(--routee-safe-top)) !important;
-  }
-}
-
-@media (max-width: 480px) {
-  .topbar {
-    padding-top: calc(10px + var(--routee-safe-top)) !important;
-  }
+.status-strip {
+  z-index: 2;
 }
 
 .brand-area,
 .brand-icon,
 .brand-icon img,
 .brand-icon svg {
-  position: relative !important;
-  z-index: 3 !important;
+  z-index: 3;
 }
 
 .brand-icon {
@@ -116,82 +108,39 @@ body::before {
   flex-shrink: 0 !important;
 }
 
-.status-strip {
-  position: relative !important;
-  z-index: 2 !important;
-}
-
-/* Splash ekranı sabitlenir:
-   iPhone viewport değişiminde yukarı-aşağı zıplamaz. */
-.startup-splash,
-.app-startup-splash,
-#startupSplash,
-#appStartupSplash,
-.loading-splash,
-.splash-screen {
-  position: fixed !important;
-  inset: 0 !important;
-  width: 100vw !important;
-  height: 100svh !important;
-  min-height: 100svh !important;
-  display: grid !important;
-  place-items: center !important;
-  padding:
-    calc(24px + var(--routee-safe-top))
-    max(20px, env(safe-area-inset-right, 0px))
-    calc(24px + var(--routee-safe-bottom))
-    max(20px, env(safe-area-inset-left, 0px)) !important;
-  box-sizing: border-box !important;
-  transform: translate3d(0, 0, 0) !important;
-  backface-visibility: hidden !important;
-  contain: layout paint size !important;
-  overflow: hidden !important;
-}
-
-.startup-splash-card,
-.app-startup-splash > *,
-#startupSplash > *,
-#appStartupSplash > *,
-.loading-splash > *,
-.splash-screen > * {
-  max-width: min(92vw, 420px) !important;
-  transform: translate3d(0, 0, 0) !important;
-  backface-visibility: hidden !important;
-}
-
-body.auth-booting,
-body.show-app-startup-splash,
-body.show-login-startup-splash,
-body.is-loading,
-body.is-auth-loading {
-  min-height: 100svh !important;
-  overflow: hidden !important;
-}
-
-@supports (-webkit-touch-callout: none) {
-  html,
-  body {
-    min-height: -webkit-fill-available !important;
+/* Harita Listelerim paneli mobilde çok yukarı yapışmasın.
+   Splash, giriş ve harita işlevlerine dokunmaz. */
+@media (max-width: 720px) {
+  .screen-overlay-panel {
+    margin-top: calc(64px + var(--routee-safe-top)) !important;
+    max-height: calc(100svh - 96px - var(--routee-safe-top)) !important;
   }
+}
 
-  body {
-    -webkit-text-size-adjust: 100% !important;
-  }
-
-  .topbar,
-  .startup-splash,
-  .app-startup-splash,
-  #startupSplash,
-  #appStartupSplash,
-  .loading-splash,
-  .splash-screen {
-    -webkit-transform: translate3d(0, 0, 0) !important;
+@media (max-width: 480px) {
+  .screen-overlay-panel {
+    margin-top: calc(58px + var(--routee-safe-top)) !important;
+    max-height: calc(100svh - 88px - var(--routee-safe-top)) !important;
   }
 }
 `;
 
     if (style.parentNode && style.parentNode.lastElementChild !== style) {
       document.head.appendChild(style);
+    }
+  }
+
+  function ensureSafeBgElement() {
+    if (!document.body) return;
+
+    var safeBg = document.getElementById("routeeStatusSafeBg");
+
+    if (!safeBg) {
+      safeBg = document.createElement("div");
+      safeBg.id = "routeeStatusSafeBg";
+      safeBg.className = "routee-status-safe-bg";
+      safeBg.setAttribute("aria-hidden", "true");
+      document.body.insertBefore(safeBg, document.body.firstChild);
     }
   }
 
@@ -206,11 +155,8 @@ body.is-auth-loading {
     document.documentElement.style.backgroundColor = STATUS_COLOR;
     document.documentElement.classList.add("routee-statusbar-locked");
 
-    if (document.body) {
-      document.body.classList.add("routee-statusbar-locked");
-    }
-
-    installStableStatusStyle();
+    installMinimalStatusStyle();
+    ensureSafeBgElement();
   }
 
   lockStatusBar();
@@ -224,26 +170,4 @@ body.is-auth-loading {
   window.addEventListener("pageshow", lockStatusBar, { passive: true });
   window.addEventListener("focus", lockStatusBar, { passive: true });
   document.addEventListener("visibilitychange", lockStatusBar, { passive: true });
-
-  if (window.MutationObserver && document.head) {
-    var scheduled = false;
-
-    var observer = new MutationObserver(function () {
-      if (scheduled) return;
-
-      scheduled = true;
-
-      window.requestAnimationFrame(function () {
-        scheduled = false;
-        lockStatusBar();
-      });
-    });
-
-    observer.observe(document.head, {
-      childList: true,
-      subtree: true,
-      attributes: true,
-      attributeFilter: ["content", "name", "media"]
-    });
-  }
 })();
