@@ -60,7 +60,10 @@ function setMobileStartupPhase(phase) {
     );
   });
 
-  if (!isMobileStartupMode()) return;
+  // phase boş/null ise splash tamamen kapatılır.
+  // Önceki sürümde null phase mobilde routee-mobile-splash-active sınıfını tekrar ekliyordu.
+  // Bu da login ekranını gizli bırakıp splash donmuş gibi gösteriyordu.
+  if (!phase || !isMobileStartupMode()) return;
 
   targets.forEach((target) => {
     target.classList.add("routee-mobile-splash-active");
@@ -72,7 +75,6 @@ function setMobileStartupPhase(phase) {
     }
   });
 }
-
 
 function clearAuthModulePromise() {
   authModulePromise = null;
