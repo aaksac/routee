@@ -193,6 +193,16 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
+  if (url.searchParams.has("_v") && (isAppDocument || isCodeAsset)) {
+    event.respondWith(
+      networkFirstWithFastFallback(request).catch(async () => {
+        const cachedResponse = await matchCached(request);
+        return cachedResponse || Response.error();
+      })
+    );
+    return;
+  }
+
   if (isAppDocument) {
     event.respondWith(
       cacheFirstWithBackgroundUpdate(request).catch(async () => {
