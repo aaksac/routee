@@ -358,18 +358,28 @@ body.auth-booting {
 
   body.routee-mobile-routing-splash .startup-splash-card {
     width: min(320px, calc(100vw - 40px));
-    min-height: 168px;
-    padding: 18px 18px 16px;
+    min-height: 220px;
+    padding: 22px 18px 18px;
     border-radius: 24px;
-    background: rgba(15, 23, 42, 0.54);
+    background: rgba(15, 23, 42, 0.58);
     border: 1px solid rgba(255, 255, 255, 0.14);
     box-shadow: 0 20px 48px rgba(0, 0, 0, 0.22);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
   }
 
-  body.routee-mobile-routing-splash .startup-splash-logo,
-  body.routee-mobile-routing-splash .startup-splash-orb {
-    display: none !important;
+  body.routee-mobile-routing-splash .startup-splash-logo {
+    display: grid !important;
+    width: 74px;
+    height: 74px;
+    border-radius: 23px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    box-shadow: 0 16px 34px rgba(37, 99, 235, 0.18);
   }
+
+  body.routee-mobile-routing-splash .startup-splash-orb {
+    display: block !important;
+  }
+
 }
