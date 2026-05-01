@@ -21,7 +21,7 @@
           isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(window.navigator.userAgent || "");
         }
         if (isMobile || sessionStorage.getItem("routeeStartupSplash") === "1") {
-          document.documentElement.classList.add("show-app-startup-splash");
+          document.documentElement.classList.add("show-app-startup-splash", "routee-mobile-splash-active", "routee-mobile-splash-image");
         }
       } catch (error) {}
     })();
@@ -118,6 +118,69 @@
         display: none !important;
       }
     }
+
+
+    /* ROUTEE — MOBILE APP SINGLE SPLASH FINAL OVERRIDE
+       app.html tarafında mavi boş perde yok; aynı splash görseli tek katman olarak kalır. */
+    @media (max-width: 720px), (hover: none) and (pointer: coarse) {
+      html.show-app-startup-splash,
+      html.show-app-startup-splash body,
+      body.routee-app-startup-active {
+        width: 100% !important;
+        height: 100% !important;
+        min-height: 100svh !important;
+        min-height: 100dvh !important;
+        margin: 0 !important;
+        overflow: hidden !important;
+        background: #0b1222 !important;
+        overscroll-behavior: none !important;
+      }
+
+      html.show-app-startup-splash #app,
+      body.routee-app-startup-active #app,
+      html.show-app-startup-splash .new-map-mobile-fab,
+      body.routee-app-startup-active .new-map-mobile-fab {
+        opacity: 0 !important;
+        visibility: hidden !important;
+        pointer-events: none !important;
+      }
+
+      html.show-app-startup-splash .app-startup-splash,
+      body.routee-app-startup-active .app-startup-splash,
+      .app-startup-splash.is-visible {
+        position: fixed !important;
+        inset: 0 !important;
+        width: 100vw !important;
+        height: 100vh !important;
+        height: 100svh !important;
+        height: 100dvh !important;
+        min-height: -webkit-fill-available !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        display: grid !important;
+        place-items: center !important;
+        overflow: hidden !important;
+        background-color: #0b1222 !important;
+        background-image: url("./icons/splash-1170x2532.png") !important;
+        background-position: center center !important;
+        background-size: cover !important;
+        background-repeat: no-repeat !important;
+        opacity: 1 !important;
+        visibility: visible !important;
+        pointer-events: auto !important;
+        z-index: 2147483646 !important;
+        transform: translateZ(0) !important;
+        -webkit-transform: translateZ(0) !important;
+        backface-visibility: hidden !important;
+        -webkit-backface-visibility: hidden !important;
+      }
+
+      .app-startup-splash .app-startup-splash-image,
+      .app-startup-splash .startup-splash-card,
+      .app-startup-splash > * {
+        display: none !important;
+      }
+    }
   </style>
 
   <script>
@@ -139,7 +202,7 @@
         }
 
         if (isMobile || sessionStorage.getItem("routeeStartupSplash") === "1") {
-          document.documentElement.classList.add("show-app-startup-splash");
+          document.documentElement.classList.add("show-app-startup-splash", "routee-mobile-splash-active", "routee-mobile-splash-image");
         }
       } catch (error) {
         console.warn("Startup splash session kontrolü başarısız:", error);
