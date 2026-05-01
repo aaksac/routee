@@ -21,14 +21,23 @@ let firestoreModuleState = "idle";
 let isRouting = false;
 let bootResolved = false;
 let bootFallbackTimer = null;
+let routeTransitionLocked = false;
+let authWatcherSettled = false;
+let bootStartedAt = 0;
 
 let initialStatus = {
   message: "Henüz giriş yapılmadı.",
   type: "normal"
 };
 
-const STARTUP_SPLASH_MIN_MS = 300;
+/*
+  STARTUP_SPLASH_MIN_MS bilinçli olarak 0 bırakıldı.
+  Amaç: Giriş/yönlendirme hızında hiçbir yapay gecikme oluşturmamak.
+*/
+const STARTUP_SPLASH_MIN_MS = 0;
 const AUTH_BOOT_TIMEOUT_MS = 2600;
+const AUTH_BOOT_RECHECK_MS = 300;
+const AUTH_BOOT_HARD_TIMEOUT_MS = 5200;
 const STALE_MODULE_RETRY_MS = AUTH_BOOT_TIMEOUT_MS - 100;
 
 function clearAuthModulePromise() {
@@ -120,12 +129,38 @@ function showStartupSplash(title = "Rota", message = "Oturumunuz kontrol ediliyo
 
 function hideStartupSplash() {
   if (!elements.startupSplash) return;
+
   elements.startupSplash.classList.remove("is-visible");
   elements.startupSplash.setAttribute("aria-hidden", "true");
 }
 
-function revealLoginScreen() {
-  if (bootResolved || isRouting) return;
+function hideLoginScreenForRouting() {
+  if (!elements.loginPage) return;
+
+  elements.loginPage.classList.add("login-page--hidden");
+  elements.loginPage.setAttribute("aria-hidden", "true");
+}
+
+function lockRouteTransition(title = "Rota", message = "Haritanız hazırlanıyor...") {
+  routeTransitionLocked = true;
+  bootResolved = true;
+
+  window.clearTimeout(bootFallbackTimer);
+  setButtonsDisabled(true);
+  hideLoginScreenForRouting();
+  showStartupSplash(title, message);
+
+  document.body.classList.add("auth-booting");
+}
+
+function unlockRouteTransition() {
+  routeTransitionLocked = false;
+}
+
+function revealLoginScreen(options = {}) {
+  const force = options.force === true;
+
+  if (!force && (bootResolved || isRouting || routeTransitionLocked)) return;
 
   bootResolved = true;
   window.clearTimeout(bootFallbackTimer);
@@ -246,9 +281,9 @@ async function routeAfterLogin(user, options = {}) {
   if (isRouting) return;
 
   isRouting = true;
-  bootResolved = true;
-  window.clearTimeout(bootFallbackTimer);
-  setButtonsDisabled(true);
+
+  const firstSplashMessage = options.message || "Haritanız hazırlanıyor...";
+  lockRouteTransition("Rota", firstSplashMessage);
 
   try {
     const { getUserClaims } = await loadAuthModule({ allowRetryIfStale: true });
@@ -257,29 +292,31 @@ async function routeAfterLogin(user, options = {}) {
     const targetUrl = isAdmin ? "./chooser.html" : "./app.html";
 
     const splashTitle = isAdmin ? "Yönetim paneli açılıyor" : "Rota";
-    const splashMessage = isAdmin
-      ? "Yetkileriniz doğrulanıyor..."
-      : options.message || "Oturumunuz açılıyor...";
+    const splashMessage = isAdmin ? "Yetkileriniz doğrulanıyor..." : "Haritanız hazırlanıyor...";
 
-    showStartupSplash(splashTitle, splashMessage);
+    lockRouteTransition(splashTitle, splashMessage);
 
     if (!isAdmin) {
-      setAppStartupSplash("Haritanız hazırlanıyor...");
+      setAppStartupSplash(splashMessage);
     } else {
       clearAppStartupSplash();
     }
 
     const shouldDelay = options.delay !== false;
-    if (shouldDelay) {
+
+    if (shouldDelay && STARTUP_SPLASH_MIN_MS > 0) {
       await wait(STARTUP_SPLASH_MIN_MS);
     }
 
     window.location.replace(targetUrl);
   } catch (error) {
     isRouting = false;
+    unlockRouteTransition();
     setButtonsDisabled(false);
     clearAppStartupSplash();
-    revealLoginScreen();
+
+    revealLoginScreen({ force: true });
+
     throw error;
   }
 }
@@ -307,6 +344,7 @@ async function handleLogin() {
     const result = await login(email, password);
 
     setStatus("Giriş başarılı.", "success");
+
     await routeAfterLogin(result.user, {
       message: "Girişiniz doğrulanıyor..."
     });
@@ -375,9 +413,11 @@ async function initAuthWatcher() {
     const { watchAuth } = await loadAuthModule();
 
     watchAuth(async (user) => {
+      authWatcherSettled = true;
+
       if (user) {
         await routeAfterLogin(user, {
-          message: "Oturumunuz açılıyor...",
+          message: "Haritanız hazırlanıyor...",
           delay: false
         });
         return;
@@ -386,7 +426,8 @@ async function initAuthWatcher() {
       revealLoginScreen();
     });
   } catch {
-    revealLoginScreen();
+    authWatcherSettled = true;
+    revealLoginScreen({ force: true });
   }
 }
 
@@ -414,26 +455,58 @@ function applyQueryStatus() {
   };
 }
 
-function init() {
-  bindEvents();
-  applyQueryStatus();
-  showStartupSplash("Rota", "Oturumunuz kontrol ediliyor...");
-  setButtonsDisabled(true);
-  initAuthWatcher();
+function scheduleBootFallback(delay = AUTH_BOOT_TIMEOUT_MS) {
+  window.clearTimeout(bootFallbackTimer);
 
   bootFallbackTimer = window.setTimeout(() => {
-    revealLoginScreen();
-  }, AUTH_BOOT_TIMEOUT_MS);
+    if (bootResolved || isRouting || routeTransitionLocked) return;
+
+    if (!hasInternetConnection()) {
+      authWatcherSettled = true;
+      revealLoginScreen({ force: true });
+      setOfflineStatus();
+      return;
+    }
+
+    const elapsed = Date.now() - bootStartedAt;
+    const authStillPreparing =
+      !authWatcherSettled &&
+      elapsed < AUTH_BOOT_HARD_TIMEOUT_MS &&
+      (authModuleState === "pending" || authModuleState === "resolved");
+
+    if (authStillPreparing) {
+      showStartupSplash("Rota", "Oturumunuz kontrol ediliyor...");
+      scheduleBootFallback(AUTH_BOOT_RECHECK_MS);
+      return;
+    }
+
+    revealLoginScreen({ force: true });
+  }, delay);
+}
+
+function init() {
+  bootStartedAt = Date.now();
+
+  bindEvents();
+  applyQueryStatus();
+
+  showStartupSplash("Rota", "Oturumunuz kontrol ediliyor...");
+  setButtonsDisabled(true);
+
+  initAuthWatcher();
+  scheduleBootFallback();
 
   window.addEventListener("offline", () => {
-    if (!bootResolved && !isRouting) {
-      revealLoginScreen();
+    if (!bootResolved && !isRouting && !routeTransitionLocked) {
+      authWatcherSettled = true;
+      revealLoginScreen({ force: true });
     }
+
     setOfflineStatus();
   });
 
   window.addEventListener("online", () => {
-    if (bootResolved && !isRouting) {
+    if (bootResolved && !isRouting && !routeTransitionLocked) {
       setStatus("Bağlantı yeniden kuruldu.");
     }
   });
