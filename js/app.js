@@ -143,6 +143,19 @@ const DEFAULT_POINT_COLOR = "#dc2626";
 const GOOGLE_MAPS_BOOT_TIMEOUT_MS = 12000;
 let mapFeaturesInitialized = false;
 let mapsBootPromise = null;
+const APP_STARTUP_SPLASH_MIN_MS = 650;
+
+function wait(ms) {
+  return new Promise((resolve) => window.setTimeout(resolve, ms));
+}
+
+function waitForStablePaint() {
+  return new Promise((resolve) => {
+    window.requestAnimationFrame(() => {
+      window.requestAnimationFrame(resolve);
+    });
+  });
+}
 
 function areGoogleMapsLibrariesReady() {
   return Boolean(
@@ -270,6 +283,16 @@ async function closeAppStartupSplash(splashState) {
     clearAppStartupSplashSession();
     return;
   }
+
+  const startedAt = Number(splashState.startedAt) || Date.now();
+  const elapsed = Date.now() - startedAt;
+  const remaining = Math.max(0, APP_STARTUP_SPLASH_MIN_MS - elapsed);
+
+  if (remaining > 0) {
+    await wait(remaining);
+  }
+
+  await waitForStablePaint();
 
   elements.appStartupSplash.classList.remove("is-visible");
   elements.appStartupSplash.setAttribute("aria-hidden", "true");
