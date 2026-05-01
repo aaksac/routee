@@ -58,6 +58,7 @@ const state = {
   mapQuota: 1,
   lastScrollY: 0,
   appStartupSplash: null,
+  appStartupRevealTimer: null,
   appAuthReadyForReveal: false,
   appMapReadyForReveal: false,
   selectedPointColor: "#dc2626",
@@ -146,6 +147,7 @@ const GOOGLE_MAPS_BOOT_TIMEOUT_MS = 12000;
 let mapFeaturesInitialized = false;
 let mapsBootPromise = null;
 const MOBILE_STARTUP_QUERY = "(max-width: 720px), (hover: none) and (pointer: coarse)";
+const APP_STARTUP_REVEAL_TIMEOUT_MS = 12000;
 
 function isMobileStartupMode() {
   try {
@@ -303,6 +305,11 @@ async function closeAppStartupSplash(splashState) {
     return;
   }
 
+  if (state.appStartupRevealTimer) {
+    window.clearTimeout(state.appStartupRevealTimer);
+    state.appStartupRevealTimer = null;
+  }
+
   elements.appStartupSplash.classList.remove("is-visible");
   elements.appStartupSplash.setAttribute("aria-hidden", "true");
   document.documentElement.classList.remove("show-app-startup-splash", "routee-mobile-splash-active", "routee-mobile-splash-image", "routee-mobile-splash-message");
@@ -317,6 +324,27 @@ async function closeAppStartupSplashWhenReady() {
 
   await closeAppStartupSplash(state.appStartupSplash);
   state.appStartupSplash = null;
+}
+
+function armAppStartupSplashFallback() {
+  if (!state.appStartupSplash || !isMobileStartupMode()) return;
+
+  if (state.appStartupRevealTimer) {
+    window.clearTimeout(state.appStartupRevealTimer);
+  }
+
+  state.appStartupRevealTimer = window.setTimeout(async () => {
+    if (!state.appStartupSplash) return;
+
+    if (!state.currentUser && !state.appAuthReadyForReveal) {
+      clearAppStartupSplashSession();
+      goToLogin();
+      return;
+    }
+
+    await closeAppStartupSplash(state.appStartupSplash);
+    state.appStartupSplash = null;
+  }, APP_STARTUP_REVEAL_TIMEOUT_MS);
 }
 
 function formatKm(value) {
@@ -2715,6 +2743,7 @@ function initAuthWatcher() {
 
 function init() {
   state.appStartupSplash = hydrateAppStartupSplash();
+  armAppStartupSplashFallback();
 
   renderSummary();
   renderTripList();
