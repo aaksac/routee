@@ -203,3 +203,44 @@ body.routee-statusbar-locked {
 body.routee-statusbar-locked #app {
   background: var(--bg);
 }
+/* =========================================================
+   Saved Maps Overlay Safe Area
+   Harita Listelerim panelinin iPhone/Safari/PWA üst alanına
+   fazla yaklaşmasını engeller.
+   ========================================================= */
+
+@media (max-width: 720px) {
+  #savedMapsOverlay {
+    padding-top: calc(var(--routee-safe-top) + 14px);
+    padding-right: max(8px, var(--routee-safe-right));
+    padding-bottom: calc(var(--routee-safe-bottom) + 14px);
+    padding-left: max(8px, var(--routee-safe-left));
+    box-sizing: border-box;
+    align-items: flex-start;
+  }
+
+  #savedMapsOverlay .screen-overlay-panel {
+    margin-top: calc(var(--routee-safe-top) + 18px) !important;
+    max-height: calc(
+      100dvh - var(--routee-safe-top) - var(--routee-safe-bottom) - 42px
+    );
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+}
+
+@media (max-width: 480px) {
+  #savedMapsOverlay {
+    padding-top: calc(var(--routee-safe-top) + 12px);
+    padding-right: max(6px, var(--routee-safe-right));
+    padding-bottom: calc(var(--routee-safe-bottom) + 12px);
+    padding-left: max(6px, var(--routee-safe-left));
+  }
+
+  #savedMapsOverlay .screen-overlay-panel {
+    margin-top: calc(var(--routee-safe-top) + 16px) !important;
+    max-height: calc(
+      100dvh - var(--routee-safe-top) - var(--routee-safe-bottom) - 36px
+    );
+  }
+}
