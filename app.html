@@ -11,7 +11,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="Rota" />
 
-  <script id="routee-mobile-app-splash-early-lock">
+  <script id="routee-app-splash-early-lock">
     (function () {
       try {
         var mobileQuery = "(max-width: 720px), (hover: none) and (pointer: coarse)";
@@ -20,8 +20,16 @@
         if (!isMobile) {
           isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(window.navigator.userAgent || "");
         }
-        if (isMobile || sessionStorage.getItem("routeeStartupSplash") === "1") {
-          document.documentElement.classList.add("show-app-startup-splash", "routee-mobile-splash-active", "routee-mobile-splash-image");
+
+        var hasSessionSplash = false;
+        try { hasSessionSplash = sessionStorage.getItem("routeeStartupSplash") === "1"; } catch (storageError) { hasSessionSplash = false; }
+
+        if (isMobile || hasSessionSplash) {
+          document.documentElement.classList.add("show-app-startup-splash");
+        }
+
+        if (isMobile) {
+          document.documentElement.classList.add("routee-mobile-splash-active", "routee-mobile-splash-image");
         }
       } catch (error) {}
     })();
@@ -40,7 +48,7 @@
   <link rel="stylesheet" href="./css/mobile.css" />
   <link rel="stylesheet" href="./css/auth.css" />
 
-  <style id="routee-mobile-splash-image-css">
+  <style id="routee-app-splash-critical-css">
     :root {
       --routee-splash-bg: #0b1222;
       --routee-splash-image: url("./icons/splash-1170x2532.png?v=20260501-pro-light");
@@ -55,7 +63,17 @@
     html.show-app-startup-splash,
     html.show-app-startup-splash body,
     body.routee-app-startup-active {
-      background: var(--routee-splash-bg);
+      background: var(--routee-splash-bg) !important;
+      overflow: hidden !important;
+    }
+
+    html.show-app-startup-splash #app,
+    body.routee-app-startup-active #app,
+    html.show-app-startup-splash .new-map-mobile-fab,
+    body.routee-app-startup-active .new-map-mobile-fab {
+      opacity: 0 !important;
+      visibility: hidden !important;
+      pointer-events: none !important;
     }
 
     .app-startup-splash {
@@ -91,13 +109,6 @@
       pointer-events: auto !important;
     }
 
-    html.show-app-startup-splash #app,
-    body.routee-app-startup-active #app {
-      opacity: 0 !important;
-      visibility: hidden !important;
-      pointer-events: none !important;
-    }
-
     .app-startup-splash > * {
       display: none !important;
     }
@@ -111,57 +122,15 @@
         min-height: 100svh;
         min-height: 100dvh;
         margin: 0;
-        overflow: hidden !important;
-        background: var(--routee-splash-bg) !important;
         overscroll-behavior: none;
       }
 
-      html.show-app-startup-splash #app,
-      body.routee-app-startup-active #app,
-      html.show-app-startup-splash .new-map-mobile-fab,
-      body.routee-app-startup-active .new-map-mobile-fab {
-        opacity: 0 !important;
-        visibility: hidden !important;
-        pointer-events: none !important;
-      }
-
       .app-startup-splash {
-        position: fixed !important;
-        inset: 0 !important;
-        z-index: 2147483646 !important;
-        width: 100vw !important;
         height: 100vh !important;
         height: 100svh !important;
         height: 100dvh !important;
         min-height: -webkit-fill-available !important;
-        margin: 0 !important;
-        padding: 0 !important;
-        display: block !important;
-        overflow: hidden !important;
-        background-color: var(--routee-splash-bg) !important;
-        background-image: var(--routee-splash-image) !important;
-        background-position: center center !important;
         background-size: 100% 100% !important;
-        background-repeat: no-repeat !important;
-        opacity: 0;
-        visibility: hidden;
-        pointer-events: none;
-        transform: translateZ(0);
-        -webkit-transform: translateZ(0);
-        backface-visibility: hidden;
-        -webkit-backface-visibility: hidden;
-      }
-
-      html.show-app-startup-splash .app-startup-splash,
-      body.routee-app-startup-active .app-startup-splash,
-      .app-startup-splash.is-visible {
-        opacity: 1 !important;
-        visibility: visible !important;
-        pointer-events: auto !important;
-      }
-
-      .app-startup-splash > * {
-        display: none !important;
       }
     }
   </style>
