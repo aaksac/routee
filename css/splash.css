@@ -6,7 +6,7 @@
 
 :root {
   --routee-splash-bg: #0b1222;
-  --routee-splash-image: url("../icons/splash-1170x2532.png?v=20260501-single");
+  --routee-splash-image: url("../icons/splash-1170x2532.png?v=20260501-cover");
 }
 
 @media (max-width: 720px), (hover: none) and (pointer: coarse) {
@@ -71,7 +71,7 @@
     background-color: var(--routee-splash-bg) !important;
     background-image: var(--routee-splash-image) !important;
     background-position: center center !important;
-    background-size: contain !important;
+    background-size: cover !important;
     background-repeat: no-repeat !important;
     opacity: 1 !important;
     visibility: visible !important;
