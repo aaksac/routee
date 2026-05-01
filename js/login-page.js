@@ -482,10 +482,19 @@ function init() {
   setButtonsDisabled(true);
   initAuthWatcher();
 
-  // Oturum kontrolü bitmeden giriş ekranı açılmaz.
-  // Firebase oturum cevabı gecikirse eski zamanlayıcı giriş ekranını gösterip
-  // ardından otomatik oturuma geçerek kötü bir sıçrama oluşturuyordu.
-  bootFallbackTimer = null;
+  // Oturum kontrolü normalde Firebase cevabı ile çözülür.
+  // Ancak modül/Firebase cevabı hiç gelmezse splash sonsuza kadar kilitli kalmamalı.
+  // Bu emniyet sadece donmayı önler; cevap zamanında gelirse hiçbir görsel ara geçiş üretmez.
+  bootFallbackTimer = window.setTimeout(() => {
+    if (bootResolved || isRouting) return;
+    revealLoginScreen();
+    setStatus(
+      hasInternetConnection()
+        ? "Oturum kontrolü gecikti. Giriş bilgilerinle devam edebilirsin."
+        : "Lütfen internet bağlantınızı kontrol edin.",
+      hasInternetConnection() ? "normal" : "offline"
+    );
+  }, AUTH_BOOT_TIMEOUT_MS);
 
   window.addEventListener("offline", () => {
     if (!bootResolved && !isRouting) {
