@@ -250,25 +250,23 @@ async function routeAfterLogin(user, options = {}) {
   window.clearTimeout(bootFallbackTimer);
   setButtonsDisabled(true);
 
+  // Başarılı girişten sonra login kartının status/claim kontrolü sırasında yeniden
+  // ölçülmesini kullanıcıya göstermemek için splash'i en başta kilitle.
+  const immediateMessage = options.message || "Oturumunuz kontrol ediliyor...";
+  showStartupSplash("Rota", immediateMessage);
+  elements.loginPage?.classList.add("login-page--hidden");
+  elements.loginPage?.setAttribute("aria-hidden", "true");
+  setAppStartupSplash("Haritanız hazırlanıyor...");
+
   try {
     const { getUserClaims } = await loadAuthModule({ allowRetryIfStale: true });
     const claims = await getUserClaims(user);
     const isAdmin = claims.adminPanel === true;
     const targetUrl = isAdmin ? "./chooser.html" : "./app.html";
 
-    const splashTitle = isAdmin ? "Yönetim paneli açılıyor" : "Rota";
-    const splashMessage = isAdmin
-      ? "Yetkileriniz doğrulanıyor..."
-      : "Oturumunuz kontrol ediliyor...";
-
-    // iOS/PWA geçişinde metin uzunluğu değişince splash kartı yeniden layout alıp titreyebiliyor.
-    // Bu yüzden index.html üzerinde metni sabit tutuyor, app.html tarafına geçiş mesajını sessionStorage ile taşıyoruz.
-    showStartupSplash(splashTitle, splashMessage);
-
-    if (!isAdmin) {
-      setAppStartupSplash("Haritanız hazırlanıyor...");
-    } else {
+    if (isAdmin) {
       clearAppStartupSplash();
+      showStartupSplash("Yönetim paneli açılıyor", "Yetkileriniz doğrulanıyor...");
     }
 
     const shouldDelay = options.delay !== false;
@@ -308,9 +306,8 @@ async function handleLogin() {
     const { login } = await loadAuthModule({ allowRetryIfStale: true });
     const result = await login(email, password);
 
-    setStatus("Giriş başarılı.", "success");
     await routeAfterLogin(result.user, {
-      message: "Girişiniz doğrulanıyor..."
+      message: "Oturumunuz kontrol ediliyor..."
     });
   } catch (error) {
     setButtonsDisabled(false);
