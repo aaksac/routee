@@ -28,9 +28,7 @@ let initialStatus = {
 };
 
 const STARTUP_SPLASH_MIN_MS = 300;
-const AUTH_BOOT_TIMEOUT_MS = 900;
-const AUTH_ACTION_TIMEOUT_MS = 12000;
-const USER_CLAIMS_TIMEOUT_MS = 4500;
+const AUTH_BOOT_TIMEOUT_MS = 2600;
 const STALE_MODULE_RETRY_MS = AUTH_BOOT_TIMEOUT_MS - 100;
 const MOBILE_STARTUP_QUERY = "(max-width: 720px), (hover: none) and (pointer: coarse)";
 
@@ -62,14 +60,16 @@ function setMobileStartupPhase(phase) {
     );
   });
 
-  // Mobilde tek görsel mantığı: giriş, yönlendirme ve app açılışında kartlı ikinci splash gösterilmez.
-  // phase boş/null ise splash tamamen kapatılır.
   if (!phase || !isMobileStartupMode()) return;
 
+  // Mobilde tek splash kuralı:
+  // entry, routing ve app geçişinde farklı kart/metin/loader sınıfı açılmaz.
+  // Hep aynı görsel gösterilir; sadece kapanışta splash kaldırılır.
   targets.forEach((target) => {
     target.classList.add("routee-mobile-splash-active", "routee-mobile-splash-image");
   });
 }
+
 
 function clearAuthModulePromise() {
   authModulePromise = null;
@@ -133,22 +133,6 @@ function loadFirestoreModule() {
 
 function wait(ms) {
   return new Promise((resolve) => window.setTimeout(resolve, ms));
-}
-
-function withTimeout(promise, timeoutMs, label = "İşlem") {
-  let timeoutId;
-
-  const timeoutPromise = new Promise((_, reject) => {
-    timeoutId = window.setTimeout(() => {
-      const error = new Error(`${label} zaman aşımına uğradı.`);
-      error.code = "routee/timeout";
-      reject(error);
-    }, timeoutMs);
-  });
-
-  return Promise.race([promise, timeoutPromise]).finally(() => {
-    window.clearTimeout(timeoutId);
-  });
 }
 
 function setButtonsDisabled(disabled) {
@@ -301,19 +285,6 @@ function isNetworkLikeError(error) {
   );
 }
 
-async function getUserClaimsWithTimeout(getUserClaims, user) {
-  try {
-    return await withTimeout(
-      getUserClaims(user),
-      USER_CLAIMS_TIMEOUT_MS,
-      "Kullanıcı yetkisi kontrolü"
-    );
-  } catch (error) {
-    console.warn("Kullanıcı yetkisi zamanında alınamadı, standart kullanıcı akışıyla devam ediliyor:", error);
-    return {};
-  }
-}
-
 async function routeAfterLogin(user, options = {}) {
   if (isRouting) return;
 
@@ -323,29 +294,8 @@ async function routeAfterLogin(user, options = {}) {
   setButtonsDisabled(true);
 
   try {
-    const shouldOpenAppImmediately = options.openAppImmediately === true;
-
-    if (shouldOpenAppImmediately) {
-      // Manuel girişten sonra yetki/profil kontrolleri app.html içinde yapılır.
-      // Böylece kullanıcı auth/claims beklerken splash'te kilitli kalmaz.
-      showStartupSplash("Rota", "", { phase: "routing" });
-      setAppStartupSplash();
-
-      const shouldDelay = options.delay !== false;
-      if (shouldDelay) {
-        await wait(STARTUP_SPLASH_MIN_MS);
-      }
-
-      window.location.replace("./app.html");
-      return;
-    }
-
-    const { getUserClaims } = await withTimeout(
-      loadAuthModule({ allowRetryIfStale: true }),
-      AUTH_ACTION_TIMEOUT_MS,
-      "Kimlik modülü"
-    );
-    const claims = await getUserClaimsWithTimeout(getUserClaims, user);
+    const { getUserClaims } = await loadAuthModule({ allowRetryIfStale: true });
+    const claims = await getUserClaims(user);
     const isAdmin = claims.adminPanel === true;
     const targetUrl = isAdmin ? "./chooser.html" : "./app.html";
 
@@ -354,9 +304,8 @@ async function routeAfterLogin(user, options = {}) {
       !isAdmin &&
       isMobileStartupMode();
 
-    if (keepExistingMobileSplash) {
-      // Oturumu zaten açık olan mobil kullanıcıda ikinci/metinli splash üretme.
-      // İlk açılıştaki aynı splash görseli app.html harita hazır olana kadar devam eder.
+    if (keepExistingMobileSplash || isMobileStartupMode()) {
+      // Mobilde tek görsel korunur; routing/message kartı üretilmez.
       showStartupSplash("Rota", "", { phase: "entry" });
     } else {
       const splashTitle = isAdmin ? "Yönetim paneli açılıyor" : "Rota";
@@ -405,23 +354,14 @@ async function handleLogin() {
     return;
   }
 
-  showStartupSplash("Rota", "Oturumunuz açılıyor...", { phase: "routing" });
+  showStartupSplash("Rota", "", { phase: "entry" });
 
   try {
-    const { login } = await withTimeout(
-      loadAuthModule({ allowRetryIfStale: true }),
-      AUTH_ACTION_TIMEOUT_MS,
-      "Kimlik modülü"
-    );
-    const result = await withTimeout(
-      login(email, password),
-      AUTH_ACTION_TIMEOUT_MS,
-      "Giriş işlemi"
-    );
+    const { login } = await loadAuthModule({ allowRetryIfStale: true });
+    const result = await login(email, password);
 
     await routeAfterLogin(result.user, {
-      message: "Oturumunuz açılıyor...",
-      openAppImmediately: true
+      message: "Oturumunuz açılıyor..."
     });
   } catch (error) {
     isRouting = false;
@@ -465,16 +405,8 @@ async function handleReset() {
   }
 
   try {
-    const { sendReset } = await withTimeout(
-      loadAuthModule({ allowRetryIfStale: true }),
-      AUTH_ACTION_TIMEOUT_MS,
-      "Kimlik modülü"
-    );
-    await withTimeout(
-      sendReset(email),
-      AUTH_ACTION_TIMEOUT_MS,
-      "Şifre sıfırlama işlemi"
-    );
+    const { sendReset } = await loadAuthModule({ allowRetryIfStale: true });
+    await sendReset(email);
 
     setStatus(
       "Şifre sıfırlama maili gönderildi. Gelen kutusunu ve spam klasörünü kontrol et.",
@@ -499,29 +431,16 @@ async function initAuthWatcher() {
     const { watchAuth } = await loadAuthModule();
 
     watchAuth(async (user) => {
-      try {
-        if (user) {
-          await routeAfterLogin(user, {
-            message: "Oturumunuz açılıyor...",
-            delay: false,
-            keepExistingMobileSplash: true
-          });
-          return;
-        }
-
-        revealLoginScreen();
-      } catch (error) {
-        console.error("Oturum yönlendirme hatası:", error);
-        isRouting = false;
-        clearAppStartupSplash();
-        revealLoginScreen();
-        setStatus(
-          isNetworkLikeError(error) || !hasInternetConnection()
-            ? "Lütfen internet bağlantınızı kontrol edin."
-            : `Oturum yönlendirme hatası: ${error.message}`,
-          isNetworkLikeError(error) || !hasInternetConnection() ? "offline" : "normal"
-        );
+      if (user) {
+        await routeAfterLogin(user, {
+          message: "Oturumunuz açılıyor...",
+          delay: false,
+          keepExistingMobileSplash: true
+        });
+        return;
       }
+
+      revealLoginScreen();
     });
   } catch {
     revealLoginScreen();
@@ -564,10 +483,10 @@ function init() {
   // Bu emniyet sadece donmayı önler; cevap zamanında gelirse hiçbir görsel ara geçiş üretmez.
   bootFallbackTimer = window.setTimeout(() => {
     if (bootResolved || isRouting) return;
-
-    // Profesyonel mobil akış: oturum kontrolü gecikirse kullanıcı splash'te bekletilmez.
-    // Giriş arayüzü açılır; Firebase auth cevabı arkada gelirse watchAuth yine otomatik yönlendirir.
     revealLoginScreen();
+    if (!hasInternetConnection()) {
+      setOfflineStatus();
+    }
   }, AUTH_BOOT_TIMEOUT_MS);
 
   window.addEventListener("offline", () => {
