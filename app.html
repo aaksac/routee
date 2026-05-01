@@ -31,7 +31,7 @@
   <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png" />
   <link rel="apple-touch-icon" sizes="180x180" href="./icons/apple-touch-icon.png" />
   <link rel="manifest" href="./manifest.webmanifest" />
-  <link rel="preload" as="image" href="./icons/splash-1170x2532.png" media="(max-width: 720px), (hover: none) and (pointer: coarse)" />
+  <link rel="preload" as="image" href="./icons/splash-1170x2532.png?v=2026.05.01-single-splash-map-ready" media="(max-width: 720px), (hover: none) and (pointer: coarse)" />
 
   <script type="module" src="./js/version-guard.js"></script>
   <script src="./js/status-bar.js"></script>
@@ -41,99 +41,30 @@
   <link rel="stylesheet" href="./css/auth.css" />
 
   <style id="routee-mobile-splash-image-css">
-    /* Sadece mobil açılış geçişi: masaüstü/web davranışına dokunmaz. */
-    @media (max-width: 720px), (hover: none) and (pointer: coarse) {
-      html.show-app-startup-splash,
-      html.show-app-startup-splash body,
-      body.routee-app-startup-active {
-        overflow: hidden !important;
-        background: #0f172a !important;
-      }
-
-      html.show-app-startup-splash #app,
-      body.routee-app-startup-active #app {
-        opacity: 0 !important;
-        visibility: hidden !important;
-        pointer-events: none !important;
-      }
-
-      html.show-app-startup-splash .new-map-mobile-fab,
-      body.routee-app-startup-active .new-map-mobile-fab {
-        display: none !important;
-        opacity: 0 !important;
-        visibility: hidden !important;
-        pointer-events: none !important;
-      }
-
-      .app-startup-splash {
-        position: fixed !important;
-        inset: 0 !important;
-        z-index: 2147483000 !important;
-        width: 100vw !important;
-        height: 100vh !important;
-        min-height: 100vh !important;
-        min-height: 100dvh !important;
-        display: grid !important;
-        place-items: center !important;
-        box-sizing: border-box !important;
-        padding: max(24px, env(safe-area-inset-top, 0px)) max(20px, env(safe-area-inset-right, 0px)) max(24px, env(safe-area-inset-bottom, 0px)) max(20px, env(safe-area-inset-left, 0px)) !important;
-        background: #0f172a url("./icons/splash-1170x2532.png") center center / cover no-repeat !important;
-        opacity: 0;
-        visibility: hidden;
-        pointer-events: none;
-      }
-
-      @supports (-webkit-touch-callout: none) {
-        .app-startup-splash {
-          min-height: -webkit-fill-available !important;
-        }
-      }
-
-      .show-app-startup-splash .app-startup-splash,
-      .app-startup-splash.is-visible {
-        opacity: 1 !important;
-        visibility: visible !important;
-        pointer-events: auto !important;
-      }
-
-      .app-startup-splash-image {
-        position: absolute !important;
-        inset: 0 !important;
-        width: 100% !important;
-        height: 100% !important;
-        object-fit: cover !important;
-        object-position: center center !important;
-        display: block !important;
-        z-index: 0 !important;
-        transform: translateZ(0);
-        -webkit-transform: translateZ(0);
-      }
-
-      .app-startup-splash > *:not(.app-startup-splash-image) {
-        position: relative;
-        z-index: 1;
-      }
-
-      .app-startup-splash .startup-splash-card {
-        display: none !important;
-      }
+    :root {
+      --routee-splash-bg: #0b1222;
+      --routee-splash-image: url("./icons/splash-1170x2532.png?v=20260501-single");
     }
 
+    html,
+    body {
+      margin: 0;
+      min-height: 100%;
+      background: var(--routee-splash-bg);
+    }
 
-    /* ROUTEE — MOBILE APP SINGLE SPLASH FINAL OVERRIDE
-       app.html tarafında mavi boş perde yok; aynı splash görseli tek katman olarak kalır. */
     @media (max-width: 720px), (hover: none) and (pointer: coarse) {
       html.show-app-startup-splash,
       html.show-app-startup-splash body,
       body.routee-app-startup-active {
-        width: 100% !important;
-        height: 100% !important;
-        min-height: 100svh !important;
-        min-height: 100dvh !important;
-        margin: 0 !important;
+        width: 100%;
+        height: 100%;
+        min-height: 100svh;
+        min-height: 100dvh;
+        margin: 0;
         overflow: hidden !important;
-        background: #0b1222 !important;
-        overscroll-behavior: none !important;
+        background: var(--routee-splash-bg) !important;
+        overscroll-behavior: none;
       }
 
       html.show-app-startup-splash #app,
@@ -145,38 +76,41 @@
         pointer-events: none !important;
       }
 
-      html.show-app-startup-splash .app-startup-splash,
-      body.routee-app-startup-active .app-startup-splash,
-      .app-startup-splash.is-visible {
+      .app-startup-splash {
         position: fixed !important;
         inset: 0 !important;
+        z-index: 2147483646 !important;
         width: 100vw !important;
         height: 100vh !important;
         height: 100svh !important;
         height: 100dvh !important;
         min-height: -webkit-fill-available !important;
-        padding: 0 !important;
         margin: 0 !important;
-        display: grid !important;
-        place-items: center !important;
+        padding: 0 !important;
+        display: block !important;
         overflow: hidden !important;
-        background-color: #0b1222 !important;
-        background-image: url("./icons/splash-1170x2532.png") !important;
+        background-color: var(--routee-splash-bg) !important;
+        background-image: var(--routee-splash-image) !important;
         background-position: center center !important;
-        background-size: cover !important;
+        background-size: contain !important;
         background-repeat: no-repeat !important;
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+        transform: translateZ(0);
+        -webkit-transform: translateZ(0);
+        backface-visibility: hidden;
+        -webkit-backface-visibility: hidden;
+      }
+
+      html.show-app-startup-splash .app-startup-splash,
+      body.routee-app-startup-active .app-startup-splash,
+      .app-startup-splash.is-visible {
         opacity: 1 !important;
         visibility: visible !important;
         pointer-events: auto !important;
-        z-index: 2147483646 !important;
-        transform: translateZ(0) !important;
-        -webkit-transform: translateZ(0) !important;
-        backface-visibility: hidden !important;
-        -webkit-backface-visibility: hidden !important;
       }
 
-      .app-startup-splash .app-startup-splash-image,
-      .app-startup-splash .startup-splash-card,
       .app-startup-splash > * {
         display: none !important;
       }
@@ -187,22 +121,7 @@
 
 </head>
 <body>
-  <div class="startup-splash app-startup-splash" id="appStartupSplash" aria-hidden="true">
-    <img class="app-startup-splash-image" src="./icons/splash-1170x2532.png" alt="" aria-hidden="true" decoding="async" />
-    <div class="startup-splash-card">
-      <div class="startup-splash-orb" aria-hidden="true"></div>
-      <div class="startup-splash-logo">
-        <img src="./icons/icon-192.png" alt="Rota Planlayıcı logosu" width="74" height="74" decoding="async" />
-      </div>
-      <div class="startup-splash-copy">
-        <strong>Rota</strong>
-        <span id="appStartupSplashText"></span>
-      </div>
-      <div class="startup-splash-loader" aria-hidden="true">
-        <span></span><span></span><span></span>
-      </div>
-    </div>
-  </div>
+  <div class="startup-splash app-startup-splash" id="appStartupSplash" aria-hidden="true"></div>
 
   <div id="app">
     <header class="topbar">
