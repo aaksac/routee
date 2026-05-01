@@ -259,8 +259,10 @@ async function routeAfterLogin(user, options = {}) {
     const splashTitle = isAdmin ? "Yönetim paneli açılıyor" : "Rota";
     const splashMessage = isAdmin
       ? "Yetkileriniz doğrulanıyor..."
-      : "Haritanız hazırlanıyor...";
+      : "Oturumunuz kontrol ediliyor...";
 
+    // iOS/PWA geçişinde metin uzunluğu değişince splash kartı yeniden layout alıp titreyebiliyor.
+    // Bu yüzden index.html üzerinde metni sabit tutuyor, app.html tarafına geçiş mesajını sessionStorage ile taşıyoruz.
     showStartupSplash(splashTitle, splashMessage);
 
     if (!isAdmin) {
