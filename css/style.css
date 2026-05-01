@@ -1922,3 +1922,35 @@ body.routee-statusbar-locked::before {
   }
 }
 
+
+/* =========================================================
+   ROUTEE — FINAL MOBILE SAFE-AREA BACKGROUND FIX
+   Uygulamaya girdikten sonra lacivert ton yalnızca üst sistem alanında kalır;
+   alt safe-area uygulama arka planıyla birleşir.
+   ========================================================= */
+@media (max-width: 720px), (hover: none) and (pointer: coarse) {
+  html.routee-statusbar-locked:not(.routee-mobile-splash-active):not(.routee-mobile-entry-splash):not(.routee-mobile-routing-splash):not(.show-app-startup-splash),
+  html.routee-statusbar-locked:not(.routee-mobile-splash-active):not(.routee-mobile-entry-splash):not(.routee-mobile-routing-splash):not(.show-app-startup-splash) body,
+  body.routee-statusbar-locked:not(.routee-mobile-splash-active):not(.routee-mobile-entry-splash):not(.routee-mobile-routing-splash):not(.routee-app-startup-active) {
+    background-color: var(--bg) !important;
+  }
+
+  html.routee-statusbar-locked:not(.routee-mobile-splash-active):not(.routee-mobile-entry-splash):not(.routee-mobile-routing-splash):not(.show-app-startup-splash)::before,
+  body.routee-statusbar-locked:not(.routee-mobile-splash-active):not(.routee-mobile-entry-splash):not(.routee-mobile-routing-splash):not(.routee-app-startup-active)::before,
+  .topbar::before {
+    display: block !important;
+    background: var(--routee-system-status-bg, #0f172a) !important;
+  }
+
+  body.routee-statusbar-locked #app {
+    background: var(--bg) !important;
+  }
+}
+
+@media all and (display-mode: standalone) {
+  html.routee-statusbar-locked:not(.routee-mobile-splash-active):not(.routee-mobile-entry-splash):not(.routee-mobile-routing-splash):not(.show-app-startup-splash),
+  html.routee-statusbar-locked:not(.routee-mobile-splash-active):not(.routee-mobile-entry-splash):not(.routee-mobile-routing-splash):not(.show-app-startup-splash) body,
+  body.routee-statusbar-locked:not(.routee-mobile-splash-active):not(.routee-mobile-entry-splash):not(.routee-mobile-routing-splash):not(.routee-app-startup-active) {
+    background-color: var(--bg) !important;
+  }
+}
