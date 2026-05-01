@@ -9,6 +9,60 @@
   --routee-splash-image: url("../icons/splash-1170x2532.png?v=20260501-pro-light");
 }
 
+/* =========================================================
+   ROUTEE — SPLASH IMAGE FOR ALL VERSIONS
+   Web/desktop ekranlarda boş lacivert perde yerine aynı splash görseli görünür.
+   Mobildeki tam ekran/safe-area davranışı aşağıdaki medya sorgularında ayrıca korunur.
+   ========================================================= */
+.startup-splash.is-visible,
+html.show-app-startup-splash .app-startup-splash,
+body.routee-app-startup-active .app-startup-splash,
+.app-startup-splash.is-visible {
+  position: fixed !important;
+  inset: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  min-height: 100vh !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  display: block !important;
+  overflow: hidden !important;
+  background-color: var(--routee-splash-bg, #0b1222) !important;
+  background-image: var(--routee-single-splash-image, var(--routee-splash-image)) !important;
+  background-position: center center !important;
+  background-size: contain !important;
+  background-repeat: no-repeat !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  pointer-events: auto !important;
+  z-index: 2147483646 !important;
+  transform: translateZ(0) !important;
+  -webkit-transform: translateZ(0) !important;
+  backface-visibility: hidden !important;
+  -webkit-backface-visibility: hidden !important;
+}
+
+html.show-app-startup-splash #app,
+body.routee-app-startup-active #app {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+.startup-splash > *,
+.app-startup-splash > *,
+.startup-splash-card,
+.app-startup-splash-image,
+.startup-splash-logo,
+.startup-splash-copy,
+.startup-splash-loader {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+
 @media (max-width: 720px), (hover: none) and (pointer: coarse) {
   html.routee-mobile-splash-active,
   html.routee-mobile-splash-active body,
