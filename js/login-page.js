@@ -477,9 +477,10 @@ function init() {
   setButtonsDisabled(true);
   initAuthWatcher();
 
-  bootFallbackTimer = window.setTimeout(() => {
-    revealLoginScreen();
-  }, AUTH_BOOT_TIMEOUT_MS);
+  // Oturum kontrolü bitmeden giriş ekranı açılmaz.
+  // Firebase oturum cevabı gecikirse eski zamanlayıcı giriş ekranını gösterip
+  // ardından otomatik oturuma geçerek kötü bir sıçrama oluşturuyordu.
+  bootFallbackTimer = null;
 
   window.addEventListener("offline", () => {
     if (!bootResolved && !isRouting) {
