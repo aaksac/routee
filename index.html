@@ -57,6 +57,197 @@
       @keyframes startupSplashPulse { 0%, 80%, 100% { opacity: .35; transform: scale(.82); } 40% { opacity: 1; transform: scale(1); } }
       @media (max-width: 640px) { .startup-splash-card { width: min(320px, calc(100vw - 40px)); min-height: 236px; padding: 24px 18px 22px; border-radius: 24px; } .startup-splash-logo { width: 72px; height: 72px; border-radius: 22px; } .startup-splash-copy strong { font-size: 1.08rem; } .startup-splash-copy span { font-size: .92rem; } }
     </style>
+    <style id="routee-locked-startup-handoff-css">
+
+/* =========================================================
+   ROUTEE — LOCKED STARTUP HANDOFF PATCH
+   iOS/PWA'da "Oturumunuz kontrol ediliyor" -> "Haritanız hazırlanıyor"
+   geçişindeki titreşimi önlemek için splash kartının bütün metriklerini sabitler.
+   ========================================================= */
+:root {
+  --routee-boot-card-width: min(360px, calc(100vw - 40px));
+  --routee-boot-card-height: 254px;
+  --routee-boot-logo-size: 82px;
+  --routee-boot-logo-radius: 26px;
+  --routee-boot-card-padding-y: 30px 24px 26px;
+}
+
+html.show-app-startup-splash,
+html.show-app-startup-splash body,
+body.auth-booting {
+  width: 100% !important;
+  min-width: 100% !important;
+  min-height: 100% !important;
+  background-color: #0f172a !important;
+  overflow: hidden !important;
+  overscroll-behavior: none !important;
+  -webkit-overflow-scrolling: auto !important;
+}
+
+.startup-splash,
+.app-startup-splash {
+  position: fixed !important;
+  inset: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  min-height: 100vh !important;
+  height: 100dvh !important;
+  min-height: 100dvh !important;
+  display: grid !important;
+  place-items: center !important;
+  justify-items: center !important;
+  align-items: center !important;
+  padding-top: max(24px, calc(var(--routee-startup-safe-top, env(safe-area-inset-top, 0px)) + 20px)) !important;
+  padding-right: max(20px, calc(var(--routee-startup-safe-right, env(safe-area-inset-right, 0px)) + 16px)) !important;
+  padding-bottom: max(24px, calc(var(--routee-startup-safe-bottom, env(safe-area-inset-bottom, 0px)) + 20px)) !important;
+  padding-left: max(20px, calc(var(--routee-startup-safe-left, env(safe-area-inset-left, 0px)) + 16px)) !important;
+  box-sizing: border-box !important;
+  overflow: clip !important;
+  transform: translate3d(0, 0, 0) !important;
+  -webkit-transform: translate3d(0, 0, 0) !important;
+  backface-visibility: hidden !important;
+  -webkit-backface-visibility: hidden !important;
+  contain: strict !important;
+}
+
+@supports not (overflow: clip) {
+  .startup-splash,
+  .app-startup-splash {
+    overflow: hidden !important;
+  }
+}
+
+@supports (-webkit-touch-callout: none) {
+  .startup-splash,
+  .app-startup-splash {
+    height: -webkit-fill-available !important;
+    min-height: -webkit-fill-available !important;
+  }
+}
+
+.startup-splash-card {
+  width: var(--routee-boot-card-width) !important;
+  min-width: 0 !important;
+  height: var(--routee-boot-card-height) !important;
+  min-height: var(--routee-boot-card-height) !important;
+  max-height: var(--routee-boot-card-height) !important;
+  display: grid !important;
+  grid-template-rows: var(--routee-boot-logo-size) 66px 14px !important;
+  align-content: center !important;
+  justify-items: center !important;
+  gap: 16px !important;
+  box-sizing: border-box !important;
+  padding: var(--routee-boot-card-padding-y) !important;
+  overflow: hidden !important;
+  transform: translate3d(0, 0, 0) !important;
+  -webkit-transform: translate3d(0, 0, 0) !important;
+  backface-visibility: hidden !important;
+  -webkit-backface-visibility: hidden !important;
+  contain: layout paint style !important;
+}
+
+.startup-splash-logo {
+  width: var(--routee-boot-logo-size) !important;
+  height: var(--routee-boot-logo-size) !important;
+  min-width: var(--routee-boot-logo-size) !important;
+  min-height: var(--routee-boot-logo-size) !important;
+  max-width: var(--routee-boot-logo-size) !important;
+  max-height: var(--routee-boot-logo-size) !important;
+  border-radius: var(--routee-boot-logo-radius) !important;
+  align-self: center !important;
+  justify-self: center !important;
+  flex: 0 0 var(--routee-boot-logo-size) !important;
+}
+
+.startup-splash-copy {
+  width: 100% !important;
+  height: 66px !important;
+  min-height: 66px !important;
+  max-height: 66px !important;
+  display: grid !important;
+  grid-template-rows: 24px 36px !important;
+  align-content: center !important;
+  justify-items: center !important;
+  gap: 6px !important;
+  overflow: hidden !important;
+}
+
+.startup-splash-copy strong {
+  display: block !important;
+  height: 24px !important;
+  min-height: 24px !important;
+  max-height: 24px !important;
+  line-height: 24px !important;
+  overflow: hidden !important;
+}
+
+.startup-splash-copy span {
+  width: 100% !important;
+  max-width: 100% !important;
+  height: 36px !important;
+  min-height: 36px !important;
+  max-height: 36px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  text-align: center !important;
+  line-height: 18px !important;
+  overflow: hidden !important;
+  white-space: normal !important;
+  text-wrap: balance;
+}
+
+.startup-splash-loader {
+  height: 14px !important;
+  min-height: 14px !important;
+  max-height: 14px !important;
+  align-self: center !important;
+}
+
+html.show-app-startup-splash *,
+body.auth-booting .login-page,
+body.auth-booting .auth-card {
+  scroll-behavior: auto !important;
+}
+
+@media (max-width: 640px) {
+  :root {
+    --routee-boot-card-width: min(320px, calc(100vw - 40px));
+    --routee-boot-card-height: 236px;
+    --routee-boot-logo-size: 72px;
+    --routee-boot-logo-radius: 22px;
+    --routee-boot-card-padding-y: 24px 18px 22px;
+  }
+
+  .startup-splash-card {
+    grid-template-rows: 72px 64px 14px !important;
+    gap: 15px !important;
+  }
+
+  .startup-splash-copy {
+    height: 64px !important;
+    min-height: 64px !important;
+    max-height: 64px !important;
+    grid-template-rows: 23px 35px !important;
+  }
+
+  .startup-splash-copy strong {
+    height: 23px !important;
+    min-height: 23px !important;
+    max-height: 23px !important;
+    line-height: 23px !important;
+  }
+
+  .startup-splash-copy span {
+    height: 35px !important;
+    min-height: 35px !important;
+    max-height: 35px !important;
+    line-height: 17.5px !important;
+  }
+}
+
+</style>
+
 
     <script type="module" src="./js/version-guard.js"></script>
   <script src="./js/status-bar.js"></script>
