@@ -296,11 +296,13 @@ async function routeAfterLogin(user, options = {}) {
 
     lockRouteTransition(splashTitle, splashMessage);
 
-    if (!isAdmin) {
-      setAppStartupSplash(splashMessage);
-    } else {
-      clearAppStartupSplash();
-    }
+    /*
+      Önemli:
+      app.html tarafındaki ikinci splash'i başlatmıyoruz.
+      Böylece “Haritanız hazırlanıyor...” ekranı iki defa çizilmez
+      ve tek seferlik kesiklik oluşmaz.
+    */
+    clearAppStartupSplash();
 
     const shouldDelay = options.delay !== false;
 
