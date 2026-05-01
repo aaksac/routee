@@ -259,7 +259,7 @@ async function routeAfterLogin(user, options = {}) {
     const splashTitle = isAdmin ? "Yönetim paneli açılıyor" : "Rota";
     const splashMessage = isAdmin
       ? "Yetkileriniz doğrulanıyor..."
-      : options.message || "Oturumunuz açılıyor...";
+      : "Haritanız hazırlanıyor...";
 
     showStartupSplash(splashTitle, splashMessage);
 
