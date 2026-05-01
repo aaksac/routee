@@ -304,7 +304,9 @@ async function closeAppStartupSplash(splashState) {
     await wait(remaining);
   }
 
-  await waitForStablePaint();
+  document.documentElement.classList.add("routee-app-reveal-lock");
+  document.body.classList.add("routee-app-reveal-lock");
+  elements.topbar?.classList.remove("is-hidden-on-scroll");
 
   try {
     window.scrollTo(0, 0);
@@ -316,9 +318,22 @@ async function closeAppStartupSplash(splashState) {
 
   await waitForStablePaint();
 
+  try {
+    window.dispatchEvent(new Event("resize"));
+  } catch (error) {
+    // Resize bildirimi desteklenmezse akış bozulmasın.
+  }
+
+  await waitForStablePaint();
+
+  document.documentElement.classList.remove("show-app-startup-splash");
   elements.appStartupSplash.classList.remove("is-visible");
   elements.appStartupSplash.setAttribute("aria-hidden", "true");
-  document.documentElement.classList.remove("show-app-startup-splash");
+
+  await waitForStablePaint();
+
+  document.documentElement.classList.remove("routee-app-reveal-lock");
+  document.body.classList.remove("routee-app-reveal-lock");
   clearAppStartupSplashSession();
 }
 
