@@ -71,7 +71,7 @@
     background-color: var(--routee-splash-bg) !important;
     background-image: var(--routee-splash-image) !important;
     background-position: center center !important;
-    background-size: cover !important;
+    background-size: 100% 100% !important;
     background-repeat: no-repeat !important;
     opacity: 1 !important;
     visibility: visible !important;
@@ -94,5 +94,52 @@
     visibility: hidden !important;
     opacity: 0 !important;
     pointer-events: none !important;
+  }
+}
+
+/* =========================================================
+   ROUTEE — FINAL MOBILE SPLASH FULL-FRAME FIX
+   Mobil splash görseli safe-area örtüsüne takılmadan ekranın tamamına yayılır.
+   Üst/alt kırpılmayı engellemek için görsel kırpma yerine tam çerçeveye oturtulur.
+   ========================================================= */
+@media (max-width: 720px), (hover: none) and (pointer: coarse) {
+  html.routee-mobile-splash-active::before,
+  body.routee-mobile-splash-active::before,
+  html.routee-mobile-entry-splash::before,
+  body.routee-mobile-entry-splash::before,
+  html.routee-mobile-routing-splash::before,
+  body.routee-mobile-routing-splash::before,
+  html.show-app-startup-splash::before,
+  body.routee-app-startup-active::before {
+    display: none !important;
+    content: none !important;
+  }
+
+  html.routee-mobile-splash-active .startup-splash,
+  body.routee-mobile-splash-active .startup-splash,
+  html.routee-mobile-entry-splash .startup-splash,
+  body.routee-mobile-entry-splash .startup-splash,
+  html.routee-mobile-routing-splash .startup-splash,
+  body.routee-mobile-routing-splash .startup-splash,
+  html.show-app-startup-splash .app-startup-splash,
+  body.routee-app-startup-active .app-startup-splash,
+  .startup-splash.is-visible,
+  .app-startup-splash.is-visible {
+    inset: 0 !important;
+    top: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    height: 100svh !important;
+    height: 100dvh !important;
+    min-height: -webkit-fill-available !important;
+    padding: 0 !important;
+    background-color: var(--routee-splash-bg, #0b1222) !important;
+    background-image: var(--routee-single-splash-image, var(--routee-splash-image)) !important;
+    background-position: center center !important;
+    background-size: 100% 100% !important;
+    background-repeat: no-repeat !important;
   }
 }
