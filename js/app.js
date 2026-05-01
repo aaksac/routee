@@ -145,6 +145,7 @@ const GOOGLE_MAPS_BOOT_TIMEOUT_MS = 12000;
 let mapFeaturesInitialized = false;
 let mapsBootPromise = null;
 const APP_STARTUP_SPLASH_MIN_MS = 650;
+const APP_STARTUP_REVEAL_MS = 520;
 
 function wait(ms) {
   return new Promise((resolve) => window.setTimeout(resolve, ms));
@@ -308,8 +309,8 @@ async function closeAppStartupSplash(splashState) {
     await wait(remaining);
   }
 
-  document.documentElement.classList.add("routee-app-reveal-lock");
-  document.body.classList.add("routee-app-reveal-lock");
+  document.documentElement.classList.add("routee-app-reveal-lock", "routee-app-ready-to-reveal");
+  document.body.classList.add("routee-app-reveal-lock", "routee-app-ready-to-reveal");
   elements.topbar?.classList.remove("is-hidden-on-scroll");
 
   try {
@@ -330,9 +331,23 @@ async function closeAppStartupSplash(splashState) {
 
   await waitForStablePaint();
 
-  document.documentElement.classList.remove("show-app-startup-splash");
-  document.body?.classList.remove("routee-startup-active");
-  elements.appStartupSplash.classList.remove("is-visible");
+  document.documentElement.classList.add("routee-startup-fading-out");
+  document.body.classList.add("routee-startup-fading-out");
+  elements.appStartupSplash.classList.add("is-leaving");
+
+  await wait(APP_STARTUP_REVEAL_MS);
+
+  document.documentElement.classList.remove(
+    "show-app-startup-splash",
+    "routee-startup-fading-out",
+    "routee-app-ready-to-reveal"
+  );
+  document.body?.classList.remove(
+    "routee-startup-active",
+    "routee-startup-fading-out",
+    "routee-app-ready-to-reveal"
+  );
+  elements.appStartupSplash.classList.remove("is-visible", "is-leaving");
   elements.appStartupSplash.setAttribute("aria-hidden", "true");
 
   await waitForStablePaint();
