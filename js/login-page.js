@@ -182,10 +182,10 @@ function revealLoginScreen() {
   setStatus(initialStatus.message, initialStatus.type);
 }
 
-function setAppStartupSplash(message = "Haritanız hazırlanıyor...") {
+function setAppStartupSplash() {
   try {
     sessionStorage.setItem("routeeStartupSplash", "1");
-    sessionStorage.setItem("routeeStartupSplashText", message);
+    sessionStorage.removeItem("routeeStartupSplashText");
     sessionStorage.setItem("routeeStartupSplashAt", String(Date.now()));
   } catch (error) {
     console.warn("Startup splash session yazımı başarısız:", error);
@@ -300,12 +300,12 @@ async function routeAfterLogin(user, options = {}) {
     const splashTitle = isAdmin ? "Yönetim paneli açılıyor" : "Rota";
     const splashMessage = isAdmin
       ? "Yetkileriniz doğrulanıyor..."
-      : options.message || "Oturumunuz açılıyor...";
+      : "Oturumunuz açılıyor...";
 
     showStartupSplash(splashTitle, splashMessage, { phase: "routing" });
 
     if (!isAdmin) {
-      setAppStartupSplash("Haritanız hazırlanıyor...");
+      setAppStartupSplash();
     } else {
       clearAppStartupSplash();
     }
@@ -335,7 +335,6 @@ async function handleLogin() {
   }
 
   setButtonsDisabled(true);
-  setStatus("Giriş yapılıyor...", "normal");
 
   if (!hasInternetConnection()) {
     setButtonsDisabled(false);
@@ -343,16 +342,20 @@ async function handleLogin() {
     return;
   }
 
+  showStartupSplash("Rota", "Oturumunuz açılıyor...", { phase: "routing" });
+
   try {
     const { login } = await loadAuthModule({ allowRetryIfStale: true });
     const result = await login(email, password);
 
-    showStartupSplash("Rota", "Girişiniz doğrulanıyor...", { phase: "routing" });
     await routeAfterLogin(result.user, {
-      message: "Girişiniz doğrulanıyor..."
+      message: "Oturumunuz açılıyor..."
     });
   } catch (error) {
+    isRouting = false;
     setButtonsDisabled(false);
+    hideStartupSplash();
+    document.body.classList.remove("auth-booting");
 
     if (isNetworkLikeError(error) || !hasInternetConnection()) {
       setOfflineStatus();
