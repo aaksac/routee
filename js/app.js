@@ -37,6 +37,8 @@ import {
   convertImportedRowsToState
 } from "./import-export.js";
 
+window.__routeeAppModuleReady = true;
+
 const state = {
   tripPanelOpen: true,
   activeFloatingPanel: null,
@@ -59,6 +61,7 @@ const state = {
   lastScrollY: 0,
   appStartupSplash: null,
   appStartupRevealTimer: null,
+  appStartupMapGraceTimer: null,
   appAuthReadyForReveal: false,
   appMapReadyForReveal: false,
   selectedPointColor: "#dc2626",
@@ -254,6 +257,11 @@ function goToLogin() {
 function hydrateAppStartupSplash() {
   if (!elements.appStartupSplash) return null;
 
+  if (window.__routeeAppSplashHardReleased === true) {
+    clearAppStartupSplashSession();
+    return null;
+  }
+
   try {
     const hasSessionSplash = sessionStorage.getItem("routeeStartupSplash") === "1";
     const shouldUseMobileSplash = hasSessionSplash || isMobileStartupMode();
@@ -310,6 +318,12 @@ async function closeAppStartupSplash(splashState) {
     state.appStartupRevealTimer = null;
   }
 
+  if (state.appStartupMapGraceTimer) {
+    window.clearTimeout(state.appStartupMapGraceTimer);
+    state.appStartupMapGraceTimer = null;
+  }
+
+  window.__routeeAppSplashResolved = true;
   elements.appStartupSplash.classList.remove("is-visible");
   elements.appStartupSplash.setAttribute("aria-hidden", "true");
   document.documentElement.classList.remove("show-app-startup-splash", "routee-mobile-splash-active", "routee-mobile-splash-image", "routee-mobile-splash-message");
@@ -320,7 +334,22 @@ async function closeAppStartupSplash(splashState) {
 async function closeAppStartupSplashWhenReady() {
   if (!state.appStartupSplash) return;
   if (!isMobileStartupMode()) return;
-  if (!state.appAuthReadyForReveal || !state.appMapReadyForReveal) return;
+  if (!state.appAuthReadyForReveal) return;
+
+  const elapsed = Date.now() - Number(state.appStartupSplash.startedAt || Date.now());
+
+  // Splash artık Google Maps cevabına süresiz bağlı değil.
+  // Auth tamamlandıysa ve harita hâlâ gecikiyorsa kullanıcı uygulama arayüzünü görür;
+  // harita yükleme/bağlantı uyarısı status alanında devam eder.
+  if (!state.appMapReadyForReveal && elapsed < 1800) {
+    if (!state.appStartupMapGraceTimer) {
+      state.appStartupMapGraceTimer = window.setTimeout(() => {
+        state.appStartupMapGraceTimer = null;
+        void closeAppStartupSplashWhenReady();
+      }, Math.max(0, 1800 - elapsed));
+    }
+    return;
+  }
 
   await closeAppStartupSplash(state.appStartupSplash);
   state.appStartupSplash = null;
