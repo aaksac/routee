@@ -58,7 +58,8 @@ const state = {
   mapQuota: 1,
   lastScrollY: 0,
   appStartupSplash: null,
-  mapFeaturesReadyPromise: null,
+  appAuthReadyForReveal: false,
+  appMapReadyForReveal: false,
   selectedPointColor: "#dc2626",
   noteEditorTarget: null
 };
@@ -144,19 +145,20 @@ const DEFAULT_POINT_COLOR = "#dc2626";
 const GOOGLE_MAPS_BOOT_TIMEOUT_MS = 12000;
 let mapFeaturesInitialized = false;
 let mapsBootPromise = null;
-const APP_STARTUP_SPLASH_MIN_MS = 650;
-const APP_STARTUP_REVEAL_MS = 520;
+const MOBILE_STARTUP_QUERY = "(max-width: 720px), (hover: none) and (pointer: coarse)";
 
-function wait(ms) {
-  return new Promise((resolve) => window.setTimeout(resolve, ms));
-}
+function isMobileStartupMode() {
+  try {
+    if (window.matchMedia && window.matchMedia(MOBILE_STARTUP_QUERY).matches) {
+      return true;
+    }
+  } catch (error) {
+    // Mobil tespit desteklenmezse normal masaüstü akışı korunur.
+  }
 
-function waitForStablePaint() {
-  return new Promise((resolve) => {
-    window.requestAnimationFrame(() => {
-      window.requestAnimationFrame(resolve);
-    });
-  });
+  return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+    window.navigator.userAgent || ""
+  );
 }
 
 function areGoogleMapsLibrariesReady() {
@@ -229,28 +231,17 @@ function waitForGoogleMaps() {
 }
 
 async function bootstrapMapFeatures() {
-  if (initializeMapFeatures()) {
-    await waitForStablePaint();
-    return true;
-  }
-
-  if (elements.appStartupSplashText && state.appStartupSplash) {
-    elements.appStartupSplashText.textContent = "Haritanız hazırlanıyor...";
-  }
+  if (initializeMapFeatures()) return;
 
   elements.authStatus.textContent = "Harita servisi yükleniyor...";
 
   try {
     await waitForGoogleMaps();
-    const initialized = initializeMapFeatures();
-    await waitForStablePaint();
-    return initialized;
+    initializeMapFeatures();
   } catch (error) {
     console.warn(error);
     elements.authStatus.textContent =
       "Harita servisine bağlanılamadı. İnternet bağlantınızı kontrol edip sayfayı yenileyin.";
-    await waitForStablePaint();
-    return false;
   }
 }
 
@@ -262,26 +253,40 @@ function hydrateAppStartupSplash() {
   if (!elements.appStartupSplash) return null;
 
   try {
-    if (sessionStorage.getItem("routeeStartupSplash") !== "1") {
-      document.body?.classList.remove("routee-startup-active");
+    const hasSessionSplash = sessionStorage.getItem("routeeStartupSplash") === "1";
+    const shouldUseMobileSplash = hasSessionSplash || isMobileStartupMode();
+
+    if (!shouldUseMobileSplash) {
       return null;
     }
 
     document.documentElement.classList.add("show-app-startup-splash");
-    document.body?.classList.add("routee-startup-active");
+    document.body?.classList.add("routee-app-startup-active");
 
-    const message = sessionStorage.getItem("routeeStartupSplashText");
+    const message =
+      sessionStorage.getItem("routeeStartupSplashText") ||
+      "Haritanız yükleniyor...";
     const startedAt = Number(sessionStorage.getItem("routeeStartupSplashAt")) || Date.now();
 
-    if (message && elements.appStartupSplashText) {
+    if (elements.appStartupSplashText) {
       elements.appStartupSplashText.textContent = message;
     }
 
+    elements.appStartupSplash.classList.add("is-visible");
     elements.appStartupSplash.setAttribute("aria-hidden", "false");
     return { startedAt };
   } catch (error) {
     console.warn("Startup splash verisi okunamadı:", error);
-    return { startedAt: Date.now() };
+
+    if (isMobileStartupMode()) {
+      document.documentElement.classList.add("show-app-startup-splash");
+      document.body?.classList.add("routee-app-startup-active");
+      elements.appStartupSplash.classList.add("is-visible");
+      elements.appStartupSplash.setAttribute("aria-hidden", "false");
+      return { startedAt: Date.now() };
+    }
+
+    return null;
   }
 }
 
@@ -301,60 +306,20 @@ async function closeAppStartupSplash(splashState) {
     return;
   }
 
-  const startedAt = Number(splashState.startedAt) || Date.now();
-  const elapsed = Date.now() - startedAt;
-  const remaining = Math.max(0, APP_STARTUP_SPLASH_MIN_MS - elapsed);
-
-  if (remaining > 0) {
-    await wait(remaining);
-  }
-
-  document.documentElement.classList.add("routee-app-reveal-lock", "routee-app-ready-to-reveal");
-  document.body.classList.add("routee-app-reveal-lock", "routee-app-ready-to-reveal");
-  elements.topbar?.classList.remove("is-hidden-on-scroll");
-
-  try {
-    window.scrollTo(0, 0);
-    document.documentElement.scrollTop = 0;
-    document.body.scrollTop = 0;
-  } catch (error) {
-    // Kaydırma sıfırlama görsel stabilite içindir; hata verirse uygulama akışı kesilmez.
-  }
-
-  await waitForStablePaint();
-
-  try {
-    window.dispatchEvent(new Event("resize"));
-  } catch (error) {
-    // Resize bildirimi desteklenmezse akış bozulmasın.
-  }
-
-  await waitForStablePaint();
-
-  document.documentElement.classList.add("routee-startup-fading-out");
-  document.body.classList.add("routee-startup-fading-out");
-  elements.appStartupSplash.classList.add("is-leaving");
-
-  await wait(APP_STARTUP_REVEAL_MS);
-
-  document.documentElement.classList.remove(
-    "show-app-startup-splash",
-    "routee-startup-fading-out",
-    "routee-app-ready-to-reveal"
-  );
-  document.body?.classList.remove(
-    "routee-startup-active",
-    "routee-startup-fading-out",
-    "routee-app-ready-to-reveal"
-  );
-  elements.appStartupSplash.classList.remove("is-visible", "is-leaving");
+  elements.appStartupSplash.classList.remove("is-visible");
   elements.appStartupSplash.setAttribute("aria-hidden", "true");
-
-  await waitForStablePaint();
-
-  document.documentElement.classList.remove("routee-app-reveal-lock");
-  document.body.classList.remove("routee-app-reveal-lock");
+  document.documentElement.classList.remove("show-app-startup-splash");
+  document.body?.classList.remove("routee-app-startup-active");
   clearAppStartupSplashSession();
+}
+
+async function closeAppStartupSplashWhenReady() {
+  if (!state.appStartupSplash) return;
+  if (!isMobileStartupMode()) return;
+  if (!state.appAuthReadyForReveal || !state.appMapReadyForReveal) return;
+
+  await closeAppStartupSplash(state.appStartupSplash);
+  state.appStartupSplash = null;
 }
 
 function formatKm(value) {
@@ -2699,18 +2664,16 @@ function initAuthWatcher() {
 
     try {
       if (user) {
+        if (!isMobileStartupMode()) {
+          await closeAppStartupSplash(state.appStartupSplash);
+          state.appStartupSplash = null;
+        }
+
         elements.authStatus.textContent = `Aktif kullanıcı: ${user.email}`;
 
         await ensureUserProfile(user.uid, user.email);
         await loadAccessModel(user);
         elements.authStatus.textContent = `Aktif kullanıcı: ${user.email} · ${getAccessStatusText()}`;
-
-        if (state.mapFeaturesReadyPromise) {
-          await state.mapFeaturesReadyPromise;
-        }
-
-        await closeAppStartupSplash(state.appStartupSplash);
-        state.appStartupSplash = null;
 
         const loadMapsTask = async () => {
           try {
@@ -2719,6 +2682,9 @@ function initAuthWatcher() {
             console.warn("Harita listesi yüklenemedi:", error);
           }
         };
+
+        state.appAuthReadyForReveal = true;
+        await closeAppStartupSplashWhenReady();
 
         if ("requestIdleCallback" in window) {
           window.requestIdleCallback(() => {
@@ -2752,10 +2718,10 @@ function init() {
   initMobileTopbarAutoHide();
   initAuthWatcher();
 
-  state.mapFeaturesReadyPromise = new Promise((resolve) => {
-    window.requestAnimationFrame(() => {
-      resolve(bootstrapMapFeatures());
-    });
+  window.requestAnimationFrame(async () => {
+    await bootstrapMapFeatures();
+    state.appMapReadyForReveal = true;
+    await closeAppStartupSplashWhenReady();
   });
 }
 
