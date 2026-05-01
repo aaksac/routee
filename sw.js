@@ -11,6 +11,7 @@ const APP_SHELL = [
   "./css/style.css",
   "./css/mobile.css",
   "./css/auth.css",
+  "./css/splash.css",
   "./js/firebase-config.js",
   "./js/auth.js",
   "./js/firestore.js",
