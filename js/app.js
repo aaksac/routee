@@ -262,8 +262,12 @@ function hydrateAppStartupSplash() {
 
   try {
     if (sessionStorage.getItem("routeeStartupSplash") !== "1") {
+      document.body?.classList.remove("routee-startup-active");
       return null;
     }
+
+    document.documentElement.classList.add("show-app-startup-splash");
+    document.body?.classList.add("routee-startup-active");
 
     const message = sessionStorage.getItem("routeeStartupSplashText");
     const startedAt = Number(sessionStorage.getItem("routeeStartupSplashAt")) || Date.now();
@@ -327,6 +331,7 @@ async function closeAppStartupSplash(splashState) {
   await waitForStablePaint();
 
   document.documentElement.classList.remove("show-app-startup-splash");
+  document.body?.classList.remove("routee-startup-active");
   elements.appStartupSplash.classList.remove("is-visible");
   elements.appStartupSplash.setAttribute("aria-hidden", "true");
 
