@@ -2693,7 +2693,10 @@ function initAuthWatcher() {
           }, 0);
         }
       } else {
-        if (isMobileStartupMode() && state.appStartupSplash) {
+        // Mobilde doğrudan app.html açılıp oturum yoksa splash kapanmadan girişe dön.
+        // Böylece uygulama arayüzü veya boş mavi perde bir an bile görünmez.
+        if (isMobileStartupMode()) {
+          clearAppStartupSplashSession();
           goToLogin();
           return;
         }
