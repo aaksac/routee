@@ -282,8 +282,12 @@ async function routeAfterLogin(user, options = {}) {
 
   isRouting = true;
 
-  const firstSplashMessage = options.message || "Haritanız hazırlanıyor...";
-  lockRouteTransition("Rota", firstSplashMessage);
+  /*
+    Normal kullanıcı için tek ve sabit mesaj kullanıyoruz.
+    Böylece "Girişiniz doğrulanıyor" → "Haritanız hazırlanıyor"
+    arasında kart/metin yeniden hizalanması olmaz.
+  */
+  lockRouteTransition("Rota", "Haritanız hazırlanıyor...");
 
   try {
     const { getUserClaims } = await loadAuthModule({ allowRetryIfStale: true });
@@ -291,21 +295,11 @@ async function routeAfterLogin(user, options = {}) {
     const isAdmin = claims.adminPanel === true;
     const targetUrl = isAdmin ? "./chooser.html" : "./app.html";
 
-    const splashTitle = isAdmin ? "Yönetim paneli açılıyor" : "Rota";
-    const splashMessage = isAdmin ? "Yetkileriniz doğrulanıyor..." : "Haritanız hazırlanıyor...";
-
-    lockRouteTransition(splashTitle, splashMessage);
-
-    /*
-      Önemli:
-      app.html tarafındaki ikinci splash'i başlatmıyoruz.
-      Böylece “Haritanız hazırlanıyor...” ekranı iki defa çizilmez
-      ve tek seferlik kesiklik oluşmaz.
-    */
-    if (!isAdmin) {
-      setAppStartupSplash(splashMessage);
-    } else {
+    if (isAdmin) {
+      showStartupSplash("Yönetim paneli açılıyor", "Yetkileriniz doğrulanıyor...");
       clearAppStartupSplash();
+    } else {
+      setAppStartupSplash("Haritanız hazırlanıyor...");
     }
 
     const shouldDelay = options.delay !== false;
