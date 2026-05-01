@@ -263,13 +263,10 @@ function hydrateAppStartupSplash() {
     document.documentElement.classList.add("show-app-startup-splash");
     document.body?.classList.add("routee-app-startup-active");
 
-    const message =
-      sessionStorage.getItem("routeeStartupSplashText") ||
-      "Haritanız hazırlanıyor...";
     const startedAt = Number(sessionStorage.getItem("routeeStartupSplashAt")) || Date.now();
 
     if (elements.appStartupSplashText) {
-      elements.appStartupSplashText.textContent = message;
+      elements.appStartupSplashText.textContent = "";
     }
 
     elements.appStartupSplash.classList.add("is-visible");
