@@ -58,6 +58,7 @@ const state = {
   mapQuota: 1,
   lastScrollY: 0,
   appStartupSplash: null,
+  mapFeaturesReadyPromise: null,
   selectedPointColor: "#dc2626",
   noteEditorTarget: null
 };
@@ -227,17 +228,28 @@ function waitForGoogleMaps() {
 }
 
 async function bootstrapMapFeatures() {
-  if (initializeMapFeatures()) return;
+  if (initializeMapFeatures()) {
+    await waitForStablePaint();
+    return true;
+  }
+
+  if (elements.appStartupSplashText && state.appStartupSplash) {
+    elements.appStartupSplashText.textContent = "Haritanız hazırlanıyor...";
+  }
 
   elements.authStatus.textContent = "Harita servisi yükleniyor...";
 
   try {
     await waitForGoogleMaps();
-    initializeMapFeatures();
+    const initialized = initializeMapFeatures();
+    await waitForStablePaint();
+    return initialized;
   } catch (error) {
     console.warn(error);
     elements.authStatus.textContent =
       "Harita servisine bağlanılamadı. İnternet bağlantınızı kontrol edip sayfayı yenileyin.";
+    await waitForStablePaint();
+    return false;
   }
 }
 
@@ -2642,14 +2654,18 @@ function initAuthWatcher() {
 
     try {
       if (user) {
-        await closeAppStartupSplash(state.appStartupSplash);
-        state.appStartupSplash = null;
-
         elements.authStatus.textContent = `Aktif kullanıcı: ${user.email}`;
 
         await ensureUserProfile(user.uid, user.email);
         await loadAccessModel(user);
         elements.authStatus.textContent = `Aktif kullanıcı: ${user.email} · ${getAccessStatusText()}`;
+
+        if (state.mapFeaturesReadyPromise) {
+          await state.mapFeaturesReadyPromise;
+        }
+
+        await closeAppStartupSplash(state.appStartupSplash);
+        state.appStartupSplash = null;
 
         const loadMapsTask = async () => {
           try {
@@ -2691,8 +2707,10 @@ function init() {
   initMobileTopbarAutoHide();
   initAuthWatcher();
 
-  window.requestAnimationFrame(() => {
-    bootstrapMapFeatures();
+  state.mapFeaturesReadyPromise = new Promise((resolve) => {
+    window.requestAnimationFrame(() => {
+      resolve(bootstrapMapFeatures());
+    });
   });
 }
 
