@@ -41,6 +41,18 @@
       visibility: hidden !important;
       pointer-events: none !important;
     }
+    /* Splash açıkken #app dışında duran mobil FAB butonları görünmemeli.
+       Yeni Harita mobil FAB, HTML'de #app dışında olduğu için #app gizlense bile
+       z-index nedeniyle splash üstünde görünebiliyordu. */
+    html.show-app-startup-splash .new-map-mobile-fab,
+    html.show-app-startup-splash .new-map-inline-btn,
+    body.routee-startup-active .new-map-mobile-fab,
+    body.routee-startup-active .new-map-inline-btn {
+      display: none !important;
+      opacity: 0 !important;
+      visibility: hidden !important;
+      pointer-events: none !important;
+    }
     .app-startup-splash {
       position: fixed !important;
       top: 0 !important;
