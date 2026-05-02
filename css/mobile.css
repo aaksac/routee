@@ -199,8 +199,8 @@
   }
 
   body.has-mobile-floating-panel .new-map-mobile-fab {
-    opacity: 0;
-    visibility: hidden;
+    opacity: 1;
+    visibility: visible;
     pointer-events: none;
     filter: blur(4px);
   }
