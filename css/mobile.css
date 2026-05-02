@@ -1664,6 +1664,7 @@
     --routee-safe-right: env(safe-area-inset-right, 0px);
     --routee-safe-bottom: env(safe-area-inset-bottom, 0px);
     --routee-safe-left: env(safe-area-inset-left, 0px);
+    --routee-mobile-fab-viewport-bottom: 0px;
     --routee-mobile-page-x: max(12px, var(--routee-safe-left));
     --routee-mobile-page-r: max(12px, var(--routee-safe-right));
   }
@@ -1903,14 +1904,14 @@
   }
 
   .new-map-mobile-fab {
-    right: max(16px, calc(var(--routee-safe-right) + 12px)) !important;
+    right: max(14px, calc(var(--routee-safe-right) + 12px)) !important;
     /*
-      Mobil Safari/Chrome ilk açılışta tarayıcı alt çubuğunu ve safe-area değerini
-      farklı hesaplayabiliyor. Bu butonda safe-area tabanlı bottom kullanılırsa ilk
-      yüklemede yukarıda başlıyor, harita/listeler etkileşiminden sonra yeniden
-      hesaplanıp aşağı iniyordu. Konumu stabil tutmak için FAB alt boşluğu sabittir.
+      FAB ilk açılışta daha aşağı ve doğal dursun; mobil tarayıcının alt çerçevesi
+      görünüp kaybolduğunda visualViewport farkı kadar telafi edilerek butonun
+      ekrandaki hissedilen konumu sabit kalır.
     */
-    bottom: 24px !important;
+    bottom: calc(12px + var(--routee-mobile-fab-viewport-bottom, 0px)) !important;
+    z-index: 1200 !important;
   }
 }
 
@@ -2101,13 +2102,18 @@
     background: var(--bg, #f4f7fb) !important;
     background-color: var(--bg, #f4f7fb) !important;
     pointer-events: none !important;
-    z-index: 2147483000 !important;
+    z-index: 1100 !important;
   }
 
   @supports (bottom: constant(safe-area-inset-bottom)) {
     body:not(.routee-splash-active)::after {
       height: max(constant(safe-area-inset-bottom), 18px) !important;
     }
+  }
+
+  body.has-mobile-floating-panel::after,
+  body.has-screen-overlay::after {
+    z-index: 50 !important;
   }
 }
 
