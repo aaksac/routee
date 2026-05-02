@@ -19,11 +19,41 @@
           return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(window.navigator.userAgent || "");
         }
 
+        var lockedSplashHeight = 0;
+        function syncSplashHeight() {
+          try {
+            var root = document.documentElement;
+            var viewport = window.visualViewport;
+            var values = [
+              window.innerHeight || 0,
+              root.clientHeight || 0,
+              viewport && viewport.height ? viewport.height : 0,
+              window.screen && window.screen.height ? window.screen.height : 0
+            ];
+            var nextHeight = Math.ceil(Math.max.apply(Math, values));
+            if (nextHeight > lockedSplashHeight) {
+              lockedSplashHeight = nextHeight;
+            }
+            if (lockedSplashHeight > 0) {
+              root.style.setProperty("--routee-splash-height", lockedSplashHeight + "px");
+            }
+          } catch (error) {}
+        }
+
         try {
           var isMobile = isMobileLike();
           document.documentElement.classList.add(isMobile ? "routee-mobile-boot" : "routee-desktop-boot");
           if (isMobile) {
+            syncSplashHeight();
             document.documentElement.classList.add("routee-splash-active", "routee-splash-image");
+            window.addEventListener("resize", syncSplashHeight, { passive: true });
+            window.addEventListener("orientationchange", function () {
+              lockedSplashHeight = 0;
+              window.setTimeout(syncSplashHeight, 80);
+            }, { passive: true });
+            if (window.visualViewport) {
+              window.visualViewport.addEventListener("resize", syncSplashHeight, { passive: true });
+            }
           }
         } catch (error) {}
       })();
@@ -40,13 +70,15 @@
     <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png" />
     <link rel="apple-touch-icon" sizes="180x180" href="./icons/apple-touch-icon.png" />
     <link rel="manifest" href="./manifest.webmanifest" />
-    <link rel="preload" as="image" href="./icons/splash-1170x2532.png?v=20260502-one-mobile-html-splash" media="(max-width: 720px), (hover: none) and (pointer: coarse)" />
+    <link rel="preload" as="image" href="./icons/splash-1170x2532.png?v=20260502-mobile-whitebottom-fix" media="(max-width: 720px), (hover: none) and (pointer: coarse)" />
 
 
     <style id="routee-critical-boot-css">
       :root {
         --routee-splash-bg: #d8dde3;
-        --routee-splash-image: url("./icons/splash-1170x2532.png?v=20260502-one-mobile-html-splash");
+        --routee-splash-edge-bg: #162533;
+        --routee-splash-height: 100vh;
+        --routee-splash-image: url("./icons/splash-1170x2532.png?v=20260502-mobile-whitebottom-fix");
       }
 
       html,
@@ -61,9 +93,10 @@
       html.routee-splash-active body,
       body.routee-splash-active {
         width: 100%;
-        height: 100%;
+        height: var(--routee-splash-height, 100vh);
+        min-height: 100vh;
         overflow: hidden;
-        background: var(--routee-splash-bg) !important;
+        background: var(--routee-splash-edge-bg, var(--routee-splash-bg)) !important;
         overscroll-behavior: none;
       }
 
@@ -74,18 +107,20 @@
       html.routee-splash-active .startup-splash,
       body.routee-splash-active .startup-splash {
         position: fixed;
-        inset: 0;
+        left: 0;
+        top: 0;
+        right: 0;
+        bottom: auto;
         z-index: 2147483646;
         width: 100vw;
-        height: 100vh;
-        height: 100dvh;
-        min-height: 100svh;
+        height: var(--routee-splash-height, 100vh);
+        min-height: 100vh;
         margin: 0;
         padding: 0;
         display: grid;
         place-items: center;
         overflow: hidden;
-        background: var(--routee-splash-bg);
+        background: var(--routee-splash-edge-bg, var(--routee-splash-bg));
         opacity: 1;
         visibility: visible;
         pointer-events: auto;
@@ -127,7 +162,7 @@
   </head>
   <body>
     <div class="startup-splash" id="startupSplash" data-mode="image" aria-hidden="true">
-      <img class="routee-splash-image-element" id="startupSplashImage" src="./icons/splash-1170x2532.png?v=20260502-one-mobile-html-splash" alt="" aria-hidden="true" decoding="async" fetchpriority="high" />
+      <img class="routee-splash-image-element" id="startupSplashImage" src="./icons/splash-1170x2532.png?v=20260502-mobile-whitebottom-fix" alt="" aria-hidden="true" decoding="async" fetchpriority="high" />
       <div class="routee-splash-card" aria-live="polite" aria-atomic="true">
         <div class="routee-splash-logo" aria-hidden="true">R</div>
         <p class="routee-splash-title" id="startupSplashTitle">Rota</p>
