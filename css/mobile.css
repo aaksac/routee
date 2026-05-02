@@ -2308,3 +2308,75 @@
     --routee-mobile-radius: 20px;
   }
 }
+
+/* =========================================================
+   ROUTEE — MOBILE MODAL BACKDROP RESTORE
+   Önceki harita hizalama katmanında map-shell'e verilen kırpma/contain
+   ayarları, mobileFloatingBackdrop'u harita alanına hapsettiği için
+   mobil panel davranışını bozmadan geri ayrıştırılır.
+   ========================================================= */
+@media (max-width: 720px), (hover: none) and (pointer: coarse) {
+  .map-shell {
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    overflow: visible !important;
+    clip-path: none !important;
+    contain: none !important;
+    border: 0 !important;
+    box-shadow: none !important;
+    background: transparent !important;
+    border-radius: 0 !important;
+    isolation: auto !important;
+  }
+
+  .map-canvas {
+    height: var(--routee-mobile-map-height) !important;
+    min-height: var(--routee-mobile-map-height) !important;
+    max-height: calc(100dvh - 190px) !important;
+    overflow: hidden !important;
+    border-radius: var(--routee-mobile-radius) !important;
+    border: 1px solid rgba(219, 228, 240, 0.95) !important;
+    box-shadow: var(--shadow) !important;
+    background: #eaf1ff !important;
+    clip-path: inset(0 round var(--routee-mobile-radius)) !important;
+    transform: translateZ(0) !important;
+    -webkit-transform: translateZ(0) !important;
+    backface-visibility: hidden !important;
+    -webkit-backface-visibility: hidden !important;
+    isolation: isolate !important;
+  }
+
+  #mobileFloatingBackdrop.mobile-floating-backdrop {
+    position: fixed !important;
+    inset: 0 !important;
+    width: 100vw !important;
+    height: 100dvh !important;
+    z-index: 90 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: visible !important;
+    clip-path: none !important;
+    contain: none !important;
+    transform: none !important;
+    -webkit-transform: none !important;
+    border-radius: 0 !important;
+    pointer-events: auto !important;
+  }
+
+  body.has-mobile-floating-panel #mobileFloatingBackdrop.mobile-floating-backdrop {
+    display: block !important;
+    background: rgba(15, 23, 42, 0.26) !important;
+    backdrop-filter: blur(4px) !important;
+    -webkit-backdrop-filter: blur(4px) !important;
+    touch-action: none !important;
+  }
+
+  body[data-mobile-panel="start"] #startPanel,
+  body[data-mobile-panel="point"] #pointPanel,
+  body[data-mobile-panel="end"] #endPanel,
+  body[data-mobile-panel="save"] #savePanel,
+  body[data-mobile-panel="importExport"] #importExportPanel {
+    z-index: 95 !important;
+  }
+}
