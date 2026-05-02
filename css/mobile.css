@@ -1932,3 +1932,36 @@
     max-width: calc(100% - 76px) !important;
   }
 }
+
+/* =========================================================
+   ROUTEE — MOBILE TRUE FULLSCREEN APP SURFACE
+   Splash kapandıktan sonra iOS/Android'de alt/üstte boş lacivert alan kalmasını engeller.
+   ========================================================= */
+@media (max-width: 720px), (hover: none) and (pointer: coarse) {
+  html:not(.routee-splash-active):not(.show-app-startup-splash),
+  html:not(.routee-splash-active):not(.show-app-startup-splash) body,
+  body:not(.routee-splash-active):not(.routee-app-startup-active) {
+    width: 100% !important;
+    min-height: 100vh !important;
+    min-height: 100svh !important;
+    min-height: 100dvh !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: var(--bg) !important;
+    background-color: var(--bg) !important;
+    overflow-x: hidden !important;
+  }
+
+  body:not(.routee-splash-active):not(.routee-app-startup-active) #app {
+    width: 100% !important;
+    min-height: 100vh !important;
+    min-height: 100svh !important;
+    min-height: 100dvh !important;
+    background: var(--bg) !important;
+    background-color: var(--bg) !important;
+  }
+
+  body:not(.routee-splash-active):not(.routee-app-startup-active) .topbar {
+    top: 0 !important;
+  }
+}
