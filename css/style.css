@@ -190,13 +190,24 @@ select:focus {
 .brand-icon {
   width: 46px;
   height: 46px;
+  min-width: 46px;
+  min-height: 46px;
+  flex: 0 0 46px;
   border-radius: 16px;
-  display: grid;
-  place-items: center;
-  background: linear-gradient(135deg, #2563eb, #0f172a);
-  color: #fff;
-  font-weight: 800;
-  box-shadow: var(--shadow-soft);
+  display: block;
+  background-color: transparent;
+  background-image: url("../icons/icon-512.png?v=20260502-brand-ui-mobile");
+  background-position: center center;
+  background-size: contain;
+  background-repeat: no-repeat;
+  box-shadow: none;
+  color: transparent;
+  font-size: 0;
+  line-height: 0;
+  text-indent: -9999px;
+  overflow: visible;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 .brand-text h1 {
