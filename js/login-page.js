@@ -32,7 +32,7 @@ const AUTH_BOOT_TIMEOUT_MS = 6000;
 const STALE_MODULE_RETRY_MS = AUTH_BOOT_TIMEOUT_MS - 100;
 const MOBILE_STARTUP_QUERY = "(max-width: 720px), (hover: none) and (pointer: coarse)";
 
-const SPLASH_ASSET_REVISION = "20260502-mobile-only-splash";
+const SPLASH_ASSET_REVISION = "20260502-mobile-splash-nocrop";
 const SPLASH_IMAGE_MAP = [
   { w: 320, h: 568, dpr: 2, file: "splash-640x1136.png" },
   { w: 375, h: 667, dpr: 2, file: "splash-750x1334.png" },
