@@ -198,7 +198,9 @@
     pointer-events: auto;
   }
 
-  body.has-mobile-floating-panel .new-map-mobile-fab {
+  body.has-mobile-floating-panel .new-map-mobile-fab,
+  body.has-screen-overlay .new-map-mobile-fab {
+    z-index: 60;
     opacity: 1;
     visibility: visible;
     pointer-events: none;
