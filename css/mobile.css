@@ -2203,3 +2203,28 @@
     -ms-touch-action: manipulation;
   }
 }
+
+/* =========================================================
+   ROUTA — MOBİL PROGRAM İÇİ MARKA İKONU
+   Sadece görsel düzeltmedir. İşlevlere dokunmaz.
+   Mobil kırılımlarda eski R/A harfi görünmesin, yeni PNG ikon korunsun.
+   ========================================================= */
+@media (max-width: 720px), (hover: none) and (pointer: coarse) {
+  .brand-icon {
+    display: block !important;
+    background-color: transparent !important;
+    background-image: url("../icons/icon-512.png?v=20260502-brand-ui-mobile") !important;
+    background-position: center center !important;
+    background-size: contain !important;
+    background-repeat: no-repeat !important;
+    box-shadow: none !important;
+    color: transparent !important;
+    font-size: 0 !important;
+    line-height: 0 !important;
+    text-indent: -9999px !important;
+    overflow: visible !important;
+    user-select: none !important;
+    -webkit-user-select: none !important;
+  }
+}
+
