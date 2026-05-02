@@ -2090,3 +2090,75 @@
     }
   }
 }
+
+/* =========================================================
+   ROUTEE — MOBILE TOPBAR DEAD-ZONE STABILITY FIX
+   Üst barda ikon ile Çıkış Yap arasındaki boş alana çift dokunulduğunda
+   iOS/Android tarayıcı yakınlaştırma/sekme davranışı üretmesin.
+   Gerçek butonların tıklama işlevlerine dokunmaz.
+   ========================================================= */
+@media (max-width: 720px), (hover: none) and (pointer: coarse) {
+  html.routee-statusbar-locked:not(.routee-splash-active):not(.show-app-startup-splash),
+  html.routee-statusbar-locked:not(.routee-splash-active):not(.show-app-startup-splash) body,
+  body.routee-statusbar-locked:not(.routee-splash-active):not(.routee-app-startup-active) {
+    background: var(--bg, #f4f7fb) !important;
+    background-color: var(--bg, #f4f7fb) !important;
+  }
+
+  .topbar {
+    box-sizing: border-box !important;
+    height: calc(64px + var(--routee-safe-top, env(safe-area-inset-top, 0px))) !important;
+    min-height: calc(64px + var(--routee-safe-top, env(safe-area-inset-top, 0px))) !important;
+    max-height: calc(64px + var(--routee-safe-top, env(safe-area-inset-top, 0px))) !important;
+    flex: 0 0 calc(64px + var(--routee-safe-top, env(safe-area-inset-top, 0px))) !important;
+    align-items: center !important;
+    touch-action: manipulation;
+    -ms-touch-action: manipulation;
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+    -webkit-tap-highlight-color: transparent;
+    overscroll-behavior: contain;
+  }
+
+  @supports (top: constant(safe-area-inset-top)) {
+    .topbar {
+      height: calc(64px + var(--routee-safe-top, constant(safe-area-inset-top))) !important;
+      min-height: calc(64px + var(--routee-safe-top, constant(safe-area-inset-top))) !important;
+      max-height: calc(64px + var(--routee-safe-top, constant(safe-area-inset-top))) !important;
+      flex-basis: calc(64px + var(--routee-safe-top, constant(safe-area-inset-top))) !important;
+    }
+  }
+
+  .topbar,
+  .topbar * {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .topbar::before,
+  html.routee-statusbar-locked::before,
+  body.routee-statusbar-locked::before {
+    pointer-events: none !important;
+  }
+
+  .topbar .brand-area,
+  .topbar .brand-text,
+  .topbar .topbar-actions {
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+  }
+
+  .topbar .brand-area {
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+    touch-action: manipulation;
+  }
+
+  .topbar .topbar-actions,
+  .topbar button,
+  .topbar a {
+    touch-action: manipulation;
+    -ms-touch-action: manipulation;
+  }
+}
