@@ -2092,14 +2092,16 @@
 }
 
 /* =========================================================
-   ROUTEE — MOBILE STRAIGHT SURFACE ALIGNMENT FINAL
-   Uygulama açıldıktan sonra app.html yüzeyindeki üst bar, harita,
-   gezi listesi ve çıkış alanı aynı dikey eksende düz görünür.
-   İşlevsel JS akışına dokunmaz; yalnızca mobil yerleşim hizasını sabitler.
+   ROUTEE — MOBILE FLAT FRAME ALIGNMENT FINAL
+   Mobil app yüzeyinde harita, gezi listesi ve üst bar aynı düzlemde kalır.
+   Haritanın sağ kenarında iOS/Android GPU yuvarlatma kaynaklı aşağı eğik
+   görünümü engellemek için görsel çerçeve map-shell'e alınır.
    ========================================================= */
 @media (max-width: 720px), (hover: none) and (pointer: coarse) {
   :root {
     --routee-mobile-edge: max(14px, calc(var(--routee-safe-left, 0px) + 12px), calc(var(--routee-safe-right, 0px) + 12px));
+    --routee-mobile-map-height: clamp(330px, 55svh, 520px);
+    --routee-mobile-radius: 22px;
   }
 
   #app,
@@ -2112,6 +2114,24 @@
   .trip-column,
   .trip-panel {
     box-sizing: border-box !important;
+  }
+
+  #app,
+  .status-strip,
+  .app-layout,
+  .map-area,
+  .map-shell,
+  .trip-column,
+  .trip-panel {
+    transform: none !important;
+    -webkit-transform: none !important;
+    rotate: 0deg !important;
+    scale: 1 !important;
+    translate: 0 0 !important;
+    perspective: none !important;
+    -webkit-perspective: none !important;
+    backface-visibility: visible !important;
+    -webkit-backface-visibility: visible !important;
   }
 
   .topbar {
@@ -2205,21 +2225,62 @@
     margin: 0 !important;
   }
 
-  .map-shell,
-  .map-canvas,
+  .map-shell {
+    position: relative !important;
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    height: var(--routee-mobile-map-height) !important;
+    min-height: var(--routee-mobile-map-height) !important;
+    max-height: calc(100dvh - 190px) !important;
+    margin: 0 !important;
+    overflow: hidden !important;
+    border-radius: var(--routee-mobile-radius) !important;
+    background: #eaf1ff !important;
+    border: 1px solid rgba(219, 228, 240, 0.95) !important;
+    box-shadow: var(--shadow) !important;
+    clip-path: inset(0 round var(--routee-mobile-radius)) !important;
+    contain: layout paint !important;
+  }
+
+  .map-canvas {
+    position: relative !important;
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    height: 100% !important;
+    min-height: 100% !important;
+    max-height: none !important;
+    margin: 0 !important;
+    overflow: hidden !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    background: #eaf1ff !important;
+    transform: none !important;
+    -webkit-transform: none !important;
+    clip-path: none !important;
+    contain: paint !important;
+  }
+
+  .map-shell > .map-overlay,
+  .map-shell > .mobile-floating-backdrop {
+    transform: none !important;
+    -webkit-transform: none !important;
+  }
+
   .trip-panel {
     width: 100% !important;
     max-width: 100% !important;
     min-width: 0 !important;
-    margin-left: 0 !important;
-    margin-right: 0 !important;
+    margin: 0 !important;
     justify-self: stretch !important;
     align-self: stretch !important;
-  }
-
-  .map-canvas,
-  .trip-panel {
     display: block !important;
+    transform: none !important;
+    -webkit-transform: none !important;
   }
 
   .right-tools {
@@ -2244,5 +2305,6 @@
 @media (max-width: 390px) {
   :root {
     --routee-mobile-edge: max(12px, calc(var(--routee-safe-left, 0px) + 10px), calc(var(--routee-safe-right, 0px) + 10px));
+    --routee-mobile-radius: 20px;
   }
 }
