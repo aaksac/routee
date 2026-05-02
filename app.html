@@ -398,6 +398,98 @@
     </span>
   </button>
 
+  <script id="routee-mobile-new-map-fab-lock">
+    (function () {
+      var MOBILE_QUERY = "(max-width: 720px), (hover: none) and (pointer: coarse)";
+      var lockedTop = null;
+      var lockedWidth = 0;
+      var lockedOrientation = "";
+
+      function isMobileLike() {
+        try {
+          if (window.matchMedia && window.matchMedia(MOBILE_QUERY).matches) return true;
+        } catch (error) {}
+        return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(window.navigator.userAgent || "");
+      }
+
+      function getOrientation(width, height) {
+        return width > height ? "landscape" : "portrait";
+      }
+
+      function getViewportMetrics() {
+        var root = document.documentElement;
+        var viewport = window.visualViewport;
+        var visualWidth = Math.ceil(viewport && viewport.width ? viewport.width : (window.innerWidth || root.clientWidth || 0));
+        var visualHeight = Math.ceil(viewport && viewport.height ? viewport.height : (window.innerHeight || root.clientHeight || 0));
+        var layoutHeight = Math.ceil(Math.max(window.innerHeight || 0, root.clientHeight || 0, visualHeight));
+        return {
+          width: visualWidth,
+          visualHeight: visualHeight,
+          layoutHeight: layoutHeight,
+          orientation: getOrientation(visualWidth, visualHeight)
+        };
+      }
+
+      function calculateIdealTop(fab, metrics) {
+        var fabHeight = Math.ceil((fab && fab.offsetHeight) || 58);
+        /*
+          Mobil tarayıcı alt çubuğu görünürken visualViewport kısalıyor ve fixed-bottom
+          buton yukarıda kalıyor. Butonu küçük bir payla daha aşağı indiriyoruz ancak
+          tamamen tarayıcı çerçevesinin altına kaçmasına izin vermiyoruz.
+        */
+        var loweredHeight = Math.max(metrics.visualHeight, Math.min(metrics.layoutHeight, metrics.visualHeight + 34));
+        var bottomGap = 4;
+        return Math.max(8, Math.round(loweredHeight - fabHeight - bottomGap));
+      }
+
+      function syncFabPosition(force) {
+        var root = document.documentElement;
+        var fab = document.getElementById("btnNewMapMobile");
+
+        if (!isMobileLike()) {
+          root.style.removeProperty("--routee-mobile-fab-top");
+          lockedTop = null;
+          lockedWidth = 0;
+          lockedOrientation = "";
+          return;
+        }
+
+        var metrics = getViewportMetrics();
+        if (!metrics.width || !metrics.visualHeight) return;
+
+        var widthChanged = lockedWidth && Math.abs(metrics.width - lockedWidth) > 48;
+        var orientationChanged = lockedOrientation && metrics.orientation !== lockedOrientation;
+
+        if (force || lockedTop === null || widthChanged || orientationChanged) {
+          lockedTop = calculateIdealTop(fab, metrics);
+          lockedWidth = metrics.width;
+          lockedOrientation = metrics.orientation;
+        }
+
+        root.style.setProperty("--routee-mobile-fab-top", lockedTop + "px");
+      }
+
+      function scheduleSync(force) {
+        window.requestAnimationFrame(function () {
+          syncFabPosition(Boolean(force));
+        });
+      }
+
+      document.addEventListener("DOMContentLoaded", function () { scheduleSync(true); });
+      window.addEventListener("load", function () { scheduleSync(true); }, { passive: true });
+      window.addEventListener("resize", function () { scheduleSync(false); }, { passive: true });
+      window.addEventListener("orientationchange", function () {
+        lockedTop = null;
+        window.setTimeout(function () { scheduleSync(true); }, 120);
+      }, { passive: true });
+
+      if (window.visualViewport) {
+        window.visualViewport.addEventListener("resize", function () { scheduleSync(false); }, { passive: true });
+        window.visualViewport.addEventListener("scroll", function () { scheduleSync(false); }, { passive: true });
+      }
+    })();
+  </script>
+
   <script>
     window.__routeeGoogleMapsLoaded = window.__routeeGoogleMapsLoaded || function () {};
   </script>
