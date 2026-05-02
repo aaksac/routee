@@ -920,9 +920,9 @@ select:focus {
   background: linear-gradient(180deg, #1d4ed8 0%, #0f172a 100%);
   color: #ffffff;
   box-shadow: 0 16px 34px rgba(15, 23, 42, 0.28);
-  z-index: 60;
+  z-index: 1200;
   cursor: pointer;
-  transition: transform 0.18s ease, box-shadow 0.18s ease, opacity 0.18s ease, filter 0.18s ease;
+  transition: transform 0.18s ease, box-shadow 0.18s ease, opacity 0.18s ease;
   -webkit-tap-highlight-color: transparent;
 }
 
