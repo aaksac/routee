@@ -14,18 +14,15 @@
   <script id="routee-app-splash-early-lock">
     (function () {
       try {
-        var mobileQuery = "(max-width: 720px), (hover: none) and (pointer: coarse)";
-        var isMobile = false;
-        try { isMobile = window.matchMedia && window.matchMedia(mobileQuery).matches; } catch (queryError) { isMobile = false; }
-        if (!isMobile) {
-          isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(window.navigator.userAgent || "");
+        var mode = "image";
+        try {
+          mode = sessionStorage.getItem("routeeStartupSplashMode") || "image";
+        } catch (storageError) {
+          mode = "image";
         }
 
-        document.documentElement.classList.add("show-app-startup-splash", "routee-splash-active", "routee-splash-message");
-
-        if (isMobile) {
-          document.documentElement.classList.add("routee-mobile-splash-active", "routee-mobile-splash-message");
-        }
+        document.documentElement.classList.add("show-app-startup-splash", "routee-splash-active");
+        document.documentElement.classList.add(mode === "message" ? "routee-app-splash-message" : "routee-splash-image");
       } catch (error) {}
     })();
   </script>
@@ -34,7 +31,7 @@
   <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png" />
   <link rel="apple-touch-icon" sizes="180x180" href="./icons/apple-touch-icon.png" />
   <link rel="manifest" href="./manifest.webmanifest" />
-  <link rel="preload" as="image" href="./icons/splash-1170x2532.png?v=20260501-pro-light" />
+  <link rel="preload" as="image" href="./icons/splash-1170x2532.png?v=20260502-unified-splash" />
 
   <script type="module" src="./js/version-guard.js"></script>
   <script src="./js/status-bar.js"></script>
@@ -46,7 +43,7 @@
   <style id="routee-app-splash-critical-css">
     :root {
       --routee-splash-bg: #0b1222;
-      --routee-splash-image: url("./icons/splash-1170x2532.png?v=20260501-pro-light");
+      --routee-splash-image: url("./icons/splash-1170x2532.png?v=20260502-unified-splash");
     }
 
     html,
@@ -77,10 +74,13 @@
       z-index: 2147483646 !important;
       width: 100vw !important;
       height: 100vh !important;
-      min-height: 100vh !important;
+      height: 100svh !important;
+      height: 100dvh !important;
+      min-height: -webkit-fill-available !important;
       margin: 0 !important;
       padding: 0 !important;
-      display: block !important;
+      display: grid !important;
+      place-items: center !important;
       overflow: hidden !important;
       background-color: var(--routee-splash-bg) !important;
       background-image: var(--routee-splash-image) !important;
@@ -104,30 +104,8 @@
       pointer-events: auto !important;
     }
 
-    .app-startup-splash .routee-splash-card {
-      display: grid !important;
-      place-items: center !important;
-    }
-
-    @media (max-width: 720px), (hover: none) and (pointer: coarse) {
-      html.show-app-startup-splash,
-      html.show-app-startup-splash body,
-      body.routee-app-startup-active {
-        width: 100%;
-        height: 100%;
-        min-height: 100svh;
-        min-height: 100dvh;
-        margin: 0;
-        overscroll-behavior: none;
-      }
-
-      .app-startup-splash {
-        height: 100vh !important;
-        height: 100svh !important;
-        height: 100dvh !important;
-        min-height: -webkit-fill-available !important;
-        background-size: 100% 100% !important;
-      }
+    .routee-splash-card {
+      display: none;
     }
   </style>
   <link rel="stylesheet" href="./css/splash.css" />
@@ -135,13 +113,12 @@
 
 </head>
 <body>
-  <div class="startup-splash app-startup-splash" id="appStartupSplash" aria-hidden="false" role="status" aria-live="polite">
-    <div class="routee-splash-card" aria-hidden="false">
+  <div class="startup-splash app-startup-splash" id="appStartupSplash" data-mode="image" aria-hidden="true">
+    <div class="routee-splash-card" aria-live="polite" aria-atomic="true">
       <div class="routee-splash-logo" aria-hidden="true">R</div>
-      <div class="routee-splash-copy">
-        <strong id="appStartupSplashTitle">Rota</strong>
-        <span id="appStartupSplashText">Oturumunuz açılıyor</span>
-      </div>
+      <p class="routee-splash-title" id="appStartupSplashTitle">Rota</p>
+      <p class="routee-splash-text" id="appStartupSplashText">Oturumunuz açılıyor</p>
+      <div class="routee-splash-dots" aria-hidden="true"><span></span><span></span><span></span></div>
     </div>
   </div>
 
