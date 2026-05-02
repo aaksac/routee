@@ -404,6 +404,9 @@
       var lockedTop = null;
       var lockedWidth = 0;
       var lockedOrientation = "";
+      var portraitLockedTop = null;
+      var portraitLockedWidth = 0;
+      var syncTimer = 0;
 
       function isMobileLike() {
         try {
@@ -432,14 +435,19 @@
 
       function calculateIdealTop(fab, metrics) {
         var fabHeight = Math.ceil((fab && fab.offsetHeight) || 58);
-        /*
-          Mobil tarayıcı alt çubuğu görünürken visualViewport kısalıyor ve fixed-bottom
-          buton yukarıda kalıyor. Butonu küçük bir payla daha aşağı indiriyoruz ancak
-          tamamen tarayıcı çerçevesinin altına kaçmasına izin vermiyoruz.
-        */
         var loweredHeight = Math.max(metrics.visualHeight, Math.min(metrics.layoutHeight, metrics.visualHeight + 34));
         var bottomGap = -1;
         return Math.max(8, Math.round(loweredHeight - fabHeight - bottomGap));
+      }
+
+      function canReusePortraitLock(metrics) {
+        return metrics.orientation === "portrait" && portraitLockedTop !== null && Math.abs(metrics.width - portraitLockedWidth) <= 48;
+      }
+
+      function rememberPortraitLock(metrics) {
+        if (metrics.orientation !== "portrait" || lockedTop === null) return;
+        portraitLockedTop = lockedTop;
+        portraitLockedWidth = metrics.width;
       }
 
       function syncFabPosition(force) {
@@ -451,6 +459,8 @@
           lockedTop = null;
           lockedWidth = 0;
           lockedOrientation = "";
+          portraitLockedTop = null;
+          portraitLockedWidth = 0;
           return;
         }
 
@@ -460,32 +470,40 @@
         var widthChanged = lockedWidth && Math.abs(metrics.width - lockedWidth) > 48;
         var orientationChanged = lockedOrientation && metrics.orientation !== lockedOrientation;
 
-        if (force || lockedTop === null || widthChanged || orientationChanged) {
+        if (canReusePortraitLock(metrics)) {
+          lockedTop = portraitLockedTop;
+          lockedWidth = metrics.width;
+          lockedOrientation = metrics.orientation;
+        } else if (force || lockedTop === null || widthChanged || orientationChanged) {
           lockedTop = calculateIdealTop(fab, metrics);
           lockedWidth = metrics.width;
           lockedOrientation = metrics.orientation;
+          rememberPortraitLock(metrics);
         }
 
         root.style.setProperty("--routee-mobile-fab-top", lockedTop + "px");
       }
 
-      function scheduleSync(force) {
-        window.requestAnimationFrame(function () {
-          syncFabPosition(Boolean(force));
-        });
+      function scheduleSync(force, delay) {
+        window.clearTimeout(syncTimer);
+        syncTimer = window.setTimeout(function () {
+          window.requestAnimationFrame(function () {
+            syncFabPosition(Boolean(force));
+          });
+        }, delay || 0);
       }
 
-      document.addEventListener("DOMContentLoaded", function () { scheduleSync(true); });
-      window.addEventListener("load", function () { scheduleSync(true); }, { passive: true });
-      window.addEventListener("resize", function () { scheduleSync(false); }, { passive: true });
+      document.addEventListener("DOMContentLoaded", function () { scheduleSync(true, 0); });
+      window.addEventListener("load", function () { scheduleSync(true, 80); }, { passive: true });
+      window.addEventListener("resize", function () { scheduleSync(false, 160); }, { passive: true });
       window.addEventListener("orientationchange", function () {
-        lockedTop = null;
-        window.setTimeout(function () { scheduleSync(true); }, 120);
+        scheduleSync(false, 420);
+        scheduleSync(false, 780);
       }, { passive: true });
 
       if (window.visualViewport) {
-        window.visualViewport.addEventListener("resize", function () { scheduleSync(false); }, { passive: true });
-        window.visualViewport.addEventListener("scroll", function () { scheduleSync(false); }, { passive: true });
+        window.visualViewport.addEventListener("resize", function () { scheduleSync(false, 160); }, { passive: true });
+        window.visualViewport.addEventListener("scroll", function () { scheduleSync(false, 160); }, { passive: true });
       }
     })();
   </script>
