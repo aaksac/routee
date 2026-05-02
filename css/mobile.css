@@ -2090,3 +2090,159 @@
     }
   }
 }
+
+/* =========================================================
+   ROUTEE — MOBILE STRAIGHT SURFACE ALIGNMENT FINAL
+   Uygulama açıldıktan sonra app.html yüzeyindeki üst bar, harita,
+   gezi listesi ve çıkış alanı aynı dikey eksende düz görünür.
+   İşlevsel JS akışına dokunmaz; yalnızca mobil yerleşim hizasını sabitler.
+   ========================================================= */
+@media (max-width: 720px), (hover: none) and (pointer: coarse) {
+  :root {
+    --routee-mobile-edge: max(14px, calc(var(--routee-safe-left, 0px) + 12px), calc(var(--routee-safe-right, 0px) + 12px));
+  }
+
+  #app,
+  .topbar,
+  .status-strip,
+  .app-layout,
+  .map-area,
+  .map-shell,
+  .map-canvas,
+  .trip-column,
+  .trip-panel {
+    box-sizing: border-box !important;
+  }
+
+  .topbar {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) auto !important;
+    align-items: center !important;
+    column-gap: 10px !important;
+    width: 100% !important;
+    max-width: 100vw !important;
+    margin: 0 !important;
+    padding-left: var(--routee-mobile-edge) !important;
+    padding-right: var(--routee-mobile-edge) !important;
+  }
+
+  .brand-area,
+  .topbar-actions {
+    min-height: 44px !important;
+    align-items: center !important;
+    align-self: center !important;
+    margin: 0 !important;
+  }
+
+  .brand-area {
+    display: flex !important;
+    justify-content: flex-start !important;
+  }
+
+  .topbar-actions {
+    display: flex !important;
+    justify-content: flex-end !important;
+  }
+
+  .brand-icon {
+    align-self: center !important;
+    margin: 0 !important;
+  }
+
+  .brand-text {
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    align-self: center !important;
+    min-height: 40px !important;
+    margin: 0 !important;
+  }
+
+  .brand-text h1,
+  .brand-text p {
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+  }
+
+  .page-action-btn {
+    height: 40px !important;
+    min-height: 40px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    align-self: center !important;
+    line-height: 1 !important;
+    margin: 0 !important;
+  }
+
+  .status-strip {
+    width: 100% !important;
+    max-width: 100vw !important;
+    margin: 0 !important;
+    padding-left: var(--routee-mobile-edge) !important;
+    padding-right: var(--routee-mobile-edge) !important;
+  }
+
+  .app-layout {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) !important;
+    justify-items: stretch !important;
+    align-items: stretch !important;
+    width: 100% !important;
+    max-width: 100vw !important;
+    margin: 0 !important;
+    padding-left: var(--routee-mobile-edge) !important;
+    padding-right: var(--routee-mobile-edge) !important;
+  }
+
+  .map-area,
+  .trip-column {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    justify-self: stretch !important;
+    align-self: stretch !important;
+    margin: 0 !important;
+  }
+
+  .map-shell,
+  .map-canvas,
+  .trip-panel {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    justify-self: stretch !important;
+    align-self: stretch !important;
+  }
+
+  .map-canvas,
+  .trip-panel {
+    display: block !important;
+  }
+
+  .right-tools {
+    align-items: center !important;
+  }
+
+  .trip-panel-header {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) auto !important;
+    align-items: center !important;
+    width: 100% !important;
+  }
+
+  .trip-header-actions {
+    align-items: center !important;
+    justify-content: flex-end !important;
+    align-self: center !important;
+    margin: 0 !important;
+  }
+}
+
+@media (max-width: 390px) {
+  :root {
+    --routee-mobile-edge: max(12px, calc(var(--routee-safe-left, 0px) + 10px), calc(var(--routee-safe-right, 0px) + 10px));
+  }
+}
