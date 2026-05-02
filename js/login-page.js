@@ -32,7 +32,7 @@ const AUTH_BOOT_TIMEOUT_MS = 6000;
 const STALE_MODULE_RETRY_MS = AUTH_BOOT_TIMEOUT_MS - 100;
 const MOBILE_STARTUP_QUERY = "(max-width: 720px), (hover: none) and (pointer: coarse)";
 
-const SPLASH_ASSET_REVISION = "20260502-fullscreen-splash";
+const SPLASH_ASSET_REVISION = "20260502-mobile-only-splash";
 const SPLASH_IMAGE_MAP = [
   { w: 320, h: 568, dpr: 2, file: "splash-640x1136.png" },
   { w: 375, h: 667, dpr: 2, file: "splash-750x1334.png" },
@@ -82,6 +82,13 @@ function setStartupSplashMode(mode = "image") {
     );
   });
 
+  if (!isMobileStartupMode()) {
+    if (elements.startupSplash) {
+      elements.startupSplash.dataset.mode = "image";
+    }
+    return;
+  }
+
   targets.forEach((target) => {
     target.classList.add("routee-splash-active");
     target.classList.add(normalizedMode === "message" ? "routee-splash-message" : "routee-splash-image");
@@ -107,6 +114,10 @@ function getPreferredSplashImageUrl() {
 }
 
 function preloadStartupSplashImage() {
+  if (!isMobileStartupMode()) {
+    return Promise.resolve(false);
+  }
+
   if (startupSplashImagePromise) return startupSplashImagePromise;
 
   startupSplashImagePromise = new Promise((resolve) => {
@@ -191,7 +202,7 @@ function setButtonsDisabled(disabled) {
 }
 
 function showStartupSplash(title = "Rota", message = "", options = {}) {
-  if (!elements.startupSplash) return;
+  if (!elements.startupSplash || !isMobileStartupMode()) return;
 
   const mode = options.mode === "message" ? "message" : "image";
   setStartupSplashMode(mode);
@@ -371,11 +382,9 @@ async function routeAfterLogin(user, options = {}) {
 
     showStartupSplash("Rota", "Oturumunuz açılıyor", { mode: splashMode });
 
-    if (!isAdmin) {
-      setAppStartupSplash("image");
+    clearAppStartupSplash();
+    if (!isAdmin && isMobileStartupMode()) {
       await preloadStartupSplashImage();
-    } else {
-      clearAppStartupSplash();
     }
 
     const shouldDelay = options.delay !== false;
@@ -410,7 +419,11 @@ async function handleLogin() {
     return;
   }
 
-  showStartupSplash("Rota", "Oturumunuz açılıyor", { mode: "message" });
+  if (isMobileStartupMode()) {
+    showStartupSplash("Rota", "Oturumunuz açılıyor", { mode: "message" });
+  } else {
+    setStatus("Oturumunuz açılıyor...", "normal");
+  }
 
   try {
     const { login } = await loadAuthModule({ allowRetryIfStale: true });
@@ -529,9 +542,15 @@ function applyQueryStatus() {
 function init() {
   bindEvents();
   applyQueryStatus();
-  showStartupSplash("Rota", "", { mode: "image" });
-  preloadStartupSplashImage();
-  setButtonsDisabled(true);
+  if (isMobileStartupMode()) {
+    showStartupSplash("Rota", "", { mode: "image" });
+    preloadStartupSplashImage();
+    setButtonsDisabled(true);
+  } else {
+    hideStartupSplash();
+    document.body.classList.remove("auth-booting");
+    setButtonsDisabled(false);
+  }
   initAuthWatcher();
 
   // Oturum kontrolü normalde Firebase cevabı ile çözülür.
