@@ -1,7 +1,7 @@
 const SW_VERSION = new URL(self.location.href).searchParams.get("v") || "dev";
 const CACHE_NAME = `routee-shell-${SW_VERSION}`;
 const NETWORK_TIMEOUT_MS = 1200;
-const ROUTEE_ASSET_REVISION = "20260502-no-desktop-splash";
+const ROUTEE_ASSET_REVISION = "20260502-mobile-splash-nocrop";
 
 const APP_SHELL = [
   "./",
