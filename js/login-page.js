@@ -33,7 +33,7 @@ const AUTH_BOOT_TIMEOUT_MS = 6000;
 const STALE_MODULE_RETRY_MS = AUTH_BOOT_TIMEOUT_MS - 100;
 const MOBILE_STARTUP_QUERY = "(max-width: 720px), (hover: none) and (pointer: coarse)";
 
-const SPLASH_ASSET_REVISION = "20260502-one-mobile-html-splash";
+const SPLASH_ASSET_REVISION = "20260502-mobile-whitebottom-fix";
 const SPLASH_IMAGE_FILE = "splash-1170x2532.png";
 let startupSplashImagePromise = null;
 
