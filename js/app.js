@@ -252,52 +252,70 @@ function goToLogin() {
   window.location.href = "./index.html";
 }
 
+function getAppStartupSplashMode() {
+  try {
+    return sessionStorage.getItem("routeeStartupSplashMode") === "message" ? "message" : "image";
+  } catch (error) {
+    return "image";
+  }
+}
+
+function applyAppStartupSplashMode(mode = "image") {
+  const normalizedMode = mode === "message" ? "message" : "image";
+  const targets = [document.documentElement, document.body].filter(Boolean);
+
+  targets.forEach((target) => {
+    target.classList.remove(
+      "routee-splash-image",
+      "routee-splash-message",
+      "routee-app-splash-message",
+      "routee-mobile-splash-active",
+      "routee-mobile-splash-image",
+      "routee-mobile-splash-message"
+    );
+    target.classList.add("routee-splash-active");
+    target.classList.add(normalizedMode === "message" ? "routee-app-splash-message" : "routee-splash-image");
+  });
+
+  if (elements.appStartupSplash) {
+    elements.appStartupSplash.dataset.mode = normalizedMode;
+  }
+
+  if (elements.appStartupSplashTitle) {
+    elements.appStartupSplashTitle.textContent = "Rota";
+  }
+
+  if (elements.appStartupSplashText) {
+    elements.appStartupSplashText.textContent = normalizedMode === "message" ? "Oturumunuz açılıyor" : "";
+  }
+}
+
 function hydrateAppStartupSplash() {
   if (!elements.appStartupSplash) return null;
 
-  try {
-    const isMobileSplash = isMobileStartupMode();
-
-    document.documentElement.classList.add("show-app-startup-splash", "routee-splash-active", "routee-splash-message");
-    document.body?.classList.add("routee-app-startup-active", "routee-splash-active", "routee-splash-message");
-
-    if (isMobileSplash) {
-      document.documentElement.classList.add("routee-mobile-splash-active", "routee-mobile-splash-message");
-      document.body?.classList.add("routee-mobile-splash-active", "routee-mobile-splash-message");
+  const mode = getAppStartupSplashMode();
+  const startedAt = (() => {
+    try {
+      return Number(sessionStorage.getItem("routeeStartupSplashAt")) || Date.now();
+    } catch (error) {
+      return Date.now();
     }
+  })();
 
-    const startedAt = Number(sessionStorage.getItem("routeeStartupSplashAt")) || Date.now();
-    const startupText = sessionStorage.getItem("routeeStartupSplashText") || "Oturumunuz açılıyor";
+  document.documentElement.classList.add("show-app-startup-splash");
+  document.body?.classList.add("routee-app-startup-active");
+  applyAppStartupSplashMode(mode);
 
-    if (elements.appStartupSplashTitle) {
-      elements.appStartupSplashTitle.textContent = "Rota";
-    }
+  elements.appStartupSplash.classList.add("is-visible");
+  elements.appStartupSplash.setAttribute("aria-hidden", "false");
 
-    if (elements.appStartupSplashText) {
-      elements.appStartupSplashText.textContent = startupText;
-    }
-
-    elements.appStartupSplash.classList.add("is-visible");
-    elements.appStartupSplash.setAttribute("aria-hidden", "false");
-    return { startedAt };
-  } catch (error) {
-    console.warn("Startup splash verisi okunamadı:", error);
-
-    if (isMobileStartupMode()) {
-      document.documentElement.classList.add("show-app-startup-splash", "routee-splash-active", "routee-splash-message", "routee-mobile-splash-active", "routee-mobile-splash-message");
-      document.body?.classList.add("routee-app-startup-active", "routee-splash-active", "routee-splash-message", "routee-mobile-splash-active", "routee-mobile-splash-message");
-      elements.appStartupSplash.classList.add("is-visible");
-      elements.appStartupSplash.setAttribute("aria-hidden", "false");
-      return { startedAt: Date.now() };
-    }
-
-    return null;
-  }
+  return { startedAt, mode };
 }
 
 function clearAppStartupSplashSession() {
   try {
     sessionStorage.removeItem("routeeStartupSplash");
+    sessionStorage.removeItem("routeeStartupSplashMode");
     sessionStorage.removeItem("routeeStartupSplashText");
     sessionStorage.removeItem("routeeStartupSplashAt");
   } catch (error) {
@@ -318,8 +336,23 @@ async function closeAppStartupSplash(splashState) {
 
   elements.appStartupSplash.classList.remove("is-visible");
   elements.appStartupSplash.setAttribute("aria-hidden", "true");
-  document.documentElement.classList.remove("show-app-startup-splash", "routee-splash-active", "routee-splash-message", "routee-mobile-splash-active", "routee-mobile-splash-image", "routee-mobile-splash-message");
-  document.body?.classList.remove("routee-app-startup-active", "routee-splash-active", "routee-splash-message", "routee-mobile-splash-active", "routee-mobile-splash-image", "routee-mobile-splash-message");
+  elements.appStartupSplash.dataset.mode = "image";
+
+  const targets = [document.documentElement, document.body].filter(Boolean);
+  targets.forEach((target) => {
+    target.classList.remove(
+      "show-app-startup-splash",
+      "routee-app-startup-active",
+      "routee-splash-active",
+      "routee-splash-image",
+      "routee-splash-message",
+      "routee-app-splash-message",
+      "routee-mobile-splash-active",
+      "routee-mobile-splash-image",
+      "routee-mobile-splash-message"
+    );
+  });
+
   clearAppStartupSplashSession();
 }
 
@@ -2722,17 +2755,10 @@ function initAuthWatcher() {
           }, 0);
         }
       } else {
-        // Mobilde doğrudan app.html açılıp oturum yoksa splash kapanmadan girişe dön.
-        // Böylece uygulama arayüzü veya boş mavi perde bir an bile görünmez.
-        if (isMobileStartupMode()) {
-          clearAppStartupSplashSession();
-          goToLogin();
-          return;
-        }
-
-        await closeAppStartupSplash(state.appStartupSplash);
-        state.appStartupSplash = null;
+        // Doğrudan app.html açılıp oturum yoksa hiçbir cihazda uygulama arayüzü görünmeden girişe dön.
+        clearAppStartupSplashSession();
         goToLogin();
+        return;
       }
     } catch (error) {
       await closeAppStartupSplash(state.appStartupSplash);
