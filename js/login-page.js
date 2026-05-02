@@ -7,6 +7,7 @@ const elements = {
   btnResetPassword: document.getElementById("btnResetPassword"),
   authStatus: document.getElementById("authStatus"),
   startupSplash: document.getElementById("startupSplash"),
+  startupSplashImage: document.getElementById("startupSplashImage"),
   startupSplashTitle: document.getElementById("startupSplashTitle"),
   startupSplashText: document.getElementById("startupSplashText")
 };
@@ -32,22 +33,8 @@ const AUTH_BOOT_TIMEOUT_MS = 6000;
 const STALE_MODULE_RETRY_MS = AUTH_BOOT_TIMEOUT_MS - 100;
 const MOBILE_STARTUP_QUERY = "(max-width: 720px), (hover: none) and (pointer: coarse)";
 
-const SPLASH_ASSET_REVISION = "20260502-mobile-cover-final";
-const SPLASH_IMAGE_MAP = [
-  { w: 320, h: 568, dpr: 2, file: "splash-640x1136.png" },
-  { w: 375, h: 667, dpr: 2, file: "splash-750x1334.png" },
-  { w: 414, h: 896, dpr: 2, file: "splash-828x1792.png" },
-  { w: 375, h: 812, dpr: 3, file: "splash-1125x2436.png" },
-  { w: 390, h: 844, dpr: 3, file: "splash-1170x2532.png" },
-  { w: 414, h: 736, dpr: 3, file: "splash-1242x2208.png" },
-  { w: 414, h: 896, dpr: 3, file: "splash-1242x2688.png" },
-  { w: 428, h: 926, dpr: 3, file: "splash-1284x2778.png" },
-  { w: 430, h: 932, dpr: 3, file: "splash-1290x2796.png" },
-  { w: 768, h: 1024, dpr: 2, file: "splash-1536x2048.png" },
-  { w: 834, h: 1112, dpr: 2, file: "splash-1668x2224.png" },
-  { w: 834, h: 1194, dpr: 2, file: "splash-1668x2388.png" },
-  { w: 1024, h: 1366, dpr: 2, file: "splash-2048x2732.png" }
-];
+const SPLASH_ASSET_REVISION = "20260502-one-mobile-html-splash";
+const SPLASH_IMAGE_FILE = "splash-1170x2532.png";
 let startupSplashImagePromise = null;
 
 function isMobileStartupMode() {
@@ -101,16 +88,7 @@ function setStartupSplashMode(mode = "image") {
 
 
 function getPreferredSplashImageUrl() {
-  try {
-    const w = Math.round(window.screen?.width || window.innerWidth || 0);
-    const h = Math.round(window.screen?.height || window.innerHeight || 0);
-    const dpr = Math.round(window.devicePixelRatio || 1);
-    const match = SPLASH_IMAGE_MAP.find((item) => item.w === w && item.h === h && item.dpr === dpr);
-    const file = match?.file || "splash-1170x2532.png";
-    return `./icons/${file}?v=${SPLASH_ASSET_REVISION}`;
-  } catch (error) {
-    return `./icons/splash-1170x2532.png?v=${SPLASH_ASSET_REVISION}`;
-  }
+  return `./icons/${SPLASH_IMAGE_FILE}?v=${SPLASH_ASSET_REVISION}`;
 }
 
 function preloadStartupSplashImage() {
@@ -205,6 +183,12 @@ function showStartupSplash(title = "Rota", message = "", options = {}) {
   if (!elements.startupSplash || !isMobileStartupMode()) return;
 
   const mode = options.mode === "message" ? "message" : "image";
+  if (elements.startupSplashImage) {
+    const src = getPreferredSplashImageUrl();
+    if (elements.startupSplashImage.getAttribute("src") !== src) {
+      elements.startupSplashImage.setAttribute("src", src);
+    }
+  }
   setStartupSplashMode(mode);
 
   if (elements.startupSplashTitle) {
