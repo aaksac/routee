@@ -1970,6 +1970,7 @@ async function handleNewMap() {
   }
 
   resetMapEditor();
+  alert("Yeni harita oluşturuldu.");
 }
 
 async function handleDeleteMap(mapId) {
