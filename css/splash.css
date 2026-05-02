@@ -7,49 +7,49 @@
 
 :root {
   --routee-splash-bg: #d8dde3;
-  --routee-splash-image: url("../icons/splash-1170x2532.png?v=20260502-mobile-only-splash");
+  --routee-splash-image: url("../icons/splash-1170x2532.png?v=20260502-mobile-splash-nocrop");
   --routee-splash-fit: 100% 100%;
 }
 
 /* iOS native startup image ile HTML splash aynı dosyayı kullansın. */
 @media (device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait) {
-  :root { --routee-splash-image: url("../icons/splash-640x1136.png?v=20260502-mobile-only-splash"); }
+  :root { --routee-splash-image: url("../icons/splash-640x1136.png?v=20260502-mobile-splash-nocrop"); }
 }
 @media (device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait) {
-  :root { --routee-splash-image: url("../icons/splash-750x1334.png?v=20260502-mobile-only-splash"); }
+  :root { --routee-splash-image: url("../icons/splash-750x1334.png?v=20260502-mobile-splash-nocrop"); }
 }
 @media (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait) {
-  :root { --routee-splash-image: url("../icons/splash-828x1792.png?v=20260502-mobile-only-splash"); }
+  :root { --routee-splash-image: url("../icons/splash-828x1792.png?v=20260502-mobile-splash-nocrop"); }
 }
 @media (device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait) {
-  :root { --routee-splash-image: url("../icons/splash-1125x2436.png?v=20260502-mobile-only-splash"); }
+  :root { --routee-splash-image: url("../icons/splash-1125x2436.png?v=20260502-mobile-splash-nocrop"); }
 }
 @media (device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait) {
-  :root { --routee-splash-image: url("../icons/splash-1170x2532.png?v=20260502-mobile-only-splash"); }
+  :root { --routee-splash-image: url("../icons/splash-1170x2532.png?v=20260502-mobile-splash-nocrop"); }
 }
 @media (device-width: 414px) and (device-height: 736px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait) {
-  :root { --routee-splash-image: url("../icons/splash-1242x2208.png?v=20260502-mobile-only-splash"); }
+  :root { --routee-splash-image: url("../icons/splash-1242x2208.png?v=20260502-mobile-splash-nocrop"); }
 }
 @media (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait) {
-  :root { --routee-splash-image: url("../icons/splash-1242x2688.png?v=20260502-mobile-only-splash"); }
+  :root { --routee-splash-image: url("../icons/splash-1242x2688.png?v=20260502-mobile-splash-nocrop"); }
 }
 @media (device-width: 428px) and (device-height: 926px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait) {
-  :root { --routee-splash-image: url("../icons/splash-1284x2778.png?v=20260502-mobile-only-splash"); }
+  :root { --routee-splash-image: url("../icons/splash-1284x2778.png?v=20260502-mobile-splash-nocrop"); }
 }
 @media (device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait) {
-  :root { --routee-splash-image: url("../icons/splash-1290x2796.png?v=20260502-mobile-only-splash"); }
+  :root { --routee-splash-image: url("../icons/splash-1290x2796.png?v=20260502-mobile-splash-nocrop"); }
 }
 @media (device-width: 768px) and (device-height: 1024px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait) {
-  :root { --routee-splash-image: url("../icons/splash-1536x2048.png?v=20260502-mobile-only-splash"); }
+  :root { --routee-splash-image: url("../icons/splash-1536x2048.png?v=20260502-mobile-splash-nocrop"); }
 }
 @media (device-width: 834px) and (device-height: 1112px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait) {
-  :root { --routee-splash-image: url("../icons/splash-1668x2224.png?v=20260502-mobile-only-splash"); }
+  :root { --routee-splash-image: url("../icons/splash-1668x2224.png?v=20260502-mobile-splash-nocrop"); }
 }
 @media (device-width: 834px) and (device-height: 1194px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait) {
-  :root { --routee-splash-image: url("../icons/splash-1668x2388.png?v=20260502-mobile-only-splash"); }
+  :root { --routee-splash-image: url("../icons/splash-1668x2388.png?v=20260502-mobile-splash-nocrop"); }
 }
 @media (device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait) {
-  :root { --routee-splash-image: url("../icons/splash-2048x2732.png?v=20260502-mobile-only-splash"); }
+  :root { --routee-splash-image: url("../icons/splash-2048x2732.png?v=20260502-mobile-splash-nocrop"); }
 }
 
 html.routee-splash-active,
@@ -292,5 +292,96 @@ html:not(.show-app-startup-splash) body:not(.routee-app-startup-active) .app-sta
       height: -webkit-fill-available !important;
       min-height: -webkit-fill-available !important;
     }
+  }
+}
+
+/* =========================================================
+   ROUTEE — MOBILE SPLASH NO-CROP FINAL OVERRIDE
+   Mobil tarayıcı/PWA viewport farklarında splash görseli alttan/üstten kesilmesin.
+   ========================================================= */
+@media (max-width: 720px), (hover: none) and (pointer: coarse) {
+  :root {
+    --routee-splash-bg: #d8dde3;
+    --routee-splash-fit: contain;
+  }
+
+  html.routee-splash-active,
+  html.routee-splash-active body,
+  body.routee-splash-active {
+    position: fixed !important;
+    inset: 0 !important;
+    width: 100vw !important;
+    width: var(--routee-visual-width, 100vw) !important;
+    height: var(--routee-visual-height, 100svh) !important;
+    min-height: var(--routee-visual-height, 100svh) !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    background: var(--routee-splash-bg) !important;
+    background-color: var(--routee-splash-bg) !important;
+  }
+
+  html.routee-splash-active .startup-splash,
+  body.routee-splash-active .startup-splash,
+  .startup-splash.is-visible {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: auto !important;
+    width: 100vw !important;
+    width: var(--routee-visual-width, 100vw) !important;
+    height: var(--routee-visual-height, 100svh) !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    background-color: var(--routee-splash-bg) !important;
+    background-image: var(--routee-splash-image) !important;
+    background-repeat: no-repeat !important;
+    background-position: center center !important;
+    background-size: contain !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    transform: translate3d(0, 0, 0) !important;
+    -webkit-transform: translate3d(0, 0, 0) !important;
+  }
+
+  html.routee-splash-active .startup-splash::before,
+  body.routee-splash-active .startup-splash::before,
+  .startup-splash.is-visible::before {
+    content: "" !important;
+    position: absolute !important;
+    inset: 0 !important;
+    background: var(--routee-splash-bg) !important;
+    background-image: var(--routee-splash-image) !important;
+    background-repeat: no-repeat !important;
+    background-position: center center !important;
+    background-size: contain !important;
+    z-index: -1 !important;
+    pointer-events: none !important;
+  }
+
+  html.routee-splash-active .startup-splash::after,
+  body.routee-splash-active .startup-splash::after,
+  .startup-splash.is-visible::after {
+    content: "" !important;
+    position: fixed !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    height: max(env(safe-area-inset-bottom, 0px), 1px) !important;
+    background: var(--routee-splash-bg) !important;
+    z-index: 0 !important;
+    pointer-events: none !important;
+  }
+
+  .startup-splash[data-mode="message"] .routee-splash-card,
+  html.routee-splash-message .startup-splash .routee-splash-card,
+  body.routee-splash-message .startup-splash .routee-splash-card {
+    position: relative !important;
+    z-index: 1 !important;
   }
 }
