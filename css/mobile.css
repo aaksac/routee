@@ -2162,3 +2162,44 @@
     -ms-touch-action: manipulation;
   }
 }
+
+
+/* =========================================================
+   ROUTEE — MOBILE TRIP HEADER DEAD-ZONE STABILITY FIX
+   Gezi Listesi başlığı ile hızlı işlem ikonları arasındaki boş alana
+   çift dokunulduğunda tarayıcı yakınlaştırma/sekme davranışı üretmesin.
+   Harita Listelerim ve Kaydet ikonlarının gerçek tıklama işlevleri korunur.
+   ========================================================= */
+@media (max-width: 720px), (hover: none) and (pointer: coarse) {
+  .trip-panel-header {
+    touch-action: manipulation;
+    -ms-touch-action: manipulation;
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+    -webkit-tap-highlight-color: transparent;
+    overscroll-behavior: contain;
+  }
+
+  .trip-panel-header,
+  .trip-panel-header * {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .trip-panel-header > div:first-child {
+    min-width: 0;
+    flex: 1 1 auto;
+  }
+
+  .trip-panel-header h2 {
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+  }
+
+  .trip-header-actions,
+  .trip-header-actions button {
+    touch-action: manipulation;
+    -ms-touch-action: manipulation;
+  }
+}
