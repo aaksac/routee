@@ -1904,7 +1904,13 @@
 
   .new-map-mobile-fab {
     right: max(16px, calc(var(--routee-safe-right) + 12px)) !important;
-    bottom: clamp(26px, calc(var(--routee-safe-bottom) + 4px), 38px) !important;
+    /*
+      Mobil Safari/Chrome ilk açılışta tarayıcı alt çubuğunu ve safe-area değerini
+      farklı hesaplayabiliyor. Bu butonda safe-area tabanlı bottom kullanılırsa ilk
+      yüklemede yukarıda başlıyor, harita/listeler etkileşiminden sonra yeniden
+      hesaplanıp aşağı iniyordu. Konumu stabil tutmak için FAB alt boşluğu sabittir.
+    */
+    bottom: 24px !important;
   }
 }
 
