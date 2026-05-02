@@ -1905,16 +1905,17 @@
   .new-map-mobile-fab {
     position: fixed !important;
     right: max(14px, calc(var(--routee-safe-right) + 12px)) !important;
-    /*
-      Mobilde butonun ilk açılışta yukarıda kalmaması ve konum paneli
-      açıldığında tarayıcı alt çerçevesinden etkilenip aşağı/yukarı oynamaması
-      için visualViewport farkı kullanılmaz. Buton doğrudan görünür ekranın
-      güvenli alt çizgisine sabitlenir.
-    */
-    bottom: max(7px, calc(var(--routee-safe-bottom) + 7px)) !important;
+    top: var(--routee-mobile-fab-top, calc(100dvh - 66px)) !important;
+    bottom: auto !important;
     transform: translate3d(0, 0, 0);
     -webkit-transform: translate3d(0, 0, 0);
     z-index: 1200 !important;
+    will-change: top;
+  }
+
+  body.has-mobile-floating-panel .new-map-mobile-fab,
+  body.has-screen-overlay .new-map-mobile-fab {
+    z-index: 60 !important;
   }
 }
 
@@ -2024,7 +2025,7 @@
     height: env(safe-area-inset-bottom, 0px);
     background: var(--bg, #f4f7fb) !important;
     pointer-events: none;
-    z-index: 2147483000;
+    z-index: 10;
   }
 
   @supports (bottom: constant(safe-area-inset-bottom)) {
@@ -2105,7 +2106,7 @@
     background: var(--bg, #f4f7fb) !important;
     background-color: var(--bg, #f4f7fb) !important;
     pointer-events: none !important;
-    z-index: 1100 !important;
+    z-index: 10 !important;
   }
 
   @supports (bottom: constant(safe-area-inset-bottom)) {
