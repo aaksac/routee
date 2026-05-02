@@ -2565,6 +2565,11 @@ function initMobileDeadZoneTapGuards() {
     return !event.target.closest(interactiveSelector);
   };
 
+  const closeTransientMenusFromDeadZoneTap = () => {
+    closeMapMenu();
+    closeLocationActionMenu();
+  };
+
   guardedAreas.forEach((area) => {
     let lastTapAt = 0;
 
@@ -2578,6 +2583,7 @@ function initMobileDeadZoneTapGuards() {
         lastTapAt = now;
 
         if (isDoubleTap) {
+          closeTransientMenusFromDeadZoneTap();
           event.preventDefault();
           event.stopPropagation();
 
@@ -2594,6 +2600,7 @@ function initMobileDeadZoneTapGuards() {
       "dblclick",
       (event) => {
         if (!isDeadZoneTap(event, area)) return;
+        closeTransientMenusFromDeadZoneTap();
         event.preventDefault();
         event.stopPropagation();
       },
@@ -2604,6 +2611,7 @@ function initMobileDeadZoneTapGuards() {
       "click",
       (event) => {
         if (!isDeadZoneTap(event, area)) return;
+        closeTransientMenusFromDeadZoneTap();
         event.stopPropagation();
       },
       true
