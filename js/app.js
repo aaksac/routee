@@ -2510,11 +2510,13 @@ function openSavedMapsOverlay() {
   closeFloatingPanels();
   closeMapMenu();
   closeLocationActionMenu();
+  document.body.classList.add("has-screen-overlay");
   elements.savedMapsOverlay?.classList.remove("hidden");
 }
 
 function closeSavedMapsOverlay() {
   elements.savedMapsOverlay?.classList.add("hidden");
+  document.body.classList.remove("has-screen-overlay");
 }
 
 function handleShellClick(event) {
