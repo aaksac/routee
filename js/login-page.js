@@ -329,6 +329,38 @@ function getPasswordResetErrorMessage(error) {
   return `Şifre sıfırlama maili gönderilemedi.${code ? ` Hata kodu: ${code}` : ""} E-posta adresini kontrol edip tekrar dene.`;
 }
 
+
+function getFriendlyLoginErrorMessage(error) {
+  const code = String(error?.code || "").toLowerCase();
+
+  if (
+    code.includes("auth/invalid-credential") ||
+    code.includes("auth/wrong-password") ||
+    code.includes("auth/user-not-found") ||
+    code.includes("auth/invalid-login-credentials")
+  ) {
+    return "E-posta adresi veya şifre hatalı. Lütfen bilgilerinizi kontrol edip tekrar deneyiniz.";
+  }
+
+  if (code.includes("auth/invalid-email")) {
+    return "E-posta adresi geçerli görünmüyor. Lütfen adresi kontrol edip tekrar deneyiniz.";
+  }
+
+  if (code.includes("auth/too-many-requests")) {
+    return "Çok fazla başarısız giriş denemesi yapıldı. Lütfen bir süre sonra tekrar deneyiniz.";
+  }
+
+  if (code.includes("auth/user-disabled")) {
+    return "Bu kullanıcı hesabı devre dışı bırakılmış. Lütfen yöneticiyle iletişime geçiniz.";
+  }
+
+  if (code.includes("auth/network-request-failed")) {
+    return "İnternet bağlantınızı kontrol edip tekrar deneyiniz.";
+  }
+
+  return "Giriş yapılırken bir sorun oluştu. Lütfen tekrar deneyiniz.";
+}
+
 function hasInternetConnection() {
   return navigator.onLine;
 }
@@ -427,7 +459,8 @@ async function handleLogin() {
       return;
     }
 
-    setStatus(`Giriş hatası: ${error.message}`);
+    console.error("Giriş hatası:", error);
+    setStatus(getFriendlyLoginErrorMessage(error));
   }
 }
 
