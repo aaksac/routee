@@ -1905,7 +1905,7 @@
   .new-map-mobile-fab {
     position: fixed !important;
     right: max(14px, calc(var(--routee-safe-right) + 12px)) !important;
-    top: var(--routee-mobile-fab-top, calc(100dvh - 58px)) !important;
+    top: var(--routee-mobile-fab-top, calc(100dvh - 62px)) !important;
     bottom: auto !important;
     transform: translate3d(0, 0, 0);
     -webkit-transform: translate3d(0, 0, 0);
