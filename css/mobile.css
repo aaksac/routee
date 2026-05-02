@@ -2022,3 +2022,20 @@
     content: none !important;
   }
 }
+
+
+/* ROUTEE — MOBILE APP VISUAL VIEWPORT HEIGHT FINAL OVERRIDE */
+@media (max-width: 720px), (hover: none) and (pointer: coarse) {
+  html,
+  body,
+  #app {
+    min-height: var(--routee-visual-height, 100svh) !important;
+  }
+
+  body:not(.routee-splash-active):not(.routee-app-startup-active),
+  body:not(.routee-splash-active):not(.routee-app-startup-active) #app {
+    min-height: var(--routee-visual-height, 100svh) !important;
+    background: var(--bg, #f4f7fb) !important;
+    background-color: var(--bg, #f4f7fb) !important;
+  }
+}
