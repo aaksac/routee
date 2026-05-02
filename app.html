@@ -11,19 +11,10 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="Rota" />
 
-  <script id="routee-app-splash-early-lock">
-    (function () {
-      try {
-        document.documentElement.classList.add("show-app-startup-splash", "routee-splash-active", "routee-splash-image");
-      } catch (error) {}
-    })();
-  </script>
-
   <link rel="icon" type="image/png" sizes="32x32" href="./icons/favicon-32.png" />
   <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png" />
   <link rel="apple-touch-icon" sizes="180x180" href="./icons/apple-touch-icon.png" />
   <link rel="manifest" href="./manifest.webmanifest" />
-  <link rel="preload" as="image" href="./icons/splash-1170x2532.png?v=20260502-fullscreen-splash" />
 
   <script type="module" src="./js/version-guard.js"></script>
   <script src="./js/status-bar.js"></script>
@@ -32,90 +23,8 @@
   <link rel="stylesheet" href="./css/mobile.css" />
   <link rel="stylesheet" href="./css/auth.css" />
 
-  <style id="routee-app-splash-critical-css">
-    :root {
-      --routee-splash-bg: #d8dde3;
-      --routee-splash-image: url("./icons/splash-1170x2532.png?v=20260502-fullscreen-splash");
-    }
-
-    html,
-    body {
-      margin: 0;
-      height: 100%;
-      min-height: 100%;
-      padding: 0;
-    }
-
-    html.show-app-startup-splash,
-    html.show-app-startup-splash body,
-    body.routee-app-startup-active {
-      background: var(--routee-splash-bg) !important;
-      overflow: hidden !important;
-    }
-
-    html.show-app-startup-splash #app,
-    body.routee-app-startup-active #app,
-    html.show-app-startup-splash .new-map-mobile-fab,
-    body.routee-app-startup-active .new-map-mobile-fab {
-      opacity: 0 !important;
-      visibility: hidden !important;
-      pointer-events: none !important;
-    }
-
-    .app-startup-splash {
-      position: fixed !important;
-      inset: 0 !important;
-      z-index: 2147483646 !important;
-      width: 100vw !important;
-      height: 100vh !important;
-      height: 100svh !important;
-      height: 100dvh !important;
-      min-height: -webkit-fill-available !important;
-      margin: 0 !important;
-      padding: 0 !important;
-      display: grid !important;
-      place-items: center !important;
-      overflow: hidden !important;
-      background-color: var(--routee-splash-bg) !important;
-      background-image: var(--routee-splash-image) !important;
-      background-position: center center !important;
-      background-size: 100% 100% !important;
-      background-repeat: no-repeat !important;
-      opacity: 0;
-      visibility: hidden;
-      pointer-events: none;
-      transform: translateZ(0);
-      -webkit-transform: translateZ(0);
-      backface-visibility: hidden;
-      -webkit-backface-visibility: hidden;
-    }
-
-    html.show-app-startup-splash .app-startup-splash,
-    body.routee-app-startup-active .app-startup-splash,
-    .app-startup-splash.is-visible {
-      opacity: 1 !important;
-      visibility: visible !important;
-      pointer-events: auto !important;
-    }
-
-    .routee-splash-card {
-      display: none;
-    }
-  </style>
-  <link rel="stylesheet" href="./css/splash.css" />
-
-
 </head>
 <body>
-  <div class="startup-splash app-startup-splash" id="appStartupSplash" data-mode="image" aria-hidden="true">
-    <div class="routee-splash-card" aria-live="polite" aria-atomic="true">
-      <div class="routee-splash-logo" aria-hidden="true">R</div>
-      <p class="routee-splash-title" id="appStartupSplashTitle">Rota</p>
-      <p class="routee-splash-text" id="appStartupSplashText">Oturumunuz açılıyor</p>
-      <div class="routee-splash-dots" aria-hidden="true"><span></span><span></span><span></span></div>
-    </div>
-  </div>
-
   <div id="app">
     <header class="topbar">
       <div class="brand-area">
