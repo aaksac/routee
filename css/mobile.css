@@ -1664,7 +1664,6 @@
     --routee-safe-right: env(safe-area-inset-right, 0px);
     --routee-safe-bottom: env(safe-area-inset-bottom, 0px);
     --routee-safe-left: env(safe-area-inset-left, 0px);
-    --routee-mobile-fab-viewport-bottom: 0px;
     --routee-mobile-page-x: max(12px, var(--routee-safe-left));
     --routee-mobile-page-r: max(12px, var(--routee-safe-right));
   }
@@ -1904,13 +1903,17 @@
   }
 
   .new-map-mobile-fab {
+    position: fixed !important;
     right: max(14px, calc(var(--routee-safe-right) + 12px)) !important;
     /*
-      FAB ilk açılışta daha aşağı ve doğal dursun; mobil tarayıcının alt çerçevesi
-      görünüp kaybolduğunda visualViewport farkı kadar telafi edilerek butonun
-      ekrandaki hissedilen konumu sabit kalır.
+      Mobilde butonun ilk açılışta yukarıda kalmaması ve konum paneli
+      açıldığında tarayıcı alt çerçevesinden etkilenip aşağı/yukarı oynamaması
+      için visualViewport farkı kullanılmaz. Buton doğrudan görünür ekranın
+      güvenli alt çizgisine sabitlenir.
     */
-    bottom: calc(12px + var(--routee-mobile-fab-viewport-bottom, 0px)) !important;
+    bottom: max(7px, calc(var(--routee-safe-bottom) + 7px)) !important;
+    transform: translate3d(0, 0, 0);
+    -webkit-transform: translate3d(0, 0, 0);
     z-index: 1200 !important;
   }
 }
