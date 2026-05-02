@@ -1904,7 +1904,7 @@
 
   .new-map-mobile-fab {
     right: max(16px, calc(var(--routee-safe-right) + 12px)) !important;
-    bottom: max(16px, calc(var(--routee-safe-bottom) + 12px)) !important;
+    bottom: 16px !important;
   }
 }
 
