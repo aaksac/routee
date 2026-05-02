@@ -2530,6 +2530,79 @@ function handleShellClick(event) {
   }
 }
 
+
+function initMobileTopbarDeadZoneGuard() {
+  if (!elements.topbar) return;
+
+  const interactiveSelector = [
+    "button",
+    "a",
+    "input",
+    "textarea",
+    "select",
+    "label",
+    "[role='button']",
+    "[tabindex]"
+  ].join(",");
+
+  const isMobileTopbar = () => {
+    try {
+      return window.matchMedia("(max-width: 720px), (hover: none) and (pointer: coarse)").matches;
+    } catch (error) {
+      return window.innerWidth <= 720;
+    }
+  };
+
+  const isDeadZoneTap = (event) => {
+    if (!isMobileTopbar()) return false;
+    if (!event.target || typeof event.target.closest !== "function") return false;
+    return !event.target.closest(interactiveSelector);
+  };
+
+  let lastTapAt = 0;
+
+  elements.topbar.addEventListener(
+    "touchend",
+    (event) => {
+      if (!isDeadZoneTap(event)) return;
+
+      const now = Date.now();
+      const isDoubleTap = now - lastTapAt < 360;
+      lastTapAt = now;
+
+      if (isDoubleTap) {
+        event.preventDefault();
+        event.stopPropagation();
+
+        const active = document.activeElement;
+        if (active && active !== document.body && typeof active.blur === "function") {
+          active.blur();
+        }
+      }
+    },
+    { passive: false }
+  );
+
+  elements.topbar.addEventListener(
+    "dblclick",
+    (event) => {
+      if (!isDeadZoneTap(event)) return;
+      event.preventDefault();
+      event.stopPropagation();
+    },
+    true
+  );
+
+  elements.topbar.addEventListener(
+    "click",
+    (event) => {
+      if (!isDeadZoneTap(event)) return;
+      event.stopPropagation();
+    },
+    true
+  );
+}
+
 function initMobileTopbarAutoHide() {
   if (!elements.topbar) return;
 
@@ -2790,6 +2863,7 @@ function init() {
   renderTripList();
   bindEvents();
   syncMobilePanelState();
+  initMobileTopbarDeadZoneGuard();
   initMobileTopbarAutoHide();
   initAuthWatcher();
 
