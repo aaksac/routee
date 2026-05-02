@@ -14,15 +14,7 @@
   <script id="routee-app-splash-early-lock">
     (function () {
       try {
-        var mode = "image";
-        try {
-          mode = sessionStorage.getItem("routeeStartupSplashMode") || "image";
-        } catch (storageError) {
-          mode = "image";
-        }
-
-        document.documentElement.classList.add("show-app-startup-splash", "routee-splash-active");
-        document.documentElement.classList.add(mode === "message" ? "routee-app-splash-message" : "routee-splash-image");
+        document.documentElement.classList.add("show-app-startup-splash", "routee-splash-active", "routee-splash-image");
       } catch (error) {}
     })();
   </script>
@@ -31,7 +23,7 @@
   <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png" />
   <link rel="apple-touch-icon" sizes="180x180" href="./icons/apple-touch-icon.png" />
   <link rel="manifest" href="./manifest.webmanifest" />
-  <link rel="preload" as="image" href="./icons/splash-1170x2532.png?v=20260502-unified-splash" />
+  <link rel="preload" as="image" href="./icons/splash-1170x2532.png?v=20260502-fullscreen-splash" />
 
   <script type="module" src="./js/version-guard.js"></script>
   <script src="./js/status-bar.js"></script>
@@ -42,14 +34,16 @@
 
   <style id="routee-app-splash-critical-css">
     :root {
-      --routee-splash-bg: #0b1222;
-      --routee-splash-image: url("./icons/splash-1170x2532.png?v=20260502-unified-splash");
+      --routee-splash-bg: #d8dde3;
+      --routee-splash-image: url("./icons/splash-1170x2532.png?v=20260502-fullscreen-splash");
     }
 
     html,
     body {
       margin: 0;
+      height: 100%;
       min-height: 100%;
+      padding: 0;
     }
 
     html.show-app-startup-splash,
@@ -85,7 +79,7 @@
       background-color: var(--routee-splash-bg) !important;
       background-image: var(--routee-splash-image) !important;
       background-position: center center !important;
-      background-size: contain !important;
+      background-size: 100% 100% !important;
       background-repeat: no-repeat !important;
       opacity: 0;
       visibility: hidden;
