@@ -289,25 +289,24 @@ function applyAppStartupSplashMode(mode = "image") {
 }
 
 function hydrateAppStartupSplash() {
-  if (!elements.appStartupSplash) return null;
-
-  const mode = getAppStartupSplashMode();
-  const startedAt = (() => {
-    try {
-      return Number(sessionStorage.getItem("routeeStartupSplashAt")) || Date.now();
-    } catch (error) {
-      return Date.now();
-    }
-  })();
-
-  document.documentElement.classList.add("show-app-startup-splash");
-  document.body?.classList.add("routee-app-startup-active");
-  applyAppStartupSplashMode(mode);
-
-  elements.appStartupSplash.classList.add("is-visible");
-  elements.appStartupSplash.setAttribute("aria-hidden", "false");
-
-  return { startedAt, mode };
+  // App sayfası ikinci bir splash üretmez. Mobilde de masaüstünde de
+  // giriş sayfasındaki splashten sonra uygulama arayüzü doğrudan açılır.
+  const targets = [document.documentElement, document.body].filter(Boolean);
+  targets.forEach((target) => {
+    target.classList.remove(
+      "show-app-startup-splash",
+      "routee-app-startup-active",
+      "routee-splash-active",
+      "routee-splash-image",
+      "routee-splash-message",
+      "routee-app-splash-message",
+      "routee-mobile-splash-active",
+      "routee-mobile-splash-image",
+      "routee-mobile-splash-message"
+    );
+  });
+  clearAppStartupSplashSession();
+  return null;
 }
 
 function clearAppStartupSplashSession() {
@@ -323,6 +322,20 @@ function clearAppStartupSplashSession() {
 
 async function closeAppStartupSplash(splashState) {
   if (!splashState || !elements.appStartupSplash) {
+    const targets = [document.documentElement, document.body].filter(Boolean);
+    targets.forEach((target) => {
+      target.classList.remove(
+        "show-app-startup-splash",
+        "routee-app-startup-active",
+        "routee-splash-active",
+        "routee-splash-image",
+        "routee-splash-message",
+        "routee-app-splash-message",
+        "routee-mobile-splash-active",
+        "routee-mobile-splash-image",
+        "routee-mobile-splash-message"
+      );
+    });
     clearAppStartupSplashSession();
     return;
   }
