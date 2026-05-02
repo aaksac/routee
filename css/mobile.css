@@ -1650,10 +1650,10 @@
     --routee-safe-right: env(safe-area-inset-right, 0px);
     --routee-safe-bottom: env(safe-area-inset-bottom, 0px);
     --routee-safe-left: env(safe-area-inset-left, 0px);
-    --routee-mobile-page-x: max(22px, calc(var(--routee-safe-left) + 18px));
-    --routee-mobile-page-r: max(22px, calc(var(--routee-safe-right) + 18px));
-    --routee-map-control-x: 16px;
-    --routee-map-control-gap: 16px;
+    --routee-mobile-page-x: max(12px, var(--routee-safe-left));
+    --routee-mobile-page-r: max(12px, var(--routee-safe-right));
+    --routee-map-control-x: 10px;
+    --routee-map-control-gap: 10px;
     --routee-map-control-size: 52px;
   }
 
@@ -1692,9 +1692,9 @@
     overflow: hidden;
     min-height: calc(64px + var(--routee-safe-top));
     padding-top: calc(12px + var(--routee-safe-top)) !important;
-    padding-right: var(--routee-mobile-page-r) !important;
+    padding-right: max(14px, calc(var(--routee-safe-right) + 12px)) !important;
     padding-bottom: 12px !important;
-    padding-left: var(--routee-mobile-page-x) !important;
+    padding-left: max(14px, calc(var(--routee-safe-left) + 12px)) !important;
     align-items: center;
     justify-content: space-between;
     gap: 12px;
@@ -1768,8 +1768,8 @@
   }
 
   .status-strip {
-    padding-left: var(--routee-mobile-page-x) !important;
-    padding-right: var(--routee-mobile-page-r) !important;
+    padding-left: max(14px, calc(var(--routee-safe-left) + 12px)) !important;
+    padding-right: max(14px, calc(var(--routee-safe-right) + 12px)) !important;
   }
 
   .auth-status {
@@ -1916,10 +1916,10 @@
 
 @media (max-width: 390px) {
   :root {
-    --routee-mobile-page-x: max(18px, calc(env(safe-area-inset-left, 0px) + 16px));
-    --routee-mobile-page-r: max(18px, calc(env(safe-area-inset-right, 0px) + 16px));
-    --routee-map-control-x: 14px;
-    --routee-map-control-gap: 14px;
+    --routee-mobile-page-x: max(12px, calc(env(safe-area-inset-left, 0px) + 10px));
+    --routee-mobile-page-r: max(12px, calc(env(safe-area-inset-right, 0px) + 10px));
+    --routee-map-control-x: 10px;
+    --routee-map-control-gap: 8px;
     --routee-map-control-size: 48px;
   }
 
