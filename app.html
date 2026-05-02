@@ -436,7 +436,7 @@
       function calculateIdealTop(fab, metrics) {
         var fabHeight = Math.ceil((fab && fab.offsetHeight) || 58);
         var loweredHeight = Math.max(metrics.visualHeight, Math.min(metrics.layoutHeight, metrics.visualHeight + 34));
-        var bottomGap = 1;
+        var bottomGap = 2;
         return Math.max(8, Math.round(loweredHeight - fabHeight - bottomGap));
       }
 
