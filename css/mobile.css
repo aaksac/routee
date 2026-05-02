@@ -190,12 +190,24 @@
     display: block;
     position: fixed;
     inset: 0;
-    z-index: 5;
-    background: rgba(15, 23, 42, 0.26);
+    z-index: 70;
+    background: rgba(15, 23, 42, 0.30);
     backdrop-filter: blur(4px);
     -webkit-backdrop-filter: blur(4px);
     touch-action: none;
     pointer-events: auto;
+  }
+
+  body.has-mobile-floating-panel .new-map-mobile-fab {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    filter: blur(4px);
+  }
+
+  body.has-mobile-floating-panel .map-overlay.top-left,
+  body.has-mobile-floating-panel .map-overlay.top-right {
+    z-index: 90;
   }
 
   body.has-mobile-floating-panel .map-canvas,
