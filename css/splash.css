@@ -1,141 +1,154 @@
 /* =========================================================
-   ROUTEE — PROFESSIONAL FULLSCREEN SPLASH
-   İlk açılış + otomatik giriş: yalnızca tek tam ekran splash görseli.
-   Mail/şifre ile giriş: aynı splash üzerinde logo + "Oturumunuz açılıyor" kartı.
-   iOS/Android/Web/Desktop: aynı akış, boş mavi ara ekran yok.
+   ROUTEE — MOBILE ONLY FULL-COVER SPLASH
+   Web/desktop: splash kapalı.
+   Mobil: tek görsel, tam ekran kaplama, beyaz alt boşluk yok.
+   Mail/şifre ile girişte aynı görsel üzerinde logo + "Oturumunuz açılıyor" kartı.
    ========================================================= */
 
 :root {
   --routee-splash-bg: #d8dde3;
-  --routee-splash-image: url("../icons/splash-1170x2532.png?v=20260502-mobile-splash-nocrop");
+  --routee-splash-image: url("../icons/splash-1170x2532.png?v=20260502-mobile-cover-final");
   --routee-splash-fit: 100% 100%;
 }
 
-/* iOS native startup image ile HTML splash aynı dosyayı kullansın. */
 @media (device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait) {
-  :root { --routee-splash-image: url("../icons/splash-640x1136.png?v=20260502-mobile-splash-nocrop"); }
+  :root { --routee-splash-image: url("../icons/splash-640x1136.png?v=20260502-mobile-cover-final"); }
 }
 @media (device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait) {
-  :root { --routee-splash-image: url("../icons/splash-750x1334.png?v=20260502-mobile-splash-nocrop"); }
+  :root { --routee-splash-image: url("../icons/splash-750x1334.png?v=20260502-mobile-cover-final"); }
 }
 @media (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait) {
-  :root { --routee-splash-image: url("../icons/splash-828x1792.png?v=20260502-mobile-splash-nocrop"); }
+  :root { --routee-splash-image: url("../icons/splash-828x1792.png?v=20260502-mobile-cover-final"); }
 }
 @media (device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait) {
-  :root { --routee-splash-image: url("../icons/splash-1125x2436.png?v=20260502-mobile-splash-nocrop"); }
+  :root { --routee-splash-image: url("../icons/splash-1125x2436.png?v=20260502-mobile-cover-final"); }
 }
 @media (device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait) {
-  :root { --routee-splash-image: url("../icons/splash-1170x2532.png?v=20260502-mobile-splash-nocrop"); }
+  :root { --routee-splash-image: url("../icons/splash-1170x2532.png?v=20260502-mobile-cover-final"); }
 }
 @media (device-width: 414px) and (device-height: 736px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait) {
-  :root { --routee-splash-image: url("../icons/splash-1242x2208.png?v=20260502-mobile-splash-nocrop"); }
+  :root { --routee-splash-image: url("../icons/splash-1242x2208.png?v=20260502-mobile-cover-final"); }
 }
 @media (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait) {
-  :root { --routee-splash-image: url("../icons/splash-1242x2688.png?v=20260502-mobile-splash-nocrop"); }
+  :root { --routee-splash-image: url("../icons/splash-1242x2688.png?v=20260502-mobile-cover-final"); }
 }
 @media (device-width: 428px) and (device-height: 926px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait) {
-  :root { --routee-splash-image: url("../icons/splash-1284x2778.png?v=20260502-mobile-splash-nocrop"); }
+  :root { --routee-splash-image: url("../icons/splash-1284x2778.png?v=20260502-mobile-cover-final"); }
 }
 @media (device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait) {
-  :root { --routee-splash-image: url("../icons/splash-1290x2796.png?v=20260502-mobile-splash-nocrop"); }
+  :root { --routee-splash-image: url("../icons/splash-1290x2796.png?v=20260502-mobile-cover-final"); }
 }
 @media (device-width: 768px) and (device-height: 1024px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait) {
-  :root { --routee-splash-image: url("../icons/splash-1536x2048.png?v=20260502-mobile-splash-nocrop"); }
+  :root { --routee-splash-image: url("../icons/splash-1536x2048.png?v=20260502-mobile-cover-final"); }
 }
 @media (device-width: 834px) and (device-height: 1112px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait) {
-  :root { --routee-splash-image: url("../icons/splash-1668x2224.png?v=20260502-mobile-splash-nocrop"); }
+  :root { --routee-splash-image: url("../icons/splash-1668x2224.png?v=20260502-mobile-cover-final"); }
 }
 @media (device-width: 834px) and (device-height: 1194px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait) {
-  :root { --routee-splash-image: url("../icons/splash-1668x2388.png?v=20260502-mobile-splash-nocrop"); }
+  :root { --routee-splash-image: url("../icons/splash-1668x2388.png?v=20260502-mobile-cover-final"); }
 }
 @media (device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait) {
-  :root { --routee-splash-image: url("../icons/splash-2048x2732.png?v=20260502-mobile-splash-nocrop"); }
+  :root { --routee-splash-image: url("../icons/splash-2048x2732.png?v=20260502-mobile-cover-final"); }
 }
 
-html.routee-splash-active,
-html.routee-splash-active body,
-body.routee-splash-active,
-html.show-app-startup-splash,
-html.show-app-startup-splash body,
-body.routee-app-startup-active {
-  width: 100% !important;
-  height: 100% !important;
-  min-height: 100vh !important;
-  min-height: 100svh !important;
-  min-height: 100dvh !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  overflow: hidden !important;
-  background: var(--routee-splash-bg) !important;
-  overscroll-behavior: none !important;
-  -webkit-overflow-scrolling: auto !important;
+/* Masaüstü/web tarafında splash tamamen kapalı. */
+html.routee-desktop-boot .startup-splash,
+html.routee-desktop-boot .app-startup-splash,
+html:not(.routee-splash-active) body:not(.routee-splash-active) .startup-splash,
+html:not(.show-app-startup-splash) body:not(.routee-app-startup-active) .app-startup-splash {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
 }
 
-/* Splash sırasında üst safe-area/statusbar yaması görselin üstünü kapatmasın. */
+/* Splash aktifken başka safe-area/statusbar katmanı görselin üstüne-altına binmesin. */
 html.routee-splash-active::before,
 html.routee-splash-active::after,
-html.show-app-startup-splash::before,
-html.show-app-startup-splash::after,
+html.routee-splash-active body::before,
+html.routee-splash-active body::after,
 body.routee-splash-active::before,
-body.routee-splash-active::after,
-body.routee-app-startup-active::before,
-body.routee-app-startup-active::after {
+body.routee-splash-active::after {
   display: none !important;
   content: none !important;
 }
 
-.startup-splash,
-.app-startup-splash,
-html.routee-splash-active .startup-splash,
-body.routee-splash-active .startup-splash,
-html.show-app-startup-splash .app-startup-splash,
-body.routee-app-startup-active .app-startup-splash {
-  position: fixed !important;
-  inset: 0 !important;
-  z-index: 2147483646 !important;
-  width: 100vw !important;
-  width: 100dvw !important;
-  height: 100vh !important;
-  height: 100svh !important;
-  height: 100dvh !important;
-  min-width: 100vw !important;
-  min-height: -webkit-fill-available !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  display: grid !important;
-  place-items: center !important;
-  overflow: hidden !important;
-  background-color: var(--routee-splash-bg) !important;
-  background-image: var(--routee-splash-image) !important;
-  background-position: center center !important;
-  background-size: var(--routee-splash-fit) !important;
-  background-repeat: no-repeat !important;
-  opacity: 1 !important;
-  visibility: visible !important;
-  pointer-events: auto !important;
-  transform: translate3d(0, 0, 0) !important;
-  -webkit-transform: translate3d(0, 0, 0) !important;
-  backface-visibility: hidden !important;
-  -webkit-backface-visibility: hidden !important;
-  contain: layout paint size !important;
+@media (max-width: 720px), (hover: none) and (pointer: coarse) {
+  html.routee-splash-active,
+  html.routee-splash-active body,
+  body.routee-splash-active {
+    position: fixed !important;
+    inset: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 100vh !important;
+    min-height: 100svh !important;
+    min-height: 100dvh !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    background: var(--routee-splash-bg) !important;
+    overscroll-behavior: none !important;
+    -webkit-overflow-scrolling: auto !important;
+  }
+
+  .startup-splash,
+  html.routee-splash-active .startup-splash,
+  body.routee-splash-active .startup-splash {
+    position: fixed !important;
+    top: -1px !important;
+    right: -1px !important;
+    bottom: -1px !important;
+    left: -1px !important;
+    z-index: 2147483646 !important;
+    width: auto !important;
+    height: auto !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    display: grid !important;
+    place-items: center !important;
+    overflow: hidden !important;
+    background-color: var(--routee-splash-bg) !important;
+    background-image: var(--routee-splash-image) !important;
+    background-position: center center !important;
+    background-size: 100% 100% !important;
+    background-repeat: no-repeat !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+    transform: translate3d(0, 0, 0) !important;
+    -webkit-transform: translate3d(0, 0, 0) !important;
+    backface-visibility: hidden !important;
+    -webkit-backface-visibility: hidden !important;
+  }
+
+  /* iOS'ta alt çizgi/boşluk bırakmamak için görsel sabit katman olarak da basılır. */
+  html.routee-splash-active .startup-splash::before,
+  body.routee-splash-active .startup-splash::before,
+  .startup-splash.is-visible::before {
+    content: "" !important;
+    position: absolute !important;
+    inset: 0 !important;
+    z-index: -1 !important;
+    background-color: var(--routee-splash-bg) !important;
+    background-image: var(--routee-splash-image) !important;
+    background-position: center center !important;
+    background-size: 100% 100% !important;
+    background-repeat: no-repeat !important;
+    pointer-events: none !important;
+  }
+
+  html.routee-splash-active .login-page,
+  body.routee-splash-active .login-page {
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+  }
 }
 
-.startup-splash:not(.is-visible):not([data-mode="message"]),
-.app-startup-splash:not(.is-visible):not([data-mode="message"]) {
-  pointer-events: none !important;
-}
-
-html.routee-splash-active .login-page,
-body.routee-splash-active .login-page,
-html.show-app-startup-splash #app,
-body.routee-app-startup-active #app,
-html.show-app-startup-splash .new-map-mobile-fab,
-body.routee-app-startup-active .new-map-mobile-fab {
-  opacity: 0 !important;
-  visibility: hidden !important;
-  pointer-events: none !important;
-}
-
+/* Varsayılan: yazı/kart gizli. */
 .routee-splash-card,
 .startup-splash-card,
 .app-startup-splash-image,
@@ -148,6 +161,7 @@ body.routee-app-startup-active .new-map-mobile-fab {
   pointer-events: none !important;
 }
 
+/* Sadece kullanıcı mail/şifreyle girişe bastığında kart görünür. */
 .startup-splash[data-mode="message"] .routee-splash-card,
 html.routee-splash-message .startup-splash .routee-splash-card,
 body.routee-splash-message .startup-splash .routee-splash-card {
@@ -167,16 +181,6 @@ body.routee-splash-message .startup-splash .routee-splash-card {
   box-shadow: 0 24px 58px rgba(0, 0, 0, 0.26) !important;
   backdrop-filter: blur(18px) !important;
   -webkit-backdrop-filter: blur(18px) !important;
-}
-
-/* App sayfasında ikinci defa yazılı kart gösterilmez; sadece aynı tam ekran splash devam eder. */
-.app-startup-splash .routee-splash-card,
-html.routee-app-splash-message .app-startup-splash .routee-splash-card,
-body.routee-app-splash-message .app-startup-splash .routee-splash-card {
-  display: none !important;
-  visibility: hidden !important;
-  opacity: 0 !important;
-  pointer-events: none !important;
 }
 
 .routee-splash-logo {
@@ -244,144 +248,4 @@ body.routee-app-splash-message .app-startup-splash .routee-splash-card {
 
 @media (prefers-reduced-motion: reduce) {
   .routee-splash-dots span { animation: none !important; }
-}
-
-/* Desktop/web'de splash tamamen kapalıdır. Mobilde sadece routee-splash-active aktifken görünür. */
-html.routee-desktop-boot .startup-splash,
-html.routee-desktop-boot .app-startup-splash,
-html:not(.routee-splash-active) body:not(.routee-splash-active) .startup-splash,
-html:not(.show-app-startup-splash) body:not(.routee-app-startup-active) .app-startup-splash {
-  display: none !important;
-  visibility: hidden !important;
-  opacity: 0 !important;
-  pointer-events: none !important;
-}
-
-@media (max-width: 720px), (hover: none) and (pointer: coarse) {
-  html.routee-splash-active,
-  html.routee-splash-active body,
-  body.routee-splash-active {
-    position: fixed !important;
-    inset: 0 !important;
-    width: 100vw !important;
-    height: 100vh !important;
-    height: 100svh !important;
-    height: 100dvh !important;
-    min-height: -webkit-fill-available !important;
-  }
-
-  html.routee-splash-active .startup-splash,
-  body.routee-splash-active .startup-splash {
-    top: 0 !important;
-    right: 0 !important;
-    bottom: 0 !important;
-    left: 0 !important;
-    height: 100vh !important;
-    height: 100svh !important;
-    height: 100dvh !important;
-    min-height: -webkit-fill-available !important;
-    background-size: 100% 100% !important;
-  }
-
-  @supports (-webkit-touch-callout: none) {
-    html.routee-splash-active,
-    html.routee-splash-active body,
-    body.routee-splash-active,
-    html.routee-splash-active .startup-splash,
-    body.routee-splash-active .startup-splash {
-      height: -webkit-fill-available !important;
-      min-height: -webkit-fill-available !important;
-    }
-  }
-}
-
-/* =========================================================
-   ROUTEE — MOBILE SPLASH NO-CROP FINAL OVERRIDE
-   Mobil tarayıcı/PWA viewport farklarında splash görseli alttan/üstten kesilmesin.
-   ========================================================= */
-@media (max-width: 720px), (hover: none) and (pointer: coarse) {
-  :root {
-    --routee-splash-bg: #d8dde3;
-    --routee-splash-fit: contain;
-  }
-
-  html.routee-splash-active,
-  html.routee-splash-active body,
-  body.routee-splash-active {
-    position: fixed !important;
-    inset: 0 !important;
-    width: 100vw !important;
-    width: var(--routee-visual-width, 100vw) !important;
-    height: var(--routee-visual-height, 100svh) !important;
-    min-height: var(--routee-visual-height, 100svh) !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    overflow: hidden !important;
-    background: var(--routee-splash-bg) !important;
-    background-color: var(--routee-splash-bg) !important;
-  }
-
-  html.routee-splash-active .startup-splash,
-  body.routee-splash-active .startup-splash,
-  .startup-splash.is-visible {
-    position: fixed !important;
-    top: 0 !important;
-    left: 0 !important;
-    right: 0 !important;
-    bottom: auto !important;
-    width: 100vw !important;
-    width: var(--routee-visual-width, 100vw) !important;
-    height: var(--routee-visual-height, 100svh) !important;
-    min-width: 0 !important;
-    min-height: 0 !important;
-    max-height: none !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    overflow: hidden !important;
-    background-color: var(--routee-splash-bg) !important;
-    background-image: var(--routee-splash-image) !important;
-    background-repeat: no-repeat !important;
-    background-position: center center !important;
-    background-size: contain !important;
-    opacity: 1 !important;
-    visibility: visible !important;
-    transform: translate3d(0, 0, 0) !important;
-    -webkit-transform: translate3d(0, 0, 0) !important;
-  }
-
-  html.routee-splash-active .startup-splash::before,
-  body.routee-splash-active .startup-splash::before,
-  .startup-splash.is-visible::before {
-    content: "" !important;
-    position: absolute !important;
-    inset: 0 !important;
-    background: var(--routee-splash-bg) !important;
-    background-image: var(--routee-splash-image) !important;
-    background-repeat: no-repeat !important;
-    background-position: center center !important;
-    background-size: contain !important;
-    z-index: -1 !important;
-    pointer-events: none !important;
-  }
-
-  html.routee-splash-active .startup-splash::after,
-  body.routee-splash-active .startup-splash::after,
-  .startup-splash.is-visible::after {
-    content: "" !important;
-    position: fixed !important;
-    left: 0 !important;
-    right: 0 !important;
-    bottom: 0 !important;
-    height: max(env(safe-area-inset-bottom, 0px), 1px) !important;
-    background: var(--routee-splash-bg) !important;
-    z-index: 0 !important;
-    pointer-events: none !important;
-  }
-
-  .startup-splash[data-mode="message"] .routee-splash-card,
-  html.routee-splash-message .startup-splash .routee-splash-card,
-  body.routee-splash-message .startup-splash .routee-splash-card {
-    position: relative !important;
-    z-index: 1 !important;
-  }
 }
