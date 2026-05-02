@@ -130,6 +130,7 @@ const elements = {
   savePanel: document.getElementById("savePanel"),
   importExportPanel: document.getElementById("importExportPanel"),
   appStartupSplash: document.getElementById("appStartupSplash"),
+  appStartupSplashTitle: document.getElementById("appStartupSplashTitle"),
   appStartupSplashText: document.getElementById("appStartupSplashText"),
   mobileFloatingBackdrop: document.getElementById("mobileFloatingBackdrop"),
   noteEditorOverlay: document.getElementById("noteEditorOverlay"),
@@ -255,26 +256,25 @@ function hydrateAppStartupSplash() {
   if (!elements.appStartupSplash) return null;
 
   try {
-    const hasSessionSplash = sessionStorage.getItem("routeeStartupSplash") === "1";
     const isMobileSplash = isMobileStartupMode();
-    const shouldUseStartupSplash = hasSessionSplash || isMobileSplash;
 
-    if (!shouldUseStartupSplash) {
-      return null;
-    }
-
-    document.documentElement.classList.add("show-app-startup-splash");
-    document.body?.classList.add("routee-app-startup-active");
+    document.documentElement.classList.add("show-app-startup-splash", "routee-splash-active", "routee-splash-message");
+    document.body?.classList.add("routee-app-startup-active", "routee-splash-active", "routee-splash-message");
 
     if (isMobileSplash) {
-      document.documentElement.classList.add("routee-mobile-splash-active", "routee-mobile-splash-image");
-      document.body?.classList.add("routee-mobile-splash-active", "routee-mobile-splash-image");
+      document.documentElement.classList.add("routee-mobile-splash-active", "routee-mobile-splash-message");
+      document.body?.classList.add("routee-mobile-splash-active", "routee-mobile-splash-message");
     }
 
     const startedAt = Number(sessionStorage.getItem("routeeStartupSplashAt")) || Date.now();
+    const startupText = sessionStorage.getItem("routeeStartupSplashText") || "Oturumunuz açılıyor";
+
+    if (elements.appStartupSplashTitle) {
+      elements.appStartupSplashTitle.textContent = "Rota";
+    }
 
     if (elements.appStartupSplashText) {
-      elements.appStartupSplashText.textContent = "";
+      elements.appStartupSplashText.textContent = startupText;
     }
 
     elements.appStartupSplash.classList.add("is-visible");
@@ -284,8 +284,8 @@ function hydrateAppStartupSplash() {
     console.warn("Startup splash verisi okunamadı:", error);
 
     if (isMobileStartupMode()) {
-      document.documentElement.classList.add("show-app-startup-splash", "routee-mobile-splash-active", "routee-mobile-splash-image");
-      document.body?.classList.add("routee-app-startup-active", "routee-mobile-splash-active", "routee-mobile-splash-image");
+      document.documentElement.classList.add("show-app-startup-splash", "routee-splash-active", "routee-splash-message", "routee-mobile-splash-active", "routee-mobile-splash-message");
+      document.body?.classList.add("routee-app-startup-active", "routee-splash-active", "routee-splash-message", "routee-mobile-splash-active", "routee-mobile-splash-message");
       elements.appStartupSplash.classList.add("is-visible");
       elements.appStartupSplash.setAttribute("aria-hidden", "false");
       return { startedAt: Date.now() };
@@ -318,8 +318,8 @@ async function closeAppStartupSplash(splashState) {
 
   elements.appStartupSplash.classList.remove("is-visible");
   elements.appStartupSplash.setAttribute("aria-hidden", "true");
-  document.documentElement.classList.remove("show-app-startup-splash", "routee-mobile-splash-active", "routee-mobile-splash-image");
-  document.body?.classList.remove("routee-app-startup-active", "routee-mobile-splash-active", "routee-mobile-splash-image");
+  document.documentElement.classList.remove("show-app-startup-splash", "routee-splash-active", "routee-splash-message", "routee-mobile-splash-active", "routee-mobile-splash-image", "routee-mobile-splash-message");
+  document.body?.classList.remove("routee-app-startup-active", "routee-splash-active", "routee-splash-message", "routee-mobile-splash-active", "routee-mobile-splash-image", "routee-mobile-splash-message");
   clearAppStartupSplashSession();
 }
 
