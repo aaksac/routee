@@ -2039,3 +2039,20 @@
     background-color: var(--bg, #f4f7fb) !important;
   }
 }
+
+/* ROUTEE — FINAL MOBILE APP HEIGHT LOCK AFTER SINGLE SPLASH
+   Uygulama açıldıktan sonra iOS/Android'de alt beyaz boşluk bırakmamak için
+   görsel viewport değişkenine bağlı kalmadan gerçek uygulama yüzeyi korunur. */
+@media (max-width: 720px), (hover: none) and (pointer: coarse) {
+  html:not(.routee-splash-active):not(.show-app-startup-splash),
+  html:not(.routee-splash-active):not(.show-app-startup-splash) body,
+  body:not(.routee-splash-active):not(.routee-app-startup-active),
+  body:not(.routee-splash-active):not(.routee-app-startup-active) #app,
+  #app {
+    min-height: 100vh !important;
+    min-height: 100svh !important;
+    min-height: 100dvh !important;
+    background: var(--bg, #f4f7fb) !important;
+    background-color: var(--bg, #f4f7fb) !important;
+  }
+}
