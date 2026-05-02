@@ -1971,3 +1971,22 @@ body.routee-statusbar-locked::before {
     background-color: var(--bg) !important;
   }
 }
+
+
+/* ROUTEE — APP SURFACE FALLBACK AFTER SPLASH REMOVAL */
+html,
+body,
+#app {
+  background-color: var(--bg, #f4f7fb);
+}
+
+@media (max-width: 720px), (hover: none) and (pointer: coarse) {
+  html,
+  body,
+  #app {
+    min-height: 100vh;
+    min-height: 100svh;
+    min-height: 100dvh;
+    background-color: var(--bg, #f4f7fb) !important;
+  }
+}
