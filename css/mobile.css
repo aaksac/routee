@@ -1965,3 +1965,60 @@
     top: 0 !important;
   }
 }
+
+
+/* =========================================================
+   ROUTEE — FINAL MOBILE NO-WHITE-BOTTOM OVERRIDE
+   iPhone/Android tarayıcı ve PWA altında kalan beyaz güvenli alanı uygulama yüzeyine eşitler.
+   ========================================================= */
+@media (max-width: 720px), (hover: none) and (pointer: coarse) {
+  html,
+  body {
+    width: 100% !important;
+    min-height: 100vh !important;
+    min-height: 100svh !important;
+    min-height: 100dvh !important;
+    background: var(--bg, #f4f7fb) !important;
+    background-color: var(--bg, #f4f7fb) !important;
+  }
+
+  body,
+  #app {
+    min-height: 100vh !important;
+    min-height: 100svh !important;
+    min-height: 100dvh !important;
+    background: var(--bg, #f4f7fb) !important;
+    background-color: var(--bg, #f4f7fb) !important;
+  }
+
+  body::after {
+    content: "";
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: env(safe-area-inset-bottom, 0px);
+    background: var(--bg, #f4f7fb) !important;
+    pointer-events: none;
+    z-index: 2147483000;
+  }
+
+  @supports (bottom: constant(safe-area-inset-bottom)) {
+    body::after {
+      height: constant(safe-area-inset-bottom);
+    }
+  }
+
+  html.routee-splash-active,
+  html.routee-splash-active body,
+  body.routee-splash-active {
+    background: var(--routee-splash-bg, #d8dde3) !important;
+    background-color: var(--routee-splash-bg, #d8dde3) !important;
+  }
+
+  html.routee-splash-active body::after,
+  body.routee-splash-active::after {
+    display: none !important;
+    content: none !important;
+  }
+}
