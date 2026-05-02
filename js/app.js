@@ -253,15 +253,13 @@ function goToLogin() {
 }
 
 function getAppStartupSplashMode() {
-  try {
-    return sessionStorage.getItem("routeeStartupSplashMode") === "message" ? "message" : "image";
-  } catch (error) {
-    return "image";
-  }
+  // App sayfası ikinci yazılı splash üretmez; girişteki yazılı durumdan sonra
+  // harita hazır olana kadar aynı tam ekran görsel devam eder.
+  return "image";
 }
 
 function applyAppStartupSplashMode(mode = "image") {
-  const normalizedMode = mode === "message" ? "message" : "image";
+  const normalizedMode = "image";
   const targets = [document.documentElement, document.body].filter(Boolean);
 
   targets.forEach((target) => {
@@ -333,6 +331,9 @@ async function closeAppStartupSplash(splashState) {
     window.clearTimeout(state.appStartupRevealTimer);
     state.appStartupRevealTimer = null;
   }
+
+  // Uygulama katmanı DOM'a boyanmadan splash kaldırılırsa kısa mavi/boş geçiş görünebilir.
+  await new Promise((resolve) => window.requestAnimationFrame(() => window.requestAnimationFrame(resolve)));
 
   elements.appStartupSplash.classList.remove("is-visible");
   elements.appStartupSplash.setAttribute("aria-hidden", "true");
