@@ -51,6 +51,8 @@ function setMobileStartupPhase(phase) {
 
   targets.forEach((target) => {
     target.classList.remove(
+      "routee-splash-active",
+      "routee-splash-message",
       "routee-mobile-entry-splash",
       "routee-mobile-routing-splash",
       "routee-mobile-startup-active",
@@ -60,13 +62,14 @@ function setMobileStartupPhase(phase) {
     );
   });
 
-  if (!phase || !isMobileStartupMode()) return;
+  if (!phase) return;
 
-  // Mobilde tek splash kuralı:
-  // entry, routing ve app geçişinde farklı kart/metin/loader sınıfı açılmaz.
-  // Hep aynı görsel gösterilir; sadece kapanışta splash kaldırılır.
   targets.forEach((target) => {
-    target.classList.add("routee-mobile-splash-active", "routee-mobile-splash-image");
+    target.classList.add("routee-splash-active", "routee-splash-message");
+
+    if (isMobileStartupMode()) {
+      target.classList.add("routee-mobile-splash-active", "routee-mobile-splash-message");
+    }
   });
 }
 
@@ -142,7 +145,7 @@ function setButtonsDisabled(disabled) {
   });
 }
 
-function showStartupSplash(title = "Rota", message = "Oturumunuz kontrol ediliyor...", options = {}) {
+function showStartupSplash(title = "Rota", message = "Oturumunuz açılıyor", options = {}) {
   if (!elements.startupSplash) return;
 
   setMobileStartupPhase(options.phase || "routing");
@@ -187,7 +190,7 @@ function revealLoginScreen() {
 function setAppStartupSplash() {
   try {
     sessionStorage.setItem("routeeStartupSplash", "1");
-    sessionStorage.removeItem("routeeStartupSplashText");
+    sessionStorage.setItem("routeeStartupSplashText", "Oturumunuz açılıyor");
     sessionStorage.setItem("routeeStartupSplashAt", String(Date.now()));
   } catch (error) {
     console.warn("Startup splash session yazımı başarısız:", error);
@@ -299,22 +302,7 @@ async function routeAfterLogin(user, options = {}) {
     const isAdmin = claims.adminPanel === true;
     const targetUrl = isAdmin ? "./chooser.html" : "./app.html";
 
-    const keepExistingMobileSplash =
-      options.keepExistingMobileSplash === true &&
-      !isAdmin &&
-      isMobileStartupMode();
-
-    if (keepExistingMobileSplash || isMobileStartupMode()) {
-      // Mobilde tek görsel korunur; routing/message kartı üretilmez.
-      showStartupSplash("Rota", "", { phase: "entry" });
-    } else {
-      const splashTitle = isAdmin ? "Yönetim paneli açılıyor" : "Rota";
-      const splashMessage = isAdmin
-        ? "Yetkileriniz doğrulanıyor..."
-        : "Oturumunuz açılıyor...";
-
-      showStartupSplash(splashTitle, splashMessage, { phase: "routing" });
-    }
+    showStartupSplash("Rota", "Oturumunuz açılıyor", { phase: "routing" });
 
     if (!isAdmin) {
       setAppStartupSplash();
@@ -354,14 +342,14 @@ async function handleLogin() {
     return;
   }
 
-  showStartupSplash("Rota", "", { phase: "entry" });
+  showStartupSplash("Rota", "Oturumunuz açılıyor", { phase: "entry" });
 
   try {
     const { login } = await loadAuthModule({ allowRetryIfStale: true });
     const result = await login(email, password);
 
     await routeAfterLogin(result.user, {
-      message: "Oturumunuz açılıyor..."
+      message: "Oturumunuz açılıyor"
     });
   } catch (error) {
     isRouting = false;
@@ -433,7 +421,7 @@ async function initAuthWatcher() {
     watchAuth(async (user) => {
       if (user) {
         await routeAfterLogin(user, {
-          message: "Oturumunuz açılıyor...",
+          message: "Oturumunuz açılıyor",
           delay: false,
           keepExistingMobileSplash: true
         });
@@ -474,7 +462,7 @@ function applyQueryStatus() {
 function init() {
   bindEvents();
   applyQueryStatus();
-  showStartupSplash("Rota", "", { phase: "entry" });
+  showStartupSplash("Rota", "Oturumunuz açılıyor", { phase: "entry" });
   setButtonsDisabled(true);
   initAuthWatcher();
 
