@@ -28,7 +28,7 @@ let initialStatus = {
 };
 
 const STARTUP_SPLASH_MIN_MS = 300;
-const AUTH_BOOT_TIMEOUT_MS = 2600;
+const AUTH_BOOT_TIMEOUT_MS = 6000;
 const STALE_MODULE_RETRY_MS = AUTH_BOOT_TIMEOUT_MS - 100;
 const MOBILE_STARTUP_QUERY = "(max-width: 720px), (hover: none) and (pointer: coarse)";
 
@@ -46,12 +46,14 @@ function isMobileStartupMode() {
   );
 }
 
-function setMobileStartupPhase(phase) {
+function setStartupSplashMode(mode = "image") {
+  const normalizedMode = mode === "message" ? "message" : "image";
   const targets = [document.documentElement, document.body].filter(Boolean);
 
   targets.forEach((target) => {
     target.classList.remove(
       "routee-splash-active",
+      "routee-splash-image",
       "routee-splash-message",
       "routee-mobile-entry-splash",
       "routee-mobile-routing-splash",
@@ -62,17 +64,15 @@ function setMobileStartupPhase(phase) {
     );
   });
 
-  if (!phase) return;
-
   targets.forEach((target) => {
-    target.classList.add("routee-splash-active", "routee-splash-message");
-
-    if (isMobileStartupMode()) {
-      target.classList.add("routee-mobile-splash-active", "routee-mobile-splash-message");
-    }
+    target.classList.add("routee-splash-active");
+    target.classList.add(normalizedMode === "message" ? "routee-splash-message" : "routee-splash-image");
   });
-}
 
+  if (elements.startupSplash) {
+    elements.startupSplash.dataset.mode = normalizedMode;
+  }
+}
 
 function clearAuthModulePromise() {
   authModulePromise = null;
@@ -145,20 +145,22 @@ function setButtonsDisabled(disabled) {
   });
 }
 
-function showStartupSplash(title = "Rota", message = "Oturumunuz açılıyor", options = {}) {
+function showStartupSplash(title = "Rota", message = "", options = {}) {
   if (!elements.startupSplash) return;
 
-  setMobileStartupPhase(options.phase || "routing");
+  const mode = options.mode === "message" ? "message" : "image";
+  setStartupSplashMode(mode);
 
   if (elements.startupSplashTitle) {
-    elements.startupSplashTitle.textContent = title;
+    elements.startupSplashTitle.textContent = title || "Rota";
   }
 
   if (elements.startupSplashText) {
-    elements.startupSplashText.textContent = message;
+    elements.startupSplashText.textContent = mode === "message" ? (message || "Oturumunuz açılıyor") : "";
   }
 
   document.body.classList.add("auth-booting");
+  elements.startupSplash.dataset.mode = mode;
   elements.startupSplash.classList.add("is-visible");
   elements.startupSplash.setAttribute("aria-hidden", "false");
 }
@@ -167,7 +169,22 @@ function hideStartupSplash() {
   if (!elements.startupSplash) return;
   elements.startupSplash.classList.remove("is-visible");
   elements.startupSplash.setAttribute("aria-hidden", "true");
-  setMobileStartupPhase(null);
+  elements.startupSplash.dataset.mode = "image";
+
+  const targets = [document.documentElement, document.body].filter(Boolean);
+  targets.forEach((target) => {
+    target.classList.remove(
+      "routee-splash-active",
+      "routee-splash-image",
+      "routee-splash-message",
+      "routee-mobile-entry-splash",
+      "routee-mobile-routing-splash",
+      "routee-mobile-startup-active",
+      "routee-mobile-splash-active",
+      "routee-mobile-splash-image",
+      "routee-mobile-splash-message"
+    );
+  });
 }
 
 function revealLoginScreen() {
@@ -187,10 +204,12 @@ function revealLoginScreen() {
   setStatus(initialStatus.message, initialStatus.type);
 }
 
-function setAppStartupSplash() {
+function setAppStartupSplash(mode = "image") {
+  const normalizedMode = mode === "message" ? "message" : "image";
+
   try {
     sessionStorage.setItem("routeeStartupSplash", "1");
-    sessionStorage.setItem("routeeStartupSplashText", "Oturumunuz açılıyor");
+    sessionStorage.setItem("routeeStartupSplashMode", normalizedMode);
     sessionStorage.setItem("routeeStartupSplashAt", String(Date.now()));
   } catch (error) {
     console.warn("Startup splash session yazımı başarısız:", error);
@@ -200,6 +219,7 @@ function setAppStartupSplash() {
 function clearAppStartupSplash() {
   try {
     sessionStorage.removeItem("routeeStartupSplash");
+    sessionStorage.removeItem("routeeStartupSplashMode");
     sessionStorage.removeItem("routeeStartupSplashText");
     sessionStorage.removeItem("routeeStartupSplashAt");
   } catch (error) {
@@ -296,16 +316,18 @@ async function routeAfterLogin(user, options = {}) {
   window.clearTimeout(bootFallbackTimer);
   setButtonsDisabled(true);
 
+  const splashMode = options.splashMode === "message" ? "message" : "image";
+
   try {
     const { getUserClaims } = await loadAuthModule({ allowRetryIfStale: true });
     const claims = await getUserClaims(user);
     const isAdmin = claims.adminPanel === true;
     const targetUrl = isAdmin ? "./chooser.html" : "./app.html";
 
-    showStartupSplash("Rota", "Oturumunuz açılıyor", { phase: "routing" });
+    showStartupSplash("Rota", "Oturumunuz açılıyor", { mode: splashMode });
 
     if (!isAdmin) {
-      setAppStartupSplash();
+      setAppStartupSplash(splashMode);
     } else {
       clearAppStartupSplash();
     }
@@ -342,14 +364,14 @@ async function handleLogin() {
     return;
   }
 
-  showStartupSplash("Rota", "Oturumunuz açılıyor", { phase: "entry" });
+  showStartupSplash("Rota", "Oturumunuz açılıyor", { mode: "message" });
 
   try {
     const { login } = await loadAuthModule({ allowRetryIfStale: true });
     const result = await login(email, password);
 
     await routeAfterLogin(result.user, {
-      message: "Oturumunuz açılıyor"
+      splashMode: "message"
     });
   } catch (error) {
     isRouting = false;
@@ -421,9 +443,8 @@ async function initAuthWatcher() {
     watchAuth(async (user) => {
       if (user) {
         await routeAfterLogin(user, {
-          message: "Oturumunuz açılıyor",
-          delay: false,
-          keepExistingMobileSplash: true
+          splashMode: "image",
+          delay: false
         });
         return;
       }
@@ -462,7 +483,7 @@ function applyQueryStatus() {
 function init() {
   bindEvents();
   applyQueryStatus();
-  showStartupSplash("Rota", "Oturumunuz açılıyor", { phase: "entry" });
+  showStartupSplash("Rota", "", { mode: "image" });
   setButtonsDisabled(true);
   initAuthWatcher();
 
