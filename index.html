@@ -8,18 +8,10 @@
     />
     <title>Giriş | Rota </title>
 
-    <script id="routee-mobile-entry-splash-early-lock">
+    <script id="routee-entry-splash-early-lock">
       (function () {
         try {
-          var mobileQuery = "(max-width: 720px), (hover: none) and (pointer: coarse)";
-          var isMobile = false;
-          try { isMobile = window.matchMedia && window.matchMedia(mobileQuery).matches; } catch (queryError) { isMobile = false; }
-          if (!isMobile) {
-            isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(window.navigator.userAgent || "");
-          }
-          if (isMobile) {
-            document.documentElement.classList.add("routee-splash-active", "routee-splash-message", "routee-mobile-splash-active", "routee-mobile-splash-message");
-          }
+          document.documentElement.classList.add("routee-splash-active", "routee-splash-image");
         } catch (error) {}
       })();
     </script>
@@ -35,27 +27,27 @@
     <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png" />
     <link rel="apple-touch-icon" sizes="180x180" href="./icons/apple-touch-icon.png" />
 
-    <link rel="apple-touch-startup-image" href="./icons/splash-640x1136.png?v=20260501-pro-light" media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" />
-    <link rel="apple-touch-startup-image" href="./icons/splash-750x1334.png?v=20260501-pro-light" media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" />
-    <link rel="apple-touch-startup-image" href="./icons/splash-828x1792.png?v=20260501-pro-light" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" />
-    <link rel="apple-touch-startup-image" href="./icons/splash-1125x2436.png?v=20260501-pro-light" media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" />
-    <link rel="apple-touch-startup-image" href="./icons/splash-1170x2532.png?v=20260501-pro-light" media="(device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" />
-    <link rel="apple-touch-startup-image" href="./icons/splash-1242x2208.png?v=20260501-pro-light" media="(device-width: 414px) and (device-height: 736px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" />
-    <link rel="apple-touch-startup-image" href="./icons/splash-1242x2688.png?v=20260501-pro-light" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" />
-    <link rel="apple-touch-startup-image" href="./icons/splash-1284x2778.png?v=20260501-pro-light" media="(device-width: 428px) and (device-height: 926px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" />
-    <link rel="apple-touch-startup-image" href="./icons/splash-1290x2796.png?v=20260501-pro-light" media="(device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" />
-    <link rel="apple-touch-startup-image" href="./icons/splash-1536x2048.png?v=20260501-pro-light" media="(device-width: 768px) and (device-height: 1024px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" />
-    <link rel="apple-touch-startup-image" href="./icons/splash-1668x2224.png?v=20260501-pro-light" media="(device-width: 834px) and (device-height: 1112px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" />
-    <link rel="apple-touch-startup-image" href="./icons/splash-1668x2388.png?v=20260501-pro-light" media="(device-width: 834px) and (device-height: 1194px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" />
-    <link rel="apple-touch-startup-image" href="./icons/splash-2048x2732.png?v=20260501-pro-light" media="(device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" />
+    <link rel="apple-touch-startup-image" href="./icons/splash-640x1136.png?v=20260502-unified-splash" media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" />
+    <link rel="apple-touch-startup-image" href="./icons/splash-750x1334.png?v=20260502-unified-splash" media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" />
+    <link rel="apple-touch-startup-image" href="./icons/splash-828x1792.png?v=20260502-unified-splash" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" />
+    <link rel="apple-touch-startup-image" href="./icons/splash-1125x2436.png?v=20260502-unified-splash" media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" />
+    <link rel="apple-touch-startup-image" href="./icons/splash-1170x2532.png?v=20260502-unified-splash" media="(device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" />
+    <link rel="apple-touch-startup-image" href="./icons/splash-1242x2208.png?v=20260502-unified-splash" media="(device-width: 414px) and (device-height: 736px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" />
+    <link rel="apple-touch-startup-image" href="./icons/splash-1242x2688.png?v=20260502-unified-splash" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" />
+    <link rel="apple-touch-startup-image" href="./icons/splash-1284x2778.png?v=20260502-unified-splash" media="(device-width: 428px) and (device-height: 926px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" />
+    <link rel="apple-touch-startup-image" href="./icons/splash-1290x2796.png?v=20260502-unified-splash" media="(device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" />
+    <link rel="apple-touch-startup-image" href="./icons/splash-1536x2048.png?v=20260502-unified-splash" media="(device-width: 768px) and (device-height: 1024px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" />
+    <link rel="apple-touch-startup-image" href="./icons/splash-1668x2224.png?v=20260502-unified-splash" media="(device-width: 834px) and (device-height: 1112px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" />
+    <link rel="apple-touch-startup-image" href="./icons/splash-1668x2388.png?v=20260502-unified-splash" media="(device-width: 834px) and (device-height: 1194px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" />
+    <link rel="apple-touch-startup-image" href="./icons/splash-2048x2732.png?v=20260502-unified-splash" media="(device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" />
     <link rel="manifest" href="./manifest.webmanifest" />
-    <link rel="preload" as="image" href="./icons/splash-1170x2532.png?v=20260501-pro-light" />
+    <link rel="preload" as="image" href="./icons/splash-1170x2532.png?v=20260502-unified-splash" />
 
 
     <style id="routee-critical-boot-css">
       :root {
         --routee-splash-bg: #0b1222;
-        --routee-splash-image: url("./icons/splash-1170x2532.png?v=20260501-pro-light");
+        --routee-splash-image: url("./icons/splash-1170x2532.png?v=20260502-unified-splash");
       }
 
       html,
@@ -65,9 +57,12 @@
         background: var(--routee-splash-bg);
       }
 
-      body.auth-booting {
+      body.auth-booting,
+      html.routee-splash-active,
+      html.routee-splash-active body,
+      body.routee-splash-active {
         overflow: hidden;
-        background: var(--routee-splash-bg);
+        background: var(--routee-splash-bg) !important;
       }
 
       .startup-splash {
@@ -81,7 +76,8 @@
         min-height: -webkit-fill-available;
         margin: 0;
         padding: 0;
-        display: block;
+        display: grid;
+        place-items: center;
         overflow: hidden;
         background-color: var(--routee-splash-bg);
         background-image: var(--routee-splash-image);
@@ -98,36 +94,22 @@
       }
 
       .startup-splash.is-visible,
-      html.routee-mobile-splash-active .startup-splash,
-      body.routee-mobile-splash-active .startup-splash {
+      html.routee-splash-active .startup-splash,
+      body.routee-splash-active .startup-splash {
         opacity: 1 !important;
         visibility: visible !important;
         pointer-events: auto !important;
       }
 
-      html.routee-mobile-splash-active,
-      html.routee-mobile-splash-active body,
-      body.routee-mobile-splash-active {
-        width: 100%;
-        height: 100%;
-        min-height: 100svh;
-        min-height: 100dvh;
-        margin: 0;
-        overflow: hidden !important;
-        background: var(--routee-splash-bg) !important;
-        overscroll-behavior: none;
-      }
-
-      html.routee-mobile-splash-active .login-page,
-      body.routee-mobile-splash-active .login-page {
+      html.routee-splash-active .login-page,
+      body.routee-splash-active .login-page {
         opacity: 0 !important;
         visibility: hidden !important;
         pointer-events: none !important;
       }
 
-      .startup-splash .routee-splash-card {
-        display: grid !important;
-        place-items: center !important;
+      .routee-splash-card {
+        display: none;
       }
     </style>
 
@@ -139,13 +121,12 @@
     <link rel="stylesheet" href="./css/splash.css" />
   </head>
   <body class="auth-booting">
-    <div class="startup-splash routee-auth-splash is-visible" id="startupSplash" aria-hidden="false" role="status" aria-live="polite">
-      <div class="routee-splash-card" aria-hidden="false">
+    <div class="startup-splash is-visible" id="startupSplash" data-mode="image" aria-hidden="false">
+      <div class="routee-splash-card" aria-live="polite" aria-atomic="true">
         <div class="routee-splash-logo" aria-hidden="true">R</div>
-        <div class="routee-splash-copy">
-          <strong id="startupSplashTitle">Rota</strong>
-          <span id="startupSplashText">Oturumunuz açılıyor</span>
-        </div>
+        <p class="routee-splash-title" id="startupSplashTitle">Rota</p>
+        <p class="routee-splash-text" id="startupSplashText">Oturumunuz açılıyor</p>
+        <div class="routee-splash-dots" aria-hidden="true"><span></span><span></span><span></span></div>
       </div>
     </div>
 
