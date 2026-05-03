@@ -2379,3 +2379,78 @@
     -webkit-transform: translate3d(0, calc(-1 * var(--routee-mobile-topbar-locked-height, var(--routee-mobile-topbar-natural-height))), 0) !important;
   }
 }
+
+
+/* =========================================================
+   ROUTEE — MOBILE TOPBAR CONTENT HEIGHT HARD FIX
+   Konum ekleme, arama, klavye veya harita etkileşiminden sonra
+   beyaz marka/çıkış alanı büyümesin; üst sistem alanı ayrı,
+   uygulama topbar içeriği ayrı ve sabit kalsın.
+   ========================================================= */
+@media (max-width: 720px), (hover: none) and (pointer: coarse) {
+  :root {
+    --routee-mobile-topbar-content-height: 64px !important;
+    --routee-mobile-topbar-natural-height: calc(64px + env(safe-area-inset-top, 0px)) !important;
+    --routee-mobile-topbar-locked-height: var(--routee-mobile-topbar-natural-height) !important;
+  }
+
+  @supports (top: constant(safe-area-inset-top)) {
+    :root {
+      --routee-mobile-topbar-natural-height: calc(64px + constant(safe-area-inset-top)) !important;
+    }
+  }
+
+  .topbar {
+    height: var(--routee-mobile-topbar-natural-height) !important;
+    min-height: var(--routee-mobile-topbar-natural-height) !important;
+    max-height: var(--routee-mobile-topbar-natural-height) !important;
+    flex: 0 0 var(--routee-mobile-topbar-natural-height) !important;
+    padding-top: env(safe-area-inset-top, 0px) !important;
+    padding-bottom: 0 !important;
+    overflow: hidden !important;
+    contain: layout paint !important;
+  }
+
+  @supports (top: constant(safe-area-inset-top)) {
+    .topbar {
+      padding-top: constant(safe-area-inset-top) !important;
+    }
+  }
+
+  .topbar::before {
+    height: env(safe-area-inset-top, 0px) !important;
+    max-height: env(safe-area-inset-top, 0px) !important;
+    background: var(--routee-system-status-bg, #0f172a) !important;
+  }
+
+  @supports (top: constant(safe-area-inset-top)) {
+    .topbar::before {
+      height: constant(safe-area-inset-top) !important;
+      max-height: constant(safe-area-inset-top) !important;
+    }
+  }
+
+  .topbar > .brand-area,
+  .topbar > .topbar-actions {
+    height: 64px !important;
+    min-height: 64px !important;
+    max-height: 64px !important;
+    align-self: flex-end !important;
+  }
+
+  .topbar .brand-icon {
+    width: 40px !important;
+    height: 40px !important;
+    min-width: 40px !important;
+    min-height: 40px !important;
+    max-width: 40px !important;
+    max-height: 40px !important;
+    flex: 0 0 40px !important;
+  }
+
+  .topbar .page-action-btn {
+    height: 38px !important;
+    min-height: 38px !important;
+    max-height: 38px !important;
+  }
+}
