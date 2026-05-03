@@ -2454,3 +2454,39 @@
     max-height: 38px !important;
   }
 }
+
+/* =========================================================
+   ROUTEE — TABLET PORTRAIT FULL MAP HEIGHT FIX
+   Tablet dikey kullanımda harita, mobildeki uygulama yüzeyi mantığıyla
+   kullanılabilir ekran yüksekliğine yayılır. Telefon, masaüstü ve yatay
+   tablet davranışlarına dokunmaz.
+   ========================================================= */
+@media (min-width: 721px) and (max-width: 1100px) and (orientation: portrait) and (hover: none) and (pointer: coarse) {
+  .app-layout {
+    grid-template-columns: 1fr !important;
+    align-items: stretch !important;
+    gap: 14px !important;
+  }
+
+  .map-area,
+  .map-shell {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  .map-canvas {
+    width: 100% !important;
+    height: calc(100dvh - var(--routee-mobile-topbar-natural-height, 64px) - 72px) !important;
+    min-height: calc(100svh - var(--routee-mobile-topbar-natural-height, 64px) - 72px) !important;
+    max-height: none !important;
+    border-radius: 24px !important;
+  }
+
+  .trip-column,
+  .trip-panel {
+    width: 100% !important;
+    max-width: 100% !important;
+    justify-self: stretch !important;
+  }
+}
