@@ -1905,12 +1905,12 @@
   .new-map-mobile-fab {
     position: fixed !important;
     right: max(14px, calc(var(--routee-safe-right) + 12px)) !important;
-    top: var(--routee-mobile-fab-top, calc(100dvh - 62px)) !important;
-    bottom: auto !important;
+    top: auto !important;
+    bottom: max(14px, calc(var(--routee-safe-bottom, env(safe-area-inset-bottom, 0px)) + 14px)) !important;
     transform: translate3d(0, 0, 0);
     -webkit-transform: translate3d(0, 0, 0);
     z-index: 1200 !important;
-    will-change: top;
+    will-change: auto;
   }
 
   body.has-mobile-floating-panel .new-map-mobile-fab,
@@ -2377,5 +2377,588 @@
   .topbar.is-hidden-on-scroll {
     transform: translate3d(0, calc(-1 * var(--routee-mobile-topbar-locked-height, var(--routee-mobile-topbar-natural-height))), 0) !important;
     -webkit-transform: translate3d(0, calc(-1 * var(--routee-mobile-topbar-locked-height, var(--routee-mobile-topbar-natural-height))), 0) !important;
+  }
+}
+
+
+/* =========================================================
+   ROUTEE — FINAL RESPONSIVE VISUAL STABILITY 2026-05-03
+   Kapsam: telefon üst barı, yeni harita FAB konumu, iPad/tablet dikey-yatay düzeni.
+   İşlevsel JS akışlarına dokunmadan yalnızca görünüm katmanını sabitler.
+   ========================================================= */
+@media (max-width: 720px), (hover: none) and (pointer: coarse) {
+  :root {
+    --routee-safe-top: env(safe-area-inset-top, 0px);
+    --routee-safe-right: env(safe-area-inset-right, 0px);
+    --routee-safe-bottom: env(safe-area-inset-bottom, 0px);
+    --routee-safe-left: env(safe-area-inset-left, 0px);
+    --routee-mobile-topbar-content-height: 64px;
+    --routee-mobile-topbar-natural-height: calc(var(--routee-mobile-topbar-content-height) + var(--routee-safe-top));
+  }
+
+  @supports (top: constant(safe-area-inset-top)) {
+    :root {
+      --routee-safe-top: constant(safe-area-inset-top);
+      --routee-safe-right: constant(safe-area-inset-right);
+      --routee-safe-bottom: constant(safe-area-inset-bottom);
+      --routee-safe-left: constant(safe-area-inset-left);
+      --routee-mobile-topbar-natural-height: calc(var(--routee-mobile-topbar-content-height) + var(--routee-safe-top));
+    }
+  }
+
+  .topbar,
+  body.has-mobile-floating-panel .topbar,
+  body.has-screen-overlay .topbar {
+    height: var(--routee-mobile-topbar-natural-height) !important;
+    min-height: var(--routee-mobile-topbar-natural-height) !important;
+    max-height: var(--routee-mobile-topbar-natural-height) !important;
+    flex: 0 0 var(--routee-mobile-topbar-natural-height) !important;
+    padding-top: var(--routee-safe-top) !important;
+    padding-bottom: 0 !important;
+    padding-left: max(14px, calc(var(--routee-safe-left) + 12px)) !important;
+    padding-right: max(14px, calc(var(--routee-safe-right) + 12px)) !important;
+    align-items: center !important;
+    overflow: hidden !important;
+    contain: layout paint !important;
+  }
+
+  .topbar > .brand-area,
+  .topbar > .topbar-actions {
+    height: var(--routee-mobile-topbar-content-height) !important;
+    min-height: var(--routee-mobile-topbar-content-height) !important;
+    max-height: var(--routee-mobile-topbar-content-height) !important;
+    overflow: hidden !important;
+    align-items: center !important;
+  }
+
+  .topbar .brand-area {
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+  }
+
+  .topbar .brand-text {
+    min-width: 0 !important;
+    max-width: 100% !important;
+    overflow: hidden !important;
+  }
+
+  .topbar .brand-text h1 {
+    margin: 0 !important;
+    font-size: 1rem !important;
+    line-height: 1.05 !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+
+  .topbar .brand-text p {
+    display: none !important;
+  }
+
+  .topbar .brand-icon {
+    width: 40px !important;
+    min-width: 40px !important;
+    max-width: 40px !important;
+    height: 40px !important;
+    min-height: 40px !important;
+    max-height: 40px !important;
+    flex: 0 0 40px !important;
+  }
+
+  .topbar .page-action-btn {
+    height: 36px !important;
+    min-height: 36px !important;
+    max-height: 36px !important;
+    padding: 0 11px !important;
+    font-size: 0.82rem !important;
+    line-height: 1 !important;
+    white-space: nowrap !important;
+    flex: 0 0 auto !important;
+  }
+
+  .new-map-mobile-fab {
+    top: auto !important;
+    right: max(14px, calc(var(--routee-safe-right) + 12px)) !important;
+    bottom: max(14px, calc(var(--routee-safe-bottom) + 14px)) !important;
+    width: 56px !important;
+    height: 56px !important;
+    min-width: 56px !important;
+    min-height: 56px !important;
+    transform: translate3d(0, 0, 0) !important;
+    -webkit-transform: translate3d(0, 0, 0) !important;
+    will-change: auto !important;
+  }
+
+  body.has-mobile-floating-panel .new-map-mobile-fab,
+  body.has-screen-overlay .new-map-mobile-fab {
+    top: auto !important;
+    bottom: max(14px, calc(var(--routee-safe-bottom) + 14px)) !important;
+    transform: translate3d(0, 0, 0) !important;
+    -webkit-transform: translate3d(0, 0, 0) !important;
+  }
+}
+
+
+@media (max-width: 720px) {
+  .new-map-mobile-fab {
+    display: inline-flex !important;
+  }
+}
+
+@media (min-width: 721px) {
+  .new-map-mobile-fab {
+    display: none !important;
+  }
+}
+
+@media (max-width: 720px) and (orientation: landscape) {
+  .new-map-mobile-fab {
+    width: 52px !important;
+    height: 52px !important;
+    min-width: 52px !important;
+    min-height: 52px !important;
+    bottom: max(10px, calc(env(safe-area-inset-bottom, 0px) + 10px)) !important;
+  }
+}
+
+@media (min-width: 721px) and (max-width: 1366px) and (hover: none) and (pointer: coarse) {
+  .trip-panel .trip-item {
+    grid-template-columns: 42px minmax(0, 1fr) !important;
+    grid-auto-rows: auto !important;
+    align-items: start !important;
+    column-gap: 12px !important;
+    row-gap: 10px !important;
+    overflow: hidden !important;
+  }
+
+  .trip-panel .trip-order {
+    grid-column: 1 !important;
+    grid-row: 1 / span 2 !important;
+    align-self: start !important;
+  }
+
+  .trip-panel .trip-content {
+    grid-column: 2 !important;
+    grid-row: 1 !important;
+    min-width: 0 !important;
+    width: 100% !important;
+  }
+
+  .trip-panel .trip-content strong,
+  .trip-panel .trip-content span {
+    max-width: 100% !important;
+    min-width: 0 !important;
+    white-space: normal !important;
+    overflow-wrap: anywhere !important;
+    word-break: normal !important;
+  }
+
+  .trip-panel .trip-item > .trip-actions,
+  .trip-panel .trip-actions {
+    grid-column: 2 !important;
+    grid-row: 2 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    display: flex !important;
+    flex-wrap: wrap !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    gap: 7px !important;
+    white-space: normal !important;
+  }
+
+  .trip-panel .trip-actions .tiny-btn {
+    flex: 0 0 auto !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    white-space: nowrap !important;
+  }
+
+  .trip-panel .trip-actions .icon-route-btn,
+  .trip-panel .trip-actions .icon-note-btn,
+  .trip-panel .trip-actions .tiny-btn.icon-route-btn,
+  .trip-panel .trip-actions .tiny-btn.icon-note-btn {
+    width: 40px !important;
+    min-width: 40px !important;
+    max-width: 40px !important;
+    height: 40px !important;
+    min-height: 40px !important;
+    flex: 0 0 40px !important;
+    padding: 0 !important;
+  }
+}
+
+@media (min-width: 721px) and (max-width: 1100px) and (hover: none) and (pointer: coarse) and (orientation: portrait) {
+  .app-layout {
+    grid-template-columns: 1fr !important;
+    gap: 14px !important;
+    padding: 14px max(16px, env(safe-area-inset-right, 0px)) 20px max(16px, env(safe-area-inset-left, 0px)) !important;
+    align-items: stretch !important;
+  }
+
+  .map-canvas {
+    height: clamp(600px, 70svh, 860px) !important;
+    min-height: clamp(600px, 70svh, 860px) !important;
+    max-height: none !important;
+  }
+
+  .trip-column,
+  .trip-panel {
+    width: 100% !important;
+    max-width: none !important;
+    justify-self: stretch !important;
+  }
+}
+
+@media (min-width: 900px) and (max-width: 1366px) and (hover: none) and (pointer: coarse) and (orientation: landscape) {
+  .app-layout {
+    grid-template-columns: minmax(0, 1fr) minmax(320px, 360px) !important;
+    gap: 16px !important;
+    align-items: stretch !important;
+    padding: 14px 18px 18px !important;
+  }
+
+  .map-canvas,
+  .trip-panel {
+    height: calc(100dvh - 126px) !important;
+    min-height: 520px !important;
+    max-height: none !important;
+  }
+
+  .trip-column {
+    min-width: 0 !important;
+    width: 100% !important;
+  }
+
+  .trip-panel {
+    max-width: 360px !important;
+    width: 100% !important;
+    justify-self: stretch !important;
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
+  .trip-list {
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+  }
+}
+
+@media (min-width: 721px) and (max-width: 899px) and (hover: none) and (pointer: coarse) and (orientation: landscape) {
+  .app-layout {
+    grid-template-columns: 1fr !important;
+    gap: 14px !important;
+  }
+
+  .map-canvas {
+    height: clamp(420px, 64svh, 620px) !important;
+    min-height: clamp(420px, 64svh, 620px) !important;
+    max-height: none !important;
+  }
+}
+
+
+/* =========================================================
+   ROUTEE — V5 VISUAL STABILITY GUARD
+   Amaç: telefon üst barı ve Yeni Harita FAB konumunu yalnızca CSS ile sabitlemek;
+   iPad/tablet dikey-yatay düzeninde metin/buton taşmalarını kesin olarak engellemek.
+   ========================================================= */
+@media (max-width: 720px) {
+  :root {
+    --routee-phone-safe-top: env(safe-area-inset-top, 0px);
+    --routee-phone-safe-right: env(safe-area-inset-right, 0px);
+    --routee-phone-safe-bottom: env(safe-area-inset-bottom, 0px);
+    --routee-phone-safe-left: env(safe-area-inset-left, 0px);
+    --routee-phone-topbar-content-height: 64px;
+    --routee-phone-topbar-height: calc(var(--routee-phone-topbar-content-height) + var(--routee-phone-safe-top));
+  }
+
+  @supports (top: constant(safe-area-inset-top)) {
+    :root {
+      --routee-phone-safe-top: constant(safe-area-inset-top);
+      --routee-phone-safe-right: constant(safe-area-inset-right);
+      --routee-phone-safe-bottom: constant(safe-area-inset-bottom);
+      --routee-phone-safe-left: constant(safe-area-inset-left);
+      --routee-phone-topbar-height: calc(var(--routee-phone-topbar-content-height) + var(--routee-phone-safe-top));
+    }
+  }
+
+  html,
+  body,
+  #app {
+    max-width: 100vw !important;
+    overflow-x: hidden !important;
+  }
+
+  .topbar,
+  body.has-mobile-floating-panel .topbar,
+  body.has-screen-overlay .topbar,
+  body[data-mobile-panel] .topbar {
+    position: sticky !important;
+    top: 0 !important;
+    width: 100% !important;
+    height: var(--routee-phone-topbar-height) !important;
+    min-height: var(--routee-phone-topbar-height) !important;
+    max-height: var(--routee-phone-topbar-height) !important;
+    flex: 0 0 var(--routee-phone-topbar-height) !important;
+    padding-top: var(--routee-phone-safe-top) !important;
+    padding-bottom: 0 !important;
+    padding-left: max(12px, calc(var(--routee-phone-safe-left) + 12px)) !important;
+    padding-right: max(12px, calc(var(--routee-phone-safe-right) + 12px)) !important;
+    gap: 10px !important;
+    align-items: center !important;
+    overflow: hidden !important;
+    contain: layout paint !important;
+    transform-origin: top center !important;
+  }
+
+  .topbar > .brand-area,
+  .topbar > .topbar-actions {
+    height: var(--routee-phone-topbar-content-height) !important;
+    min-height: var(--routee-phone-topbar-content-height) !important;
+    max-height: var(--routee-phone-topbar-content-height) !important;
+    display: flex !important;
+    align-items: center !important;
+    overflow: hidden !important;
+    min-width: 0 !important;
+  }
+
+  .topbar .brand-area {
+    flex: 1 1 auto !important;
+  }
+
+  .topbar .brand-text {
+    min-width: 0 !important;
+    overflow: hidden !important;
+  }
+
+  .topbar .brand-text h1 {
+    max-width: 100% !important;
+    margin: 0 !important;
+    font-size: 1rem !important;
+    line-height: 1.05 !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+
+  .topbar .brand-text p {
+    display: none !important;
+  }
+
+  .topbar .brand-icon {
+    width: 40px !important;
+    min-width: 40px !important;
+    max-width: 40px !important;
+    height: 40px !important;
+    min-height: 40px !important;
+    max-height: 40px !important;
+    flex: 0 0 40px !important;
+  }
+
+  .topbar .page-action-btn {
+    height: 36px !important;
+    min-height: 36px !important;
+    max-height: 36px !important;
+    padding: 0 11px !important;
+    font-size: 0.82rem !important;
+    line-height: 1 !important;
+    white-space: nowrap !important;
+    flex: 0 0 auto !important;
+  }
+
+  .new-map-mobile-fab,
+  body.has-mobile-floating-panel .new-map-mobile-fab,
+  body.has-screen-overlay .new-map-mobile-fab,
+  body[data-mobile-panel] .new-map-mobile-fab {
+    display: inline-flex !important;
+    position: fixed !important;
+    top: auto !important;
+    left: auto !important;
+    right: max(14px, calc(var(--routee-phone-safe-right) + 12px)) !important;
+    bottom: max(14px, calc(var(--routee-phone-safe-bottom) + 14px)) !important;
+    width: 56px !important;
+    min-width: 56px !important;
+    max-width: 56px !important;
+    height: 56px !important;
+    min-height: 56px !important;
+    max-height: 56px !important;
+    transform: translate3d(0, 0, 0) !important;
+    -webkit-transform: translate3d(0, 0, 0) !important;
+    will-change: auto !important;
+    z-index: 1200 !important;
+  }
+
+  body.has-mobile-floating-panel .new-map-mobile-fab,
+  body.has-screen-overlay .new-map-mobile-fab,
+  body[data-mobile-panel] .new-map-mobile-fab {
+    z-index: 60 !important;
+    pointer-events: none !important;
+  }
+
+  .trip-panel .trip-item {
+    min-width: 0 !important;
+    overflow: hidden !important;
+  }
+
+  .trip-panel .trip-content,
+  .trip-panel .trip-content strong,
+  .trip-panel .trip-content span,
+  .trip-note-preview,
+  .custom-info-note-preview {
+    min-width: 0 !important;
+    max-width: 100% !important;
+    overflow-wrap: anywhere !important;
+    word-break: normal !important;
+  }
+}
+
+@media (max-width: 720px) and (orientation: landscape) {
+  .new-map-mobile-fab,
+  body.has-mobile-floating-panel .new-map-mobile-fab,
+  body.has-screen-overlay .new-map-mobile-fab,
+  body[data-mobile-panel] .new-map-mobile-fab {
+    width: 52px !important;
+    min-width: 52px !important;
+    max-width: 52px !important;
+    height: 52px !important;
+    min-height: 52px !important;
+    max-height: 52px !important;
+    bottom: max(10px, calc(env(safe-area-inset-bottom, 0px) + 10px)) !important;
+  }
+}
+
+@media (min-width: 721px) {
+  .new-map-mobile-fab {
+    display: none !important;
+  }
+}
+
+@media (min-width: 721px) and (max-width: 1366px) and (hover: none) and (pointer: coarse) {
+  html,
+  body,
+  #app {
+    max-width: 100vw !important;
+    overflow-x: hidden !important;
+  }
+
+  .app-layout,
+  .map-area,
+  .map-shell,
+  .trip-column,
+  .trip-panel,
+  .trip-list,
+  .trip-item,
+  .trip-content,
+  .trip-actions {
+    min-width: 0 !important;
+  }
+
+  .trip-panel .trip-item {
+    grid-template-columns: 42px minmax(0, 1fr) !important;
+    grid-auto-rows: auto !important;
+    align-items: start !important;
+    overflow: hidden !important;
+  }
+
+  .trip-panel .trip-order {
+    grid-column: 1 !important;
+    grid-row: 1 / span 2 !important;
+    align-self: start !important;
+  }
+
+  .trip-panel .trip-content {
+    grid-column: 2 !important;
+    grid-row: 1 !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+  }
+
+  .trip-panel .trip-content strong,
+  .trip-panel .trip-content span,
+  .trip-note-preview,
+  .custom-info-note-preview {
+    min-width: 0 !important;
+    max-width: 100% !important;
+    white-space: normal !important;
+    overflow-wrap: anywhere !important;
+    word-break: normal !important;
+  }
+
+  .trip-panel .trip-actions,
+  .trip-panel .trip-item > .trip-actions {
+    grid-column: 2 !important;
+    grid-row: 2 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    display: flex !important;
+    flex-wrap: wrap !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    gap: 7px !important;
+    white-space: normal !important;
+  }
+
+  .trip-panel .trip-actions .tiny-btn {
+    flex: 0 0 auto !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+  }
+}
+
+@media (min-width: 721px) and (max-width: 1100px) and (hover: none) and (pointer: coarse) and (orientation: portrait) {
+  .app-layout {
+    grid-template-columns: 1fr !important;
+    gap: 14px !important;
+    padding: 14px max(16px, env(safe-area-inset-right, 0px)) 20px max(16px, env(safe-area-inset-left, 0px)) !important;
+    align-items: stretch !important;
+  }
+
+  .map-canvas {
+    height: clamp(620px, 72svh, 900px) !important;
+    min-height: clamp(620px, 72svh, 900px) !important;
+    max-height: none !important;
+  }
+
+  .trip-column,
+  .trip-panel {
+    width: 100% !important;
+    max-width: none !important;
+    justify-self: stretch !important;
+  }
+}
+
+@media (min-width: 900px) and (max-width: 1366px) and (hover: none) and (pointer: coarse) and (orientation: landscape) {
+  .app-layout {
+    grid-template-columns: minmax(0, 1fr) minmax(330px, 372px) !important;
+    gap: 16px !important;
+    align-items: stretch !important;
+    padding: 14px 18px 18px !important;
+  }
+
+  .map-canvas,
+  .trip-panel {
+    height: calc(100dvh - 126px) !important;
+    min-height: 520px !important;
+    max-height: none !important;
+  }
+
+  .trip-panel {
+    width: 100% !important;
+    max-width: 372px !important;
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
+  .trip-list {
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
   }
 }
