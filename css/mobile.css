@@ -3314,3 +3314,230 @@
     padding: 0 !important;
   }
 }
+
+/* =========================================================
+   ROUTEE — V8 PHONE STATUS STRIP + NEW MAP FAB CORRECTION
+   Amaç: Rota/Çıkış Yap satırını değil, onun üstündeki mobil sistem
+   güvenli alanını sabit siyah tutmak. Yeni Harita FAB blur altında
+   kalmasın ve yer ekleme/liste büyümesiyle aşağı-yukarı oynamasın.
+   İşlevsel akışlara dokunmaz; yalnızca görünüm katmanını düzeltir.
+   ========================================================= */
+@media (max-width: 720px) {
+  :root {
+    --routee-v8-status-strip-height: max(18px, env(safe-area-inset-top, 0px));
+    --routee-v8-topbar-content-height: 64px;
+    --routee-v8-topbar-height: calc(var(--routee-v8-status-strip-height) + var(--routee-v8-topbar-content-height));
+    --routee-v8-fab-size: 56px;
+    --routee-v8-fab-right: max(16px, calc(env(safe-area-inset-right, 0px) + 14px));
+    --routee-v8-fab-bottom-gap: max(18px, calc(env(safe-area-inset-bottom, 0px) + 12px));
+  }
+
+  @supports (top: constant(safe-area-inset-top)) {
+    :root {
+      --routee-v8-status-strip-height: max(18px, constant(safe-area-inset-top));
+      --routee-v8-fab-right: max(16px, calc(constant(safe-area-inset-right) + 14px));
+      --routee-v8-fab-bottom-gap: max(18px, calc(constant(safe-area-inset-bottom) + 12px));
+    }
+  }
+
+  html.routee-statusbar-locked::before,
+  body.routee-statusbar-locked::before,
+  html::before {
+    content: "" !important;
+    display: block !important;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    height: var(--routee-v8-status-strip-height) !important;
+    min-height: var(--routee-v8-status-strip-height) !important;
+    max-height: var(--routee-v8-status-strip-height) !important;
+    background: var(--routee-system-status-bg, #0f172a) !important;
+    background-color: var(--routee-system-status-bg, #0f172a) !important;
+    pointer-events: none !important;
+    opacity: 1 !important;
+    filter: none !important;
+    transform: translateZ(0) !important;
+    -webkit-transform: translateZ(0) !important;
+    z-index: 2147483647 !important;
+  }
+
+  .topbar,
+  .topbar.is-hidden-on-scroll,
+  body.has-mobile-floating-panel .topbar,
+  body.has-screen-overlay .topbar,
+  body[data-mobile-panel] .topbar {
+    position: sticky !important;
+    top: 0 !important;
+    width: 100% !important;
+    height: var(--routee-v8-topbar-height) !important;
+    min-height: var(--routee-v8-topbar-height) !important;
+    max-height: var(--routee-v8-topbar-height) !important;
+    flex: 0 0 var(--routee-v8-topbar-height) !important;
+    padding-top: var(--routee-v8-status-strip-height) !important;
+    padding-bottom: 0 !important;
+    padding-left: max(14px, calc(env(safe-area-inset-left, 0px) + 12px)) !important;
+    padding-right: max(14px, calc(env(safe-area-inset-right, 0px) + 12px)) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 10px !important;
+    overflow: hidden !important;
+    background: rgba(255, 255, 255, 0.94) !important;
+    background-color: rgba(255, 255, 255, 0.94) !important;
+    border-bottom: 1px solid rgba(219, 228, 240, 0.9) !important;
+    backdrop-filter: blur(14px) !important;
+    -webkit-backdrop-filter: blur(14px) !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    filter: none !important;
+    transform: translate3d(0, 0, 0) !important;
+    -webkit-transform: translate3d(0, 0, 0) !important;
+    z-index: 50 !important;
+  }
+
+  @supports (left: constant(safe-area-inset-left)) {
+    .topbar,
+    .topbar.is-hidden-on-scroll,
+    body.has-mobile-floating-panel .topbar,
+    body.has-screen-overlay .topbar,
+    body[data-mobile-panel] .topbar {
+      padding-left: max(14px, calc(constant(safe-area-inset-left) + 12px)) !important;
+      padding-right: max(14px, calc(constant(safe-area-inset-right) + 12px)) !important;
+    }
+  }
+
+  .topbar::before,
+  body.has-mobile-floating-panel .topbar::before,
+  body.has-screen-overlay .topbar::before,
+  body[data-mobile-panel] .topbar::before {
+    content: "" !important;
+    display: block !important;
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    height: var(--routee-v8-status-strip-height) !important;
+    min-height: var(--routee-v8-status-strip-height) !important;
+    max-height: var(--routee-v8-status-strip-height) !important;
+    background: var(--routee-system-status-bg, #0f172a) !important;
+    background-color: var(--routee-system-status-bg, #0f172a) !important;
+    opacity: 1 !important;
+    filter: none !important;
+    pointer-events: none !important;
+    z-index: 0 !important;
+  }
+
+  .topbar > .brand-area,
+  .topbar > .topbar-actions {
+    height: var(--routee-v8-topbar-content-height) !important;
+    min-height: var(--routee-v8-topbar-content-height) !important;
+    max-height: var(--routee-v8-topbar-content-height) !important;
+    display: flex !important;
+    align-items: center !important;
+    overflow: hidden !important;
+    position: relative !important;
+    z-index: 1 !important;
+  }
+
+  .topbar .brand-area {
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+  }
+
+  .topbar .brand-text,
+  .topbar .brand-text h1,
+  .topbar .brand-text p {
+    min-width: 0 !important;
+    overflow: hidden !important;
+  }
+
+  .topbar .brand-text h1 {
+    margin: 0 !important;
+    font-size: 1rem !important;
+    line-height: 1.05 !important;
+    white-space: nowrap !important;
+    text-overflow: ellipsis !important;
+  }
+
+  .topbar .brand-text p {
+    display: none !important;
+  }
+
+  .topbar .brand-icon {
+    width: 40px !important;
+    min-width: 40px !important;
+    max-width: 40px !important;
+    height: 40px !important;
+    min-height: 40px !important;
+    max-height: 40px !important;
+    flex: 0 0 40px !important;
+  }
+
+  .topbar .page-action-btn {
+    height: 36px !important;
+    min-height: 36px !important;
+    max-height: 36px !important;
+    padding: 0 11px !important;
+    font-size: 0.82rem !important;
+    line-height: 1 !important;
+    white-space: nowrap !important;
+    flex: 0 0 auto !important;
+  }
+
+  .new-map-mobile-fab,
+  body.has-mobile-floating-panel .new-map-mobile-fab,
+  body.has-screen-overlay .new-map-mobile-fab,
+  body[data-mobile-panel] .new-map-mobile-fab {
+    display: inline-flex !important;
+    position: fixed !important;
+    width: var(--routee-v8-fab-size) !important;
+    min-width: var(--routee-v8-fab-size) !important;
+    max-width: var(--routee-v8-fab-size) !important;
+    height: var(--routee-v8-fab-size) !important;
+    min-height: var(--routee-v8-fab-size) !important;
+    max-height: var(--routee-v8-fab-size) !important;
+    left: auto !important;
+    right: var(--routee-v8-fab-right) !important;
+    bottom: var(--routee-v8-fab-bottom-gap) !important;
+    top: auto !important;
+    margin: 0 !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    filter: none !important;
+    -webkit-filter: none !important;
+    transform: translate3d(0, 0, 0) !important;
+    -webkit-transform: translate3d(0, 0, 0) !important;
+    will-change: auto !important;
+    transition: box-shadow 0.18s ease, opacity 0.18s ease !important;
+    z-index: 1200 !important;
+  }
+
+  @supports (height: 100svh) {
+    .new-map-mobile-fab,
+    body.has-mobile-floating-panel .new-map-mobile-fab,
+    body.has-screen-overlay .new-map-mobile-fab,
+    body[data-mobile-panel] .new-map-mobile-fab {
+      top: calc(100svh - var(--routee-v8-fab-size) - var(--routee-v8-fab-bottom-gap)) !important;
+      bottom: auto !important;
+    }
+  }
+
+  body.has-mobile-floating-panel .new-map-mobile-fab,
+  body.has-screen-overlay .new-map-mobile-fab,
+  body[data-mobile-panel] .new-map-mobile-fab {
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+    filter: none !important;
+    -webkit-filter: none !important;
+  }
+}
+
+@media (max-width: 720px) and (orientation: landscape) {
+  :root {
+    --routee-v8-status-strip-height: max(14px, env(safe-area-inset-top, 0px));
+    --routee-v8-fab-size: 52px;
+    --routee-v8-fab-bottom-gap: max(12px, calc(env(safe-area-inset-bottom, 0px) + 8px));
+  }
+}
