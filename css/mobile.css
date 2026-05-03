@@ -2379,3 +2379,128 @@
     -webkit-transform: translate3d(0, calc(-1 * var(--routee-mobile-topbar-locked-height, var(--routee-mobile-topbar-natural-height))), 0) !important;
   }
 }
+
+/* =========================================================
+   ROUTEE — MOBILE TOPBAR GEOMETRY STABILITY FIX
+   Konum ekleme, arama sonucu seçimi, klavye/visualViewport değişimi ve
+   iOS adres çubuğu hareketinde Rota/Çıkış Yap üst alanı yüksekliği değişmesin.
+   Sadece üst bar ve durum satırının geometrisini sabitler; işlevlere dokunmaz.
+   ========================================================= */
+@media (max-width: 720px), (hover: none) and (pointer: coarse) {
+  :root {
+    --routee-mobile-topbar-content-height: 64px;
+    --routee-mobile-status-strip-height: 44px;
+  }
+
+  .topbar {
+    box-sizing: border-box !important;
+    position: sticky !important;
+    top: 0 !important;
+    height: var(--routee-mobile-topbar-locked-height, calc(var(--routee-mobile-topbar-content-height) + var(--routee-safe-top, env(safe-area-inset-top, 0px)))) !important;
+    min-height: var(--routee-mobile-topbar-locked-height, calc(var(--routee-mobile-topbar-content-height) + var(--routee-safe-top, env(safe-area-inset-top, 0px)))) !important;
+    max-height: var(--routee-mobile-topbar-locked-height, calc(var(--routee-mobile-topbar-content-height) + var(--routee-safe-top, env(safe-area-inset-top, 0px)))) !important;
+    flex: 0 0 var(--routee-mobile-topbar-locked-height, calc(var(--routee-mobile-topbar-content-height) + var(--routee-safe-top, env(safe-area-inset-top, 0px)))) !important;
+    padding-top: var(--routee-mobile-safe-top-locked, var(--routee-safe-top, env(safe-area-inset-top, 0px))) !important;
+    padding-bottom: 0 !important;
+    padding-left: max(14px, calc(var(--routee-safe-left, env(safe-area-inset-left, 0px)) + 12px)) !important;
+    padding-right: max(14px, calc(var(--routee-safe-right, env(safe-area-inset-right, 0px)) + 12px)) !important;
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) auto !important;
+    grid-template-rows: var(--routee-mobile-topbar-content-height) !important;
+    align-items: center !important;
+    align-content: end !important;
+    gap: 10px !important;
+    overflow: hidden !important;
+    contain: layout paint !important;
+    transform: translate3d(0, 0, 0) !important;
+    -webkit-transform: translate3d(0, 0, 0) !important;
+    transition: transform 0.24s ease, opacity 0.24s ease !important;
+  }
+
+  .topbar::before {
+    height: var(--routee-mobile-safe-top-locked, var(--routee-safe-top, env(safe-area-inset-top, 0px))) !important;
+    min-height: 0 !important;
+    max-height: var(--routee-mobile-safe-top-locked, var(--routee-safe-top, env(safe-area-inset-top, 0px))) !important;
+  }
+
+  .topbar > .brand-area,
+  .topbar > .topbar-actions {
+    height: var(--routee-mobile-topbar-content-height) !important;
+    min-height: var(--routee-mobile-topbar-content-height) !important;
+    max-height: var(--routee-mobile-topbar-content-height) !important;
+    align-self: end !important;
+    overflow: hidden !important;
+  }
+
+  .topbar > .brand-area {
+    grid-column: 1 !important;
+    grid-row: 1 !important;
+  }
+
+  .topbar > .topbar-actions {
+    grid-column: 2 !important;
+    grid-row: 1 !important;
+  }
+
+  .topbar .brand-icon {
+    width: 40px !important;
+    height: 40px !important;
+    min-width: 40px !important;
+    min-height: 40px !important;
+    max-width: 40px !important;
+    max-height: 40px !important;
+    flex: 0 0 40px !important;
+  }
+
+  .topbar .brand-text,
+  .topbar .brand-text h1,
+  .topbar .brand-text p {
+    min-height: 0 !important;
+    max-height: var(--routee-mobile-topbar-content-height) !important;
+    overflow: hidden !important;
+  }
+
+  .topbar .brand-text h1,
+  .topbar .brand-text p {
+    white-space: nowrap !important;
+    text-overflow: ellipsis !important;
+  }
+
+  .topbar .page-action-btn {
+    height: 38px !important;
+    min-height: 38px !important;
+    max-height: 38px !important;
+    line-height: 1 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex: 0 0 auto !important;
+  }
+
+  .topbar.is-hidden-on-scroll {
+    transform: translate3d(0, calc(-1 * var(--routee-mobile-topbar-locked-height, calc(var(--routee-mobile-topbar-content-height) + var(--routee-safe-top, env(safe-area-inset-top, 0px))))), 0) !important;
+    -webkit-transform: translate3d(0, calc(-1 * var(--routee-mobile-topbar-locked-height, calc(var(--routee-mobile-topbar-content-height) + var(--routee-safe-top, env(safe-area-inset-top, 0px))))), 0) !important;
+  }
+
+  .status-strip {
+    box-sizing: border-box !important;
+    height: var(--routee-mobile-status-strip-height) !important;
+    min-height: var(--routee-mobile-status-strip-height) !important;
+    max-height: var(--routee-mobile-status-strip-height) !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    overflow: hidden !important;
+  }
+
+  .auth-status {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    line-height: 1.25 !important;
+  }
+}
