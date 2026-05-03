@@ -3,6 +3,7 @@
 
   var STATUS_COLOR = "#0f172a";
   var APPLE_STATUS_STYLE = "black-translucent";
+  var scheduled = false;
 
   function isIOSDevice() {
     var ua = window.navigator.userAgent || "";
@@ -40,6 +41,31 @@
     return meta;
   }
 
+  function ensureStatusBarShield() {
+    if (!document.body) return;
+
+    var shield = document.getElementById("routee-statusbar-shield");
+    if (!shield) {
+      shield = document.createElement("div");
+      shield.id = "routee-statusbar-shield";
+      shield.setAttribute("aria-hidden", "true");
+      document.body.insertBefore(shield, document.body.firstChild);
+    }
+
+    var style = shield.style;
+    style.position = "fixed";
+    style.top = "0";
+    style.left = "0";
+    style.right = "0";
+    style.height = "env(safe-area-inset-top, 0px)";
+    style.background = STATUS_COLOR;
+    style.pointerEvents = "none";
+    style.zIndex = "2147483647";
+    style.transform = "translateZ(0)";
+    style.webkitTransform = "translateZ(0)";
+    style.willChange = "transform";
+  }
+
   function applyStatusBarLock() {
     ensureMeta("theme-color", STATUS_COLOR);
     ensureMeta("msapplication-navbutton-color", STATUS_COLOR);
@@ -51,7 +77,7 @@
     var root = document.documentElement;
     root.classList.add("routee-statusbar-locked");
     root.style.setProperty("--routee-system-status-bg", STATUS_COLOR);
-    root.style.backgroundColor = STATUS_COLOR;
+    root.style.setProperty("background-color", STATUS_COLOR, "important");
 
     if (isIOSDevice()) {
       root.classList.add("routee-ios");
@@ -66,7 +92,17 @@
       }
 
       document.body.classList.toggle("routee-ios-standalone", isIOSDevice() && isStandaloneMode());
+      ensureStatusBarShield();
     }
+  }
+
+  function scheduleStatusBarLock() {
+    if (scheduled) return;
+    scheduled = true;
+    window.requestAnimationFrame(function () {
+      scheduled = false;
+      applyStatusBarLock();
+    });
   }
 
   applyStatusBarLock();
@@ -77,17 +113,26 @@
     applyStatusBarLock();
   }
 
-  window.addEventListener("pageshow", applyStatusBarLock);
-  window.addEventListener("focus", applyStatusBarLock);
-  document.addEventListener("visibilitychange", applyStatusBarLock);
+  ["pageshow", "focus", "resize", "orientationchange", "scroll"].forEach(function (eventName) {
+    window.addEventListener(eventName, scheduleStatusBarLock, { passive: true });
+  });
+
+  ["visibilitychange", "focusin", "focusout", "touchstart", "touchend", "pointerdown", "pointerup", "click", "input", "change"].forEach(function (eventName) {
+    document.addEventListener(eventName, scheduleStatusBarLock, { passive: true, capture: true });
+  });
+
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener("resize", scheduleStatusBarLock, { passive: true });
+    window.visualViewport.addEventListener("scroll", scheduleStatusBarLock, { passive: true });
+  }
 
   if (window.matchMedia) {
     try {
       var standaloneQuery = window.matchMedia("(display-mode: standalone)");
       if (standaloneQuery && typeof standaloneQuery.addEventListener === "function") {
-        standaloneQuery.addEventListener("change", applyStatusBarLock);
+        standaloneQuery.addEventListener("change", scheduleStatusBarLock);
       } else if (standaloneQuery && typeof standaloneQuery.addListener === "function") {
-        standaloneQuery.addListener(applyStatusBarLock);
+        standaloneQuery.addListener(scheduleStatusBarLock);
       }
     } catch (error) {
       // Status bar kilidi kritik olmayan bir iyileştirmedir; uygulama akışını kesmemelidir.
@@ -95,15 +140,7 @@
   }
 
   if (document.head && window.MutationObserver) {
-    var scheduled = false;
-    var observer = new MutationObserver(function () {
-      if (scheduled) return;
-      scheduled = true;
-      window.requestAnimationFrame(function () {
-        scheduled = false;
-        applyStatusBarLock();
-      });
-    });
+    var observer = new MutationObserver(scheduleStatusBarLock);
 
     observer.observe(document.head, {
       childList: true,
