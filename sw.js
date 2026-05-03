@@ -1,7 +1,7 @@
 const SW_VERSION = new URL(self.location.href).searchParams.get("v") || "dev";
 const CACHE_NAME = `routee-shell-${SW_VERSION}`;
 const NETWORK_TIMEOUT_MS = 1200;
-const ROUTEE_ASSET_REVISION = "20260504-responsive-core-v10";
+const ROUTEE_ASSET_REVISION = "20260504-responsive-core-v11";
 
 const APP_SHELL = [
   "./",
@@ -10,10 +10,10 @@ const APP_SHELL = [
   "./chooser.html",
   "./manifest.webmanifest",
   "./css/style.css",
-  "./css/mobile.css",
+  "./css/mobile.css,
+  css/responsive-core.css",
   "./css/auth.css",
   "./css/splash.css",
-  "./css/responsive-core.css",
   "./js/firebase-config.js",
   "./js/auth.js",
   "./js/firestore.js",
