@@ -33,7 +33,7 @@ const AUTH_BOOT_TIMEOUT_MS = 6000;
 const STALE_MODULE_RETRY_MS = AUTH_BOOT_TIMEOUT_MS - 100;
 const MOBILE_STARTUP_QUERY = "(max-width: 720px), (hover: none) and (pointer: coarse)";
 
-const SPLASH_ASSET_REVISION = "20260502-mobile-whitebottom-fix";
+const SPLASH_ASSET_REVISION = "20260503-visual-stability-v5";
 const SPLASH_IMAGE_FILE = "splash-1170x2532.png";
 let startupSplashImagePromise = null;
 
@@ -87,8 +87,30 @@ function setStartupSplashMode(mode = "image") {
 }
 
 
+function getPreferredSplashImageFile() {
+  const root = document.documentElement;
+  const viewport = window.visualViewport;
+  const width = Math.ceil(Math.max(
+    window.innerWidth || 0,
+    root?.clientWidth || 0,
+    viewport?.width || 0
+  ));
+  const height = Math.ceil(Math.max(
+    window.innerHeight || 0,
+    root?.clientHeight || 0,
+    viewport?.height || 0
+  ));
+  const isLandscape = width > height;
+
+  if (width >= 1024 && !isLandscape) return "splash-2048x2732.png";
+  if (width >= 721 && !isLandscape) return "splash-1536x2048.png";
+  if (width >= 721 && isLandscape) return "splash-2048x2732.png";
+
+  return SPLASH_IMAGE_FILE;
+}
+
 function getPreferredSplashImageUrl() {
-  return `./icons/${SPLASH_IMAGE_FILE}?v=${SPLASH_ASSET_REVISION}`;
+  return `./icons/${getPreferredSplashImageFile()}?v=${SPLASH_ASSET_REVISION}`;
 }
 
 function preloadStartupSplashImage() {
