@@ -52,6 +52,23 @@
     return Number.isFinite(parsed) && parsed > 0 ? parsed : 64;
   }
 
+  function readStableTopbarHeight() {
+    var topbar = getTopbar();
+    if (!topbar) return 64;
+
+    var contentHeight = clamp(readContentHeight(), 56, 72);
+    var styles = window.getComputedStyle(topbar);
+    var paddingTop = parseFloat(styles.paddingTop) || 0;
+    var paddingBottom = parseFloat(styles.paddingBottom) || 0;
+
+    // iOS/Android'de klavye, çift dokunma veya harita etkileşiminden sonra
+    // ölçülen topbar yüksekliği geçici olarak büyüyebiliyor. Kilidi gerçek
+    // ölçümden değil, sabit içerik yüksekliği + güvenli üst alandan üretmek
+    // üstteki beyaz marka alanının genişlemesini engeller.
+    var safeAreaPart = clamp(paddingTop + paddingBottom, 0, 64);
+    return Math.round(contentHeight + safeAreaPart);
+  }
+
   function applyLock(height) {
     if (!height) return;
     var nextValue = Math.round(height) + "px";
@@ -82,11 +99,7 @@
       var previousValue = document.documentElement.style.getPropertyValue(HEIGHT_VAR);
       clearLock();
 
-      var measured = measureTopbarHeight();
-      var contentHeight = readContentHeight();
-      var minHeight = Math.max(64, contentHeight);
-      var maxHeight = 150;
-      var lockedHeight = clamp(measured, minHeight, maxHeight);
+      var lockedHeight = readStableTopbarHeight();
 
       locks[key] = lockedHeight;
 
