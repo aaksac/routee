@@ -70,7 +70,7 @@
     <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png" />
     <link rel="apple-touch-icon" sizes="180x180" href="./icons/apple-touch-icon.png" />
     <link rel="manifest" href="./manifest.webmanifest" />
-    <link rel="preload" as="image" href="./icons/splash-1170x2532.png?v=20260502-mobile-whitebottom-fix" media="(max-width: 720px), (hover: none) and (pointer: coarse)" />
+    <link rel="preload" as="image" href="./icons/splash-1170x2532.png?v=20260503-visual-stability-v5" media="(max-width: 720px), (hover: none) and (pointer: coarse)" />
 
 
     <style id="routee-critical-boot-css">
@@ -78,7 +78,7 @@
         --routee-splash-bg: #d8dde3;
         --routee-splash-edge-bg: #162533;
         --routee-splash-height: 100vh;
-        --routee-splash-image: url("./icons/splash-1170x2532.png?v=20260502-mobile-whitebottom-fix");
+        --routee-splash-image: url("./icons/splash-1170x2532.png?v=20260503-visual-stability-v5");
       }
 
       html,
@@ -126,12 +126,22 @@
         pointer-events: auto;
       }
 
+      .routee-splash-picture {
+        position: absolute;
+        inset: 0;
+        z-index: 0;
+        width: 100%;
+        height: 100%;
+        display: block;
+        overflow: hidden;
+      }
+
       .routee-splash-image-element {
         position: absolute;
         inset: 0;
         width: 100%;
         height: 100%;
-        object-fit: fill;
+        object-fit: cover;
         object-position: center center;
         display: block;
         border: 0;
@@ -151,6 +161,14 @@
       .routee-splash-card {
         display: none;
       }
+
+      /* V5 critical tablet landscape splash guard */
+      @media (min-width: 721px) and (orientation: landscape) and (hover: none) and (pointer: coarse) {
+        .routee-splash-image-element {
+          object-fit: contain !important;
+          background: var(--routee-splash-edge-bg, #162533) !important;
+        }
+      }
     </style>
 
     <script type="module" src="./js/version-guard.js"></script>
@@ -162,7 +180,12 @@
   </head>
   <body>
     <div class="startup-splash" id="startupSplash" data-mode="image" aria-hidden="true">
-      <img class="routee-splash-image-element" id="startupSplashImage" src="./icons/splash-1170x2532.png?v=20260502-mobile-whitebottom-fix" alt="" aria-hidden="true" decoding="async" fetchpriority="high" />
+      <picture class="routee-splash-picture" aria-hidden="true">
+        <source media="(min-width: 1024px) and (orientation: portrait)" srcset="./icons/splash-2048x2732.png?v=20260503-visual-stability-v5" />
+        <source media="(min-width: 721px) and (orientation: portrait)" srcset="./icons/splash-1536x2048.png?v=20260503-visual-stability-v5" />
+        <source media="(min-width: 721px) and (orientation: landscape)" srcset="./icons/splash-2048x2732.png?v=20260503-visual-stability-v5" />
+        <img class="routee-splash-image-element" id="startupSplashImage" src="./icons/splash-1170x2532.png?v=20260503-visual-stability-v5" alt="" aria-hidden="true" decoding="async" fetchpriority="high" />
+      </picture>
       <div class="routee-splash-card" aria-live="polite" aria-atomic="true">
         <div class="routee-splash-logo" aria-hidden="true">R</div>
         <p class="routee-splash-title" id="startupSplashTitle">Rota</p>
