@@ -345,7 +345,7 @@ body.auth-booting {
    ========================================================= */
 @media (max-width: 720px), (hover: none) and (pointer: coarse) {
   body.routee-mobile-entry-splash .startup-splash {
-    background: #0f172a url("../icons/splash-1170x2532.png") center center / 100% 100% no-repeat !important;
+    background: #0f172a url("../icons/splash-1170x2532.png") center center / cover no-repeat !important;
   }
 
   body.routee-mobile-entry-splash .startup-splash-card {
@@ -353,7 +353,7 @@ body.auth-booting {
   }
 
   body.routee-mobile-routing-splash .startup-splash {
-    background: #0f172a url("../icons/splash-1170x2532.png") center center / 100% 100% no-repeat !important;
+    background: #0f172a url("../icons/splash-1170x2532.png") center center / cover no-repeat !important;
   }
 
   body.routee-mobile-routing-splash .startup-splash-card {
@@ -464,7 +464,7 @@ body.auth-booting {
     background-color: #0b1222 !important;
     background-image: url("../icons/splash-1170x2532.png") !important;
     background-position: center center !important;
-    background-size: 100% 100% !important;
+    background-size: cover !important;
     background-repeat: no-repeat !important;
     opacity: 1 !important;
     visibility: visible !important;
@@ -603,7 +603,7 @@ body.auth-booting {
     background-color: #0b1222 !important;
     background-image: var(--routee-single-splash-image) !important;
     background-position: center center !important;
-    background-size: 100% 100% !important;
+    background-size: cover !important;
     background-repeat: no-repeat !important;
   }
 
@@ -621,5 +621,34 @@ body.auth-booting {
   .app-startup-splash .app-startup-splash-image,
   .app-startup-splash > * {
     display: none !important;
+  }
+}
+
+
+/* ROUTEE — VISUAL STABILITY OVERRIDE: splash görseli tüm dokunmatik cihazlarda oranını korur. */
+@media (max-width: 720px), (hover: none) and (pointer: coarse) {
+  html.routee-mobile-splash-active .startup-splash,
+  body.routee-mobile-splash-active .startup-splash,
+  html.routee-mobile-entry-splash .startup-splash,
+  body.routee-mobile-entry-splash .startup-splash,
+  html.routee-mobile-routing-splash .startup-splash,
+  body.routee-mobile-routing-splash .startup-splash,
+  html.show-app-startup-splash .app-startup-splash,
+  body.routee-app-startup-active .app-startup-splash,
+  .app-startup-splash.is-visible {
+    background-size: cover !important;
+    background-position: center center !important;
+  }
+}
+
+@media (min-width: 721px) and (max-width: 1366px) and (hover: none) and (pointer: coarse) and (orientation: portrait) {
+  :root {
+    --routee-single-splash-image: url("../icons/splash-1536x2048.png?v=20260503-visual-stability-v5");
+  }
+}
+
+@media (min-width: 1024px) and (max-width: 1366px) and (hover: none) and (pointer: coarse) and (orientation: portrait) {
+  :root {
+    --routee-single-splash-image: url("../icons/splash-2048x2732.png?v=20260503-visual-stability-v5");
   }
 }
