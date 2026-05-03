@@ -33,8 +33,10 @@ const AUTH_BOOT_TIMEOUT_MS = 6000;
 const STALE_MODULE_RETRY_MS = AUTH_BOOT_TIMEOUT_MS - 100;
 const MOBILE_STARTUP_QUERY = "(max-width: 720px), (hover: none) and (pointer: coarse)";
 
-const SPLASH_ASSET_REVISION = "20260502-mobile-whitebottom-fix";
-const SPLASH_IMAGE_FILE = "splash-1170x2532.png";
+const SPLASH_ASSET_REVISION = "20260503-tablet-splash-ratio";
+const DEFAULT_SPLASH_IMAGE_FILE = "splash-1170x2532.png";
+const TABLET_PORTRAIT_SPLASH_IMAGE_FILE = "splash-1536x2048.png";
+const TABLET_LANDSCAPE_SPLASH_IMAGE_FILE = "splash-tablet-landscape-2048x1536.png";
 let startupSplashImagePromise = null;
 
 function isMobileStartupMode() {
@@ -87,8 +89,46 @@ function setStartupSplashMode(mode = "image") {
 }
 
 
+function getViewportSnapshot() {
+  const root = document.documentElement;
+  const viewport = window.visualViewport;
+
+  const width = Math.ceil(Math.max(
+    window.innerWidth || 0,
+    root?.clientWidth || 0,
+    viewport?.width || 0
+  ));
+
+  const height = Math.ceil(Math.max(
+    window.innerHeight || 0,
+    root?.clientHeight || 0,
+    viewport?.height || 0
+  ));
+
+  return { width, height };
+}
+
+function getPreferredSplashImageFile() {
+  const { width, height } = getViewportSnapshot();
+  const shortestSide = Math.min(width || 0, height || 0);
+  const longestSide = Math.max(width || 0, height || 0);
+  const isLandscape = width > height;
+  const isTabletLandscape = isLandscape && width >= 721 && height >= 560;
+  const isTabletPortrait = !isLandscape && (shortestSide >= 721 || longestSide >= 1024);
+
+  if (isTabletLandscape) {
+    return TABLET_LANDSCAPE_SPLASH_IMAGE_FILE;
+  }
+
+  if (isTabletPortrait) {
+    return TABLET_PORTRAIT_SPLASH_IMAGE_FILE;
+  }
+
+  return DEFAULT_SPLASH_IMAGE_FILE;
+}
+
 function getPreferredSplashImageUrl() {
-  return `./icons/${SPLASH_IMAGE_FILE}?v=${SPLASH_ASSET_REVISION}`;
+  return `./icons/${getPreferredSplashImageFile()}?v=${SPLASH_ASSET_REVISION}`;
 }
 
 function preloadStartupSplashImage() {
@@ -594,5 +634,10 @@ function init() {
     }
   });
 }
+
+
+window.addEventListener("orientationchange", () => {
+  startupSplashImagePromise = null;
+}, { passive: true });
 
 document.addEventListener("DOMContentLoaded", init);
