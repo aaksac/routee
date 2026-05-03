@@ -2456,14 +2456,14 @@
 }
 
 /* =========================================================
-   ROUTEE — TABLET PORTRAIT MAP + TWO-ITEM TRIP PREVIEW
+   ROUTEE — TABLET PORTRAIT MAP + ONE-ITEM TRIP PREVIEW
    Tablet dikey kullanımda harita büyük kalır; ancak ekranın altında
-   Gezi Listesi bölümünden yaklaşık iki konum görünecek kadar alan bırakılır.
+   Gezi Listesi bölümünden yaklaşık tek konum görünecek kadar alan bırakılır.
    Telefon, masaüstü ve yatay tablet davranışlarına dokunmaz.
    ========================================================= */
 @media (min-width: 721px) and (max-width: 1100px) and (orientation: portrait) and (hover: none) and (pointer: coarse) {
   .app-layout {
-    --routee-tablet-trip-preview-height: clamp(292px, 30svh, 338px);
+    --routee-tablet-trip-preview-height: clamp(190px, 20svh, 220px);
     grid-template-columns: 1fr !important;
     align-items: stretch !important;
     gap: 14px !important;
@@ -2478,9 +2478,9 @@
 
   .map-canvas {
     width: 100% !important;
-    height: clamp(560px, calc(100dvh - var(--routee-mobile-topbar-natural-height, 64px) - var(--routee-tablet-trip-preview-height, 316px) - 96px), 820px) !important;
-    min-height: clamp(560px, calc(100svh - var(--routee-mobile-topbar-natural-height, 64px) - var(--routee-tablet-trip-preview-height, 316px) - 96px), 820px) !important;
-    max-height: calc(100dvh - var(--routee-mobile-topbar-natural-height, 64px) - 250px) !important;
+    height: clamp(560px, calc(100dvh - var(--routee-mobile-topbar-natural-height, 64px) - var(--routee-tablet-trip-preview-height, 205px) - 96px), 820px) !important;
+    min-height: clamp(560px, calc(100svh - var(--routee-mobile-topbar-natural-height, 64px) - var(--routee-tablet-trip-preview-height, 205px) - 96px), 820px) !important;
+    max-height: calc(100dvh - var(--routee-mobile-topbar-natural-height, 64px) - 174px) !important;
     border-radius: 24px !important;
   }
 
@@ -2495,7 +2495,7 @@
     display: flex !important;
     flex-direction: column !important;
     min-height: 0 !important;
-    max-height: var(--routee-tablet-trip-preview-height, 316px) !important;
+    max-height: var(--routee-tablet-trip-preview-height, 205px) !important;
     overflow: hidden !important;
   }
 
