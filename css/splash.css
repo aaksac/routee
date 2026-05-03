@@ -9,7 +9,7 @@
   --routee-splash-bg: #d8dde3;
   --routee-splash-edge-bg: #162533;
   --routee-splash-height: 100vh;
-  --routee-splash-image: url("../icons/splash-1170x2532.png?v=20260502-mobile-whitebottom-fix");
+  --routee-splash-image: url("../icons/splash-1170x2532.png?v=20260503-tablet-splash-ratio");
 }
 
 /* Masaüstü/web: splash tamamen kapalı. */
@@ -83,6 +83,20 @@ body.routee-splash-active::after {
     transition: none !important;
   }
 
+  .routee-splash-picture {
+    position: absolute !important;
+    inset: 0 !important;
+    z-index: 0 !important;
+    display: block !important;
+    width: 100% !important;
+    height: 100% !important;
+    min-width: 100% !important;
+    min-height: 100% !important;
+    overflow: hidden !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
   .routee-splash-image-element {
     position: absolute !important;
     inset: 0 !important;
@@ -92,7 +106,7 @@ body.routee-splash-active::after {
     min-width: 100% !important;
     min-height: 100% !important;
     display: block !important;
-    object-fit: fill !important;
+    object-fit: cover !important;
     object-position: center center !important;
     border: 0 !important;
     margin: 0 !important;
@@ -211,6 +225,39 @@ body.routee-splash-message .startup-splash .routee-splash-card {
   40% { transform: translateY(-4px); opacity: 1; }
 }
 
+/* Tablet yatay görünümde görsel asla sıkıştırılmaz; cihaz oranına göre hazırlanmış landscape dosyası kullanılır. */
+@media (min-width: 721px) and (min-height: 560px) and (orientation: landscape) and (hover: none) and (pointer: coarse) {
+  :root {
+    --routee-splash-image: url("../icons/splash-tablet-landscape-2048x1536.png?v=20260503-tablet-splash-ratio");
+  }
+
+  html.routee-splash-active .startup-splash,
+  body.routee-splash-active .startup-splash,
+  .startup-splash.is-visible {
+    width: 100vw !important;
+    height: var(--routee-splash-height, 100vh) !important;
+    min-height: 100vh !important;
+    min-height: 100svh !important;
+    background-color: var(--routee-splash-edge-bg, #162533) !important;
+  }
+
+  .routee-splash-image-element {
+    object-fit: cover !important;
+    object-position: center center !important;
+  }
+}
+
+@media (min-width: 721px) and (orientation: portrait) and (hover: none) and (pointer: coarse) {
+  :root {
+    --routee-splash-image: url("../icons/splash-1536x2048.png?v=20260503-tablet-splash-ratio");
+  }
+
+  .routee-splash-image-element {
+    object-fit: cover !important;
+    object-position: center center !important;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .routee-splash-dots span { animation: none !important; }
 }
@@ -251,7 +298,31 @@ body.routee-splash-message .startup-splash .routee-splash-card {
     height: var(--routee-splash-height, 100vh) !important;
     min-height: 100vh !important;
     min-height: 100lvh !important;
-    object-fit: fill !important;
+    object-fit: cover !important;
+    object-position: center center !important;
+  }
+}
+
+/* ROUTEE — TABLET LANDSCAPE RATIO LOCK
+   Son override: yatay tablette 100lvh/min-height zorlaması görseli büyütüp basık/kırpık algısı üretmesin. */
+@media (orientation: landscape) and (hover: none) and (pointer: coarse) {
+  html.routee-splash-active,
+  html.routee-splash-active body,
+  body.routee-splash-active,
+  html.routee-splash-active .startup-splash,
+  body.routee-splash-active .startup-splash,
+  .startup-splash.is-visible,
+  .routee-splash-picture,
+  .routee-splash-image-element {
+    height: var(--routee-splash-height, 100svh) !important;
+    min-height: var(--routee-splash-height, 100svh) !important;
+    max-height: var(--routee-splash-height, 100svh) !important;
+  }
+
+  .routee-splash-image-element {
+    width: 100vw !important;
+    min-width: 100vw !important;
+    object-fit: cover !important;
     object-position: center center !important;
   }
 }
