@@ -102,12 +102,14 @@
 
   function buildLock() {
     var contentHeight = readContentHeight();
-    var safeTop = readSafeTop();
-    var totalHeight = clamp(contentHeight + safeTop, contentHeight, contentHeight + 58);
 
+    // Üst barın görsel yüksekliği safe-area değerine bağlanmaz.
+    // Safe-area siyah şerit olarak topbar içinde çizildiğinde iPhone/Safari'de
+    // Rota/Çıkış Yap alanının üstünde ikinci koyu bant oluşabiliyor.
+    // Bu kilit yalnızca beyaz uygulama üst barını sabitler.
     return {
-      height: Math.round(totalHeight),
-      safeTop: Math.round(safeTop)
+      height: Math.round(contentHeight),
+      safeTop: 0
     };
   }
 
