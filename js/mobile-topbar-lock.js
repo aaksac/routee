@@ -3,11 +3,14 @@
 
   var MOBILE_QUERY = "(max-width: 720px), (hover: none) and (pointer: coarse)";
   var HEIGHT_VAR = "--routee-mobile-topbar-locked-height";
+  var SAFE_TOP_VAR = "--routee-mobile-safe-top-locked";
   var CONTENT_HEIGHT_VAR = "--routee-mobile-topbar-content-height";
+  var DEFAULT_CONTENT_HEIGHT = 64;
   var locks = Object.create(null);
   var syncTimer = 0;
   var lastDeadZoneTouchTime = 0;
   var lastDeadZoneTouchHost = null;
+  var lastOrientationKey = "";
 
   function isMobileLike() {
     try {
@@ -18,14 +21,17 @@
   }
 
   function orientationKey() {
+    try {
+      if (window.matchMedia && window.matchMedia("(orientation: landscape)").matches) {
+        return "landscape";
+      }
+      if (window.matchMedia && window.matchMedia("(orientation: portrait)").matches) {
+        return "portrait";
+      }
+    } catch (error) {}
+
     var width = Math.ceil(window.innerWidth || document.documentElement.clientWidth || 0);
     var height = Math.ceil(window.innerHeight || document.documentElement.clientHeight || 0);
-
-    if (window.visualViewport) {
-      width = Math.ceil(Math.max(width, window.visualViewport.width || 0));
-      height = Math.ceil(Math.max(height, window.visualViewport.height || 0));
-    }
-
     return width > height ? "landscape" : "portrait";
   }
 
@@ -34,36 +40,97 @@
     return Math.max(min, Math.min(max, value));
   }
 
+  function readPxCustomProperty(name, fallback) {
+    try {
+      var value = window.getComputedStyle(document.documentElement).getPropertyValue(name);
+      var parsed = parseFloat(value);
+      if (Number.isFinite(parsed)) return parsed;
+    } catch (error) {}
+    return fallback;
+  }
+
+  function readContentHeight() {
+    return clamp(readPxCustomProperty(CONTENT_HEIGHT_VAR, DEFAULT_CONTENT_HEIGHT), 58, 72);
+  }
+
+  function measureCssEnvHeight(value) {
+    try {
+      if (!document.body) return 0;
+
+      var probe = document.createElement("div");
+      probe.style.cssText = [
+        "position:fixed",
+        "left:0",
+        "top:0",
+        "width:0",
+        "height:" + value,
+        "visibility:hidden",
+        "pointer-events:none",
+        "contain:strict",
+        "z-index:-1"
+      ].join(";");
+
+      document.body.appendChild(probe);
+      var height = probe.getBoundingClientRect().height || probe.offsetHeight || 0;
+      document.body.removeChild(probe);
+      return Number.isFinite(height) ? height : 0;
+    } catch (error) {
+      return 0;
+    }
+  }
+
+  function readSafeTop() {
+    var safeTop = readPxCustomProperty("--routee-safe-top", NaN);
+
+    if (!Number.isFinite(safeTop)) {
+      safeTop = measureCssEnvHeight("env(safe-area-inset-top, 0px)");
+    }
+
+    if (!safeTop) {
+      safeTop = measureCssEnvHeight("constant(safe-area-inset-top)");
+    }
+
+    // iOS Safari can briefly report an exaggerated safe-area value while the address bar,
+    // keyboard, or visual viewport is settling. The topbar should never follow that transient
+    // value after a location action; it must keep the same visual height until orientation changes.
+    return clamp(safeTop || 0, 0, 58);
+  }
+
   function getTopbar() {
     return document.querySelector(".topbar");
   }
 
-  function measureTopbarHeight() {
-    var topbar = getTopbar();
-    if (!topbar) return 0;
+  function buildLock() {
+    var contentHeight = readContentHeight();
+    var safeTop = readSafeTop();
+    var totalHeight = clamp(contentHeight + safeTop, contentHeight, contentHeight + 58);
 
-    var rect = topbar.getBoundingClientRect();
-    return Math.ceil(rect && rect.height ? rect.height : topbar.offsetHeight || 0);
+    return {
+      height: Math.round(totalHeight),
+      safeTop: Math.round(safeTop)
+    };
   }
 
-  function readContentHeight() {
-    var value = window.getComputedStyle(document.documentElement).getPropertyValue(CONTENT_HEIGHT_VAR);
-    var parsed = parseFloat(value);
-    return Number.isFinite(parsed) && parsed > 0 ? parsed : 64;
-  }
+  function applyLock(lock) {
+    if (!lock || !lock.height) return;
 
-  function applyLock(height) {
-    if (!height) return;
-    var nextValue = Math.round(height) + "px";
-    if (document.documentElement.style.getPropertyValue(HEIGHT_VAR) !== nextValue) {
-      document.documentElement.style.setProperty(HEIGHT_VAR, nextValue);
+    var heightValue = lock.height + "px";
+    var safeTopValue = lock.safeTop + "px";
+    var rootStyle = document.documentElement.style;
+
+    if (rootStyle.getPropertyValue(HEIGHT_VAR) !== heightValue) {
+      rootStyle.setProperty(HEIGHT_VAR, heightValue);
+    }
+
+    if (rootStyle.getPropertyValue(SAFE_TOP_VAR) !== safeTopValue) {
+      rootStyle.setProperty(SAFE_TOP_VAR, safeTopValue);
     }
   }
 
   function clearLock() {
-    if (document.documentElement.style.getPropertyValue(HEIGHT_VAR)) {
-      document.documentElement.style.removeProperty(HEIGHT_VAR);
-    }
+    var rootStyle = document.documentElement.style;
+    if (rootStyle.getPropertyValue(HEIGHT_VAR)) rootStyle.removeProperty(HEIGHT_VAR);
+    if (rootStyle.getPropertyValue(SAFE_TOP_VAR)) rootStyle.removeProperty(SAFE_TOP_VAR);
   }
 
   function syncTopbarLock(options) {
@@ -72,27 +139,18 @@
       return;
     }
 
-    var topbar = getTopbar();
-    if (!topbar) return;
+    if (!getTopbar()) return;
 
     var key = orientationKey();
     var forceNewMeasurement = options && options.forceNewMeasurement;
 
+    if (key !== lastOrientationKey) {
+      lastOrientationKey = key;
+      forceNewMeasurement = true;
+    }
+
     if (!locks[key] || forceNewMeasurement) {
-      var previousValue = document.documentElement.style.getPropertyValue(HEIGHT_VAR);
-      clearLock();
-
-      var measured = measureTopbarHeight();
-      var contentHeight = readContentHeight();
-      var minHeight = Math.max(64, contentHeight);
-      var maxHeight = 150;
-      var lockedHeight = clamp(measured, minHeight, maxHeight);
-
-      locks[key] = lockedHeight;
-
-      if (previousValue && !forceNewMeasurement && locks[key]) {
-        document.documentElement.style.setProperty(HEIGHT_VAR, previousValue);
-      }
+      locks[key] = buildLock();
     }
 
     applyLock(locks[key]);
@@ -160,7 +218,7 @@
   window.addEventListener("pageshow", function () { scheduleSync(null, 80); }, { passive: true });
   window.addEventListener("resize", function () { scheduleSync(null, 160); }, { passive: true });
   window.addEventListener("orientationchange", function () {
-    scheduleSync(null, 260);
+    scheduleSync({ forceNewMeasurement: true }, 260);
     scheduleSync(null, 620);
   }, { passive: true });
 
