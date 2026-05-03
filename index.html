@@ -24,16 +24,42 @@
           try {
             var root = document.documentElement;
             var viewport = window.visualViewport;
-            var values = [
+            var rawWidth = Math.max(
+              window.innerWidth || 0,
+              root.clientWidth || 0,
+              viewport && viewport.width ? viewport.width : 0
+            );
+            var rawHeight = Math.max(
               window.innerHeight || 0,
               root.clientHeight || 0,
-              viewport && viewport.height ? viewport.height : 0,
-              window.screen && window.screen.height ? window.screen.height : 0
-            ];
-            var nextHeight = Math.ceil(Math.max.apply(Math, values));
-            if (nextHeight > lockedSplashHeight) {
-              lockedSplashHeight = nextHeight;
+              viewport && viewport.height ? viewport.height : 0
+            );
+            var width = Math.ceil(rawWidth);
+            var height = Math.ceil(rawHeight);
+            var isLandscape = width > height && width >= 720;
+
+            if (width > 0) {
+              root.style.setProperty("--routee-splash-width", width + "px");
             }
+
+            root.classList.toggle("routee-splash-landscape", isLandscape);
+            root.classList.toggle("routee-splash-portrait", !isLandscape);
+
+            if (isLandscape) {
+              // Tablette yatay splash, ekran yüksekliğinden büyük kilitlenirse görselin üst kısmı basık/kırpık algılanır.
+              // Bu yüzden yatayda yalnızca gerçek görsel viewport yüksekliği kullanılır.
+              lockedSplashHeight = height || lockedSplashHeight;
+            } else {
+              var values = [
+                height || 0,
+                window.screen && window.screen.height ? window.screen.height : 0
+              ];
+              var nextHeight = Math.ceil(Math.max.apply(Math, values));
+              if (nextHeight > lockedSplashHeight) {
+                lockedSplashHeight = nextHeight;
+              }
+            }
+
             if (lockedSplashHeight > 0) {
               root.style.setProperty("--routee-splash-height", lockedSplashHeight + "px");
             }
@@ -70,7 +96,9 @@
     <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png" />
     <link rel="apple-touch-icon" sizes="180x180" href="./icons/apple-touch-icon.png" />
     <link rel="manifest" href="./manifest.webmanifest" />
-    <link rel="preload" as="image" href="./icons/splash-1170x2532.png?v=20260502-mobile-whitebottom-fix" media="(max-width: 720px), (hover: none) and (pointer: coarse)" />
+    <link rel="preload" as="image" href="./icons/splash-1170x2532.png?v=20260503-tablet-splash-ratio" media="(max-width: 720px), (hover: none) and (pointer: coarse)" />
+    <link rel="preload" as="image" href="./icons/splash-1536x2048.png?v=20260503-tablet-splash-ratio" media="(min-width: 721px) and (orientation: portrait) and (hover: none) and (pointer: coarse)" />
+    <link rel="preload" as="image" href="./icons/splash-tablet-landscape-2048x1536.png?v=20260503-tablet-splash-ratio" media="(min-width: 721px) and (min-height: 560px) and (orientation: landscape) and (hover: none) and (pointer: coarse)" />
 
 
     <style id="routee-critical-boot-css">
@@ -78,7 +106,7 @@
         --routee-splash-bg: #d8dde3;
         --routee-splash-edge-bg: #162533;
         --routee-splash-height: 100vh;
-        --routee-splash-image: url("./icons/splash-1170x2532.png?v=20260502-mobile-whitebottom-fix");
+        --routee-splash-image: url("./icons/splash-1170x2532.png?v=20260503-tablet-splash-ratio");
       }
 
       html,
@@ -126,12 +154,22 @@
         pointer-events: auto;
       }
 
+      .routee-splash-picture {
+        position: absolute;
+        inset: 0;
+        z-index: 0;
+        display: block;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+      }
+
       .routee-splash-image-element {
         position: absolute;
         inset: 0;
         width: 100%;
         height: 100%;
-        object-fit: fill;
+        object-fit: cover;
         object-position: center center;
         display: block;
         border: 0;
@@ -162,7 +200,11 @@
   </head>
   <body>
     <div class="startup-splash" id="startupSplash" data-mode="image" aria-hidden="true">
-      <img class="routee-splash-image-element" id="startupSplashImage" src="./icons/splash-1170x2532.png?v=20260502-mobile-whitebottom-fix" alt="" aria-hidden="true" decoding="async" fetchpriority="high" />
+      <picture class="routee-splash-picture" aria-hidden="true">
+        <source media="(min-width: 721px) and (min-height: 560px) and (orientation: landscape) and (hover: none) and (pointer: coarse)" srcset="./icons/splash-tablet-landscape-2048x1536.png?v=20260503-tablet-splash-ratio" />
+        <source media="(min-width: 721px) and (orientation: portrait) and (hover: none) and (pointer: coarse)" srcset="./icons/splash-1536x2048.png?v=20260503-tablet-splash-ratio 1536w, ./icons/splash-2048x2732.png?v=20260503-tablet-splash-ratio 2048w" sizes="100vw" />
+        <img class="routee-splash-image-element" id="startupSplashImage" src="./icons/splash-1170x2532.png?v=20260503-tablet-splash-ratio" alt="" aria-hidden="true" decoding="async" fetchpriority="high" />
+      </picture>
       <div class="routee-splash-card" aria-live="polite" aria-atomic="true">
         <div class="routee-splash-logo" aria-hidden="true">R</div>
         <p class="routee-splash-title" id="startupSplashTitle">Rota</p>
