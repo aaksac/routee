@@ -2962,3 +2962,196 @@
     overflow-x: hidden !important;
   }
 }
+
+/* =========================================================
+   ROUTEE — V6 PHONE TOPBAR + NEW MAP FAB HARD STABILITY
+   Mobilde üst siyah alan konum ekleme, liste büyümesi, klavye,
+   scroll veya overlay durumunda kaybolmasın. Yeni Harita butonu
+   yer ekleme sayısından bağımsız olarak aynı koordinatta kalsın.
+   ========================================================= */
+@media (max-width: 720px) {
+  :root {
+    --routee-v6-phone-safe-top: env(safe-area-inset-top, 0px);
+    --routee-v6-phone-safe-right: env(safe-area-inset-right, 0px);
+    --routee-v6-phone-safe-bottom: env(safe-area-inset-bottom, 0px);
+    --routee-v6-phone-safe-left: env(safe-area-inset-left, 0px);
+    --routee-v6-topbar-content-height: 64px;
+    --routee-v6-topbar-height: calc(var(--routee-v6-topbar-content-height) + var(--routee-v6-phone-safe-top));
+    --routee-v6-fab-size: 56px;
+    --routee-v6-fab-right: max(14px, calc(var(--routee-v6-phone-safe-right) + 12px));
+    --routee-v6-fab-bottom: max(10px, calc(var(--routee-v6-phone-safe-bottom) + 10px));
+  }
+
+  @supports (top: constant(safe-area-inset-top)) {
+    :root {
+      --routee-v6-phone-safe-top: constant(safe-area-inset-top);
+      --routee-v6-phone-safe-right: constant(safe-area-inset-right);
+      --routee-v6-phone-safe-bottom: constant(safe-area-inset-bottom);
+      --routee-v6-phone-safe-left: constant(safe-area-inset-left);
+      --routee-v6-topbar-height: calc(var(--routee-v6-topbar-content-height) + var(--routee-v6-phone-safe-top));
+      --routee-v6-fab-right: max(14px, calc(var(--routee-v6-phone-safe-right) + 12px));
+      --routee-v6-fab-bottom: max(10px, calc(var(--routee-v6-phone-safe-bottom) + 10px));
+    }
+  }
+
+  html,
+  body,
+  #app {
+    width: 100% !important;
+    max-width: 100vw !important;
+    overflow-x: hidden !important;
+  }
+
+  .topbar,
+  .topbar.is-hidden-on-scroll,
+  body.has-mobile-floating-panel .topbar,
+  body.has-screen-overlay .topbar,
+  body[data-mobile-panel] .topbar {
+    position: sticky !important;
+    top: 0 !important;
+    width: 100% !important;
+    height: var(--routee-v6-topbar-height) !important;
+    min-height: var(--routee-v6-topbar-height) !important;
+    max-height: var(--routee-v6-topbar-height) !important;
+    flex: 0 0 var(--routee-v6-topbar-height) !important;
+    padding-top: var(--routee-v6-phone-safe-top) !important;
+    padding-bottom: 0 !important;
+    padding-left: max(12px, calc(var(--routee-v6-phone-safe-left) + 12px)) !important;
+    padding-right: max(12px, calc(var(--routee-v6-phone-safe-right) + 12px)) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 10px !important;
+    overflow: hidden !important;
+    background: var(--routee-system-status-bg, #0f172a) !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    filter: none !important;
+    transform: translate3d(0, 0, 0) !important;
+    -webkit-transform: translate3d(0, 0, 0) !important;
+    contain: layout paint !important;
+    z-index: 1400 !important;
+  }
+
+  .topbar::before,
+  body.has-mobile-floating-panel .topbar::before,
+  body.has-screen-overlay .topbar::before,
+  body[data-mobile-panel] .topbar::before {
+    content: "" !important;
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    height: var(--routee-v6-phone-safe-top) !important;
+    max-height: var(--routee-v6-phone-safe-top) !important;
+    background: var(--routee-system-status-bg, #0f172a) !important;
+    opacity: 1 !important;
+    filter: none !important;
+    pointer-events: none !important;
+    z-index: 0 !important;
+  }
+
+  .topbar > .brand-area,
+  .topbar > .topbar-actions {
+    height: var(--routee-v6-topbar-content-height) !important;
+    min-height: var(--routee-v6-topbar-content-height) !important;
+    max-height: var(--routee-v6-topbar-content-height) !important;
+    display: flex !important;
+    align-items: center !important;
+    overflow: hidden !important;
+    position: relative !important;
+    z-index: 1 !important;
+  }
+
+  .topbar .brand-area {
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+  }
+
+  .topbar .brand-text,
+  .topbar .brand-text h1,
+  .topbar .brand-text p {
+    min-width: 0 !important;
+    max-height: var(--routee-v6-topbar-content-height) !important;
+    overflow: hidden !important;
+  }
+
+  .topbar .brand-text h1 {
+    margin: 0 !important;
+    font-size: 1rem !important;
+    line-height: 1.05 !important;
+    white-space: nowrap !important;
+    text-overflow: ellipsis !important;
+  }
+
+  .topbar .brand-text p {
+    display: none !important;
+  }
+
+  .topbar .brand-icon {
+    width: 40px !important;
+    min-width: 40px !important;
+    max-width: 40px !important;
+    height: 40px !important;
+    min-height: 40px !important;
+    max-height: 40px !important;
+    flex: 0 0 40px !important;
+  }
+
+  .topbar .page-action-btn {
+    height: 36px !important;
+    min-height: 36px !important;
+    max-height: 36px !important;
+    padding: 0 11px !important;
+    font-size: 0.82rem !important;
+    line-height: 1 !important;
+    white-space: nowrap !important;
+    flex: 0 0 auto !important;
+  }
+
+  .new-map-mobile-fab,
+  body.has-mobile-floating-panel .new-map-mobile-fab,
+  body.has-screen-overlay .new-map-mobile-fab,
+  body[data-mobile-panel] .new-map-mobile-fab {
+    display: inline-flex !important;
+    position: fixed !important;
+    inset: auto var(--routee-v6-fab-right) var(--routee-v6-fab-bottom) auto !important;
+    top: auto !important;
+    left: auto !important;
+    right: var(--routee-v6-fab-right) !important;
+    bottom: var(--routee-v6-fab-bottom) !important;
+    width: var(--routee-v6-fab-size) !important;
+    min-width: var(--routee-v6-fab-size) !important;
+    max-width: var(--routee-v6-fab-size) !important;
+    height: var(--routee-v6-fab-size) !important;
+    min-height: var(--routee-v6-fab-size) !important;
+    max-height: var(--routee-v6-fab-size) !important;
+    margin: 0 !important;
+    transform: translate3d(0, 0, 0) !important;
+    -webkit-transform: translate3d(0, 0, 0) !important;
+    will-change: auto !important;
+    transition: box-shadow 0.18s ease, opacity 0.18s ease, filter 0.18s ease !important;
+    z-index: 1200 !important;
+  }
+
+  body.has-mobile-floating-panel .new-map-mobile-fab,
+  body.has-screen-overlay .new-map-mobile-fab,
+  body[data-mobile-panel] .new-map-mobile-fab {
+    right: var(--routee-v6-fab-right) !important;
+    bottom: var(--routee-v6-fab-bottom) !important;
+    transform: translate3d(0, 0, 0) !important;
+    -webkit-transform: translate3d(0, 0, 0) !important;
+    pointer-events: none !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    filter: blur(4px) !important;
+    z-index: 60 !important;
+  }
+}
+
+@media (max-width: 720px) and (orientation: landscape) {
+  :root {
+    --routee-v6-fab-size: 52px;
+    --routee-v6-fab-bottom: max(8px, calc(env(safe-area-inset-bottom, 0px) + 8px));
+  }
+}
