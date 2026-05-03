@@ -9,7 +9,7 @@
   --routee-splash-bg: #d8dde3;
   --routee-splash-edge-bg: #162533;
   --routee-splash-height: 100vh;
-  --routee-splash-image: url("../icons/splash-1170x2532.png?v=20260502-mobile-whitebottom-fix");
+  --routee-splash-image: url("../icons/splash-1170x2532.png?v=20260503-visual-stability-v5");
 }
 
 /* Masaüstü/web: splash tamamen kapalı. */
@@ -83,6 +83,17 @@ body.routee-splash-active::after {
     transition: none !important;
   }
 
+
+  .routee-splash-picture {
+    position: absolute !important;
+    inset: 0 !important;
+    z-index: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    display: block !important;
+    overflow: hidden !important;
+  }
+
   .routee-splash-image-element {
     position: absolute !important;
     inset: 0 !important;
@@ -92,7 +103,7 @@ body.routee-splash-active::after {
     min-width: 100% !important;
     min-height: 100% !important;
     display: block !important;
-    object-fit: fill !important;
+    object-fit: cover !important;
     object-position: center center !important;
     border: 0 !important;
     margin: 0 !important;
@@ -251,7 +262,31 @@ body.routee-splash-message .startup-splash .routee-splash-card {
     height: var(--routee-splash-height, 100vh) !important;
     min-height: 100vh !important;
     min-height: 100lvh !important;
-    object-fit: fill !important;
+    object-fit: cover !important;
     object-position: center center !important;
+  }
+}
+
+
+/* ROUTEE — V5 SPLASH RATIO GUARD */
+@media (max-width: 720px), (hover: none) and (pointer: coarse) {
+  .routee-splash-picture,
+  .routee-splash-image-element {
+    width: 100vw !important;
+    height: var(--routee-splash-height, 100vh) !important;
+    max-width: none !important;
+    max-height: none !important;
+  }
+
+  .routee-splash-image-element {
+    object-fit: cover !important;
+    object-position: center center !important;
+  }
+}
+
+@media (min-width: 721px) and (orientation: landscape) and (hover: none) and (pointer: coarse) {
+  .routee-splash-image-element {
+    object-fit: contain !important;
+    background: var(--routee-splash-edge-bg, #162533) !important;
   }
 }
