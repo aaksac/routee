@@ -40,6 +40,44 @@
     return meta;
   }
 
+  function normalizeViewportCover() {
+    var viewport = document.head.querySelector('meta[name="viewport"]');
+    if (!viewport) return;
+
+    var content = viewport.getAttribute("content") || "";
+    var parts = content
+      .split(",")
+      .map(function (part) { return part.trim(); })
+      .filter(Boolean);
+
+    function upsert(rule) {
+      var key = rule.split("=")[0].trim().toLowerCase();
+      var found = false;
+
+      parts = parts.map(function (part) {
+        var partKey = part.split("=")[0].trim().toLowerCase();
+        if (partKey === key) {
+          found = true;
+          return rule;
+        }
+        return part;
+      });
+
+      if (!found) parts.push(rule);
+    }
+
+    upsert("width=device-width");
+    upsert("initial-scale=1");
+    upsert("maximum-scale=1");
+    upsert("user-scalable=no");
+    upsert("viewport-fit=cover");
+
+    var nextContent = parts.join(", ");
+    if (viewport.getAttribute("content") !== nextContent) {
+      viewport.setAttribute("content", nextContent);
+    }
+  }
+
   function applyStatusBarLock() {
     ensureMeta("theme-color", STATUS_COLOR);
     ensureMeta("msapplication-navbutton-color", STATUS_COLOR);
@@ -47,11 +85,12 @@
     ensureMeta("apple-mobile-web-app-status-bar-style", APPLE_STATUS_STYLE);
     ensureMeta("apple-mobile-web-app-title", "Rota");
     ensureMeta("color-scheme", "light only");
+    normalizeViewportCover();
 
     var root = document.documentElement;
     root.classList.add("routee-statusbar-locked");
     root.style.setProperty("--routee-system-status-bg", STATUS_COLOR);
-    root.style.backgroundColor = STATUS_COLOR;
+    root.style.setProperty("background-color", STATUS_COLOR, "important");
 
     if (isIOSDevice()) {
       root.classList.add("routee-ios");
@@ -92,6 +131,22 @@
     } catch (error) {
       // Status bar kilidi kritik olmayan bir iyileştirmedir; uygulama akışını kesmemelidir.
     }
+  }
+
+  window.RouteeStatusBar = window.RouteeStatusBar || {};
+  window.RouteeStatusBar.lock = applyStatusBarLock;
+
+  document.addEventListener("touchstart", applyStatusBarLock, { capture: true, passive: true });
+  document.addEventListener("pointerdown", applyStatusBarLock, { capture: true, passive: true });
+  document.addEventListener("focusin", applyStatusBarLock, { capture: true, passive: true });
+  document.addEventListener("focusout", function () {
+    window.requestAnimationFrame(applyStatusBarLock);
+    window.setTimeout(applyStatusBarLock, 80);
+  }, { capture: true, passive: true });
+
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener("resize", applyStatusBarLock, { passive: true });
+    window.visualViewport.addEventListener("scroll", applyStatusBarLock, { passive: true });
   }
 
   if (document.head && window.MutationObserver) {
