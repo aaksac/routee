@@ -2484,23 +2484,24 @@
 
   .status-strip {
     box-sizing: border-box !important;
-    height: var(--routee-mobile-status-strip-height) !important;
+    height: auto !important;
     min-height: var(--routee-mobile-status-strip-height) !important;
-    max-height: var(--routee-mobile-status-strip-height) !important;
-    padding-top: 0 !important;
-    padding-bottom: 0 !important;
+    max-height: none !important;
+    padding-top: 4px !important;
+    padding-bottom: 4px !important;
     display: flex !important;
-    align-items: center !important;
-    overflow: hidden !important;
+    align-items: flex-start !important;
+    overflow: visible !important;
   }
 
   .auth-status {
     width: 100% !important;
     max-width: 100% !important;
     margin: 0 !important;
-    white-space: nowrap !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
+    white-space: normal !important;
+    overflow: visible !important;
+    text-overflow: clip !important;
+    word-break: break-word !important;
     line-height: 1.25 !important;
   }
 }
@@ -2653,23 +2654,24 @@
 
   .status-strip {
     box-sizing: border-box !important;
-    height: var(--routee-mobile-status-strip-height) !important;
+    height: auto !important;
     min-height: var(--routee-mobile-status-strip-height) !important;
-    max-height: var(--routee-mobile-status-strip-height) !important;
-    padding-top: 0 !important;
-    padding-bottom: 0 !important;
+    max-height: none !important;
+    padding-top: 4px !important;
+    padding-bottom: 4px !important;
     display: flex !important;
-    align-items: center !important;
-    overflow: hidden !important;
+    align-items: flex-start !important;
+    overflow: visible !important;
   }
 
   .auth-status {
     width: 100% !important;
     max-width: 100% !important;
     margin: 0 !important;
-    white-space: nowrap !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
+    white-space: normal !important;
+    overflow: visible !important;
+    text-overflow: clip !important;
+    word-break: break-word !important;
     line-height: 1.25 !important;
   }
 }
@@ -2717,4 +2719,3 @@
     }
   }
 }
-
