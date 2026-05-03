@@ -55,6 +55,7 @@
 
     if (isIOSDevice()) {
       root.classList.add("routee-ios");
+      root.classList.toggle("routee-ios-standalone", isStandaloneMode());
     }
 
     if (document.body) {
