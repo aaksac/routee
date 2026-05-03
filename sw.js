@@ -1,7 +1,7 @@
 const SW_VERSION = new URL(self.location.href).searchParams.get("v") || "dev";
 const CACHE_NAME = `routee-shell-${SW_VERSION}`;
 const NETWORK_TIMEOUT_MS = 1200;
-const ROUTEE_ASSET_REVISION = "20260503-mobile-topbar-lock";
+const ROUTEE_ASSET_REVISION = "20260503-tablet-splash-ratio";
 
 const APP_SHELL = [
   "./",
@@ -42,7 +42,8 @@ const APP_SHELL = [
   "./icons/splash-1536x2048.png",
   "./icons/splash-1668x2224.png",
   "./icons/splash-1668x2388.png",
-  "./icons/splash-2048x2732.png"
+  "./icons/splash-2048x2732.png",
+  "./icons/splash-tablet-landscape-2048x1536.png"
 ];
 
 self.addEventListener("install", (event) => {
