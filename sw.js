@@ -1,7 +1,7 @@
 const SW_VERSION = new URL(self.location.href).searchParams.get("v") || "dev";
 const CACHE_NAME = `routee-shell-${SW_VERSION}`;
 const NETWORK_TIMEOUT_MS = 1200;
-const ROUTEE_ASSET_REVISION = "20260503-phone-status-strip-fab-v8";
+const ROUTEE_ASSET_REVISION = "20260503-tablet-landscape-trip-card-v9";
 
 const APP_SHELL = [
   "./",
