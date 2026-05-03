@@ -2001,3 +2001,81 @@ body,
     background-color: var(--bg, #f4f7fb) !important;
   }
 }
+
+/* =========================================================
+   ROUTEE — MOBILE STATUS BAR PERMANENT DARK LOCK
+   Harita araması, klavye, dokunma ve Google Maps yeniden boyama
+   sonrasında iPhone üst sistem alanı beyaza dönmesin.
+   ========================================================= */
+@media (max-width: 720px), (hover: none) and (pointer: coarse) {
+  html.routee-statusbar-locked {
+    background: #0f172a !important;
+    background-color: #0f172a !important;
+    color-scheme: light !important;
+  }
+
+  html.routee-statusbar-locked body,
+  body.routee-statusbar-locked {
+    background-color: var(--bg, #f4f7fb) !important;
+    background-image: linear-gradient(
+      to bottom,
+      #0f172a 0,
+      #0f172a env(safe-area-inset-top, 0px),
+      var(--bg, #f4f7fb) env(safe-area-inset-top, 0px),
+      var(--bg, #f4f7fb) 100%
+    ) !important;
+    background-repeat: no-repeat !important;
+    background-attachment: fixed !important;
+  }
+
+  @supports (top: constant(safe-area-inset-top)) {
+    html.routee-statusbar-locked body,
+    body.routee-statusbar-locked {
+      background-image: linear-gradient(
+        to bottom,
+        #0f172a 0,
+        #0f172a constant(safe-area-inset-top),
+        var(--bg, #f4f7fb) constant(safe-area-inset-top),
+        var(--bg, #f4f7fb) 100%
+      ) !important;
+    }
+  }
+
+  body.routee-statusbar-locked #app,
+  body.routee-statusbar-locked .app-shell {
+    background: var(--bg, #f4f7fb) !important;
+    background-color: var(--bg, #f4f7fb) !important;
+  }
+
+  html.routee-statusbar-locked::before,
+  body.routee-statusbar-locked::before,
+  .topbar::before,
+  #routee-statusbar-shield {
+    display: block !important;
+    content: "" !important;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    height: env(safe-area-inset-top, 0px) !important;
+    min-height: env(safe-area-inset-top, 0px) !important;
+    max-height: env(safe-area-inset-top, 0px) !important;
+    background: #0f172a !important;
+    background-color: #0f172a !important;
+    pointer-events: none !important;
+    z-index: 2147483647 !important;
+    transform: translateZ(0) !important;
+    -webkit-transform: translateZ(0) !important;
+  }
+
+  @supports (top: constant(safe-area-inset-top)) {
+    html.routee-statusbar-locked::before,
+    body.routee-statusbar-locked::before,
+    .topbar::before,
+    #routee-statusbar-shield {
+      height: constant(safe-area-inset-top) !important;
+      min-height: constant(safe-area-inset-top) !important;
+      max-height: constant(safe-area-inset-top) !important;
+    }
+  }
+}
