@@ -2504,3 +2504,217 @@
     line-height: 1.25 !important;
   }
 }
+
+/* =========================================================
+   ROUTEE — MOBILE TOPBAR FINAL COMPACT LOCK
+   Konum ekleme/arama/klavye/visualViewport hareketlerinde üst barın
+   yüksekliği sabit kalır. Siyah safe-area katmanı artık topbar içinde
+   çizilmez; böylece ikon ile Çıkış Yap alanının üstünde ikinci koyu şerit
+   oluşmaz. İşlevsel buton/panel davranışlarına dokunmaz.
+   ========================================================= */
+@media (max-width: 720px), (hover: none) and (pointer: coarse) {
+  :root {
+    --routee-mobile-topbar-content-height: 64px;
+    --routee-mobile-topbar-locked-height: 64px;
+    --routee-mobile-safe-top-locked: 0px;
+    --routee-mobile-status-strip-height: 44px;
+  }
+
+  html.routee-statusbar-locked,
+  html.routee-statusbar-locked body,
+  body.routee-statusbar-locked {
+    background-color: var(--bg, #f4f7fb) !important;
+  }
+
+  body.routee-statusbar-locked #app,
+  #app {
+    padding-top: 0 !important;
+    background: var(--bg, #f4f7fb) !important;
+    background-color: var(--bg, #f4f7fb) !important;
+  }
+
+  .topbar {
+    position: sticky !important;
+    top: 0 !important;
+    box-sizing: border-box !important;
+    height: 64px !important;
+    min-height: 64px !important;
+    max-height: 64px !important;
+    flex: 0 0 64px !important;
+    padding: 12px 14px !important;
+    padding-left: max(14px, calc(env(safe-area-inset-left, 0px) + 12px)) !important;
+    padding-right: max(14px, calc(env(safe-area-inset-right, 0px) + 12px)) !important;
+    background: rgba(255, 255, 255, 0.96) !important;
+    border-bottom: 1px solid rgba(219, 228, 240, 0.9) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 10px !important;
+    overflow: hidden !important;
+    isolation: isolate !important;
+    contain: layout paint !important;
+    transform: translate3d(0, 0, 0) !important;
+    -webkit-transform: translate3d(0, 0, 0) !important;
+    transition: transform 0.24s ease, opacity 0.24s ease !important;
+    touch-action: manipulation !important;
+    -ms-touch-action: manipulation !important;
+    -webkit-user-select: none !important;
+    user-select: none !important;
+    -webkit-touch-callout: none !important;
+    -webkit-tap-highlight-color: transparent !important;
+  }
+
+  @supports (left: constant(safe-area-inset-left)) {
+    .topbar {
+      padding-left: max(14px, calc(constant(safe-area-inset-left) + 12px)) !important;
+      padding-right: max(14px, calc(constant(safe-area-inset-right) + 12px)) !important;
+    }
+  }
+
+  .topbar::before {
+    display: none !important;
+    content: none !important;
+    height: 0 !important;
+    min-height: 0 !important;
+    max-height: 0 !important;
+    background: transparent !important;
+  }
+
+  .topbar > .brand-area,
+  .topbar > .topbar-actions {
+    height: 40px !important;
+    min-height: 40px !important;
+    max-height: 40px !important;
+    display: flex !important;
+    align-items: center !important;
+    align-self: center !important;
+    overflow: hidden !important;
+    position: relative !important;
+    z-index: 1 !important;
+  }
+
+  .topbar > .brand-area {
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+  }
+
+  .topbar > .topbar-actions {
+    flex: 0 0 auto !important;
+    min-width: max-content !important;
+  }
+
+  .topbar .brand-icon {
+    width: 40px !important;
+    height: 40px !important;
+    min-width: 40px !important;
+    min-height: 40px !important;
+    max-width: 40px !important;
+    max-height: 40px !important;
+    flex: 0 0 40px !important;
+  }
+
+  .topbar .brand-text,
+  .topbar .brand-text h1,
+  .topbar .brand-text p {
+    min-height: 0 !important;
+    max-height: 40px !important;
+    overflow: hidden !important;
+  }
+
+  .topbar .brand-text h1 {
+    margin: 0 !important;
+    line-height: 1.08 !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+
+  .topbar .brand-text p {
+    display: none !important;
+  }
+
+  .topbar .page-action-btn {
+    height: 38px !important;
+    min-height: 38px !important;
+    max-height: 38px !important;
+    padding: 0 14px !important;
+    line-height: 1 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex: 0 0 auto !important;
+    white-space: nowrap !important;
+  }
+
+  .topbar.is-hidden-on-scroll {
+    transform: translate3d(0, -64px, 0) !important;
+    -webkit-transform: translate3d(0, -64px, 0) !important;
+  }
+
+  .status-strip {
+    box-sizing: border-box !important;
+    height: var(--routee-mobile-status-strip-height) !important;
+    min-height: var(--routee-mobile-status-strip-height) !important;
+    max-height: var(--routee-mobile-status-strip-height) !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    overflow: hidden !important;
+  }
+
+  .auth-status {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    line-height: 1.25 !important;
+  }
+}
+
+/* ROUTEE — iOS tarayıcı/PWA safe-area ayrımı
+   Normal Safari/Chrome içinde ek koyu bant oluşturma. PWA standalone ise
+   yalnızca gerçek sistem safe-area kadar üst boşluk bırak. */
+@media (max-width: 720px), (hover: none) and (pointer: coarse) {
+  html.routee-statusbar-locked:not(.routee-ios-standalone)::before,
+  body.routee-statusbar-locked:not(.routee-ios-standalone)::before {
+    display: none !important;
+    content: none !important;
+    height: 0 !important;
+    min-height: 0 !important;
+    max-height: 0 !important;
+    background: transparent !important;
+  }
+}
+
+@media all and (display-mode: standalone) and (max-width: 720px),
+       all and (display-mode: standalone) and (hover: none) and (pointer: coarse) {
+  body.routee-ios-standalone #app {
+    padding-top: env(safe-area-inset-top, 0px) !important;
+  }
+
+  html.routee-statusbar-locked.routee-ios-standalone::before,
+  body.routee-statusbar-locked.routee-ios-standalone::before {
+    display: block !important;
+    content: "" !important;
+    height: env(safe-area-inset-top, 0px) !important;
+    min-height: 0 !important;
+    max-height: env(safe-area-inset-top, 0px) !important;
+    background: var(--routee-system-status-bg, #0f172a) !important;
+  }
+
+  @supports (height: constant(safe-area-inset-top)) {
+    body.routee-ios-standalone #app {
+      padding-top: constant(safe-area-inset-top) !important;
+    }
+
+    html.routee-statusbar-locked.routee-ios-standalone::before,
+    body.routee-statusbar-locked.routee-ios-standalone::before {
+      height: constant(safe-area-inset-top) !important;
+      max-height: constant(safe-area-inset-top) !important;
+    }
+  }
+}
+
