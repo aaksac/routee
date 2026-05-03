@@ -986,24 +986,56 @@ function focusToLocation(lat, lng, zoom = 15) {
   map.setZoom(zoom);
 }
 
+function keepMobileStatusBarDarkAfterSearch() {
+  const statusColor = "#0f172a";
+  const viewportContent =
+    "width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover";
+
+  const root = document.documentElement;
+  const body = document.body;
+  const viewportMeta = document.querySelector('meta[name="viewport"]');
+  const themeMeta = document.querySelector('meta[name="theme-color"]');
+  const navButtonMeta = document.querySelector('meta[name="msapplication-navbutton-color"]');
+
+  root.classList.add("routee-statusbar-locked");
+  root.style.setProperty("--routee-system-status-bg", statusColor);
+  root.style.setProperty("background-color", statusColor, "important");
+
+  if (body) {
+    body.classList.add("routee-statusbar-locked");
+    body.style.setProperty("--routee-system-status-bg", statusColor);
+  }
+
+  if (viewportMeta && viewportMeta.getAttribute("content") !== viewportContent) {
+    viewportMeta.setAttribute("content", viewportContent);
+  }
+
+  if (themeMeta && themeMeta.getAttribute("content") !== statusColor) {
+    themeMeta.setAttribute("content", statusColor);
+  }
+
+  if (navButtonMeta && navButtonMeta.getAttribute("content") !== statusColor) {
+    navButtonMeta.setAttribute("content", statusColor);
+  }
+
+  if (window.RouteeStatusBar && typeof window.RouteeStatusBar.lock === "function") {
+    window.RouteeStatusBar.lock();
+  }
+}
+
 function resetPageZoomAfterSearch() {
   if (!searchInputEl) return;
 
   searchInputEl.blur();
 
-  const viewportMeta = document.querySelector('meta[name="viewport"]');
-  if (!viewportMeta) return;
-
-  const originalContent = viewportMeta.getAttribute("content") || "";
-
-  viewportMeta.setAttribute(
-    "content",
-    "width=device-width, initial-scale=1, maximum-scale=1"
-  );
-
-  window.setTimeout(() => {
-    viewportMeta.setAttribute("content", originalContent);
-  }, 250);
+  // Eski çözüm viewport meta etiketini kısa süreliğine değiştiriyordu.
+  // iPhone'da bu değişim `viewport-fit=cover` değerini düşürerek harita araması
+  // sonrası üst sistem/safe-area renginin beyaza dönmesine ve görsel kaymaya sebep olabiliyordu.
+  // Burada ölçek/yerleşim değiştirmeden sadece arama odağını kapatıp koyu üst alanı yeniden sabitliyoruz.
+  keepMobileStatusBarDarkAfterSearch();
+  window.requestAnimationFrame(keepMobileStatusBarDarkAfterSearch);
+  window.setTimeout(keepMobileStatusBarDarkAfterSearch, 80);
+  window.setTimeout(keepMobileStatusBarDarkAfterSearch, 260);
 }
 
 function focusMapToPoints(startPoint, points = [], endPoint = null) {
