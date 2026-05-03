@@ -2625,38 +2625,19 @@ function initMobileDeadZoneTapGuards() {
 function initMobileTopbarAutoHide() {
   if (!elements.topbar) return;
 
-  state.lastScrollY = window.scrollY || 0;
+  // Mobilde üst siyah alan sabit kalmalı.
+  // Önceki otomatik gizleme mantığı, konum ekleme ve liste büyümesi sırasında
+  // .is-hidden-on-scroll sınıfı ekleyerek üst barın kaybolmasına neden oluyordu.
+  // Bu nedenle burada sadece olası eski sınıfı temizliyoruz; diğer işlevlere dokunmuyoruz.
+  const keepTopbarVisible = () => {
+    elements.topbar?.classList.remove("is-hidden-on-scroll");
+    state.lastScrollY = window.scrollY || 0;
+  };
 
-  window.addEventListener(
-    "scroll",
-    () => {
-      const isMobile = window.innerWidth <= 720;
-
-      if (!isMobile) {
-        elements.topbar.classList.remove("is-hidden-on-scroll");
-        state.lastScrollY = window.scrollY || 0;
-        return;
-      }
-
-      const currentY = window.scrollY || 0;
-      const delta = currentY - state.lastScrollY;
-
-      if (currentY <= 8) {
-        elements.topbar.classList.remove("is-hidden-on-scroll");
-        state.lastScrollY = currentY;
-        return;
-      }
-
-      if (delta > 8) {
-        elements.topbar.classList.add("is-hidden-on-scroll");
-      } else if (delta < -8) {
-        elements.topbar.classList.remove("is-hidden-on-scroll");
-      }
-
-      state.lastScrollY = currentY;
-    },
-    { passive: true }
-  );
+  keepTopbarVisible();
+  window.addEventListener("scroll", keepTopbarVisible, { passive: true });
+  window.addEventListener("resize", keepTopbarVisible, { passive: true });
+  window.addEventListener("orientationchange", keepTopbarVisible, { passive: true });
 }
 
 function bindEvents() {
