@@ -1,7 +1,7 @@
 const SW_VERSION = new URL(self.location.href).searchParams.get("v") || "dev";
 const CACHE_NAME = `routee-shell-${SW_VERSION}`;
 const NETWORK_TIMEOUT_MS = 1200;
-const ROUTEE_ASSET_REVISION = "20260503-topbar-fab-stability-v6";
+const ROUTEE_ASSET_REVISION = "20260503-tablet-landscape-trip-list-v7";
 
 const APP_SHELL = [
   "./",
