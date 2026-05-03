@@ -1,7 +1,7 @@
 const SW_VERSION = new URL(self.location.href).searchParams.get("v") || "dev";
 const CACHE_NAME = `routee-shell-${SW_VERSION}`;
 const NETWORK_TIMEOUT_MS = 1200;
-const ROUTEE_ASSET_REVISION = "20260502-mobile-brand-icon";
+const ROUTEE_ASSET_REVISION = "20260503-mobile-topbar-lock";
 
 const APP_SHELL = [
   "./",
@@ -25,6 +25,7 @@ const APP_SHELL = [
   "./js/chooser.js",
   "./js/version-guard.js",
   "./js/status-bar.js",
+  "./js/mobile-topbar-lock.js",
   "./icons/favicon-32.png",
   "./icons/icon-192.png",
   "./icons/icon-512.png",
