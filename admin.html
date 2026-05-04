@@ -337,6 +337,56 @@
         background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
       }
 
+
+
+      /* Admin panel mobil/tablet güvenli üst alan düzeltmesi
+         Rota ikonu, Uygulamaya Dön ve Çıkış butonları siyah sistem alanının altına girmez. */
+      body.admin-screen {
+        --admin-safe-top: env(safe-area-inset-top, 0px);
+        --admin-safe-right: env(safe-area-inset-right, 0px);
+        --admin-safe-left: env(safe-area-inset-left, 0px);
+      }
+
+      @supports (top: constant(safe-area-inset-top)) {
+        body.admin-screen {
+          --admin-safe-top: constant(safe-area-inset-top);
+          --admin-safe-right: constant(safe-area-inset-right);
+          --admin-safe-left: constant(safe-area-inset-left);
+        }
+      }
+
+      @media (max-width: 1180px), (hover: none) and (pointer: coarse) {
+        body.admin-screen .topbar {
+          position: sticky;
+          top: 0;
+          align-items: center;
+          padding-top: calc(var(--admin-safe-top, 0px) + 14px) !important;
+          padding-right: max(14px, calc(var(--admin-safe-right, 0px) + 14px)) !important;
+          padding-bottom: 14px !important;
+          padding-left: max(14px, calc(var(--admin-safe-left, 0px) + 14px)) !important;
+          min-height: calc(74px + var(--admin-safe-top, 0px));
+          transform: none !important;
+          opacity: 1 !important;
+          overflow: visible;
+        }
+
+        body.admin-screen .topbar::before {
+          content: "";
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          height: var(--admin-safe-top, 0px);
+          background: var(--routee-system-status-bg, #0f172a);
+          pointer-events: none;
+        }
+
+        body.admin-screen .topbar > * {
+          position: relative;
+          z-index: 1;
+        }
+      }
+
       @media (max-width: 1080px) {
         .admin-grid {
           grid-template-columns: 1fr;
@@ -390,7 +440,7 @@
       }
     </style>
   </head>
-  <body>
+  <body class="admin-screen">
     <div id="app">
       <header class="topbar">
         <div class="brand-area">
