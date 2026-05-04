@@ -508,43 +508,70 @@
 }
 
 /* =========================================================
-   ROUTEE — FINAL TABLET PORTRAIT MAP / FIRST CARD VIEWPORT BALANCE
-   Amaç: Tablet dikeyde harita büyük kalsın; altta yalnızca Gezi Listesi
-   başlığı ve birinci konum kartından sonraki ara boşluğun ortasına kadar bölüm görünsün.
-   Kart hizalama ve buton akışı önceki mobil mantıkta korunur.
+   ROUTEE — FINAL TABLET PORTRAIT VIEWPORT FIT
+   Tablet dikeyde mobildeki sağ-sol sığma ve ilk kart görünürlük
+   mantığı uygulanır; kart/buton akışına ve JS işlevlerine dokunmaz.
    ========================================================= */
 @media (min-width: 721px) and (max-width: 1100px) and (orientation: portrait) {
   :root {
-    --routee-tablet-visible-first-trip-card-depth: 196px;
-    --routee-tablet-status-strip-depth: 34px;
-    --routee-tablet-layout-top-depth: 14px;
-    --routee-tablet-map-trip-gap: 12px;
-    --routee-tablet-map-target-height: calc(
-      100svh
-      - var(--routee-mobile-topbar-natural-height, 64px)
-      - var(--routee-tablet-status-strip-depth)
-      - var(--routee-tablet-layout-top-depth)
-      - var(--routee-tablet-map-trip-gap)
-      - var(--routee-tablet-visible-first-trip-card-depth)
+    --routee-tablet-page-x: max(12px, calc(env(safe-area-inset-left, 0px) + 12px));
+    --routee-tablet-page-r: max(12px, calc(env(safe-area-inset-right, 0px) + 12px));
+    --routee-tablet-first-card-reserve: 238px;
+    --routee-tablet-stable-map-height: clamp(
+      560px,
+      calc(100svh - var(--routee-mobile-topbar-natural-height, 64px) - var(--routee-tablet-first-card-reserve)),
+      780px
     );
-    --routee-tablet-map-target-height: calc(
-      100dvh
-      - var(--routee-mobile-topbar-natural-height, 64px)
-      - var(--routee-tablet-status-strip-depth)
-      - var(--routee-tablet-layout-top-depth)
-      - var(--routee-tablet-map-trip-gap)
-      - var(--routee-tablet-visible-first-trip-card-depth)
-    );
+  }
+
+  @supports (left: constant(safe-area-inset-left)) {
+    :root {
+      --routee-tablet-page-x: max(12px, calc(constant(safe-area-inset-left) + 12px));
+      --routee-tablet-page-r: max(12px, calc(constant(safe-area-inset-right) + 12px));
+    }
   }
 
   .app-layout {
-    gap: var(--routee-tablet-map-trip-gap) !important;
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) !important;
+    align-items: start !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    padding-top: 12px !important;
+    padding-right: var(--routee-tablet-page-r) !important;
+    padding-bottom: max(16px, calc(env(safe-area-inset-bottom, 0px) + 12px)) !important;
+    padding-left: var(--routee-tablet-page-x) !important;
+    gap: 12px !important;
+    overflow-x: hidden !important;
+    overflow-y: visible !important;
+    box-sizing: border-box !important;
+  }
+
+  @supports (bottom: constant(safe-area-inset-bottom)) {
+    .app-layout {
+      padding-bottom: max(16px, calc(constant(safe-area-inset-bottom) + 12px)) !important;
+    }
+  }
+
+  .map-area,
+  .map-shell,
+  .trip-column,
+  .trip-panel {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    justify-self: stretch !important;
+    box-sizing: border-box !important;
   }
 
   .map-canvas {
-    height: clamp(430px, var(--routee-tablet-map-target-height), 82svh) !important;
-    min-height: clamp(430px, var(--routee-tablet-map-target-height), 82svh) !important;
-    max-height: none !important;
+    width: 100% !important;
+    height: var(--routee-tablet-stable-map-height) !important;
+    min-height: var(--routee-tablet-stable-map-height) !important;
+    max-height: var(--routee-tablet-stable-map-height) !important;
+    border-radius: 24px !important;
+    box-sizing: border-box !important;
   }
 
   .trip-column,
@@ -555,3 +582,4 @@
     overflow: visible !important;
   }
 }
+
