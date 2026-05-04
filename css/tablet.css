@@ -1,8 +1,12 @@
 /* =========================================================
    ROUTEE — TABLET PORTRAIT LAYOUT
-   Amaç: Tablet dikeyde harita mobildeki gibi geniş kalsın;
-   Gezi Listesi kendi içinde scrollbar üretmesin, sayfa aşağı doğru uzasın.
-   Mobil telefon, masaüstü, yatay tablet ve JavaScript işlevlerine dokunmaz.
+   Bu dosya yalnızca tablet dikey görünümü düzenler.
+   Amaç:
+   - Gezi Listesi kendi içinde scrollbar üretmesin.
+   - Sayfa mobildeki gibi aşağı doğru uzasın.
+   - Ekli konum kartları mobildeki gibi iki satırlı aksın.
+   - Not / Yol Tarifi / Odakla / Sil butonları yan yana kalsın.
+   - Telefon mobil, masaüstü, yatay tablet ve JS işlevleri etkilenmesin.
    ========================================================= */
 
 @media (min-width: 721px) and (max-width: 1100px) and (orientation: portrait) {
@@ -10,9 +14,9 @@
   body {
     width: 100% !important;
     max-width: 100% !important;
+    min-height: 100% !important;
     overflow-x: hidden !important;
     overflow-y: auto !important;
-    min-height: 100% !important;
     background: var(--bg, #f4f7fb) !important;
   }
 
@@ -61,19 +65,23 @@
     border-radius: 24px !important;
   }
 
+  .trip-column,
+  .trip-panel,
+  .trip-list {
+    overflow: visible !important;
+    height: auto !important;
+    max-height: none !important;
+  }
+
   .trip-column {
     display: block !important;
-    overflow: visible !important;
   }
 
   .trip-panel {
     display: block !important;
-    height: auto !important;
     min-height: 0 !important;
-    max-height: none !important;
     padding: 13px !important;
     border-radius: 22px !important;
-    overflow: visible !important;
     box-sizing: border-box !important;
   }
 
@@ -134,11 +142,8 @@
     width: 100% !important;
     max-width: 100% !important;
     min-height: 0 !important;
-    height: auto !important;
-    max-height: none !important;
     padding: 0 !important;
     margin: 0 !important;
-    overflow: visible !important;
     overscroll-behavior: auto !important;
     -webkit-overflow-scrolling: auto !important;
     scrollbar-width: none !important;
@@ -225,60 +230,69 @@
     overflow-wrap: anywhere !important;
   }
 
-  .trip-list .trip-item > .trip-actions,
-  .trip-list .trip-item > button.icon-route-btn:last-child,
-  .trip-list .trip-item > button.tiny-btn:last-child {
+  .trip-list .trip-item > .trip-actions {
     grid-area: actions !important;
     grid-column: auto !important;
     grid-row: auto !important;
     position: static !important;
-    width: auto !important;
+    display: inline-flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    gap: 6px !important;
+    width: max-content !important;
     max-width: 100% !important;
     min-width: 0 !important;
     margin: 0 !important;
     justify-self: start !important;
     align-self: start !important;
+    white-space: nowrap !important;
+    overflow: visible !important;
   }
 
   .trip-list .trip-actions {
     display: inline-flex !important;
-    flex-wrap: wrap !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
     align-items: center !important;
     justify-content: flex-start !important;
     gap: 6px !important;
-    white-space: normal !important;
+    white-space: nowrap !important;
     overflow: visible !important;
   }
 
-  .trip-list .trip-actions .tiny-btn,
+  .trip-list .trip-actions > .tiny-btn,
   .trip-list .trip-item > button.tiny-btn:last-child {
-    height: 38px !important;
-    min-height: 38px !important;
-    max-height: 38px !important;
+    height: 40px !important;
+    min-height: 40px !important;
+    max-height: 40px !important;
     display: inline-flex !important;
     align-items: center !important;
     justify-content: center !important;
     border-radius: 12px !important;
-    font-size: 0.74rem !important;
+    font-size: 0.76rem !important;
     font-weight: 750 !important;
     line-height: 1 !important;
     white-space: nowrap !important;
     flex: 0 0 auto !important;
     box-sizing: border-box !important;
+    float: none !important;
+    clear: none !important;
   }
 
-  .trip-list .trip-actions .icon-route-btn,
-  .trip-list .trip-actions .tiny-btn.icon-route-btn,
-  .trip-list .trip-actions .icon-note-btn,
-  .trip-list .trip-actions .tiny-btn.icon-note-btn,
+  .trip-list .trip-actions > .icon-route-btn,
+  .trip-list .trip-actions > .tiny-btn.icon-route-btn,
+  .trip-list .trip-actions > .icon-note-btn,
+  .trip-list .trip-actions > .tiny-btn.icon-note-btn,
   .trip-list .trip-item > button.icon-route-btn:last-child {
-    width: 38px !important;
-    min-width: 38px !important;
-    max-width: 38px !important;
-    height: 38px !important;
-    min-height: 38px !important;
-    max-height: 38px !important;
-    flex: 0 0 38px !important;
+    width: 40px !important;
+    min-width: 40px !important;
+    max-width: 40px !important;
+    height: 40px !important;
+    min-height: 40px !important;
+    max-height: 40px !important;
+    flex: 0 0 40px !important;
     padding: 0 !important;
     border-radius: 12px !important;
     display: inline-grid !important;
@@ -286,31 +300,41 @@
     line-height: 1 !important;
   }
 
-  .trip-list .trip-actions .icon-route-btn svg,
-  .trip-list .trip-actions .tiny-btn.icon-route-btn svg,
-  .trip-list .trip-actions .icon-note-btn svg,
-  .trip-list .trip-actions .tiny-btn.icon-note-btn svg,
+  .trip-list .trip-actions > .icon-route-btn svg,
+  .trip-list .trip-actions > .tiny-btn.icon-route-btn svg,
+  .trip-list .trip-actions > .icon-note-btn svg,
+  .trip-list .trip-actions > .tiny-btn.icon-note-btn svg,
   .trip-list .route-directions-icon {
-    width: 16px !important;
-    height: 16px !important;
+    width: 17px !important;
+    height: 17px !important;
     display: block !important;
     margin: auto !important;
   }
 
-  .trip-list .trip-actions .tiny-btn:not(.icon-route-btn):not(.icon-note-btn) {
+  .trip-list .trip-actions > .tiny-btn:not(.icon-route-btn):not(.icon-note-btn) {
     width: auto !important;
     min-width: auto !important;
     max-width: none !important;
-    padding: 0 11px !important;
+    padding: 0 12px !important;
     letter-spacing: -0.01em !important;
   }
 
-  .trip-list .trip-actions .tiny-btn[data-action^="focus"] {
-    min-width: 62px !important;
+  .trip-list .trip-actions > .tiny-btn[data-action^="focus"] {
+    min-width: 66px !important;
   }
 
-  .trip-list .trip-actions .tiny-btn[data-action^="delete"] {
-    min-width: 44px !important;
+  .trip-list .trip-actions > .tiny-btn[data-action^="delete"] {
+    min-width: 46px !important;
+  }
+
+  .trip-list .trip-item > button.icon-route-btn:last-child,
+  .trip-list .trip-item > button.tiny-btn:last-child {
+    grid-area: actions !important;
+    grid-column: auto !important;
+    grid-row: auto !important;
+    justify-self: start !important;
+    align-self: start !important;
+    margin: 0 !important;
   }
 
   .trip-list .trip-note-preview {
