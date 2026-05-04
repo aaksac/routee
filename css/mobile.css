@@ -3159,3 +3159,35 @@
     padding-right: 9px !important;
   }
 }
+
+/* =========================================================
+   ROUTEE — MOBILE SEARCH CLEAR OVERLAY FIX
+   Mobilde arama alanında metin varken açılan temizleme çarpısı,
+   konum ekleme/kaydetme/içe-dışa aktarma panelleri arka planı
+   blur ettiğinde aktif ve keskin görünmesin. Sadece mobil görünümde
+   çarpıyı ve arama öneri kutusunu panel açıkken pasifleştirir.
+   ========================================================= */
+@media (max-width: 720px), (hover: none) and (pointer: coarse) {
+  body.has-mobile-floating-panel #btnClearPlaceSearch,
+  body.has-mobile-floating-panel .map-search-clear,
+  body.has-screen-overlay #btnClearPlaceSearch,
+  body.has-screen-overlay .map-search-clear {
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+    filter: blur(4px) !important;
+  }
+
+  body.has-mobile-floating-panel .map-search-wrapper,
+  body.has-screen-overlay .map-search-wrapper {
+    pointer-events: none !important;
+  }
+
+  body.has-mobile-floating-panel #customPlaceSearchDropdown,
+  body.has-screen-overlay #customPlaceSearchDropdown {
+    display: none !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+  }
+}
