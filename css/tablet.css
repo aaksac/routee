@@ -908,3 +908,127 @@
     overflow-wrap: anywhere !important;
   }
 }
+
+/* =========================================================
+   ROUTEE — TABLET PORTRAIT FINAL TOP-CONTROL ALIGNMENT
+   Yalnızca tablet dikeyde harita üstündeki kontrol satırını hizalar.
+   Telefon mobil, tablet yatay, masaüstü ve JS işlevleri etkilenmez.
+   ========================================================= */
+@media (min-width: 721px) and (max-width: 1100px) and (orientation: portrait) {
+  .map-shell {
+    --routee-tablet-map-pad: 10px;
+    --routee-tablet-control-size: 46px;
+    --routee-tablet-control-gap: 10px;
+    --routee-tablet-search-width: clamp(238px, 34vw, 290px);
+    --routee-tablet-right-tools-width: calc(var(--routee-tablet-search-width) + var(--routee-tablet-control-gap) + var(--routee-tablet-control-size));
+    --routee-tablet-left-tools-width: var(--routee-tablet-control-size);
+  }
+
+  .map-overlay.top-left,
+  .map-overlay.top-center,
+  .map-overlay.top-right {
+    top: var(--routee-tablet-map-pad) !important;
+  }
+
+  .map-overlay.top-left {
+    left: var(--routee-tablet-map-pad) !important;
+    width: var(--routee-tablet-control-size) !important;
+    min-width: var(--routee-tablet-control-size) !important;
+    max-width: var(--routee-tablet-control-size) !important;
+    align-items: flex-start !important;
+  }
+
+  .map-overlay.top-right {
+    right: var(--routee-tablet-map-pad) !important;
+    width: var(--routee-tablet-right-tools-width) !important;
+    min-width: 0 !important;
+    max-width: var(--routee-tablet-right-tools-width) !important;
+    align-items: stretch !important;
+  }
+
+  .map-overlay.top-center {
+    left: calc(var(--routee-tablet-map-pad) + var(--routee-tablet-left-tools-width) + var(--routee-tablet-control-gap)) !important;
+    right: calc(var(--routee-tablet-map-pad) + var(--routee-tablet-right-tools-width) + var(--routee-tablet-control-gap)) !important;
+    width: auto !important;
+    max-width: none !important;
+    transform: none !important;
+    align-items: flex-start !important;
+    z-index: 7 !important;
+  }
+
+  .top-left .compact-buttons,
+  .top-right .right-tools,
+  .top-center .map-badges {
+    height: var(--routee-tablet-control-size) !important;
+    min-height: var(--routee-tablet-control-size) !important;
+    max-height: var(--routee-tablet-control-size) !important;
+    align-items: center !important;
+  }
+
+  .top-left .compact-buttons {
+    width: var(--routee-tablet-control-size) !important;
+    max-width: var(--routee-tablet-control-size) !important;
+    justify-content: flex-start !important;
+  }
+
+  .top-right .right-tools {
+    display: grid !important;
+    grid-template-columns: minmax(0, var(--routee-tablet-search-width)) var(--routee-tablet-control-size) !important;
+    gap: var(--routee-tablet-control-gap) !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    justify-content: stretch !important;
+    align-content: center !important;
+  }
+
+  .top-center .map-badges {
+    display: inline-flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    gap: var(--routee-tablet-control-gap) !important;
+    justify-content: flex-start !important;
+    width: auto !important;
+    max-width: 100% !important;
+    overflow: visible !important;
+  }
+
+  #btnOpenLocationActions,
+  #btnToggleMenu,
+  .top-center .badge,
+  .top-center .new-map-inline-btn,
+  .map-search-input {
+    height: var(--routee-tablet-control-size) !important;
+    min-height: var(--routee-tablet-control-size) !important;
+    max-height: var(--routee-tablet-control-size) !important;
+    box-sizing: border-box !important;
+  }
+
+  #btnOpenLocationActions,
+  #btnToggleMenu {
+    width: var(--routee-tablet-control-size) !important;
+    min-width: var(--routee-tablet-control-size) !important;
+    max-width: var(--routee-tablet-control-size) !important;
+    padding: 0 !important;
+    display: grid !important;
+    place-items: center !important;
+  }
+
+  .top-center .badge,
+  .top-center .new-map-inline-btn {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    line-height: 1 !important;
+    white-space: nowrap !important;
+  }
+
+  .map-search-wrapper,
+  .map-search-input {
+    min-width: 0 !important;
+    max-width: 100% !important;
+  }
+}
