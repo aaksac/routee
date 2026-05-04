@@ -1,7 +1,7 @@
 const SW_VERSION = new URL(self.location.href).searchParams.get("v") || "dev";
 const CACHE_NAME = `routee-shell-${SW_VERSION}`;
 const NETWORK_TIMEOUT_MS = 1200;
-const ROUTEE_ASSET_REVISION = "2026.05.4.215-mobile364-tablet-fit";
+const ROUTEE_ASSET_REVISION = "2026.05.4.216-measure-only";
 
 const APP_SHELL = [
   "./",
