@@ -1046,3 +1046,128 @@
     max-height: none !important;
   }
 }
+
+/* =========================================================
+   ROUTEE — TABLET LANDSCAPE TOP-CONTROL ALIGNMENT
+   Yalnızca tablet yatay görünümde Toplam/Yeni satırını,
+   Konum Ekle ve sağdaki arama/menü satırıyla aynı hizaya alır.
+   Mobil, tablet dikey, masaüstü ve JS işlevleri etkilenmez.
+   ========================================================= */
+@media (min-width: 721px) and (min-height: 560px) and (orientation: landscape) and (hover: none) and (pointer: coarse) {
+  .map-shell {
+    --routee-tablet-landscape-map-pad: 10px;
+    --routee-tablet-landscape-control-size: 46px;
+    --routee-tablet-landscape-control-gap: 10px;
+    --routee-tablet-landscape-search-width: clamp(226px, 27vw, 270px);
+    --routee-tablet-landscape-right-tools-width: calc(var(--routee-tablet-landscape-search-width) + var(--routee-tablet-landscape-control-gap) + var(--routee-tablet-landscape-control-size));
+    --routee-tablet-landscape-left-tools-width: var(--routee-tablet-landscape-control-size);
+  }
+
+  .map-overlay.top-left,
+  .map-overlay.top-center,
+  .map-overlay.top-right {
+    top: var(--routee-tablet-landscape-map-pad) !important;
+  }
+
+  .map-overlay.top-left {
+    left: var(--routee-tablet-landscape-map-pad) !important;
+    width: var(--routee-tablet-landscape-control-size) !important;
+    min-width: var(--routee-tablet-landscape-control-size) !important;
+    max-width: var(--routee-tablet-landscape-control-size) !important;
+    align-items: flex-start !important;
+  }
+
+  .map-overlay.top-right {
+    right: var(--routee-tablet-landscape-map-pad) !important;
+    width: var(--routee-tablet-landscape-right-tools-width) !important;
+    min-width: 0 !important;
+    max-width: var(--routee-tablet-landscape-right-tools-width) !important;
+    align-items: stretch !important;
+  }
+
+  .map-overlay.top-center {
+    left: calc(var(--routee-tablet-landscape-map-pad) + var(--routee-tablet-landscape-left-tools-width) + var(--routee-tablet-landscape-control-gap)) !important;
+    right: calc(var(--routee-tablet-landscape-map-pad) + var(--routee-tablet-landscape-right-tools-width) + var(--routee-tablet-landscape-control-gap)) !important;
+    width: auto !important;
+    max-width: none !important;
+    transform: none !important;
+    align-items: flex-start !important;
+    z-index: 7 !important;
+  }
+
+  .top-left .compact-buttons,
+  .top-right .right-tools,
+  .top-center .map-badges {
+    height: var(--routee-tablet-landscape-control-size) !important;
+    min-height: var(--routee-tablet-landscape-control-size) !important;
+    max-height: var(--routee-tablet-landscape-control-size) !important;
+    align-items: center !important;
+  }
+
+  .top-left .compact-buttons {
+    width: var(--routee-tablet-landscape-control-size) !important;
+    max-width: var(--routee-tablet-landscape-control-size) !important;
+    justify-content: flex-start !important;
+  }
+
+  .top-right .right-tools {
+    display: grid !important;
+    grid-template-columns: minmax(0, var(--routee-tablet-landscape-search-width)) var(--routee-tablet-landscape-control-size) !important;
+    gap: var(--routee-tablet-landscape-control-gap) !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    justify-content: stretch !important;
+    align-content: center !important;
+  }
+
+  .top-center .map-badges {
+    display: inline-flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    gap: var(--routee-tablet-landscape-control-gap) !important;
+    justify-content: flex-start !important;
+    width: auto !important;
+    max-width: 100% !important;
+    overflow: visible !important;
+  }
+
+  #btnOpenLocationActions,
+  #btnToggleMenu,
+  .top-center .badge,
+  .top-center .new-map-inline-btn,
+  .map-search-input {
+    height: var(--routee-tablet-landscape-control-size) !important;
+    min-height: var(--routee-tablet-landscape-control-size) !important;
+    max-height: var(--routee-tablet-landscape-control-size) !important;
+    box-sizing: border-box !important;
+  }
+
+  #btnOpenLocationActions,
+  #btnToggleMenu {
+    width: var(--routee-tablet-landscape-control-size) !important;
+    min-width: var(--routee-tablet-landscape-control-size) !important;
+    max-width: var(--routee-tablet-landscape-control-size) !important;
+    padding: 0 !important;
+    display: grid !important;
+    place-items: center !important;
+  }
+
+  .top-center .badge,
+  .top-center .new-map-inline-btn {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    line-height: 1 !important;
+    white-space: nowrap !important;
+  }
+
+  .map-search-wrapper,
+  .map-search-input {
+    min-width: 0 !important;
+    max-width: 100% !important;
+  }
+}
