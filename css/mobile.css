@@ -3094,3 +3094,17 @@
     bottom: 8px !important;
   }
 }
+
+/* =========================================================
+   ROUTEE — MOBILE TOPBAR VISIBLE SCROLL LOCK
+   Mobilde Rota ikonu ve Çıkış Yap alanı hafif kaydırmada
+   otomatik gizlenmesin. Eski is-hidden-on-scroll sınıfı
+   herhangi bir sebeple kalırsa da görünüm korunur.
+   ========================================================= */
+@media (max-width: 720px), (hover: none) and (pointer: coarse) {
+  .topbar.is-hidden-on-scroll {
+    transform: translateZ(0) !important;
+    -webkit-transform: translateZ(0) !important;
+    opacity: 1 !important;
+  }
+}
