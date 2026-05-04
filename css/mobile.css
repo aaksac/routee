@@ -2454,3 +2454,78 @@
     max-height: 38px !important;
   }
 }
+
+/* =========================================================
+   ROUTEE — FINAL MOBILE MAP / FIRST CARD VIEWPORT BALANCE
+   Amaç: Mobilde ilk ekranda harita gereksiz küçük kalmasın;
+   altta yalnızca Gezi Listesi başlığı ve birinci konum kartının
+   alt çizgisine kadar olan bölüm görünsün. İç scrollbar eklemez.
+   ========================================================= */
+@media (max-width: 720px) {
+  :root {
+    --routee-visible-first-trip-card-depth: 184px;
+    --routee-mobile-status-strip-depth: 34px;
+    --routee-mobile-layout-top-depth: 12px;
+    --routee-mobile-map-trip-gap: 12px;
+    --routee-mobile-map-target-height: calc(
+      100svh
+      - var(--routee-mobile-topbar-natural-height, 64px)
+      - var(--routee-mobile-status-strip-depth)
+      - var(--routee-mobile-layout-top-depth)
+      - var(--routee-mobile-map-trip-gap)
+      - var(--routee-visible-first-trip-card-depth)
+    );
+    --routee-mobile-map-target-height: calc(
+      100dvh
+      - var(--routee-mobile-topbar-natural-height, 64px)
+      - var(--routee-mobile-status-strip-depth)
+      - var(--routee-mobile-layout-top-depth)
+      - var(--routee-mobile-map-trip-gap)
+      - var(--routee-visible-first-trip-card-depth)
+    );
+  }
+
+  .app-layout {
+    gap: var(--routee-mobile-map-trip-gap) !important;
+  }
+
+  .map-canvas {
+    height: clamp(320px, var(--routee-mobile-map-target-height), 76svh) !important;
+    min-height: clamp(320px, var(--routee-mobile-map-target-height), 76svh) !important;
+    max-height: none !important;
+  }
+
+  .trip-column,
+  .trip-panel,
+  .trip-list {
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+  }
+}
+
+@media (max-width: 480px) {
+  :root {
+    --routee-visible-first-trip-card-depth: 176px;
+    --routee-mobile-status-strip-depth: 32px;
+    --routee-mobile-layout-top-depth: 10px;
+  }
+
+  .map-canvas {
+    height: clamp(300px, var(--routee-mobile-map-target-height), 78svh) !important;
+    min-height: clamp(300px, var(--routee-mobile-map-target-height), 78svh) !important;
+    max-height: none !important;
+  }
+}
+
+@media (max-width: 390px) {
+  :root {
+    --routee-visible-first-trip-card-depth: 168px;
+  }
+
+  .map-canvas {
+    height: clamp(286px, var(--routee-mobile-map-target-height), 79svh) !important;
+    min-height: clamp(286px, var(--routee-mobile-map-target-height), 79svh) !important;
+    max-height: none !important;
+  }
+}
