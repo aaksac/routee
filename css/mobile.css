@@ -3191,3 +3191,49 @@
     pointer-events: none !important;
   }
 }
+
+/* =========================================================
+   ROUTEE — MOBILE FLOATING PANEL BACKDROP VISIBILITY FIX
+   Mobil paneller/overlay açıkken Konum Ekle, Haritada Yer Ara
+   ve Menü kontrolleri tamamen kaybolmasın; arka planda blur'lu
+   ve pasif şekilde kalsın. Temizleme çarpısı ise gizli kalır.
+   ========================================================= */
+@media (max-width: 720px), (hover: none) and (pointer: coarse) {
+  body.has-mobile-floating-panel .top-left .compact-buttons,
+  body.has-mobile-floating-panel .map-search-wrapper,
+  body.has-mobile-floating-panel .menu-wrapper,
+  body.has-screen-overlay .top-left .compact-buttons,
+  body.has-screen-overlay .map-search-wrapper,
+  body.has-screen-overlay .menu-wrapper {
+    opacity: 0.46 !important;
+    visibility: visible !important;
+    pointer-events: none !important;
+    filter: blur(4px) !important;
+    -webkit-filter: blur(4px) !important;
+  }
+
+  body.has-mobile-floating-panel #placeSearch,
+  body.has-screen-overlay #placeSearch {
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: none !important;
+  }
+
+  body.has-mobile-floating-panel .top-left .compact-buttons *,
+  body.has-mobile-floating-panel .map-search-wrapper *,
+  body.has-mobile-floating-panel .menu-wrapper *,
+  body.has-screen-overlay .top-left .compact-buttons *,
+  body.has-screen-overlay .map-search-wrapper *,
+  body.has-screen-overlay .menu-wrapper * {
+    pointer-events: none !important;
+  }
+
+  body.has-mobile-floating-panel #btnClearPlaceSearch,
+  body.has-mobile-floating-panel .map-search-clear,
+  body.has-screen-overlay #btnClearPlaceSearch,
+  body.has-screen-overlay .map-search-clear {
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+  }
+}
