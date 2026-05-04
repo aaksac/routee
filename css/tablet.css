@@ -159,9 +159,7 @@
     position: relative !important;
     display: grid !important;
     grid-template-columns: 42px minmax(0, 1fr) !important;
-    grid-template-areas:
-      "order content"
-      ". actions" !important;
+    grid-template-rows: auto auto !important;
     column-gap: 10px !important;
     row-gap: 8px !important;
     align-items: start !important;
@@ -178,9 +176,8 @@
   }
 
   .trip-list .trip-order {
-    grid-area: order !important;
-    grid-column: auto !important;
-    grid-row: auto !important;
+    grid-column: 1 !important;
+    grid-row: 1 !important;
     width: 42px !important;
     min-width: 42px !important;
     max-width: 42px !important;
@@ -198,9 +195,8 @@
   }
 
   .trip-list .trip-content {
-    grid-area: content !important;
-    grid-column: auto !important;
-    grid-row: auto !important;
+    grid-column: 2 !important;
+    grid-row: 1 !important;
     min-width: 0 !important;
     max-width: 100% !important;
     display: flex !important;
@@ -231,9 +227,8 @@
   }
 
   .trip-list .trip-item > .trip-actions {
-    grid-area: actions !important;
-    grid-column: auto !important;
-    grid-row: auto !important;
+    grid-column: 2 / -1 !important;
+    grid-row: 2 !important;
     position: static !important;
     display: inline-flex !important;
     flex-direction: row !important;
@@ -241,10 +236,12 @@
     align-items: center !important;
     justify-content: flex-start !important;
     gap: 6px !important;
-    width: max-content !important;
+    width: auto !important;
     max-width: 100% !important;
     min-width: 0 !important;
     margin: 0 !important;
+    padding-left: 0 !important;
+    transform: none !important;
     justify-self: start !important;
     align-self: start !important;
     white-space: nowrap !important;
@@ -329,12 +326,13 @@
 
   .trip-list .trip-item > button.icon-route-btn:last-child,
   .trip-list .trip-item > button.tiny-btn:last-child {
-    grid-area: actions !important;
-    grid-column: auto !important;
-    grid-row: auto !important;
+    grid-column: 2 / -1 !important;
+    grid-row: 2 !important;
     justify-self: start !important;
     align-self: start !important;
     margin: 0 !important;
+    padding-left: 0 !important;
+    transform: none !important;
   }
 
   .trip-list .trip-note-preview {
@@ -355,4 +353,15 @@
     white-space: normal !important;
     overflow-wrap: anywhere !important;
   }
+
+  /* Tablet dikeyde buton satırı, soldaki sıra rozetinden değil konum adının başladığı çizgiden başlar. */
+  .trip-list .trip-item > .trip-actions,
+  .trip-list .trip-item > button.icon-route-btn:last-child,
+  .trip-list .trip-item > button.tiny-btn:last-child {
+    grid-column-start: 2 !important;
+    grid-column-end: -1 !important;
+    justify-self: start !important;
+    margin-left: 0 !important;
+  }
+
 }
