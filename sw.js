@@ -1,7 +1,7 @@
 const SW_VERSION = new URL(self.location.href).searchParams.get("v") || "dev";
 const CACHE_NAME = `routee-shell-${SW_VERSION}`;
 const NETWORK_TIMEOUT_MS = 1200;
-const ROUTEE_ASSET_REVISION = "20260504-tablet-portrait-final-one-card-flow";
+const ROUTEE_ASSET_REVISION = "20260504-tablet-portrait-no-inner-scroll";
 
 const APP_SHELL = [
   "./",
@@ -12,6 +12,7 @@ const APP_SHELL = [
   "./css/style.css",
   "./css/mobile.css",
   "./css/auth.css",
+  "./css/tablet.css",
   "./css/splash.css",
   "./js/firebase-config.js",
   "./js/auth.js",
