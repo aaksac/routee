@@ -2625,38 +2625,21 @@ function initMobileDeadZoneTapGuards() {
 function initMobileTopbarAutoHide() {
   if (!elements.topbar) return;
 
-  state.lastScrollY = window.scrollY || 0;
+  const keepTopbarVisible = () => {
+    elements.topbar?.classList.remove("is-hidden-on-scroll");
+    state.lastScrollY = window.scrollY || 0;
+  };
 
-  window.addEventListener(
-    "scroll",
-    () => {
-      const isMobile = window.innerWidth <= 720;
+  // Mobilde üst bar artık otomatik gizlenmez.
+  // Rota ikonu ve Çıkış Yap alanı, sayfa hareketlerinde görünür kalır;
+  // mevcut yükseklik kilidi ve diğer panel/harita işlevlerine dokunulmaz.
+  keepTopbarVisible();
 
-      if (!isMobile) {
-        elements.topbar.classList.remove("is-hidden-on-scroll");
-        state.lastScrollY = window.scrollY || 0;
-        return;
-      }
-
-      const currentY = window.scrollY || 0;
-      const delta = currentY - state.lastScrollY;
-
-      if (currentY <= 8) {
-        elements.topbar.classList.remove("is-hidden-on-scroll");
-        state.lastScrollY = currentY;
-        return;
-      }
-
-      if (delta > 8) {
-        elements.topbar.classList.add("is-hidden-on-scroll");
-      } else if (delta < -8) {
-        elements.topbar.classList.remove("is-hidden-on-scroll");
-      }
-
-      state.lastScrollY = currentY;
-    },
-    { passive: true }
-  );
+  window.addEventListener("scroll", keepTopbarVisible, { passive: true });
+  window.addEventListener("resize", keepTopbarVisible, { passive: true });
+  window.addEventListener("orientationchange", () => {
+    window.setTimeout(keepTopbarVisible, 120);
+  }, { passive: true });
 }
 
 function bindEvents() {
