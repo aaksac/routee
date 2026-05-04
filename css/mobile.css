@@ -3108,3 +3108,54 @@
     opacity: 1 !important;
   }
 }
+
+/* =========================================================
+   ROUTEE — MOBILE MAP/TRIP WIDTH POLISH
+   Yalnızca telefon mobil görünümde harita, gezi listesi paneli
+   ve konum kartlarını yatayda biraz genişletir. Kenarlara tam
+   sıfır yapışmadan küçük ve profesyonel iç boşluk bırakır.
+   Tablet dikey/yatay, masaüstü ve JS işlevleri etkilenmez.
+   ========================================================= */
+@media (max-width: 720px) {
+  .app-layout {
+    padding-left: 8px !important;
+    padding-right: 8px !important;
+  }
+
+  .map-area,
+  .map-shell,
+  .map-canvas,
+  .trip-column,
+  .trip-panel,
+  .trip-list {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    box-sizing: border-box !important;
+  }
+
+  .trip-panel {
+    padding-left: 10px !important;
+    padding-right: 10px !important;
+  }
+
+  .trip-list .trip-item,
+  .trip-item {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    box-sizing: border-box !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .app-layout {
+    padding-left: 8px !important;
+    padding-right: 8px !important;
+  }
+
+  .trip-panel {
+    padding-left: 9px !important;
+    padding-right: 9px !important;
+  }
+}
