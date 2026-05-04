@@ -506,3 +506,52 @@
   }
 
 }
+
+/* =========================================================
+   ROUTEE — FINAL TABLET PORTRAIT MAP / FIRST CARD VIEWPORT BALANCE
+   Amaç: Tablet dikeyde harita büyük kalsın; altta yalnızca Gezi Listesi
+   başlığı ve birinci konum kartının alt çizgisine kadar bölüm görünsün.
+   Kart hizalama ve buton akışı önceki mobil mantıkta korunur.
+   ========================================================= */
+@media (min-width: 721px) and (max-width: 1100px) and (orientation: portrait) {
+  :root {
+    --routee-tablet-visible-first-trip-card-depth: 190px;
+    --routee-tablet-status-strip-depth: 34px;
+    --routee-tablet-layout-top-depth: 14px;
+    --routee-tablet-map-trip-gap: 12px;
+    --routee-tablet-map-target-height: calc(
+      100svh
+      - var(--routee-mobile-topbar-natural-height, 64px)
+      - var(--routee-tablet-status-strip-depth)
+      - var(--routee-tablet-layout-top-depth)
+      - var(--routee-tablet-map-trip-gap)
+      - var(--routee-tablet-visible-first-trip-card-depth)
+    );
+    --routee-tablet-map-target-height: calc(
+      100dvh
+      - var(--routee-mobile-topbar-natural-height, 64px)
+      - var(--routee-tablet-status-strip-depth)
+      - var(--routee-tablet-layout-top-depth)
+      - var(--routee-tablet-map-trip-gap)
+      - var(--routee-tablet-visible-first-trip-card-depth)
+    );
+  }
+
+  .app-layout {
+    gap: var(--routee-tablet-map-trip-gap) !important;
+  }
+
+  .map-canvas {
+    height: clamp(430px, var(--routee-tablet-map-target-height), 82svh) !important;
+    min-height: clamp(430px, var(--routee-tablet-map-target-height), 82svh) !important;
+    max-height: none !important;
+  }
+
+  .trip-column,
+  .trip-panel,
+  .trip-list {
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+  }
+}
