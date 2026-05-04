@@ -2731,3 +2731,298 @@
     overflow-x: hidden !important;
   }
 }
+
+/* =========================================================
+   ROUTEE — TABLET PORTRAIT FINAL: MAP + ONE-CARD TRIP LIST
+   Tablet dikey görünümde harita mobildeki gibi geniş kalır;
+   Gezi Listesi ise tek konum kartı düzgün okunacak kadar görünür.
+   İşlevlere dokunmaz; yalnızca tablet-dikey yerleşimi sabitler.
+   ========================================================= */
+@media (min-width: 721px) and (max-width: 1100px) and (orientation: portrait) {
+  .app-layout {
+    --routee-tablet-trip-panel-height: clamp(216px, 20svh, 238px);
+    grid-template-columns: minmax(0, 1fr) !important;
+    align-items: stretch !important;
+    gap: 12px !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow-x: hidden !important;
+  }
+
+  .map-area,
+  .map-shell,
+  .trip-column,
+  .trip-panel {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    justify-self: stretch !important;
+  }
+
+  .map-canvas {
+    width: 100% !important;
+    height: clamp(520px, calc(100dvh - var(--routee-mobile-topbar-natural-height, 64px) - var(--routee-tablet-trip-panel-height, 226px) - 104px), 820px) !important;
+    min-height: clamp(520px, calc(100svh - var(--routee-mobile-topbar-natural-height, 64px) - var(--routee-tablet-trip-panel-height, 226px) - 104px), 820px) !important;
+    max-height: none !important;
+    border-radius: 24px !important;
+  }
+
+  .trip-column {
+    display: block !important;
+  }
+
+  .trip-panel {
+    display: flex !important;
+    flex-direction: column !important;
+    height: var(--routee-tablet-trip-panel-height, 226px) !important;
+    min-height: var(--routee-tablet-trip-panel-height, 226px) !important;
+    max-height: var(--routee-tablet-trip-panel-height, 226px) !important;
+    padding: 12px !important;
+    border-radius: 20px !important;
+    overflow: hidden !important;
+    box-sizing: border-box !important;
+  }
+
+  .trip-panel-header {
+    flex: 0 0 auto !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 10px !important;
+    margin: 0 0 9px !important;
+    min-height: 44px !important;
+  }
+
+  .trip-panel-header h2 {
+    min-width: 0 !important;
+    margin: 0 !important;
+    font-size: 0.96rem !important;
+    line-height: 1.18 !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+  }
+
+  .trip-header-actions {
+    flex: 0 0 auto !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: flex-end !important;
+    gap: 8px !important;
+  }
+
+  .trip-header-actions .trip-map-list-icon-btn,
+  .trip-header-actions .trip-save-icon-btn {
+    width: 44px !important;
+    min-width: 44px !important;
+    max-width: 44px !important;
+    height: 44px !important;
+    min-height: 44px !important;
+    max-height: 44px !important;
+    flex: 0 0 44px !important;
+    border-radius: 14px !important;
+  }
+
+  .trip-list {
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 0 !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    -webkit-overflow-scrolling: touch !important;
+    overscroll-behavior: contain !important;
+    padding: 0 1px 3px !important;
+    box-sizing: border-box !important;
+  }
+
+  .trip-list .trip-item {
+    position: relative !important;
+    flex: 0 0 auto !important;
+    display: grid !important;
+    grid-template-columns: 42px minmax(0, 1fr) !important;
+    grid-template-areas:
+      "order content"
+      ". actions" !important;
+    column-gap: 10px !important;
+    row-gap: 8px !important;
+    align-items: start !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    height: auto !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    padding: 10px !important;
+    border-radius: 16px !important;
+    box-sizing: border-box !important;
+    overflow: hidden !important;
+  }
+
+  .trip-list .trip-item + .trip-item {
+    margin-top: 9px !important;
+  }
+
+  .trip-list .trip-order {
+    grid-area: order !important;
+    grid-column: auto !important;
+    grid-row: auto !important;
+    width: 42px !important;
+    min-width: 42px !important;
+    max-width: 42px !important;
+    height: 42px !important;
+    min-height: 42px !important;
+    max-height: 42px !important;
+    border-radius: 14px !important;
+    font-size: 1rem !important;
+    line-height: 1 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex: 0 0 42px !important;
+  }
+
+  .trip-list .trip-content {
+    grid-area: content !important;
+    grid-column: auto !important;
+    grid-row: auto !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 4px !important;
+    overflow: hidden !important;
+  }
+
+  .trip-list .trip-content strong {
+    display: block !important;
+    max-width: 100% !important;
+    font-size: 0.9rem !important;
+    line-height: 1.18 !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+  }
+
+  .trip-list .trip-content span {
+    display: block !important;
+    max-width: 100% !important;
+    font-size: 0.77rem !important;
+    line-height: 1.25 !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+  }
+
+  .trip-list .trip-item > .trip-actions,
+  .trip-list .trip-item > button.icon-route-btn:last-child,
+  .trip-list .trip-item > button.tiny-btn:last-child {
+    grid-area: actions !important;
+    grid-column: auto !important;
+    grid-row: auto !important;
+    position: static !important;
+    width: auto !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    margin: 0 !important;
+    justify-self: start !important;
+    align-self: start !important;
+  }
+
+  .trip-list .trip-actions {
+    display: inline-flex !important;
+    flex-wrap: wrap !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    gap: 6px !important;
+    white-space: normal !important;
+    overflow: visible !important;
+  }
+
+  .trip-list .trip-actions .tiny-btn,
+  .trip-list .trip-item > button.tiny-btn:last-child {
+    height: 38px !important;
+    min-height: 38px !important;
+    max-height: 38px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border-radius: 12px !important;
+    font-size: 0.74rem !important;
+    font-weight: 750 !important;
+    line-height: 1 !important;
+    white-space: nowrap !important;
+    flex: 0 0 auto !important;
+    box-sizing: border-box !important;
+  }
+
+  .trip-list .trip-actions .icon-route-btn,
+  .trip-list .trip-actions .tiny-btn.icon-route-btn,
+  .trip-list .trip-actions .icon-note-btn,
+  .trip-list .trip-actions .tiny-btn.icon-note-btn,
+  .trip-list .trip-item > button.icon-route-btn:last-child {
+    width: 38px !important;
+    min-width: 38px !important;
+    max-width: 38px !important;
+    height: 38px !important;
+    min-height: 38px !important;
+    max-height: 38px !important;
+    flex: 0 0 38px !important;
+    padding: 0 !important;
+    border-radius: 12px !important;
+    display: inline-grid !important;
+    place-items: center !important;
+    line-height: 1 !important;
+  }
+
+  .trip-list .trip-actions .icon-route-btn svg,
+  .trip-list .trip-actions .tiny-btn.icon-route-btn svg,
+  .trip-list .trip-actions .icon-note-btn svg,
+  .trip-list .trip-actions .tiny-btn.icon-note-btn svg,
+  .trip-list .route-directions-icon {
+    width: 16px !important;
+    height: 16px !important;
+    display: block !important;
+    margin: auto !important;
+  }
+
+  .trip-list .trip-actions .tiny-btn:not(.icon-route-btn):not(.icon-note-btn) {
+    width: auto !important;
+    min-width: auto !important;
+    max-width: none !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    letter-spacing: -0.01em !important;
+  }
+
+  .trip-list .trip-actions .tiny-btn[data-action^="focus"] {
+    min-width: 62px !important;
+    padding-left: 11px !important;
+    padding-right: 11px !important;
+  }
+
+  .trip-list .trip-actions .tiny-btn[data-action^="delete"] {
+    min-width: 44px !important;
+    padding-left: 10px !important;
+    padding-right: 10px !important;
+  }
+
+  .trip-list .trip-note-preview {
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    display: grid !important;
+    grid-template-columns: 15px minmax(0, 1fr) !important;
+    align-items: start !important;
+    gap: 5px !important;
+    margin-top: 4px !important;
+    padding: 7px 9px 7px 8px !important;
+    border-radius: 12px !important;
+    font-size: 0.71rem !important;
+    line-height: 1.32 !important;
+    max-height: 58px !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+  }
+}
