@@ -1,7 +1,7 @@
-const SW_VERSION = new URL(self.location.href).searchParams.get("v") || "dev";
+const ROUTEE_ASSET_REVISION = "2026.05.5.130-android-ios-logic-aligned";
+const SW_VERSION = new URL(self.location.href).searchParams.get("v") || ROUTEE_ASSET_REVISION;
 const CACHE_NAME = `routee-shell-${SW_VERSION}`;
 const NETWORK_TIMEOUT_MS = 1200;
-const ROUTEE_ASSET_REVISION = "2026.05.5.122-android-trip-card-flow";
 
 const APP_SHELL = [
   "./",
