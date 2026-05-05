@@ -411,6 +411,27 @@ function formatKm(value) {
   return `${formatted} km`;
 }
 
+function isAndroidRuntime() {
+  return (
+    document.documentElement.classList.contains("routee-android") ||
+    document.body?.classList.contains("routee-android") ||
+    (/Android/i.test(window.navigator.userAgent || "") && !/iPad|iPhone|iPod/i.test(window.navigator.userAgent || ""))
+  );
+}
+
+function getAndroidAppScroller() {
+  if (!isAndroidRuntime()) return null;
+
+  const appScroller = document.getElementById("app");
+  if (!appScroller) return null;
+
+  const appStyle = window.getComputedStyle(appScroller);
+  const canScrollApp = /(auto|scroll)/i.test(appStyle.overflowY || "") &&
+    appScroller.scrollHeight > appScroller.clientHeight + 1;
+
+  return canScrollApp ? appScroller : null;
+}
+
 function scrollToMapArea() {
   const mapCanvas = document.getElementById("mapCanvas");
   if (!mapCanvas) return;
@@ -418,6 +439,19 @@ function scrollToMapArea() {
   const topbarHeight = elements.topbar?.offsetHeight || 0;
   const extraOffset = 16;
   const rect = mapCanvas.getBoundingClientRect();
+  const androidScroller = getAndroidAppScroller();
+
+  if (androidScroller) {
+    const scrollerRect = androidScroller.getBoundingClientRect();
+    const targetTop = androidScroller.scrollTop + rect.top - scrollerRect.top - topbarHeight - extraOffset;
+
+    androidScroller.scrollTo({
+      top: Math.max(0, targetTop),
+      behavior: "smooth"
+    });
+    return;
+  }
+
   const targetTop = window.scrollY + rect.top - topbarHeight - extraOffset;
 
   window.scrollTo({
