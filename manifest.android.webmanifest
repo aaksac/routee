@@ -1,13 +1,11 @@
 {
   "name": "Rota",
+  "id": "./",
   "short_name": "Rota",
   "description": "Kuş uçuşu rota planlama ve harita yönetimi uygulaması",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
-  "display_override": [
-    "standalone"
-  ],
   "background_color": "#d8dde3",
   "theme_color": "#0f172a",
   "lang": "tr",
@@ -25,5 +23,6 @@
       "purpose": "any maskable"
     }
   ],
-  "orientation": "portrait"
+  "orientation": "portrait",
+  "prefer_related_applications": false
 }
