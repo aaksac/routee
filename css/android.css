@@ -208,3 +208,103 @@
   }
 }
 
+
+/* =========================================================
+   ROUTEE — ANDROID VISIBLE SYSTEM STATUS BAR + TOPBAR FIT
+   Android'de telefonun saat/şebeke/şarj alanı işletim sisteminde görünür kalır.
+   Uygulama üst barı bu alanın altındaki viewport içinde sabit 64px içerik yüksekliğiyle çalışır.
+   iPhone/iPad seçicisi içermez.
+   ========================================================= */
+@media (max-width: 720px), (hover: none) and (pointer: coarse) {
+  html.routee-android,
+  body.routee-android {
+    --routee-mobile-topbar-content-height: 64px !important;
+    --routee-mobile-topbar-natural-height: 64px !important;
+    --routee-mobile-topbar-locked-height: 64px !important;
+  }
+
+  html.routee-android .topbar,
+  body.routee-android .topbar {
+    position: sticky !important;
+    top: 0 !important;
+    height: 64px !important;
+    min-height: 64px !important;
+    max-height: 64px !important;
+    flex: 0 0 64px !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    padding-left: max(14px, calc(var(--routee-safe-left, 0px) + 12px)) !important;
+    padding-right: max(14px, calc(var(--routee-safe-right, 0px) + 12px)) !important;
+    align-items: center !important;
+    overflow: hidden !important;
+  }
+
+  html.routee-android .topbar::before,
+  body.routee-android .topbar::before {
+    display: none !important;
+    content: none !important;
+    height: 0 !important;
+    min-height: 0 !important;
+    max-height: 0 !important;
+  }
+
+  html.routee-android .topbar > .brand-area,
+  html.routee-android .topbar > .topbar-actions,
+  body.routee-android .topbar > .brand-area,
+  body.routee-android .topbar > .topbar-actions {
+    height: 64px !important;
+    min-height: 64px !important;
+    max-height: 64px !important;
+    align-self: center !important;
+    display: flex !important;
+    align-items: center !important;
+    overflow: hidden !important;
+  }
+
+  html.routee-android .topbar .brand-area,
+  body.routee-android .topbar .brand-area {
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+  }
+
+  html.routee-android .topbar .brand-icon,
+  body.routee-android .topbar .brand-icon {
+    width: 40px !important;
+    height: 40px !important;
+    min-width: 40px !important;
+    min-height: 40px !important;
+    max-width: 40px !important;
+    max-height: 40px !important;
+    flex: 0 0 40px !important;
+  }
+
+  html.routee-android .topbar .brand-text,
+  html.routee-android .topbar .brand-text h1,
+  html.routee-android .topbar .brand-text p,
+  body.routee-android .topbar .brand-text,
+  body.routee-android .topbar .brand-text h1,
+  body.routee-android .topbar .brand-text p {
+    min-height: 0 !important;
+    max-height: 64px !important;
+    overflow: hidden !important;
+  }
+
+  html.routee-android .topbar .brand-text h1,
+  html.routee-android .topbar .brand-text p,
+  body.routee-android .topbar .brand-text h1,
+  body.routee-android .topbar .brand-text p {
+    white-space: nowrap !important;
+    text-overflow: ellipsis !important;
+  }
+
+  html.routee-android .topbar .page-action-btn,
+  body.routee-android .topbar .page-action-btn {
+    height: 38px !important;
+    min-height: 38px !important;
+    max-height: 38px !important;
+    flex: 0 0 auto !important;
+    padding-top: 6px !important;
+    padding-bottom: 6px !important;
+    overflow: hidden !important;
+  }
+}
