@@ -1,7 +1,7 @@
-const SW_VERSION = new URL(self.location.href).searchParams.get("v") || "2026.05.5.404-android-map-height";
+const SW_VERSION = new URL(self.location.href).searchParams.get("v") || "2026.05.5.405-fast-login-cache";
 const CACHE_NAME = `routee-shell-${SW_VERSION}`;
 const NETWORK_TIMEOUT_MS = 1200;
-const ROUTEE_ASSET_REVISION = "2026.05.5.404-android-map-height";
+const ROUTEE_ASSET_REVISION = "2026.05.5.405-fast-login-cache";
 
 const APP_SHELL = [
   "./",
@@ -34,21 +34,14 @@ const APP_SHELL = [
   "./icons/icon-192.png",
   "./icons/icon-512.png",
   "./icons/apple-touch-icon.png",
-  "./icons/splash-640x1136.png",
-  "./icons/splash-750x1334.png",
-  "./icons/splash-828x1792.png",
-  "./icons/splash-1125x2436.png",
-  "./icons/splash-1170x2532.png",
-  "./icons/splash-1242x2208.png",
-  "./icons/splash-1242x2688.png",
-  "./icons/splash-1284x2778.png",
-  "./icons/splash-1290x2796.png",
-  "./icons/splash-1536x2048.png",
-  "./icons/splash-1668x2224.png",
-  "./icons/splash-1668x2388.png",
-  "./icons/splash-2048x2732.png",
-  "./icons/splash-tablet-landscape-2048x1536.png"
+  "./icons/splash-1170x2532.png"
 ];
+
+/*
+  Büyük splash görselleri kurulumda topluca cache'lenmiyor.
+  İlgili cihazda gerçekten çağrıldıklarında staticCacheFirst ile cache'e alınırlar.
+  Böylece özellikle Android girişinde service worker kurulumu 39 MB'lık ön indirme yapmaz.
+*/
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
