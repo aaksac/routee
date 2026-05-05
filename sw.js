@@ -1,7 +1,7 @@
-const SW_VERSION = new URL(self.location.href).searchParams.get("v") || "2026.05.5.308-android-430-compact-buttons";
+const SW_VERSION = new URL(self.location.href).searchParams.get("v") || "2026.05.5.309-android-a12-density";
 const CACHE_NAME = `routee-shell-${SW_VERSION}`;
 const NETWORK_TIMEOUT_MS = 1200;
-const ROUTEE_ASSET_REVISION = "2026.05.5.308-android-430-compact-buttons";
+const ROUTEE_ASSET_REVISION = "2026.05.5.309-android-a12-density";
 
 const APP_SHELL = [
   "./",
