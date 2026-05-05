@@ -1,4 +1,4 @@
-const ROUTEE_ASSET_REVISION = "2026.05.5.132-android-map-only-zoom-page-lock";
+const ROUTEE_ASSET_REVISION = "2026.05.5.141-android-visual-rollback-safe";
 const SW_VERSION = new URL(self.location.href).searchParams.get("v") || ROUTEE_ASSET_REVISION;
 const CACHE_NAME = `routee-shell-${SW_VERSION}`;
 const NETWORK_TIMEOUT_MS = 1200;
