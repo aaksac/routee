@@ -1,4 +1,4 @@
-const ROUTEE_ASSET_REVISION = "2026.05.5.150-mobile-css-restore-android-safe";
+const ROUTEE_ASSET_REVISION = "2026.05.5.132-android-scrollbar-hide-final";
 const SW_VERSION = new URL(self.location.href).searchParams.get("v") || ROUTEE_ASSET_REVISION;
 const CACHE_NAME = `routee-shell-${SW_VERSION}`;
 const NETWORK_TIMEOUT_MS = 1200;
