@@ -53,6 +53,21 @@ const MARKER_CLICK_TARGET_ZOOM = 17;
 const SMOOTH_ZOOM_STEP_DELAY_MS = 120;
 const SMOOTH_ZOOM_START_DELAY_MS = 110;
 
+function isAndroidRouteeRuntime() {
+  return Boolean(
+    document.documentElement?.classList?.contains("routee-android") ||
+      document.body?.classList?.contains("routee-android")
+  );
+}
+
+function getRouteeViewportWidth() {
+  const visualWidth = Number(window.visualViewport?.width);
+  const innerWidthValue = Number(window.innerWidth);
+  const clientWidth = Number(document.documentElement?.clientWidth);
+
+  return Math.max(320, Math.floor(visualWidth || innerWidthValue || clientWidth || 360));
+}
+
 let smoothZoomTimer = null;
 let smoothZoomRunId = 0;
 
@@ -341,6 +356,13 @@ function createInfoNotePreview(pointData) {
   text.style.minWidth = "0";
   text.style.paddingRight = "2px";
   text.style.overflowWrap = "anywhere";
+  if (isAndroidRouteeRuntime()) {
+    text.style.display = "-webkit-box";
+    text.style.WebkitBoxOrient = "vertical";
+    text.style.WebkitLineClamp = "2";
+    text.style.overflow = "hidden";
+    text.style.whiteSpace = "normal";
+  }
 
   preview.appendChild(iconWrap);
   preview.appendChild(text);
@@ -349,18 +371,19 @@ function createInfoNotePreview(pointData) {
   preview.style.gridTemplateColumns = "17px minmax(0, 1fr)";
   preview.style.alignItems = "start";
   preview.style.gap = "6px";
-  preview.style.maxHeight = "82px";
-  preview.style.overflowY = "scroll";
+  const isAndroidPreview = isAndroidRouteeRuntime();
+  preview.style.maxHeight = isAndroidPreview ? "44px" : "82px";
+  preview.style.overflowY = isAndroidPreview ? "hidden" : "scroll";
   preview.style.overflowX = "hidden";
-  preview.style.scrollbarGutter = "stable";
-  preview.style.padding = "8px 11px 8px 10px";
-  preview.style.marginBottom = "10px";
-  preview.style.borderRadius = "14px";
+  preview.style.scrollbarGutter = isAndroidPreview ? "auto" : "stable";
+  preview.style.padding = isAndroidPreview ? "6px 8px 6px 7px" : "8px 11px 8px 10px";
+  preview.style.marginBottom = isAndroidPreview ? "7px" : "10px";
+  preview.style.borderRadius = isAndroidPreview ? "12px" : "14px";
   preview.style.background = "rgba(37, 99, 235, 0.065)";
   preview.style.border = "1px solid rgba(37, 99, 235, 0.17)";
   preview.style.color = "#1e40af";
-  preview.style.fontSize = "11px";
-  preview.style.lineHeight = "1.35";
+  preview.style.fontSize = isAndroidPreview ? "10px" : "11px";
+  preview.style.lineHeight = isAndroidPreview ? "1.28" : "1.35";
   preview.style.wordBreak = "normal";
   preview.style.overflowWrap = "anywhere";
 
@@ -369,6 +392,7 @@ function createInfoNotePreview(pointData) {
 
 function createNoteButton(pointData) {
   const hasNote = hasPointNote(pointData);
+  const isAndroidButton = isAndroidRouteeRuntime();
   const noteBtn = document.createElement("button");
 
   noteBtn.type = "button";
@@ -387,12 +411,12 @@ function createNoteButton(pointData) {
   noteBtn.appendChild(dot);
 
   noteBtn.style.position = "relative";
-  noteBtn.style.width = "36px";
-  noteBtn.style.minWidth = "36px";
-  noteBtn.style.height = "36px";
-  noteBtn.style.minHeight = "36px";
+  noteBtn.style.width = isAndroidButton ? "34px" : "36px";
+  noteBtn.style.minWidth = isAndroidButton ? "34px" : "36px";
+  noteBtn.style.height = isAndroidButton ? "34px" : "36px";
+  noteBtn.style.minHeight = isAndroidButton ? "34px" : "36px";
   noteBtn.style.padding = "0";
-  noteBtn.style.borderRadius = "12px";
+  noteBtn.style.borderRadius = isAndroidButton ? "11px" : "12px";
   noteBtn.style.display = "inline-flex";
   noteBtn.style.alignItems = "center";
   noteBtn.style.justifyContent = "center";
@@ -401,7 +425,7 @@ function createNoteButton(pointData) {
   noteBtn.style.verticalAlign = "middle";
   noteBtn.style.cursor = "pointer";
   noteBtn.style.boxSizing = "border-box";
-  noteBtn.style.flex = "0 0 36px";
+  noteBtn.style.flex = isAndroidButton ? "0 0 34px" : "0 0 36px";
 
   noteBtn.style.background = hasNote
     ? "linear-gradient(180deg, rgba(37, 99, 235, 0.12), rgba(37, 99, 235, 0.07))"
@@ -419,8 +443,8 @@ function createNoteButton(pointData) {
 
   const svg = noteBtn.querySelector("svg");
   if (svg) {
-    svg.style.width = "17px";
-    svg.style.height = "17px";
+    svg.style.width = isAndroidButton ? "16px" : "17px";
+    svg.style.height = isAndroidButton ? "16px" : "17px";
     svg.style.fill = "none";
     svg.style.stroke = "currentColor";
     svg.style.strokeWidth = "1.9";
@@ -495,12 +519,20 @@ function getPointSubtitle(pointData) {
 }
 
 function createInfoWindowContent(pointData) {
+  const isAndroidInfoWindow = isAndroidRouteeRuntime();
+  const viewportWidth = getRouteeViewportWidth();
+  const androidInfoWidth = Math.max(182, Math.min(196, viewportWidth - 72));
   const wrapper = document.createElement("div");
-  wrapper.style.width = "min(206px, calc(100vw - 56px))";
-  wrapper.style.maxWidth = "206px";
+  wrapper.className = isAndroidInfoWindow
+    ? "routee-marker-info-card routee-marker-info-card--android"
+    : "routee-marker-info-card";
+  wrapper.style.width = isAndroidInfoWindow
+    ? `${androidInfoWidth}px`
+    : "min(206px, calc(100vw - 56px))";
+  wrapper.style.maxWidth = isAndroidInfoWindow ? `${androidInfoWidth}px` : "206px";
   wrapper.style.boxSizing = "border-box";
-  wrapper.style.padding = "10px";
-  wrapper.style.borderRadius = "16px";
+  wrapper.style.padding = isAndroidInfoWindow ? "8px" : "10px";
+  wrapper.style.borderRadius = isAndroidInfoWindow ? "14px" : "16px";
   wrapper.style.background = "#ffffff";
   wrapper.style.border = "1px solid rgba(226, 232, 240, 0.95)";
   wrapper.style.boxShadow = "0 14px 28px rgba(15, 23, 42, 0.16)";
@@ -546,7 +578,7 @@ function createInfoWindowContent(pointData) {
 
   badge.style.display = "inline-flex";
   badge.style.alignItems = "center";
-  badge.style.fontSize = "10px";
+  badge.style.fontSize = isAndroidInfoWindow ? "9px" : "10px";
   badge.style.fontWeight = "700";
   badge.style.letterSpacing = "0.04em";
   badge.style.textTransform = "uppercase";
@@ -555,15 +587,15 @@ function createInfoWindowContent(pointData) {
     pointData?.type === "end"
       ? "rgba(249, 115, 22, 0.12)"
       : "rgba(37, 99, 235, 0.10)";
-  badge.style.padding = "5px 8px";
+  badge.style.padding = isAndroidInfoWindow ? "4px 7px" : "5px 8px";
   badge.style.borderRadius = "999px";
-  badge.style.marginBottom = "8px";
+  badge.style.marginBottom = isAndroidInfoWindow ? "6px" : "8px";
 
   const title = document.createElement("div");
   title.textContent = getPointDisplayTitle(pointData);
-  title.style.fontSize = "14px";
+  title.style.fontSize = isAndroidInfoWindow ? "13px" : "14px";
   title.style.fontWeight = "800";
-  title.style.lineHeight = "1.25";
+  title.style.lineHeight = isAndroidInfoWindow ? "1.2" : "1.25";
   title.style.color = "#0f172a";
   title.style.display = "block";
   title.style.width = "100%";
@@ -575,7 +607,13 @@ function createInfoWindowContent(pointData) {
   title.style.overflowWrap = "break-word";
   title.style.hyphens = "none";
   title.style.paddingRight = "0";
-  title.style.marginBottom = "8px";
+  title.style.marginBottom = isAndroidInfoWindow ? "6px" : "8px";
+  if (isAndroidInfoWindow) {
+    title.style.display = "-webkit-box";
+    title.style.WebkitBoxOrient = "vertical";
+    title.style.WebkitLineClamp = "2";
+    title.style.overflow = "hidden";
+  }
 
   wrapper.appendChild(closeBtn);
   wrapper.appendChild(badge);
@@ -585,11 +623,17 @@ function createInfoWindowContent(pointData) {
   if (subtitleText) {
     const subtitle = document.createElement("div");
     subtitle.textContent = subtitleText;
-    subtitle.style.fontSize = "11px";
-    subtitle.style.lineHeight = "1.35";
+    subtitle.style.fontSize = isAndroidInfoWindow ? "10px" : "11px";
+    subtitle.style.lineHeight = isAndroidInfoWindow ? "1.28" : "1.35";
     subtitle.style.color = "#64748b";
     subtitle.style.wordBreak = "break-word";
-    subtitle.style.marginBottom = "10px";
+    subtitle.style.marginBottom = isAndroidInfoWindow ? "7px" : "10px";
+    if (isAndroidInfoWindow) {
+      subtitle.style.display = "-webkit-box";
+      subtitle.style.WebkitBoxOrient = "vertical";
+      subtitle.style.WebkitLineClamp = "2";
+      subtitle.style.overflow = "hidden";
+    }
     wrapper.appendChild(subtitle);
   }
 
@@ -601,25 +645,25 @@ function createInfoWindowContent(pointData) {
   if (pointData?.type !== "start" && pointData?.type !== "end") {
     const paletteLabel = document.createElement("div");
     paletteLabel.textContent = "İşaret rengi";
-    paletteLabel.style.fontSize = "11px";
+    paletteLabel.style.fontSize = isAndroidInfoWindow ? "10px" : "11px";
     paletteLabel.style.fontWeight = "700";
     paletteLabel.style.color = "#334155";
-    paletteLabel.style.marginBottom = "8px";
+    paletteLabel.style.marginBottom = isAndroidInfoWindow ? "6px" : "8px";
     wrapper.appendChild(paletteLabel);
 
     const palette = document.createElement("div");
     palette.style.display = "grid";
     palette.style.gridTemplateColumns = "repeat(4, minmax(0, 1fr))";
-    palette.style.gap = "8px";
-    palette.style.marginBottom = "12px";
+    palette.style.gap = isAndroidInfoWindow ? "6px" : "8px";
+    palette.style.marginBottom = isAndroidInfoWindow ? "9px" : "12px";
 
     POINT_COLORS.forEach((item) => {
       const colorBtn = document.createElement("button");
       colorBtn.type = "button";
       colorBtn.setAttribute("aria-label", item.label);
       colorBtn.title = item.label;
-      colorBtn.style.height = "32px";
-      colorBtn.style.borderRadius = "12px";
+      colorBtn.style.height = isAndroidInfoWindow ? "26px" : "32px";
+      colorBtn.style.borderRadius = isAndroidInfoWindow ? "10px" : "12px";
       colorBtn.style.border =
         String(pointData.color || "#dc2626").toLowerCase() === item.value.toLowerCase()
           ? "2px solid #0f172a"
@@ -632,8 +676,8 @@ function createInfoWindowContent(pointData) {
       colorBtn.style.padding = "0";
 
       const swatch = document.createElement("span");
-      swatch.style.width = "16px";
-      swatch.style.height = "16px";
+      swatch.style.width = isAndroidInfoWindow ? "13px" : "16px";
+      swatch.style.height = isAndroidInfoWindow ? "13px" : "16px";
       swatch.style.borderRadius = "999px";
       swatch.style.display = "block";
       swatch.style.background = item.value;
@@ -653,7 +697,7 @@ function createInfoWindowContent(pointData) {
 
   const actions = document.createElement("div");
   actions.style.display = "flex";
-  actions.style.gap = "6px";
+  actions.style.gap = isAndroidInfoWindow ? "5px" : "6px";
   actions.style.alignItems = "stretch";
   actions.style.justifyContent = "center";
 
@@ -662,19 +706,19 @@ function createInfoWindowContent(pointData) {
   const directionsBtn = document.createElement("button");
   directionsBtn.type = "button";
   directionsBtn.textContent = "Yol Tarifi Al";
-  directionsBtn.style.flex = "0 0 102px";
-  directionsBtn.style.width = "102px";
-  directionsBtn.style.height = "36px";
-  directionsBtn.style.padding = "0 10px";
+  directionsBtn.style.flex = isAndroidInfoWindow ? "0 0 90px" : "0 0 102px";
+  directionsBtn.style.width = isAndroidInfoWindow ? "90px" : "102px";
+  directionsBtn.style.height = isAndroidInfoWindow ? "34px" : "36px";
+  directionsBtn.style.padding = isAndroidInfoWindow ? "0 7px" : "0 10px";
   directionsBtn.style.boxSizing = "border-box";
   directionsBtn.style.display = "inline-flex";
   directionsBtn.style.alignItems = "center";
   directionsBtn.style.justifyContent = "center";
   directionsBtn.style.border = "none";
-  directionsBtn.style.borderRadius = "12px";
+  directionsBtn.style.borderRadius = isAndroidInfoWindow ? "11px" : "12px";
   directionsBtn.style.background = "linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)";
   directionsBtn.style.color = "#ffffff";
-  directionsBtn.style.fontSize = "12px";
+  directionsBtn.style.fontSize = isAndroidInfoWindow ? "11px" : "12px";
   directionsBtn.style.fontWeight = "700";
   directionsBtn.style.cursor = "pointer";
   directionsBtn.style.boxShadow = "0 8px 18px rgba(37, 99, 235, 0.24)";
@@ -688,16 +732,16 @@ function createInfoWindowContent(pointData) {
   const deleteBtn = document.createElement("button");
   deleteBtn.type = "button";
   deleteBtn.textContent = "Sil";
-  deleteBtn.style.width = "36px";
-  deleteBtn.style.minWidth = "36px";
-  deleteBtn.style.height = "36px";
+  deleteBtn.style.width = isAndroidInfoWindow ? "34px" : "36px";
+  deleteBtn.style.minWidth = isAndroidInfoWindow ? "34px" : "36px";
+  deleteBtn.style.height = isAndroidInfoWindow ? "34px" : "36px";
   deleteBtn.style.padding = "0";
   deleteBtn.style.boxSizing = "border-box";
   deleteBtn.style.border = "1px solid #fecaca";
-  deleteBtn.style.borderRadius = "12px";
+  deleteBtn.style.borderRadius = isAndroidInfoWindow ? "11px" : "12px";
   deleteBtn.style.background = "#fef2f2";
   deleteBtn.style.color = "#b91c1c";
-  deleteBtn.style.fontSize = "12px";
+  deleteBtn.style.fontSize = isAndroidInfoWindow ? "11px" : "12px";
   deleteBtn.style.fontWeight = "700";
   deleteBtn.style.cursor = "pointer";
   deleteBtn.style.whiteSpace = "nowrap";
@@ -761,7 +805,7 @@ function openMarkerInfo(marker, pointData) {
 
   activeInfoWindow.setContent(createInfoWindowContent(pointData));
   activeInfoWindow.setOptions({
-    maxWidth: 272,
+    maxWidth: isAndroidRouteeRuntime() ? 224 : 272,
     pixelOffset: new google.maps.Size(0, -8),
     zIndex: 9999,
     disableAutoPan: false
