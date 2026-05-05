@@ -289,3 +289,49 @@
     }
   }
 }
+
+/* =========================================================
+   ROUTEE — ANDROID GLOBAL SCROLLBAR HIDE PATCH
+   ---------------------------------------------------------
+   Yalnızca Android sınıfı altında çalışır. Yerleşime, ölçülere,
+   yeni harita butonuna, topbar'a, harita/gezi listesi akışına
+   dokunmaz. Kaydırma çalışır, sadece scrollbar görünmez.
+   ========================================================= */
+@media (max-width: 720px), (hover: none) and (pointer: coarse) {
+  html.routee-android,
+  html.routee-android *,
+  body.routee-android,
+  body.routee-android * {
+    -ms-overflow-style: none !important;
+    scrollbar-width: none !important;
+    scrollbar-color: transparent transparent !important;
+    scrollbar-gutter: auto !important;
+  }
+
+  html.routee-android::-webkit-scrollbar,
+  html.routee-android *::-webkit-scrollbar,
+  body.routee-android::-webkit-scrollbar,
+  body.routee-android *::-webkit-scrollbar {
+    width: 0 !important;
+    height: 0 !important;
+    display: none !important;
+    background: transparent !important;
+  }
+
+  html.routee-android::-webkit-scrollbar-track,
+  html.routee-android *::-webkit-scrollbar-track,
+  body.routee-android::-webkit-scrollbar-track,
+  body.routee-android *::-webkit-scrollbar-track,
+  html.routee-android::-webkit-scrollbar-thumb,
+  html.routee-android *::-webkit-scrollbar-thumb,
+  body.routee-android::-webkit-scrollbar-thumb,
+  body.routee-android *::-webkit-scrollbar-thumb,
+  html.routee-android::-webkit-scrollbar-corner,
+  html.routee-android *::-webkit-scrollbar-corner,
+  body.routee-android::-webkit-scrollbar-corner,
+  body.routee-android *::-webkit-scrollbar-corner {
+    background: transparent !important;
+    border: 0 !important;
+    box-shadow: none !important;
+  }
+}
