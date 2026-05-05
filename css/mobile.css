@@ -1,0 +1,3239 @@
+@media (max-width: 720px) {
+  .topbar {
+    padding: 12px 14px;
+    gap: 10px;
+  }
+
+  .brand-area {
+    gap: 10px;
+    min-width: 0;
+  }
+
+  .brand-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 14px;
+    flex: 0 0 40px;
+  }
+
+  .brand-text h1 {
+    font-size: 1rem;
+    line-height: 1.15;
+  }
+
+  .brand-text p {
+    display: none;
+  }
+
+  .page-action-btn {
+    min-height: 36px;
+    padding: 6px 10px;
+    font-size: 0.84rem;
+  }
+
+  .status-strip {
+    padding: 8px 14px 0;
+  }
+
+  .auth-status {
+    font-size: 0.88rem;
+    line-height: 1.35;
+  }
+
+  .app-layout {
+    padding: 12px 14px 16px;
+    gap: 12px;
+  }
+
+  .map-canvas {
+    min-height: 56vh;
+    height: 56vh;
+    border-radius: 20px;
+  }
+
+  .map-overlay {
+    gap: 8px;
+  }
+
+  .top-left {
+    top: 10px;
+    left: 10px;
+    max-width: 60px;
+  }
+
+  .top-right {
+    top: 8px;
+    right: 8px;
+    width: calc(100% - 88px);
+    max-width: calc(100% - 88px);
+    align-items: stretch;
+  }
+
+  .bottom-left {
+    left: 10px;
+    bottom: 10px;
+  }
+
+  .top-left .compact-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+    align-items: stretch;
+    width: 52px;
+  }
+
+  #btnOpenLocationActions,
+  #btnToggleMenu,
+  #btnCurrentLocation,
+  .icon-only-btn {
+    width: 52px !important;
+    min-width: 52px !important;
+    max-width: 52px !important;
+    height: 52px !important;
+    min-height: 52px !important;
+    padding: 0 !important;
+    border-radius: 17px !important;
+    display: grid !important;
+    place-items: center !important;
+  }
+
+  #btnOpenLocationActions svg,
+  #btnToggleMenu svg,
+  #btnCurrentLocation svg,
+  .icon-only-btn svg {
+    width: 24px !important;
+    height: 24px !important;
+  }
+
+  .right-tools {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 9px;
+    align-items: start;
+    justify-content: stretch;
+    width: 100%;
+  }
+
+  .map-search-wrapper {
+    width: 100%;
+    min-width: 0;
+    max-width: none;
+  }
+
+  .map-search-input {
+    width: 100%;
+    min-width: 0;
+    max-width: none;
+    min-height: 52px;
+    height: 52px;
+    padding: 12px 46px 12px 17px;
+    font-size: 0.9rem;
+    line-height: 1.1;
+    border-radius: 17px;
+  }
+
+  .map-search-clear {
+    right: 9px;
+    width: 31px;
+    height: 31px;
+    min-width: 31px;
+    min-height: 31px;
+  }
+
+  .menu-wrapper {
+    position: relative;
+    justify-self: end;
+    flex: 0 0 auto;
+    z-index: 22;
+  }
+
+  .floating-menu {
+    top: calc(100% + 8px);
+    right: 0;
+    width: max-content;
+    min-width: 0;
+    max-width: calc(100vw - 16px);
+    padding: 8px;
+    gap: 8px;
+    border-radius: 18px;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .menu-item {
+    width: 100%;
+    min-width: 0;
+    min-height: 46px;
+    padding: 0 16px;
+    font-size: 0.88rem;
+    font-weight: 700;
+    line-height: 1;
+    border-radius: 14px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    white-space: nowrap;
+    box-sizing: border-box;
+  }
+
+  body.has-mobile-floating-panel {
+    overflow: hidden;
+  }
+
+  .mobile-floating-backdrop {
+    display: none;
+  }
+
+  body.has-mobile-floating-panel .mobile-floating-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 70;
+    background: rgba(15, 23, 42, 0.30);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    touch-action: none;
+    pointer-events: auto;
+  }
+
+  body.has-mobile-floating-panel .new-map-mobile-fab,
+  body.has-screen-overlay .new-map-mobile-fab {
+    z-index: 60;
+    opacity: 1;
+    visibility: visible;
+    pointer-events: none;
+    filter: blur(4px);
+  }
+
+  body.has-mobile-floating-panel .map-overlay.top-left,
+  body.has-mobile-floating-panel .map-overlay.top-right {
+    z-index: 90;
+  }
+
+  body.has-mobile-floating-panel .map-canvas,
+  body.has-mobile-floating-panel .trip-panel,
+  body.has-mobile-floating-panel .status-strip,
+  body.has-mobile-floating-panel .topbar {
+    filter: blur(4px);
+    transition: filter 0.18s ease;
+  }
+
+  body.has-mobile-floating-panel .top-left .compact-buttons,
+  body.has-mobile-floating-panel .menu-wrapper,
+  body.has-mobile-floating-panel #placeSearch {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  body.has-mobile-floating-panel #btnCurrentLocation,
+  body.has-mobile-floating-panel #btnCurrentLocation * {
+    pointer-events: none !important;
+  }
+
+  body.has-mobile-floating-panel .bottom-left {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  body[data-mobile-panel="start"] #startPanel,
+  body[data-mobile-panel="point"] #pointPanel,
+  body[data-mobile-panel="end"] #endPanel,
+  body[data-mobile-panel="save"] #savePanel,
+  body[data-mobile-panel="importExport"] #importExportPanel {
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 95;
+    width: min(92vw, 360px) !important;
+    min-width: min(92vw, 360px) !important;
+    max-width: min(92vw, 360px) !important;
+    max-height: min(82vh, 640px);
+    overflow: auto;
+    padding: 16px !important;
+    border-radius: 24px !important;
+    background: rgba(255, 255, 255, 0.98) !important;
+    border: 1px solid rgba(219, 228, 240, 0.96) !important;
+    box-shadow: 0 24px 60px rgba(15, 23, 42, 0.22) !important;
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+  }
+
+  #startPanel .card-title-row,
+  #pointPanel .card-title-row,
+  #endPanel .card-title-row,
+  #savePanel .card-title-row,
+  #importExportPanel .card-title-row {
+    margin-bottom: 12px !important;
+    gap: 10px !important;
+    align-items: center !important;
+  }
+
+  #startPanel .card-title-row h2,
+  #pointPanel .card-title-row h2,
+  #endPanel .card-title-row h2,
+  #savePanel .card-title-row h2,
+  #importExportPanel .card-title-row h2 {
+    font-size: 1rem !important;
+    line-height: 1.2 !important;
+    margin: 0 !important;
+  }
+
+  #startPanel .field-group,
+  #pointPanel .field-group,
+  #endPanel .field-group,
+  #savePanel .field-group,
+  #importExportPanel .field-group {
+    margin-bottom: 10px !important;
+  }
+
+  #startPanel .field-group label,
+  #pointPanel .field-group label,
+  #endPanel .field-group label,
+  #savePanel .field-group label,
+  #importExportPanel .field-group label {
+    font-size: 0.78rem !important;
+    margin-bottom: 5px !important;
+    line-height: 1.2 !important;
+  }
+
+  #startPanel input,
+  #pointPanel input,
+  #endPanel input,
+  #savePanel input,
+  #importExportPanel input,
+  #savePanel select,
+  #importExportPanel select {
+    min-height: 44px !important;
+    height: 44px !important;
+    padding: 10px 12px !important;
+    font-size: 0.92rem !important;
+    line-height: 1.2 !important;
+    border-radius: 12px !important;
+  }
+
+  #startPanel .field-row,
+  #pointPanel .field-row,
+  #endPanel .field-row {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    gap: 8px !important;
+  }
+
+  #savePanel .summary-grid {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 8px !important;
+  }
+
+  #startPanel .panel-actions,
+  #pointPanel .panel-actions,
+  #endPanel .panel-actions,
+  #savePanel .panel-actions,
+  #importExportPanel .panel-actions {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 8px !important;
+    margin-top: 10px !important;
+  }
+
+  #startPanel .small-btn,
+  #pointPanel .small-btn,
+  #endPanel .small-btn,
+  #savePanel .small-btn,
+  #importExportPanel .small-btn {
+    min-height: 42px !important;
+    height: 42px !important;
+    padding: 9px 15px !important;
+    font-size: 0.88rem !important;
+  }
+
+  #btnCloseStartPanel,
+  #btnClosePointPanel,
+  #btnCloseEndPanel,
+  #btnCloseSavePanel,
+  #btnCloseImportExportPanel {
+    width: 32px !important;
+    height: 32px !important;
+    min-width: 32px !important;
+    min-height: 32px !important;
+    padding: 0 !important;
+    font-size: 1rem !important;
+    line-height: 1 !important;
+    border-radius: 999px !important;
+    flex: 0 0 32px !important;
+  }
+
+  .summary-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .map-list-row {
+    grid-template-columns: minmax(0, 1fr) auto !important;
+    align-items: center !important;
+    gap: 8px !important;
+  }
+
+  .summary-card {
+    padding: 8px 9px;
+    border-radius: 10px;
+  }
+
+  .summary-card span {
+    font-size: 0.68rem;
+    margin-bottom: 3px;
+  }
+
+  .summary-card strong {
+    font-size: 0.8rem;
+  }
+
+  .fab-btn {
+    border-radius: 15px !important;
+  }
+
+  .trip-panel {
+    padding: 14px !important;
+    border-radius: 22px !important;
+  }
+
+  .trip-panel-header h2 {
+    font-size: 1rem !important;
+    line-height: 1.2 !important;
+  }
+
+  .trip-list {
+    gap: 10px !important;
+  }
+
+  .trip-item {
+    grid-template-columns: 40px minmax(0, 1fr) auto !important;
+    gap: 14px !important;
+    padding: 11px !important;
+    border-radius: 16px !important;
+    align-items: center !important;
+  }
+
+  .trip-order {
+    width: 40px !important;
+    height: 40px !important;
+    border-radius: 12px !important;
+    font-size: 0.84rem !important;
+  }
+
+  .trip-content strong {
+    font-size: 0.92rem !important;
+    line-height: 1.15 !important;
+  }
+
+  .trip-content span {
+    font-size: 0.8rem !important;
+    line-height: 1.25 !important;
+  }
+
+  .trip-item > div:last-child,
+  .trip-item > button:last-child {
+    grid-column: 2;
+    justify-self: start;
+  }
+
+  .trip-actions {
+    grid-column: 2;
+    justify-self: start;
+    gap: 6px !important;
+  }
+
+  .trip-actions .tiny-btn {
+    min-height: 32px !important;
+    height: 32px !important;
+    padding: 5px 10px !important;
+    font-size: 0.74rem !important;
+  }
+
+  .tiny-btn {
+    min-height: 34px !important;
+    height: 34px !important;
+    padding: 6px 11px !important;
+    font-size: 0.78rem !important;
+    border-radius: 999px !important;
+    white-space: nowrap !important;
+  }
+
+  .desktop-only-inline {
+    display: none !important;
+  }
+
+  .mobile-only-inline {
+    display: inline-flex;
+  }
+
+  .new-map-mobile-fab {
+    display: inline-flex !important;
+  }
+
+  .screen-overlay-panel {
+    width: calc(100vw - 16px) !important;
+    margin-top: 34px !important;
+    padding: 14px !important;
+    border-radius: 20px !important;
+  }
+
+  .screen-overlay-panel .panel-actions {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+
+  .screen-overlay-panel .small-btn {
+    min-height: 32px;
+    padding: 5px 8px;
+    font-size: 0.73rem;
+  }
+
+  .screen-overlay-panel .card-title-row.large-gap {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 10px !important;
+    margin-bottom: 14px !important;
+  }
+
+  .screen-overlay-panel .card-title-row.large-gap .panel-actions {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    gap: 8px !important;
+    justify-content: flex-start !important;
+  }
+
+  .screen-overlay-panel .card-title-row.large-gap .small-btn {
+    min-height: 34px !important;
+    padding: 6px 10px !important;
+    font-size: 0.75rem !important;
+    border-radius: 999px !important;
+    white-space: nowrap !important;
+  }
+
+  .map-list-row {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) auto !important;
+    gap: 8px !important;
+    align-items: center !important;
+  }
+
+  .map-list-item {
+    min-width: 0 !important;
+    padding: 12px 13px !important;
+    border-radius: 16px !important;
+    box-shadow: 0 8px 18px rgba(15, 23, 42, 0.06) !important;
+  }
+
+  .map-list-item strong,
+  .map-list-item b {
+    font-size: 0.9rem !important;
+    line-height: 1.15 !important;
+  }
+
+  .map-list-item span {
+    font-size: 0.76rem !important;
+    line-height: 1.3 !important;
+  }
+
+  .map-list-row .danger-outline,
+  .map-list-row .small-btn,
+  .map-list-row .tiny-btn {
+    min-height: 34px !important;
+    height: 34px !important;
+    padding: 0 10px !important;
+    font-size: 0.72rem !important;
+    border-radius: 999px !important;
+    white-space: nowrap !important;
+    align-self: center !important;
+    justify-self: end !important;
+  }
+
+  .map-list-item,
+  .trip-content {
+    overflow-wrap: anywhere !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .topbar {
+    padding: 10px 12px;
+  }
+
+  .brand-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 12px;
+    flex-basis: 36px;
+  }
+
+  .brand-text h1 {
+    font-size: 0.92rem;
+  }
+
+  .page-action-btn {
+    min-height: 34px;
+    padding: 5px 9px;
+    font-size: 0.78rem;
+  }
+
+  .app-layout {
+    padding: 10px 12px 14px;
+  }
+
+  .map-canvas {
+    min-height: 54vh;
+    height: 54vh;
+  }
+
+  .top-left {
+    top: 8px;
+    left: 8px;
+    max-width: 56px;
+  }
+
+  .top-right {
+    top: 6px;
+    right: 6px;
+    width: calc(100% - 80px);
+    max-width: calc(100% - 80px);
+  }
+
+  .bottom-left {
+    left: 8px;
+    bottom: 8px;
+  }
+
+  .top-left .compact-buttons {
+    width: 48px;
+    gap: 8px;
+  }
+
+  #btnOpenLocationActions,
+  #btnToggleMenu,
+  #btnCurrentLocation,
+  .icon-only-btn {
+    width: 48px !important;
+    min-width: 48px !important;
+    max-width: 48px !important;
+    height: 48px !important;
+    min-height: 48px !important;
+    border-radius: 15px !important;
+  }
+
+  #btnOpenLocationActions svg,
+  #btnToggleMenu svg,
+  #btnCurrentLocation svg,
+  .icon-only-btn svg {
+    width: 22px !important;
+    height: 22px !important;
+  }
+
+  .right-tools {
+    gap: 8px;
+  }
+
+  .map-search-wrapper {
+    width: 100%;
+    min-width: 0;
+    max-width: none;
+  }
+
+  .map-search-input {
+    width: 100%;
+    min-width: 0;
+    max-width: none;
+    min-height: 48px;
+    height: 48px;
+    padding: 11px 44px 11px 15px;
+    font-size: 0.84rem;
+    border-radius: 15px;
+  }
+
+  .map-search-clear {
+    right: 8px;
+    width: 29px;
+    height: 29px;
+    min-width: 29px;
+    min-height: 29px;
+  }
+
+  .floating-menu {
+    width: max-content;
+    min-width: 0;
+    max-width: calc(100vw - 12px);
+    padding: 7px;
+    gap: 7px;
+    border-radius: 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .menu-item {
+    width: 100%;
+    min-width: 0;
+    min-height: 42px;
+    padding: 0 14px;
+    font-size: 0.82rem;
+    font-weight: 700;
+    line-height: 1;
+    border-radius: 13px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    white-space: nowrap;
+    box-sizing: border-box;
+  }
+
+  body[data-mobile-panel="start"] #startPanel,
+  body[data-mobile-panel="point"] #pointPanel,
+  body[data-mobile-panel="end"] #endPanel,
+  body[data-mobile-panel="save"] #savePanel,
+  body[data-mobile-panel="importExport"] #importExportPanel {
+    width: min(94vw, 340px) !important;
+    min-width: min(94vw, 340px) !important;
+    max-width: min(94vw, 340px) !important;
+    max-height: min(80vh, 600px);
+    padding: 14px !important;
+    border-radius: 20px !important;
+  }
+
+  #startPanel .card-title-row h2,
+  #pointPanel .card-title-row h2,
+  #endPanel .card-title-row h2,
+  #savePanel .card-title-row h2,
+  #importExportPanel .card-title-row h2 {
+    font-size: 0.92rem !important;
+  }
+
+  #startPanel .field-group label,
+  #pointPanel .field-group label,
+  #endPanel .field-group label,
+  #savePanel .field-group label,
+  #importExportPanel .field-group label {
+    font-size: 0.72rem !important;
+  }
+
+  #startPanel input,
+  #pointPanel input,
+  #endPanel input,
+  #savePanel input,
+  #importExportPanel input,
+  #savePanel select,
+  #importExportPanel select {
+    min-height: 42px !important;
+    height: 42px !important;
+    padding: 9px 11px !important;
+    font-size: 0.88rem !important;
+    border-radius: 11px !important;
+  }
+
+  #startPanel .small-btn,
+  #pointPanel .small-btn,
+  #endPanel .small-btn,
+  #savePanel .small-btn,
+  #importExportPanel .small-btn {
+    min-height: 44px !important;
+    height: 44px !important;
+    padding: 10px 16px !important;
+    font-size: 0.9rem !important;
+    border-radius: 999px !important;
+  }
+
+  #btnCloseStartPanel,
+  #btnClosePointPanel,
+  #btnCloseEndPanel,
+  #btnCloseSavePanel,
+  #btnCloseImportExportPanel {
+    width: 30px !important;
+    height: 30px !important;
+    min-width: 30px !important;
+    min-height: 30px !important;
+    font-size: 0.96rem !important;
+    flex: 0 0 30px !important;
+  }
+
+  .trip-panel {
+    padding: 13px !important;
+    border-radius: 20px !important;
+  }
+
+  .trip-panel-header h2 {
+    font-size: 0.94rem !important;
+  }
+
+  .trip-list {
+    gap: 9px !important;
+  }
+
+  .trip-item {
+    grid-template-columns: 38px minmax(0, 1fr) !important;
+    gap: 13px !important;
+    padding: 10px !important;
+  }
+
+  .trip-item > div:last-child,
+  .trip-item > button:last-child {
+    grid-column: 2 !important;
+    justify-self: start !important;
+    margin-top: 2px !important;
+  }
+
+  .trip-order {
+    width: 44px !important;
+    height: 44px !important;
+    border-radius: 14px !important;
+    font-size: 1.1rem !important;
+    font-weight: 800 !important;
+    line-height: 1 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+
+  .trip-content strong {
+    font-size: 0.88rem !important;
+  }
+
+  .trip-content span {
+    font-size: 0.76rem !important;
+  }
+
+  .tiny-btn {
+    min-height: 32px !important;
+    height: 32px !important;
+    padding: 5px 10px !important;
+    font-size: 0.75rem !important;
+  }
+
+  .screen-overlay-panel {
+    width: calc(100vw - 12px) !important;
+    margin-top: 30px !important;
+    padding: 12px !important;
+    border-radius: 18px !important;
+  }
+
+  .screen-overlay-panel .card-title-row.large-gap {
+    gap: 8px !important;
+    margin-bottom: 12px !important;
+  }
+
+  .screen-overlay-panel .card-title-row.large-gap .small-btn {
+    min-height: 32px !important;
+    padding: 5px 9px !important;
+    font-size: 0.72rem !important;
+  }
+
+  .map-list-row {
+    grid-template-columns: minmax(0, 1fr) auto !important;
+    gap: 7px !important;
+    align-items: center !important;
+  }
+
+  .map-list-row .danger-outline,
+  .map-list-row .small-btn,
+  .map-list-row .tiny-btn {
+    width: auto !important;
+    justify-self: start !important;
+  }
+
+  .map-list-item {
+    padding: 11px 12px !important;
+    border-radius: 15px !important;
+  }
+
+  .map-list-item strong,
+  .map-list-item b {
+    font-size: 0.86rem !important;
+  }
+
+  .map-list-item span {
+    font-size: 0.74rem !important;
+  }
+}
+
+.trip-actions .tiny-btn[data-action^="directions"] {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8) !important;
+  border-color: #1d4ed8 !important;
+  color: #ffffff !important;
+}
+
+.trip-actions .tiny-btn[data-action^="focus"] {
+  background: linear-gradient(135deg, #0f172a, #334155) !important;
+  border-color: #334155 !important;
+  color: #ffffff !important;
+}
+
+.trip-actions .tiny-btn[data-action^="delete"] {
+  background: #fff5f5 !important;
+  border-color: #fecaca !important;
+  color: #b91c1c !important;
+}
+/* Mobil not özelliği uyum düzeltmeleri */
+@media (max-width: 720px) {
+  .trip-actions .icon-note-btn,
+  .trip-actions .tiny-btn.icon-note-btn {
+    width: 34px !important;
+    min-width: 34px !important;
+    max-width: 34px !important;
+    height: 34px !important;
+    min-height: 34px !important;
+    padding: 0 !important;
+    border-radius: 12px !important;
+    display: inline-grid !important;
+    place-items: center !important;
+    flex: 0 0 34px !important;
+  }
+
+  .trip-actions .icon-note-btn svg,
+  .trip-actions .tiny-btn.icon-note-btn svg {
+    width: 16px !important;
+    height: 16px !important;
+    display: block !important;
+  }
+
+  .trip-actions .icon-note-btn .note-state-dot {
+    top: 5px !important;
+    right: 5px !important;
+    width: 7px !important;
+    height: 7px !important;
+  }
+
+  .trip-note-preview {
+    max-height: 56px !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    scrollbar-gutter: auto !important;
+    padding: 7px 8px !important;
+    border-radius: 12px !important;
+    font-size: 0.74rem !important;
+    line-height: 1.3 !important;
+  }
+
+  .trip-note-preview svg {
+    width: 13px !important;
+    height: 13px !important;
+  }
+
+  .note-editor-overlay {
+    z-index: 1600 !important;
+  }
+
+  .note-editor-panel {
+    position: fixed !important;
+    left: 50% !important;
+    top: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    width: min(92vw, 380px) !important;
+    max-height: min(84vh, 640px) !important;
+    margin: 0 !important;
+    overflow: auto !important;
+    padding: 16px !important;
+    border-radius: 24px !important;
+  }
+
+  .note-editor-body textarea {
+    height: 186px !important;
+    min-height: 186px !important;
+    max-height: 186px !important;
+    resize: none !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    scrollbar-gutter: auto !important;
+  }
+
+  .note-editor-actions {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 10px !important;
+  }
+
+  .note-editor-actions .small-btn {
+    min-height: 42px !important;
+    height: 42px !important;
+    font-size: 0.84rem !important;
+    border-radius: 999px !important;
+  }
+
+  .custom-info-note-preview {
+    max-height: 76px !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    scrollbar-gutter: auto !important;
+    font-size: 10.5px !important;
+  }
+
+  .custom-info-card .icon-note-btn {
+    width: 38px !important;
+    min-width: 38px !important;
+    height: 38px !important;
+    min-height: 38px !important;
+    padding: 0 !important;
+    border-radius: 12px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .trip-actions .icon-note-btn,
+  .trip-actions .tiny-btn.icon-note-btn {
+    width: 32px !important;
+    min-width: 32px !important;
+    max-width: 32px !important;
+    height: 32px !important;
+    min-height: 32px !important;
+    border-radius: 11px !important;
+  }
+
+  .trip-actions .icon-note-btn svg,
+  .trip-actions .tiny-btn.icon-note-btn svg {
+    width: 15px !important;
+    height: 15px !important;
+  }
+
+  .trip-note-preview {
+    max-height: 54px !important;
+    font-size: 0.72rem !important;
+  }
+
+  .note-editor-panel {
+    width: min(94vw, 360px) !important;
+    padding: 14px !important;
+    border-radius: 22px !important;
+  }
+
+  .note-editor-body textarea {
+    height: 178px !important;
+    min-height: 178px !important;
+    max-height: 178px !important;
+  }
+}
+/* Mobil not ikonu ve not önizleme düzeltmeleri */
+@media (max-width: 720px) {
+  .trip-actions .icon-note-btn,
+  .trip-actions .tiny-btn.icon-note-btn {
+    width: 34px !important;
+    min-width: 34px !important;
+    max-width: 34px !important;
+    height: 34px !important;
+    min-height: 34px !important;
+    padding: 0 !important;
+    border-radius: 12px !important;
+    display: inline-grid !important;
+    place-items: center !important;
+    flex: 0 0 34px !important;
+    background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%) !important;
+    color: #334155 !important;
+    border: 1px solid rgba(203, 213, 225, 0.95) !important;
+  }
+
+  .trip-actions .icon-note-btn.has-note,
+  .trip-actions .tiny-btn.icon-note-btn.has-note {
+    background: linear-gradient(180deg, rgba(37, 99, 235, 0.12), rgba(37, 99, 235, 0.07)) !important;
+    color: #1d4ed8 !important;
+    border-color: rgba(37, 99, 235, 0.34) !important;
+  }
+
+  .trip-actions .icon-note-btn svg,
+  .trip-actions .tiny-btn.icon-note-btn svg {
+    width: 16px !important;
+    height: 16px !important;
+    display: block !important;
+  }
+
+  .trip-note-preview {
+    grid-template-columns: 16px minmax(0, 1fr) !important;
+    gap: 6px !important;
+    max-height: 56px !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    scrollbar-gutter: auto !important;
+    padding: 8px 10px 8px 10px !important;
+    border-radius: 12px !important;
+    font-size: 0.74rem !important;
+    line-height: 1.32 !important;
+  }
+
+  .trip-note-preview svg {
+    width: 13px !important;
+    height: 13px !important;
+    margin-top: 1px !important;
+  }
+
+  .custom-info-note-preview {
+    grid-template-columns: 16px minmax(0, 1fr) !important;
+    gap: 6px !important;
+    padding: 8px 10px !important;
+    max-height: 76px !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    scrollbar-gutter: auto !important;
+    font-size: 10.5px !important;
+  }
+
+  .custom-info-note-preview svg {
+    width: 13px !important;
+    height: 13px !important;
+    margin-top: 1px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .trip-actions .icon-note-btn,
+  .trip-actions .tiny-btn.icon-note-btn {
+    width: 32px !important;
+    min-width: 32px !important;
+    max-width: 32px !important;
+    height: 32px !important;
+    min-height: 32px !important;
+    border-radius: 11px !important;
+  }
+
+  .trip-actions .icon-note-btn svg,
+  .trip-actions .tiny-btn.icon-note-btn svg {
+    width: 15px !important;
+    height: 15px !important;
+  }
+
+  .trip-note-preview {
+    max-height: 54px !important;
+    font-size: 0.72rem !important;
+    padding: 7px 10px !important;
+  }
+}
+
+/* =========================================================
+   ROUTEE — CLEAN FINAL MOBILE CONSOLIDATION
+   Bu bölüm tek final bloktur. Eski tekrar eden mobil eklerin yerine kullanılır.
+   ========================================================= */
+
+@media (max-width: 720px) {
+  .trip-panel .trip-item {
+    grid-template-columns: 42px minmax(0, 1fr) !important;
+    column-gap: 10px !important;
+    row-gap: 9px !important;
+    align-items: start !important;
+  }
+
+  .trip-panel .trip-order {
+    grid-column: 1 !important;
+    grid-row: 1 !important;
+    width: 42px !important;
+    height: 42px !important;
+    min-width: 42px !important;
+    border-radius: 14px !important;
+  }
+
+  .trip-panel .trip-content {
+    grid-column: 2 !important;
+    grid-row: 1 !important;
+    min-width: 0 !important;
+  }
+
+.trip-panel .trip-item > .trip-actions {
+  grid-column: 2 / -1 !important;
+  grid-row: 2 !important;
+  width: auto !important;
+  max-width: 100% !important;
+  margin-top: 2px !important;
+  display: inline-flex !important;
+  flex-wrap: nowrap !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 6px !important;
+  justify-self: start !important;
+  align-self: start !important;
+  min-width: 0 !important;
+  white-space: nowrap !important;
+}
+
+.trip-panel .trip-actions {
+  justify-content: flex-start !important;
+  align-items: center !important;
+  gap: 6px !important;
+}
+
+  .trip-panel .trip-actions .tiny-btn {
+    height: 40px !important;
+    min-height: 40px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border-radius: 12px !important;
+    font-size: 0.76rem !important;
+    font-weight: 750 !important;
+    line-height: 1 !important;
+    white-space: nowrap !important;
+    flex: 0 0 auto !important;
+  }
+
+  .trip-panel .trip-actions .icon-route-btn,
+  .trip-panel .trip-actions .tiny-btn.icon-route-btn,
+  .trip-panel .trip-actions .icon-note-btn,
+  .trip-panel .trip-actions .tiny-btn.icon-note-btn {
+    width: 40px !important;
+    min-width: 40px !important;
+    max-width: 40px !important;
+    height: 40px !important;
+    min-height: 40px !important;
+    flex: 0 0 40px !important;
+    padding: 0 !important;
+    border-radius: 12px !important;
+    display: inline-grid !important;
+    place-items: center !important;
+  }
+
+  .trip-panel .trip-actions .icon-route-btn svg,
+  .trip-panel .trip-actions .tiny-btn.icon-route-btn svg,
+  .trip-panel .trip-actions .icon-note-btn svg,
+  .trip-panel .trip-actions .tiny-btn.icon-note-btn svg,
+  .trip-panel .route-directions-icon {
+    width: 17px !important;
+    height: 17px !important;
+    display: block !important;
+    margin: auto !important;
+  }
+
+  .trip-panel .trip-actions .tiny-btn:not(.icon-route-btn):not(.icon-note-btn) {
+    flex: 0 0 auto !important;
+    width: auto !important;
+    max-width: none !important;
+    min-width: auto !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    letter-spacing: -0.01em !important;
+  }
+
+  .trip-panel .trip-actions .tiny-btn[data-action^="focus"] {
+    min-width: 66px !important;
+    padding-left: 13px !important;
+    padding-right: 13px !important;
+  }
+
+  .trip-panel .trip-actions .tiny-btn[data-action^="delete"] {
+    min-width: 46px !important;
+    padding-left: 12px !important;
+    padding-right: 12px !important;
+  }
+
+  .trip-note-preview,
+  .custom-info-note-preview,
+  .gm-style .custom-info-note-preview,
+  .gm-style-iw .custom-info-note-preview {
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    display: grid !important;
+    grid-template-columns: 15px minmax(0, 1fr) !important;
+    align-items: start !important;
+    align-content: start !important;
+    gap: 5px !important;
+    padding: 7px 9px 7px 8px !important;
+    border-radius: 12px !important;
+    background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%) !important;
+    border: 1px solid rgba(203, 213, 225, 0.92) !important;
+    color: #334155 !important;
+    font-size: 0.71rem !important;
+    font-weight: 500 !important;
+    line-height: 1.34 !important;
+    letter-spacing: -0.01em !important;
+    white-space: normal !important;
+    word-break: normal !important;
+    overflow-wrap: anywhere !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    scrollbar-gutter: auto !important;
+    box-shadow:
+      inset 0 1px 1px rgba(255, 255, 255, 0.9),
+      0 5px 12px rgba(15, 23, 42, 0.04) !important;
+  }
+
+  .trip-note-preview {
+    min-height: 34px !important;
+    max-height: 68px !important;
+    margin-top: 5px !important;
+    margin-bottom: 0 !important;
+  }
+
+  .custom-info-note-preview,
+  .gm-style .custom-info-note-preview,
+  .gm-style-iw .custom-info-note-preview {
+    min-height: 34px !important;
+    max-height: 72px !important;
+    margin-top: 6px !important;
+    margin-bottom: 7px !important;
+  }
+
+  .trip-note-preview > span:first-child,
+  .custom-info-note-preview > span:first-child,
+  .gm-style .custom-info-note-preview > span:first-child,
+  .gm-style-iw .custom-info-note-preview > span:first-child {
+    width: 15px !important;
+    min-width: 15px !important;
+    max-width: 15px !important;
+    height: 15px !important;
+    display: inline-flex !important;
+    align-items: flex-start !important;
+    justify-content: center !important;
+    align-self: start !important;
+    justify-self: center !important;
+    margin: 2px 0 0 0 !important;
+    padding: 0 !important;
+  }
+
+  .trip-note-preview svg,
+  .custom-info-note-preview svg,
+  .gm-style .custom-info-note-preview svg,
+  .gm-style-iw .custom-info-note-preview svg,
+  .trip-note-preview > span:first-child svg,
+  .custom-info-note-preview > span:first-child svg,
+  .gm-style .custom-info-note-preview > span:first-child svg,
+  .gm-style-iw .custom-info-note-preview > span:first-child svg {
+    width: 13px !important;
+    height: 13px !important;
+    min-width: 13px !important;
+    max-width: 13px !important;
+    display: block !important;
+    align-self: start !important;
+    justify-self: center !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    color: #2563eb !important;
+    fill: none !important;
+    stroke: currentColor !important;
+    stroke-width: 1.9 !important;
+    stroke-linecap: round !important;
+    stroke-linejoin: round !important;
+  }
+
+  .trip-note-preview > span:last-child,
+  .custom-info-note-preview > span:last-child,
+  .gm-style .custom-info-note-preview > span:last-child,
+  .gm-style-iw .custom-info-note-preview > span:last-child {
+    min-width: 0 !important;
+    display: block !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    align-self: start !important;
+    color: #334155 !important;
+    font-size: inherit !important;
+    font-weight: inherit !important;
+    line-height: 1.34 !important;
+    white-space: pre-wrap !important;
+    word-break: normal !important;
+    overflow-wrap: anywhere !important;
+  }
+
+  .custom-info-note-preview + *,
+  .gm-style .custom-info-note-preview + *,
+  .gm-style-iw .custom-info-note-preview + * {
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+  }
+}
+
+@media (max-width: 390px) {
+  .trip-panel .trip-item {
+    grid-template-columns: 40px minmax(0, 1fr) !important;
+    column-gap: 9px !important;
+    row-gap: 8px !important;
+  }
+
+  .trip-panel .trip-order {
+    width: 40px !important;
+    height: 40px !important;
+    min-width: 40px !important;
+  }
+
+  .trip-panel .trip-item > .trip-actions {
+    gap: 5px !important;
+  }
+
+  .trip-panel .trip-actions .tiny-btn {
+    height: 38px !important;
+    min-height: 38px !important;
+    font-size: 0.74rem !important;
+    border-radius: 12px !important;
+  }
+
+  .trip-panel .trip-actions .icon-route-btn,
+  .trip-panel .trip-actions .tiny-btn.icon-route-btn,
+  .trip-panel .trip-actions .icon-note-btn,
+  .trip-panel .trip-actions .tiny-btn.icon-note-btn {
+    width: 38px !important;
+    min-width: 38px !important;
+    max-width: 38px !important;
+    height: 38px !important;
+    min-height: 38px !important;
+    flex-basis: 38px !important;
+    border-radius: 12px !important;
+  }
+
+  .trip-panel .trip-actions .icon-route-btn svg,
+  .trip-panel .trip-actions .tiny-btn.icon-route-btn svg,
+  .trip-panel .trip-actions .icon-note-btn svg,
+  .trip-panel .trip-actions .tiny-btn.icon-note-btn svg,
+  .trip-panel .route-directions-icon {
+    width: 16px !important;
+    height: 16px !important;
+  }
+
+  .trip-panel .trip-actions .tiny-btn[data-action^="focus"] {
+    min-width: 62px !important;
+    padding-left: 11px !important;
+    padding-right: 11px !important;
+  }
+
+  .trip-panel .trip-actions .tiny-btn[data-action^="delete"] {
+    min-width: 44px !important;
+    padding-left: 10px !important;
+    padding-right: 10px !important;
+  }
+
+  .trip-note-preview,
+  .custom-info-note-preview,
+  .gm-style .custom-info-note-preview,
+  .gm-style-iw .custom-info-note-preview {
+    grid-template-columns: 14px minmax(0, 1fr) !important;
+    gap: 4px !important;
+    padding: 7px 9px 7px 8px !important;
+    font-size: 0.70rem !important;
+    line-height: 1.32 !important;
+  }
+
+  .trip-note-preview {
+    max-height: 64px !important;
+  }
+
+  .custom-info-note-preview,
+  .gm-style .custom-info-note-preview,
+  .gm-style-iw .custom-info-note-preview {
+    max-height: 68px !important;
+  }
+
+  .trip-note-preview > span:first-child,
+  .custom-info-note-preview > span:first-child,
+  .gm-style .custom-info-note-preview > span:first-child,
+  .gm-style-iw .custom-info-note-preview > span:first-child {
+    width: 14px !important;
+    min-width: 14px !important;
+    max-width: 14px !important;
+  }
+
+  .trip-note-preview svg,
+  .custom-info-note-preview svg,
+  .gm-style .custom-info-note-preview svg,
+  .gm-style-iw .custom-info-note-preview svg {
+    width: 12px !important;
+    height: 12px !important;
+    min-width: 12px !important;
+    max-width: 12px !important;
+  }
+}
+
+/* Konum menüsü: mobilde metne uygun kompakt ve ortalı butonlar */
+@media (max-width: 720px) {
+  .location-actions-wrapper {
+    width: 52px;
+  }
+
+  .location-actions-menu {
+    left: 0 !important;
+    right: auto !important;
+    width: max-content !important;
+    min-width: 0 !important;
+    max-width: calc(100vw - 20px) !important;
+    padding: 6px !important;
+    gap: 6px !important;
+    align-items: center !important;
+    box-sizing: border-box !important;
+  }
+
+  .location-actions-menu .location-action-item {
+    width: 136px !important;
+    min-width: 136px !important;
+    max-width: 136px !important;
+    height: auto !important;
+    min-height: 40px !important;
+    padding: 0 10px !important;
+    border-radius: 13px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    text-align: center !important;
+    white-space: nowrap !important;
+    line-height: 1 !important;
+    font-size: 0.84rem !important;
+    box-sizing: border-box !important;
+  }
+}
+
+@media (max-width: 720px) {
+  .trip-save-icon-btn {
+    width: 42px;
+    min-width: 42px;
+    height: 42px;
+    min-height: 42px;
+    border-radius: 14px;
+  }
+}
+
+/* Mobilde Gezi Listesi hızlı kaydetme butonunu mavi sabitle */
+@media (max-width: 720px) {
+  .trip-save-icon-btn {
+    width: 42px !important;
+    min-width: 42px !important;
+    max-width: 42px !important;
+    height: 42px !important;
+    min-height: 42px !important;
+    border-radius: 14px !important;
+    background: linear-gradient(180deg, #2563eb, #1d4ed8) !important;
+    border: 1px solid rgba(37, 99, 235, 0.75) !important;
+    box-shadow: 0 12px 24px rgba(37, 99, 235, 0.24), inset 0 1px 0 rgba(255, 255, 255, 0.24) !important;
+  }
+
+  .trip-save-icon-btn svg {
+    width: 20px !important;
+    height: 20px !important;
+    stroke: #ffffff !important;
+  }
+
+  .trip-save-icon-btn:hover {
+    background: linear-gradient(180deg, #1d4ed8, #1e40af) !important;
+    border-color: rgba(29, 78, 216, 0.9) !important;
+  }
+
+  .trip-save-icon-btn:hover svg {
+    stroke: #ffffff !important;
+  }
+}
+
+
+.trip-header-actions {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.trip-map-list-icon-btn {
+  background: #ffffff;
+}
+
+.trip-map-list-icon-btn svg {
+  stroke: #0f172a;
+}
+
+.trip-map-list-icon-btn:hover {
+  background: #f8fafc;
+}
+
+.trip-map-list-icon-btn:hover svg {
+  stroke: var(--primary);
+}
+
+/* Mobilde Gezi Listesi başlığındaki iki ikon aynı ölçüde tutulur */
+@media (max-width: 720px) {
+  .trip-header-actions .trip-map-list-icon-btn,
+  .trip-header-actions .trip-save-icon-btn {
+    width: 48px !important;
+    min-width: 48px !important;
+    max-width: 48px !important;
+    height: 48px !important;
+    min-height: 48px !important;
+    max-height: 48px !important;
+    border-radius: 15px !important;
+    flex: 0 0 48px !important;
+  }
+
+  .trip-header-actions .trip-map-list-icon-btn svg,
+  .trip-header-actions .trip-save-icon-btn svg {
+    width: 22px !important;
+    height: 22px !important;
+  }
+}
+
+/* =========================================================
+   ROUTEE - PROFESSIONAL MOBILE SCROLLBAR NORMALIZER
+   Amac: Mobilde native app hissi verir; kaydirma calisir ama scrollbar gorunmez.
+   Not: Masaustundeki profesyonel scrollbar gorunumu korunur.
+   ========================================================= */
+@media (max-width: 720px), (hover: none) and (pointer: coarse) {
+  html,
+  body {
+    -ms-overflow-style: none !important;
+    scrollbar-width: none !important;
+    scrollbar-color: transparent transparent !important;
+    overscroll-behavior-y: none;
+  }
+
+  html::-webkit-scrollbar,
+  body::-webkit-scrollbar {
+    width: 0 !important;
+    height: 0 !important;
+    background: transparent !important;
+  }
+
+  .trip-list,
+  .screen-overlay-panel,
+  .note-editor-panel,
+  .note-editor-body textarea,
+  .trip-note-preview,
+  .custom-info-note-preview,
+  .floating-menu,
+  .location-actions-menu,
+  #startPanel,
+  #pointPanel,
+  #endPanel,
+  #savePanel,
+  #importExportPanel,
+  .pac-container {
+    -webkit-overflow-scrolling: touch !important;
+    -ms-overflow-style: none !important;
+    scrollbar-width: none !important;
+    scrollbar-color: transparent transparent !important;
+    scrollbar-gutter: auto !important;
+    overscroll-behavior: contain !important;
+  }
+
+  .trip-list::-webkit-scrollbar,
+  .screen-overlay-panel::-webkit-scrollbar,
+  .note-editor-panel::-webkit-scrollbar,
+  .note-editor-body textarea::-webkit-scrollbar,
+  .trip-note-preview::-webkit-scrollbar,
+  .custom-info-note-preview::-webkit-scrollbar,
+  .floating-menu::-webkit-scrollbar,
+  .location-actions-menu::-webkit-scrollbar,
+  #startPanel::-webkit-scrollbar,
+  #pointPanel::-webkit-scrollbar,
+  #endPanel::-webkit-scrollbar,
+  #savePanel::-webkit-scrollbar,
+  #importExportPanel::-webkit-scrollbar,
+  .pac-container::-webkit-scrollbar {
+    width: 0 !important;
+    height: 0 !important;
+    background: transparent !important;
+  }
+
+  .trip-list::-webkit-scrollbar-track,
+  .screen-overlay-panel::-webkit-scrollbar-track,
+  .note-editor-panel::-webkit-scrollbar-track,
+  .note-editor-body textarea::-webkit-scrollbar-track,
+  .trip-note-preview::-webkit-scrollbar-track,
+  .custom-info-note-preview::-webkit-scrollbar-track,
+  .floating-menu::-webkit-scrollbar-track,
+  .location-actions-menu::-webkit-scrollbar-track,
+  #startPanel::-webkit-scrollbar-track,
+  #pointPanel::-webkit-scrollbar-track,
+  #endPanel::-webkit-scrollbar-track,
+  #savePanel::-webkit-scrollbar-track,
+  #importExportPanel::-webkit-scrollbar-track,
+  .pac-container::-webkit-scrollbar-track,
+  .trip-list::-webkit-scrollbar-thumb,
+  .screen-overlay-panel::-webkit-scrollbar-thumb,
+  .note-editor-panel::-webkit-scrollbar-thumb,
+  .note-editor-body textarea::-webkit-scrollbar-thumb,
+  .trip-note-preview::-webkit-scrollbar-thumb,
+  .custom-info-note-preview::-webkit-scrollbar-thumb,
+  .floating-menu::-webkit-scrollbar-thumb,
+  .location-actions-menu::-webkit-scrollbar-thumb,
+  #startPanel::-webkit-scrollbar-thumb,
+  #pointPanel::-webkit-scrollbar-thumb,
+  #endPanel::-webkit-scrollbar-thumb,
+  #savePanel::-webkit-scrollbar-thumb,
+  #importExportPanel::-webkit-scrollbar-thumb,
+  .pac-container::-webkit-scrollbar-thumb {
+    background: transparent !important;
+    border: 0 !important;
+    box-shadow: none !important;
+  }
+}
+
+/* =========================================================
+   ROUTEE — FINAL MOBILE VISUAL STABILITY PATCH
+   Amaç: iOS/Android mobilde üst kesilme, yatay taşma ve panel hizası sorunlarını
+   işlevlere dokunmadan merkezî biçimde düzeltmek.
+   ========================================================= */
+@media (max-width: 720px), (hover: none) and (pointer: coarse) {
+  :root {
+    --routee-safe-top: env(safe-area-inset-top, 0px);
+    --routee-safe-right: env(safe-area-inset-right, 0px);
+    --routee-safe-bottom: env(safe-area-inset-bottom, 0px);
+    --routee-safe-left: env(safe-area-inset-left, 0px);
+    --routee-mobile-page-x: max(12px, var(--routee-safe-left));
+    --routee-mobile-page-r: max(12px, var(--routee-safe-right));
+  }
+
+  @supports (top: constant(safe-area-inset-top)) {
+    :root {
+      --routee-safe-top: constant(safe-area-inset-top);
+      --routee-safe-right: constant(safe-area-inset-right);
+      --routee-safe-bottom: constant(safe-area-inset-bottom);
+      --routee-safe-left: constant(safe-area-inset-left);
+    }
+  }
+
+  html,
+  body {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden !important;
+    -webkit-text-size-adjust: 100%;
+    overscroll-behavior-x: none;
+  }
+
+  body.routee-statusbar-locked #app,
+  #app {
+    width: 100%;
+    max-width: 100%;
+    min-height: 100svh;
+    min-height: 100dvh;
+    background: var(--bg) !important;
+    overflow-x: hidden !important;
+  }
+
+  .topbar {
+    position: sticky;
+    top: 0;
+    isolation: isolate;
+    overflow: hidden;
+    min-height: calc(64px + var(--routee-safe-top));
+    padding-top: calc(12px + var(--routee-safe-top)) !important;
+    padding-right: max(14px, calc(var(--routee-safe-right) + 12px)) !important;
+    padding-bottom: 12px !important;
+    padding-left: max(14px, calc(var(--routee-safe-left) + 12px)) !important;
+    align-items: center;
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
+  }
+
+  .topbar::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: var(--routee-safe-top);
+    background: var(--routee-system-status-bg, #0f172a);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .topbar > * {
+    position: relative;
+    z-index: 1;
+  }
+
+  .topbar.is-hidden-on-scroll {
+    transform: translate3d(0, calc(-100% - var(--routee-safe-top)), 0);
+    -webkit-transform: translate3d(0, calc(-100% - var(--routee-safe-top)), 0);
+  }
+
+  .brand-area {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow: hidden;
+  }
+
+  .brand-icon {
+    flex: 0 0 40px !important;
+    width: 40px !important;
+    height: 40px !important;
+    min-width: 40px !important;
+    min-height: 40px !important;
+    line-height: 1 !important;
+  }
+
+  .brand-text {
+    min-width: 0;
+    overflow: hidden;
+  }
+
+  .brand-text h1 {
+    max-width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.08 !important;
+  }
+
+  .topbar-actions {
+    flex: 0 0 auto;
+    min-width: max-content;
+  }
+
+  .page-action-btn {
+    white-space: nowrap;
+  }
+
+  .status-strip {
+    padding-left: max(14px, calc(var(--routee-safe-left) + 12px)) !important;
+    padding-right: max(14px, calc(var(--routee-safe-right) + 12px)) !important;
+  }
+
+  .auth-status {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
+  .app-layout {
+    width: 100%;
+    max-width: 100%;
+    padding-left: max(12px, calc(var(--routee-safe-left) + 12px)) !important;
+    padding-right: max(12px, calc(var(--routee-safe-right) + 12px)) !important;
+    overflow-x: hidden !important;
+  }
+
+  .map-area,
+  .map-shell,
+  .trip-column,
+  .trip-panel {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+  }
+
+  .map-canvas {
+    width: 100%;
+    height: clamp(330px, 55svh, 520px) !important;
+    min-height: clamp(330px, 55svh, 520px) !important;
+    max-height: calc(100dvh - 190px);
+    border-radius: 22px !important;
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
+  }
+
+  .top-left {
+    top: 10px !important;
+    left: 10px !important;
+    width: 52px;
+    max-width: 52px !important;
+  }
+
+  .top-right {
+    top: 10px !important;
+    right: 10px !important;
+    width: calc(100% - 82px) !important;
+    max-width: calc(100% - 82px) !important;
+    min-width: 0;
+  }
+
+  .right-tools {
+    width: 100%;
+    min-width: 0;
+    grid-template-columns: minmax(0, 1fr) 52px !important;
+    align-items: start !important;
+  }
+
+  .map-search-wrapper,
+  .map-search-input {
+    min-width: 0 !important;
+    max-width: 100% !important;
+  }
+
+  .floating-menu,
+  .location-actions-menu {
+    max-width: calc(100vw - var(--routee-safe-left) - var(--routee-safe-right) - 16px) !important;
+  }
+
+  body[data-mobile-panel="start"] #startPanel,
+  body[data-mobile-panel="point"] #pointPanel,
+  body[data-mobile-panel="end"] #endPanel,
+  body[data-mobile-panel="save"] #savePanel,
+  body[data-mobile-panel="importExport"] #importExportPanel {
+    width: min(94vw, 360px) !important;
+    max-width: calc(100vw - var(--routee-safe-left) - var(--routee-safe-right) - 20px) !important;
+    max-height: calc(100dvh - var(--routee-safe-top) - var(--routee-safe-bottom) - 32px) !important;
+    overscroll-behavior: contain !important;
+  }
+
+  .screen-overlay-panel,
+  .note-editor-panel {
+    max-width: calc(100vw - var(--routee-safe-left) - var(--routee-safe-right) - 16px) !important;
+    max-height: calc(100dvh - var(--routee-safe-top) - var(--routee-safe-bottom) - 32px) !important;
+    overscroll-behavior: contain !important;
+  }
+
+  .screen-overlay-panel {
+    margin-top: calc(var(--routee-safe-top) + 12px) !important;
+    margin-bottom: calc(var(--routee-safe-bottom) + 12px) !important;
+  }
+
+  .trip-panel-header {
+    align-items: center !important;
+    gap: 10px !important;
+  }
+
+  .trip-panel-header h2 {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .trip-header-actions {
+    flex: 0 0 auto;
+    gap: 8px !important;
+  }
+
+  .trip-header-actions .trip-map-list-icon-btn,
+  .trip-header-actions .trip-save-icon-btn {
+    width: 44px !important;
+    min-width: 44px !important;
+    max-width: 44px !important;
+    height: 44px !important;
+    min-height: 44px !important;
+    max-height: 44px !important;
+    flex: 0 0 44px !important;
+    border-radius: 14px !important;
+  }
+
+  .trip-panel .trip-item {
+    overflow: hidden;
+  }
+
+  .trip-panel .trip-content strong,
+  .trip-panel .trip-content span {
+    max-width: 100%;
+    overflow-wrap: anywhere;
+  }
+
+  .new-map-mobile-fab {
+    position: fixed !important;
+    right: max(14px, calc(var(--routee-safe-right) + 12px)) !important;
+    top: var(--routee-mobile-fab-top, calc(100dvh - 62px)) !important;
+    bottom: auto !important;
+    transform: translate3d(0, 0, 0);
+    -webkit-transform: translate3d(0, 0, 0);
+    z-index: 1200 !important;
+    will-change: top;
+  }
+
+  body.has-mobile-floating-panel .new-map-mobile-fab,
+  body.has-screen-overlay .new-map-mobile-fab {
+    z-index: 60 !important;
+  }
+}
+
+@media (max-width: 390px) {
+  .topbar {
+    gap: 8px !important;
+    padding-left: max(12px, calc(env(safe-area-inset-left, 0px) + 10px)) !important;
+    padding-right: max(12px, calc(env(safe-area-inset-right, 0px) + 10px)) !important;
+  }
+
+  .brand-icon {
+    flex-basis: 38px !important;
+    width: 38px !important;
+    height: 38px !important;
+    min-width: 38px !important;
+    min-height: 38px !important;
+    border-radius: 13px !important;
+  }
+
+  .page-action-btn {
+    min-height: 34px !important;
+    padding-left: 9px !important;
+    padding-right: 9px !important;
+    font-size: 0.78rem !important;
+  }
+
+  .right-tools {
+    grid-template-columns: minmax(0, 1fr) 48px !important;
+    gap: 8px !important;
+  }
+
+  .top-left {
+    width: 48px;
+    max-width: 48px !important;
+  }
+
+  .top-right {
+    width: calc(100% - 76px) !important;
+    max-width: calc(100% - 76px) !important;
+  }
+}
+
+/* =========================================================
+   ROUTEE — MOBILE TRUE FULLSCREEN APP SURFACE
+   Splash kapandıktan sonra iOS/Android'de alt/üstte boş lacivert alan kalmasını engeller.
+   ========================================================= */
+@media (max-width: 720px), (hover: none) and (pointer: coarse) {
+  html:not(.routee-splash-active):not(.show-app-startup-splash),
+  html:not(.routee-splash-active):not(.show-app-startup-splash) body,
+  body:not(.routee-splash-active):not(.routee-app-startup-active) {
+    width: 100% !important;
+    min-height: 100vh !important;
+    min-height: 100svh !important;
+    min-height: 100dvh !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: var(--bg) !important;
+    background-color: var(--bg) !important;
+    overflow-x: hidden !important;
+  }
+
+  body:not(.routee-splash-active):not(.routee-app-startup-active) #app {
+    width: 100% !important;
+    min-height: 100vh !important;
+    min-height: 100svh !important;
+    min-height: 100dvh !important;
+    background: var(--bg) !important;
+    background-color: var(--bg) !important;
+  }
+
+  body:not(.routee-splash-active):not(.routee-app-startup-active) .topbar {
+    top: 0 !important;
+  }
+}
+
+
+/* =========================================================
+   ROUTEE — FINAL MOBILE NO-WHITE-BOTTOM OVERRIDE
+   iPhone/Android tarayıcı ve PWA altında kalan beyaz güvenli alanı uygulama yüzeyine eşitler.
+   ========================================================= */
+@media (max-width: 720px), (hover: none) and (pointer: coarse) {
+  html,
+  body {
+    width: 100% !important;
+    min-height: 100vh !important;
+    min-height: 100svh !important;
+    min-height: 100dvh !important;
+    background: var(--bg, #f4f7fb) !important;
+    background-color: var(--bg, #f4f7fb) !important;
+  }
+
+  body,
+  #app {
+    min-height: 100vh !important;
+    min-height: 100svh !important;
+    min-height: 100dvh !important;
+    background: var(--bg, #f4f7fb) !important;
+    background-color: var(--bg, #f4f7fb) !important;
+  }
+
+  body::after {
+    content: "";
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: env(safe-area-inset-bottom, 0px);
+    background: var(--bg, #f4f7fb) !important;
+    pointer-events: none;
+    z-index: 10;
+  }
+
+  @supports (bottom: constant(safe-area-inset-bottom)) {
+    body::after {
+      height: constant(safe-area-inset-bottom);
+    }
+  }
+
+  html.routee-splash-active,
+  html.routee-splash-active body,
+  body.routee-splash-active {
+    background: var(--routee-splash-bg, #d8dde3) !important;
+    background-color: var(--routee-splash-bg, #d8dde3) !important;
+  }
+
+  html.routee-splash-active body::after,
+  body.routee-splash-active::after {
+    display: none !important;
+    content: none !important;
+  }
+}
+
+
+/* ROUTEE — MOBILE APP VISUAL VIEWPORT HEIGHT FINAL OVERRIDE */
+@media (max-width: 720px), (hover: none) and (pointer: coarse) {
+  html,
+  body,
+  #app {
+    min-height: var(--routee-visual-height, 100svh) !important;
+  }
+
+  body:not(.routee-splash-active):not(.routee-app-startup-active),
+  body:not(.routee-splash-active):not(.routee-app-startup-active) #app {
+    min-height: var(--routee-visual-height, 100svh) !important;
+    background: var(--bg, #f4f7fb) !important;
+    background-color: var(--bg, #f4f7fb) !important;
+  }
+}
+
+/* ROUTEE — FINAL MOBILE APP HEIGHT LOCK AFTER SINGLE SPLASH
+   Uygulama açıldıktan sonra iOS/Android'de alt beyaz boşluk bırakmamak için
+   görsel viewport değişkenine bağlı kalmadan gerçek uygulama yüzeyi korunur. */
+@media (max-width: 720px), (hover: none) and (pointer: coarse) {
+  html:not(.routee-splash-active):not(.show-app-startup-splash),
+  html:not(.routee-splash-active):not(.show-app-startup-splash) body,
+  body:not(.routee-splash-active):not(.routee-app-startup-active),
+  body:not(.routee-splash-active):not(.routee-app-startup-active) #app,
+  #app {
+    min-height: 100vh !important;
+    min-height: 100svh !important;
+    min-height: 100dvh !important;
+    background: var(--bg, #f4f7fb) !important;
+    background-color: var(--bg, #f4f7fb) !important;
+  }
+}
+
+/* ROUTEE — MOBILE APP WHITE-BOTTOM HARD FIX
+   Splash kapandıktan sonra iOS/Android'de gövde yüksekliği küçülse bile alt kısım beyaz kalmaz. */
+@media (max-width: 720px), (hover: none) and (pointer: coarse) {
+  html,
+  body,
+  #app {
+    width: 100% !important;
+    min-height: var(--routee-visual-height, 100vh) !important;
+    min-height: 100vh !important;
+    min-height: 100lvh !important;
+    background: var(--bg, #f4f7fb) !important;
+    background-color: var(--bg, #f4f7fb) !important;
+  }
+
+  body:not(.routee-splash-active)::after {
+    content: "" !important;
+    position: fixed !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    height: max(env(safe-area-inset-bottom, 0px), 18px) !important;
+    background: var(--bg, #f4f7fb) !important;
+    background-color: var(--bg, #f4f7fb) !important;
+    pointer-events: none !important;
+    z-index: 10 !important;
+  }
+
+  @supports (bottom: constant(safe-area-inset-bottom)) {
+    body:not(.routee-splash-active)::after {
+      height: max(constant(safe-area-inset-bottom), 18px) !important;
+    }
+  }
+
+  body.has-mobile-floating-panel::after,
+  body.has-screen-overlay::after {
+    z-index: 50 !important;
+  }
+}
+
+/* =========================================================
+   ROUTEE — MOBILE TOPBAR DEAD-ZONE STABILITY FIX
+   Üst barda ikon ile Çıkış Yap arasındaki boş alana çift dokunulduğunda
+   iOS/Android tarayıcı yakınlaştırma/sekme davranışı üretmesin.
+   Gerçek butonların tıklama işlevlerine dokunmaz.
+   ========================================================= */
+@media (max-width: 720px), (hover: none) and (pointer: coarse) {
+  html.routee-statusbar-locked:not(.routee-splash-active):not(.show-app-startup-splash),
+  html.routee-statusbar-locked:not(.routee-splash-active):not(.show-app-startup-splash) body,
+  body.routee-statusbar-locked:not(.routee-splash-active):not(.routee-app-startup-active) {
+    background: var(--bg, #f4f7fb) !important;
+    background-color: var(--bg, #f4f7fb) !important;
+  }
+
+  .topbar {
+    box-sizing: border-box !important;
+    height: calc(64px + var(--routee-safe-top, env(safe-area-inset-top, 0px))) !important;
+    min-height: calc(64px + var(--routee-safe-top, env(safe-area-inset-top, 0px))) !important;
+    max-height: calc(64px + var(--routee-safe-top, env(safe-area-inset-top, 0px))) !important;
+    flex: 0 0 calc(64px + var(--routee-safe-top, env(safe-area-inset-top, 0px))) !important;
+    align-items: center !important;
+    touch-action: manipulation;
+    -ms-touch-action: manipulation;
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+    -webkit-tap-highlight-color: transparent;
+    overscroll-behavior: contain;
+  }
+
+  @supports (top: constant(safe-area-inset-top)) {
+    .topbar {
+      height: calc(64px + var(--routee-safe-top, constant(safe-area-inset-top))) !important;
+      min-height: calc(64px + var(--routee-safe-top, constant(safe-area-inset-top))) !important;
+      max-height: calc(64px + var(--routee-safe-top, constant(safe-area-inset-top))) !important;
+      flex-basis: calc(64px + var(--routee-safe-top, constant(safe-area-inset-top))) !important;
+    }
+  }
+
+  .topbar,
+  .topbar * {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .topbar::before,
+  html.routee-statusbar-locked::before,
+  body.routee-statusbar-locked::before {
+    pointer-events: none !important;
+  }
+
+  .topbar .brand-area,
+  .topbar .brand-text,
+  .topbar .topbar-actions {
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+  }
+
+  .topbar .brand-area {
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+    touch-action: manipulation;
+  }
+
+  .topbar .topbar-actions,
+  .topbar button,
+  .topbar a {
+    touch-action: manipulation;
+    -ms-touch-action: manipulation;
+  }
+}
+
+
+/* =========================================================
+   ROUTEE — MOBILE TRIP HEADER DEAD-ZONE STABILITY FIX
+   Gezi Listesi başlığı ile hızlı işlem ikonları arasındaki boş alana
+   çift dokunulduğunda tarayıcı yakınlaştırma/sekme davranışı üretmesin.
+   Harita Listelerim ve Kaydet ikonlarının gerçek tıklama işlevleri korunur.
+   ========================================================= */
+@media (max-width: 720px), (hover: none) and (pointer: coarse) {
+  .trip-panel-header {
+    touch-action: manipulation;
+    -ms-touch-action: manipulation;
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+    -webkit-tap-highlight-color: transparent;
+    overscroll-behavior: contain;
+  }
+
+  .trip-panel-header,
+  .trip-panel-header * {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .trip-panel-header > div:first-child {
+    min-width: 0;
+    flex: 1 1 auto;
+  }
+
+  .trip-panel-header h2 {
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+  }
+
+  .trip-header-actions,
+  .trip-header-actions button {
+    touch-action: manipulation;
+    -ms-touch-action: manipulation;
+  }
+}
+
+/* =========================================================
+   ROUTA — MOBİL PROGRAM İÇİ MARKA İKONU
+   Sadece görsel düzeltmedir. İşlevlere dokunmaz.
+   Mobil kırılımlarda eski R/A harfi görünmesin, yeni PNG ikon korunsun.
+   ========================================================= */
+@media (max-width: 720px), (hover: none) and (pointer: coarse) {
+  .brand-icon {
+    display: block !important;
+    background-color: transparent !important;
+    background-image: url("../icons/icon-512.png?v=20260502-brand-ui-mobile") !important;
+    background-position: center center !important;
+    background-size: contain !important;
+    background-repeat: no-repeat !important;
+    box-shadow: none !important;
+    color: transparent !important;
+    font-size: 0 !important;
+    line-height: 0 !important;
+    text-indent: -9999px !important;
+    overflow: visible !important;
+    user-select: none !important;
+    -webkit-user-select: none !important;
+  }
+}
+
+/* =========================================================
+   ROUTEE — MOBILE TOPBAR HARD HEIGHT LOCK (iPhone + Android)
+   Üst siyah alan hiçbir dokunma, klavye, visualViewport veya yön değişimiyle genişlemesin.
+   Sadece mobil uygulama üst çubuğunu sabitler; buton ve panel işlevlerine dokunmaz.
+   ========================================================= */
+@media (max-width: 720px), (hover: none) and (pointer: coarse) {
+  :root {
+    --routee-mobile-topbar-content-height: 64px;
+    --routee-mobile-topbar-natural-height: calc(var(--routee-mobile-topbar-content-height) + var(--routee-safe-top, env(safe-area-inset-top, 0px)));
+  }
+
+  @supports (top: constant(safe-area-inset-top)) {
+    :root {
+      --routee-mobile-topbar-natural-height: calc(var(--routee-mobile-topbar-content-height) + var(--routee-safe-top, constant(safe-area-inset-top)));
+    }
+  }
+
+  .topbar {
+    position: sticky !important;
+    top: 0 !important;
+    box-sizing: border-box !important;
+    height: var(--routee-mobile-topbar-locked-height, var(--routee-mobile-topbar-natural-height)) !important;
+    min-height: var(--routee-mobile-topbar-locked-height, var(--routee-mobile-topbar-natural-height)) !important;
+    max-height: var(--routee-mobile-topbar-locked-height, var(--routee-mobile-topbar-natural-height)) !important;
+    flex: 0 0 var(--routee-mobile-topbar-locked-height, var(--routee-mobile-topbar-natural-height)) !important;
+    padding-top: var(--routee-safe-top, env(safe-area-inset-top, 0px)) !important;
+    padding-bottom: 0 !important;
+    padding-left: max(14px, calc(var(--routee-safe-left, env(safe-area-inset-left, 0px)) + 12px)) !important;
+    padding-right: max(14px, calc(var(--routee-safe-right, env(safe-area-inset-right, 0px)) + 12px)) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 10px !important;
+    overflow: hidden !important;
+    isolation: isolate !important;
+    contain: layout paint !important;
+    transform: translateZ(0) !important;
+    -webkit-transform: translateZ(0) !important;
+    touch-action: manipulation !important;
+    -ms-touch-action: manipulation !important;
+    -webkit-user-select: none !important;
+    user-select: none !important;
+    -webkit-touch-callout: none !important;
+    -webkit-tap-highlight-color: transparent !important;
+  }
+
+  @supports (top: constant(safe-area-inset-top)) {
+    .topbar {
+      padding-top: var(--routee-safe-top, constant(safe-area-inset-top)) !important;
+      padding-left: max(14px, calc(var(--routee-safe-left, constant(safe-area-inset-left)) + 12px)) !important;
+      padding-right: max(14px, calc(var(--routee-safe-right, constant(safe-area-inset-right)) + 12px)) !important;
+    }
+  }
+
+  .topbar::before {
+    content: "" !important;
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    height: var(--routee-safe-top, env(safe-area-inset-top, 0px)) !important;
+    min-height: 0 !important;
+    max-height: var(--routee-safe-top, env(safe-area-inset-top, 0px)) !important;
+    background: var(--routee-system-status-bg, #0f172a) !important;
+    pointer-events: none !important;
+    z-index: 0 !important;
+  }
+
+  @supports (top: constant(safe-area-inset-top)) {
+    .topbar::before {
+      height: var(--routee-safe-top, constant(safe-area-inset-top)) !important;
+      max-height: var(--routee-safe-top, constant(safe-area-inset-top)) !important;
+    }
+  }
+
+  .topbar > .brand-area,
+  .topbar > .topbar-actions {
+    height: var(--routee-mobile-topbar-content-height) !important;
+    min-height: var(--routee-mobile-topbar-content-height) !important;
+    max-height: var(--routee-mobile-topbar-content-height) !important;
+    display: flex !important;
+    align-items: center !important;
+    overflow: hidden !important;
+    position: relative !important;
+    z-index: 1 !important;
+  }
+
+  .topbar .brand-area {
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+  }
+
+  .topbar .brand-text,
+  .topbar .brand-text h1,
+  .topbar .brand-text p {
+    min-height: 0 !important;
+    max-height: var(--routee-mobile-topbar-content-height) !important;
+    overflow: hidden !important;
+  }
+
+  .topbar .brand-text h1,
+  .topbar .brand-text p {
+    white-space: nowrap !important;
+    text-overflow: ellipsis !important;
+  }
+
+  .topbar .brand-icon {
+    flex-shrink: 0 !important;
+  }
+
+  .topbar .page-action-btn {
+    flex: 0 0 auto !important;
+    max-height: 38px !important;
+    overflow: hidden !important;
+  }
+
+  .topbar.is-hidden-on-scroll {
+    transform: translate3d(0, calc(-1 * var(--routee-mobile-topbar-locked-height, var(--routee-mobile-topbar-natural-height))), 0) !important;
+    -webkit-transform: translate3d(0, calc(-1 * var(--routee-mobile-topbar-locked-height, var(--routee-mobile-topbar-natural-height))), 0) !important;
+  }
+}
+
+
+/* =========================================================
+   ROUTEE — MOBILE TOPBAR CONTENT HEIGHT HARD FIX
+   Konum ekleme, arama, klavye veya harita etkileşiminden sonra
+   beyaz marka/çıkış alanı büyümesin; üst sistem alanı ayrı,
+   uygulama topbar içeriği ayrı ve sabit kalsın.
+   ========================================================= */
+@media (max-width: 720px), (hover: none) and (pointer: coarse) {
+  :root {
+    --routee-mobile-topbar-content-height: 64px !important;
+    --routee-mobile-topbar-natural-height: calc(64px + env(safe-area-inset-top, 0px)) !important;
+    --routee-mobile-topbar-locked-height: var(--routee-mobile-topbar-natural-height) !important;
+  }
+
+  @supports (top: constant(safe-area-inset-top)) {
+    :root {
+      --routee-mobile-topbar-natural-height: calc(64px + constant(safe-area-inset-top)) !important;
+    }
+  }
+
+  .topbar {
+    height: var(--routee-mobile-topbar-natural-height) !important;
+    min-height: var(--routee-mobile-topbar-natural-height) !important;
+    max-height: var(--routee-mobile-topbar-natural-height) !important;
+    flex: 0 0 var(--routee-mobile-topbar-natural-height) !important;
+    padding-top: env(safe-area-inset-top, 0px) !important;
+    padding-bottom: 0 !important;
+    overflow: hidden !important;
+    contain: layout paint !important;
+  }
+
+  @supports (top: constant(safe-area-inset-top)) {
+    .topbar {
+      padding-top: constant(safe-area-inset-top) !important;
+    }
+  }
+
+  .topbar::before {
+    height: env(safe-area-inset-top, 0px) !important;
+    max-height: env(safe-area-inset-top, 0px) !important;
+    background: var(--routee-system-status-bg, #0f172a) !important;
+  }
+
+  @supports (top: constant(safe-area-inset-top)) {
+    .topbar::before {
+      height: constant(safe-area-inset-top) !important;
+      max-height: constant(safe-area-inset-top) !important;
+    }
+  }
+
+  .topbar > .brand-area,
+  .topbar > .topbar-actions {
+    height: 64px !important;
+    min-height: 64px !important;
+    max-height: 64px !important;
+    align-self: flex-end !important;
+  }
+
+  .topbar .brand-icon {
+    width: 40px !important;
+    height: 40px !important;
+    min-width: 40px !important;
+    min-height: 40px !important;
+    max-width: 40px !important;
+    max-height: 40px !important;
+    flex: 0 0 40px !important;
+  }
+
+  .topbar .page-action-btn {
+    height: 38px !important;
+    min-height: 38px !important;
+    max-height: 38px !important;
+  }
+}
+
+/* =========================================================
+   ROUTEE — TABLET PORTRAIT MAP + ONE-ITEM TRIP PREVIEW
+   Tablet dikey kullanımda harita büyük kalır; ancak ekranın altında
+   Gezi Listesi bölümünden yaklaşık tek konum görünecek kadar alan bırakılır.
+   Telefon, masaüstü ve yatay tablet davranışlarına dokunmaz.
+   ========================================================= */
+@media (min-width: 721px) and (max-width: 1100px) and (orientation: portrait) and (hover: none) and (pointer: coarse) {
+  .app-layout {
+    --routee-tablet-trip-preview-height: clamp(190px, 20svh, 220px);
+    grid-template-columns: 1fr !important;
+    align-items: stretch !important;
+    gap: 14px !important;
+  }
+
+  .map-area,
+  .map-shell {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  .map-canvas {
+    width: 100% !important;
+    height: clamp(560px, calc(100dvh - var(--routee-mobile-topbar-natural-height, 64px) - var(--routee-tablet-trip-preview-height, 205px) - 96px), 820px) !important;
+    min-height: clamp(560px, calc(100svh - var(--routee-mobile-topbar-natural-height, 64px) - var(--routee-tablet-trip-preview-height, 205px) - 96px), 820px) !important;
+    max-height: calc(100dvh - var(--routee-mobile-topbar-natural-height, 64px) - 174px) !important;
+    border-radius: 24px !important;
+  }
+
+  .trip-column,
+  .trip-panel {
+    width: 100% !important;
+    max-width: 100% !important;
+    justify-self: stretch !important;
+  }
+
+  .trip-panel {
+    display: flex !important;
+    flex-direction: column !important;
+    min-height: 0 !important;
+    max-height: var(--routee-tablet-trip-preview-height, 205px) !important;
+    overflow: hidden !important;
+  }
+
+  .trip-list {
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+}
+
+/* =========================================================
+   ROUTEE — TABLET PORTRAIT TRIP LIST MOBILE CARD FLOW
+   Tablet dikey görünümde Gezi Listesi kartlarını mobildeki
+   iki satırlı akışa sabitler. Harita yüksekliği ve mevcut
+   işlevler değiştirilmez; sadece kart içi yerleşim düzenlenir.
+   ========================================================= */
+@media (min-width: 721px) and (max-width: 1100px) and (orientation: portrait) and (hover: none) and (pointer: coarse) {
+  .trip-panel {
+    padding: 13px !important;
+    border-radius: 20px !important;
+    overflow: hidden !important;
+  }
+
+  .trip-panel-header {
+    flex: 0 0 auto !important;
+    align-items: center !important;
+    gap: 10px !important;
+    margin-bottom: 9px !important;
+  }
+
+  .trip-panel-header h2 {
+    min-width: 0 !important;
+    font-size: 0.96rem !important;
+    line-height: 1.18 !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+  }
+
+  .trip-list {
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 9px !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    -webkit-overflow-scrolling: touch !important;
+    overscroll-behavior: contain !important;
+    padding: 0 1px 2px !important;
+  }
+
+  .trip-panel .trip-item {
+    display: grid !important;
+    grid-template-columns: 42px minmax(0, 1fr) !important;
+    grid-auto-rows: auto !important;
+    column-gap: 10px !important;
+    row-gap: 9px !important;
+    align-items: start !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    height: auto !important;
+    min-height: 0 !important;
+    padding: 10px !important;
+    border-radius: 16px !important;
+    box-sizing: border-box !important;
+    overflow: visible !important;
+  }
+
+  .trip-panel .trip-order {
+    grid-column: 1 !important;
+    grid-row: 1 !important;
+    width: 42px !important;
+    height: 42px !important;
+    min-width: 42px !important;
+    max-width: 42px !important;
+    min-height: 42px !important;
+    max-height: 42px !important;
+    border-radius: 14px !important;
+    font-size: 1rem !important;
+    font-weight: 800 !important;
+    line-height: 1 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex: 0 0 42px !important;
+  }
+
+  .trip-panel .trip-content {
+    grid-column: 2 !important;
+    grid-row: 1 !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 4px !important;
+    overflow: visible !important;
+  }
+
+  .trip-panel .trip-content strong {
+    display: block !important;
+    max-width: 100% !important;
+    font-size: 0.9rem !important;
+    line-height: 1.16 !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+  }
+
+  .trip-panel .trip-content span {
+    display: block !important;
+    max-width: 100% !important;
+    font-size: 0.77rem !important;
+    line-height: 1.25 !important;
+    overflow-wrap: anywhere !important;
+  }
+
+  .trip-panel .trip-item > .trip-actions {
+    grid-column: 2 / -1 !important;
+    grid-row: 2 !important;
+    width: auto !important;
+    max-width: 100% !important;
+    margin-top: 1px !important;
+    display: inline-flex !important;
+    flex-wrap: nowrap !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    gap: 6px !important;
+    justify-self: start !important;
+    align-self: start !important;
+    min-width: 0 !important;
+    white-space: nowrap !important;
+    overflow: visible !important;
+  }
+
+  .trip-panel .trip-item > button.icon-route-btn:last-child,
+  .trip-panel .trip-item > button.tiny-btn:last-child {
+    grid-column: 2 / -1 !important;
+    grid-row: 2 !important;
+    justify-self: start !important;
+    align-self: start !important;
+    margin-top: 1px !important;
+  }
+
+  .trip-panel .trip-actions {
+    justify-content: flex-start !important;
+    align-items: center !important;
+    gap: 6px !important;
+  }
+
+  .trip-panel .trip-actions .tiny-btn {
+    height: 38px !important;
+    min-height: 38px !important;
+    max-height: 38px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border-radius: 12px !important;
+    font-size: 0.74rem !important;
+    font-weight: 750 !important;
+    line-height: 1 !important;
+    white-space: nowrap !important;
+    flex: 0 0 auto !important;
+  }
+
+  .trip-panel .trip-actions .icon-route-btn,
+  .trip-panel .trip-actions .tiny-btn.icon-route-btn,
+  .trip-panel .trip-actions .icon-note-btn,
+  .trip-panel .trip-actions .tiny-btn.icon-note-btn,
+  .trip-panel .trip-item > button.icon-route-btn:last-child {
+    width: 38px !important;
+    min-width: 38px !important;
+    max-width: 38px !important;
+    height: 38px !important;
+    min-height: 38px !important;
+    max-height: 38px !important;
+    flex: 0 0 38px !important;
+    padding: 0 !important;
+    border-radius: 12px !important;
+    display: inline-grid !important;
+    place-items: center !important;
+    line-height: 1 !important;
+  }
+
+  .trip-panel .trip-actions .icon-route-btn svg,
+  .trip-panel .trip-actions .tiny-btn.icon-route-btn svg,
+  .trip-panel .trip-actions .icon-note-btn svg,
+  .trip-panel .trip-actions .tiny-btn.icon-note-btn svg,
+  .trip-panel .route-directions-icon {
+    width: 16px !important;
+    height: 16px !important;
+    display: block !important;
+    margin: auto !important;
+  }
+
+  .trip-panel .trip-actions .tiny-btn:not(.icon-route-btn):not(.icon-note-btn) {
+    flex: 0 0 auto !important;
+    width: auto !important;
+    max-width: none !important;
+    min-width: auto !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    letter-spacing: -0.01em !important;
+  }
+
+  .trip-panel .trip-actions .tiny-btn[data-action^="focus"] {
+    min-width: 62px !important;
+    padding-left: 11px !important;
+    padding-right: 11px !important;
+  }
+
+  .trip-panel .trip-actions .tiny-btn[data-action^="delete"] {
+    min-width: 44px !important;
+    padding-left: 10px !important;
+    padding-right: 10px !important;
+  }
+
+  .trip-panel .trip-note-preview {
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    display: grid !important;
+    grid-template-columns: 15px minmax(0, 1fr) !important;
+    align-items: start !important;
+    gap: 5px !important;
+    padding: 7px 9px 7px 8px !important;
+    border-radius: 12px !important;
+    font-size: 0.71rem !important;
+    line-height: 1.32 !important;
+    max-height: 64px !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+  }
+}
+
+/* =========================================================
+   ROUTEE — TABLET PORTRAIT FINAL: MAP + ONE-CARD TRIP LIST
+   Tablet dikey görünümde harita mobildeki gibi geniş kalır;
+   Gezi Listesi ise tek konum kartı düzgün okunacak kadar görünür.
+   İşlevlere dokunmaz; yalnızca tablet-dikey yerleşimi sabitler.
+   ========================================================= */
+@media (min-width: 721px) and (max-width: 1100px) and (orientation: portrait) {
+  .app-layout {
+    --routee-tablet-trip-panel-height: clamp(216px, 20svh, 238px);
+    grid-template-columns: minmax(0, 1fr) !important;
+    align-items: stretch !important;
+    gap: 12px !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow-x: hidden !important;
+  }
+
+  .map-area,
+  .map-shell,
+  .trip-column,
+  .trip-panel {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    justify-self: stretch !important;
+  }
+
+  .map-canvas {
+    width: 100% !important;
+    height: clamp(520px, calc(100dvh - var(--routee-mobile-topbar-natural-height, 64px) - var(--routee-tablet-trip-panel-height, 226px) - 104px), 820px) !important;
+    min-height: clamp(520px, calc(100svh - var(--routee-mobile-topbar-natural-height, 64px) - var(--routee-tablet-trip-panel-height, 226px) - 104px), 820px) !important;
+    max-height: none !important;
+    border-radius: 24px !important;
+  }
+
+  .trip-column {
+    display: block !important;
+  }
+
+  .trip-panel {
+    display: flex !important;
+    flex-direction: column !important;
+    height: var(--routee-tablet-trip-panel-height, 226px) !important;
+    min-height: var(--routee-tablet-trip-panel-height, 226px) !important;
+    max-height: var(--routee-tablet-trip-panel-height, 226px) !important;
+    padding: 12px !important;
+    border-radius: 20px !important;
+    overflow: hidden !important;
+    box-sizing: border-box !important;
+  }
+
+  .trip-panel-header {
+    flex: 0 0 auto !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 10px !important;
+    margin: 0 0 9px !important;
+    min-height: 44px !important;
+  }
+
+  .trip-panel-header h2 {
+    min-width: 0 !important;
+    margin: 0 !important;
+    font-size: 0.96rem !important;
+    line-height: 1.18 !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+  }
+
+  .trip-header-actions {
+    flex: 0 0 auto !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: flex-end !important;
+    gap: 8px !important;
+  }
+
+  .trip-header-actions .trip-map-list-icon-btn,
+  .trip-header-actions .trip-save-icon-btn {
+    width: 44px !important;
+    min-width: 44px !important;
+    max-width: 44px !important;
+    height: 44px !important;
+    min-height: 44px !important;
+    max-height: 44px !important;
+    flex: 0 0 44px !important;
+    border-radius: 14px !important;
+  }
+
+  .trip-list {
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 0 !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    -webkit-overflow-scrolling: touch !important;
+    overscroll-behavior: contain !important;
+    padding: 0 1px 3px !important;
+    box-sizing: border-box !important;
+  }
+
+  .trip-list .trip-item {
+    position: relative !important;
+    flex: 0 0 auto !important;
+    display: grid !important;
+    grid-template-columns: 42px minmax(0, 1fr) !important;
+    grid-template-areas:
+      "order content"
+      ". actions" !important;
+    column-gap: 10px !important;
+    row-gap: 8px !important;
+    align-items: start !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    height: auto !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    padding: 10px !important;
+    border-radius: 16px !important;
+    box-sizing: border-box !important;
+    overflow: hidden !important;
+  }
+
+  .trip-list .trip-item + .trip-item {
+    margin-top: 9px !important;
+  }
+
+  .trip-list .trip-order {
+    grid-area: order !important;
+    grid-column: auto !important;
+    grid-row: auto !important;
+    width: 42px !important;
+    min-width: 42px !important;
+    max-width: 42px !important;
+    height: 42px !important;
+    min-height: 42px !important;
+    max-height: 42px !important;
+    border-radius: 14px !important;
+    font-size: 1rem !important;
+    line-height: 1 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex: 0 0 42px !important;
+  }
+
+  .trip-list .trip-content {
+    grid-area: content !important;
+    grid-column: auto !important;
+    grid-row: auto !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 4px !important;
+    overflow: hidden !important;
+  }
+
+  .trip-list .trip-content strong {
+    display: block !important;
+    max-width: 100% !important;
+    font-size: 0.9rem !important;
+    line-height: 1.18 !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+  }
+
+  .trip-list .trip-content span {
+    display: block !important;
+    max-width: 100% !important;
+    font-size: 0.77rem !important;
+    line-height: 1.25 !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+  }
+
+  .trip-list .trip-item > .trip-actions,
+  .trip-list .trip-item > button.icon-route-btn:last-child,
+  .trip-list .trip-item > button.tiny-btn:last-child {
+    grid-area: actions !important;
+    grid-column: auto !important;
+    grid-row: auto !important;
+    position: static !important;
+    width: auto !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    margin: 0 !important;
+    justify-self: start !important;
+    align-self: start !important;
+  }
+
+  .trip-list .trip-actions {
+    display: inline-flex !important;
+    flex-wrap: wrap !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    gap: 6px !important;
+    white-space: normal !important;
+    overflow: visible !important;
+  }
+
+  .trip-list .trip-actions .tiny-btn,
+  .trip-list .trip-item > button.tiny-btn:last-child {
+    height: 38px !important;
+    min-height: 38px !important;
+    max-height: 38px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border-radius: 12px !important;
+    font-size: 0.74rem !important;
+    font-weight: 750 !important;
+    line-height: 1 !important;
+    white-space: nowrap !important;
+    flex: 0 0 auto !important;
+    box-sizing: border-box !important;
+  }
+
+  .trip-list .trip-actions .icon-route-btn,
+  .trip-list .trip-actions .tiny-btn.icon-route-btn,
+  .trip-list .trip-actions .icon-note-btn,
+  .trip-list .trip-actions .tiny-btn.icon-note-btn,
+  .trip-list .trip-item > button.icon-route-btn:last-child {
+    width: 38px !important;
+    min-width: 38px !important;
+    max-width: 38px !important;
+    height: 38px !important;
+    min-height: 38px !important;
+    max-height: 38px !important;
+    flex: 0 0 38px !important;
+    padding: 0 !important;
+    border-radius: 12px !important;
+    display: inline-grid !important;
+    place-items: center !important;
+    line-height: 1 !important;
+  }
+
+  .trip-list .trip-actions .icon-route-btn svg,
+  .trip-list .trip-actions .tiny-btn.icon-route-btn svg,
+  .trip-list .trip-actions .icon-note-btn svg,
+  .trip-list .trip-actions .tiny-btn.icon-note-btn svg,
+  .trip-list .route-directions-icon {
+    width: 16px !important;
+    height: 16px !important;
+    display: block !important;
+    margin: auto !important;
+  }
+
+  .trip-list .trip-actions .tiny-btn:not(.icon-route-btn):not(.icon-note-btn) {
+    width: auto !important;
+    min-width: auto !important;
+    max-width: none !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    letter-spacing: -0.01em !important;
+  }
+
+  .trip-list .trip-actions .tiny-btn[data-action^="focus"] {
+    min-width: 62px !important;
+    padding-left: 11px !important;
+    padding-right: 11px !important;
+  }
+
+  .trip-list .trip-actions .tiny-btn[data-action^="delete"] {
+    min-width: 44px !important;
+    padding-left: 10px !important;
+    padding-right: 10px !important;
+  }
+
+  .trip-list .trip-note-preview {
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    display: grid !important;
+    grid-template-columns: 15px minmax(0, 1fr) !important;
+    align-items: start !important;
+    gap: 5px !important;
+    margin-top: 4px !important;
+    padding: 7px 9px 7px 8px !important;
+    border-radius: 12px !important;
+    font-size: 0.71rem !important;
+    line-height: 1.32 !important;
+    max-height: 58px !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+  }
+}
+
+/* =========================================================
+   ROUTEE — MEASURE-ONLY OVERRIDE FROM OLD MOBILE REFERENCE
+   Sadece ölçü/sığma değerleri: sayfa boşluğu, harita yüksekliği,
+   harita içi kontrol konumu. Kart, buton, panel akışı ve JS etkilenmez.
+   ========================================================= */
+@media (max-width: 720px) {
+  .app-layout {
+    padding: 12px 14px 16px !important;
+    gap: 12px !important;
+  }
+
+  .map-canvas {
+    min-height: 56vh !important;
+    height: 56vh !important;
+    max-height: none !important;
+    border-radius: 20px !important;
+  }
+
+  .top-left {
+    top: 10px !important;
+    left: 10px !important;
+    max-width: 60px !important;
+  }
+
+  .top-right {
+    top: 8px !important;
+    right: 8px !important;
+    width: calc(100% - 88px) !important;
+    max-width: calc(100% - 88px) !important;
+    align-items: stretch !important;
+  }
+
+  .bottom-left {
+    left: 10px !important;
+    bottom: 10px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .app-layout {
+    padding: 10px 12px 14px !important;
+  }
+
+  .map-canvas {
+    min-height: 54vh !important;
+    height: 54vh !important;
+    max-height: none !important;
+  }
+
+  .top-left {
+    top: 8px !important;
+    left: 8px !important;
+    max-width: 56px !important;
+  }
+
+  .top-right {
+    top: 6px !important;
+    right: 6px !important;
+    width: calc(100% - 80px) !important;
+    max-width: calc(100% - 80px) !important;
+  }
+
+  .bottom-left {
+    left: 8px !important;
+    bottom: 8px !important;
+  }
+}
+
+/* =========================================================
+   ROUTEE — MOBILE TOPBAR VISIBLE SCROLL LOCK
+   Mobilde Rota ikonu ve Çıkış Yap alanı hafif kaydırmada
+   otomatik gizlenmesin. Eski is-hidden-on-scroll sınıfı
+   herhangi bir sebeple kalırsa da görünüm korunur.
+   ========================================================= */
+@media (max-width: 720px), (hover: none) and (pointer: coarse) {
+  .topbar.is-hidden-on-scroll {
+    transform: translateZ(0) !important;
+    -webkit-transform: translateZ(0) !important;
+    opacity: 1 !important;
+  }
+}
+
+/* =========================================================
+   ROUTEE — MOBILE MAP/TRIP WIDTH POLISH
+   Yalnızca telefon mobil görünümde harita, gezi listesi paneli
+   ve konum kartlarını yatayda biraz genişletir. Kenarlara tam
+   sıfır yapışmadan küçük ve profesyonel iç boşluk bırakır.
+   Tablet dikey/yatay, masaüstü ve JS işlevleri etkilenmez.
+   ========================================================= */
+@media (max-width: 720px) {
+  .app-layout {
+    padding-left: 8px !important;
+    padding-right: 8px !important;
+  }
+
+  .map-area,
+  .map-shell,
+  .map-canvas,
+  .trip-column,
+  .trip-panel,
+  .trip-list {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    box-sizing: border-box !important;
+  }
+
+  .trip-panel {
+    padding-left: 10px !important;
+    padding-right: 10px !important;
+  }
+
+  .trip-list .trip-item,
+  .trip-item {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    box-sizing: border-box !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .app-layout {
+    padding-left: 8px !important;
+    padding-right: 8px !important;
+  }
+
+  .trip-panel {
+    padding-left: 9px !important;
+    padding-right: 9px !important;
+  }
+}
+
+/* =========================================================
+   ROUTEE — MOBILE SEARCH CLEAR OVERLAY FIX
+   Mobilde arama alanında metin varken açılan temizleme çarpısı,
+   konum ekleme/kaydetme/içe-dışa aktarma panelleri arka planı
+   blur ettiğinde aktif ve keskin görünmesin. Sadece mobil görünümde
+   çarpıyı ve arama öneri kutusunu panel açıkken pasifleştirir.
+   ========================================================= */
+@media (max-width: 720px), (hover: none) and (pointer: coarse) {
+  body.has-mobile-floating-panel #btnClearPlaceSearch,
+  body.has-mobile-floating-panel .map-search-clear,
+  body.has-screen-overlay #btnClearPlaceSearch,
+  body.has-screen-overlay .map-search-clear {
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+    filter: blur(4px) !important;
+  }
+
+  body.has-mobile-floating-panel .map-search-wrapper,
+  body.has-screen-overlay .map-search-wrapper {
+    pointer-events: none !important;
+  }
+
+  body.has-mobile-floating-panel #customPlaceSearchDropdown,
+  body.has-screen-overlay #customPlaceSearchDropdown {
+    display: none !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+  }
+}
+
+/* =========================================================
+   ROUTEE — MOBILE FLOATING PANEL BACKDROP VISIBILITY FIX
+   Mobil paneller/overlay açıkken Konum Ekle, Haritada Yer Ara
+   ve Menü kontrolleri tamamen kaybolmasın; arka planda blur'lu
+   ve pasif şekilde kalsın. Temizleme çarpısı ise gizli kalır.
+   ========================================================= */
+@media (max-width: 720px), (hover: none) and (pointer: coarse) {
+  body.has-mobile-floating-panel .top-left .compact-buttons,
+  body.has-mobile-floating-panel .map-search-wrapper,
+  body.has-mobile-floating-panel .menu-wrapper,
+  body.has-screen-overlay .top-left .compact-buttons,
+  body.has-screen-overlay .map-search-wrapper,
+  body.has-screen-overlay .menu-wrapper {
+    opacity: 0.46 !important;
+    visibility: visible !important;
+    pointer-events: none !important;
+    filter: blur(4px) !important;
+    -webkit-filter: blur(4px) !important;
+  }
+
+  body.has-mobile-floating-panel #placeSearch,
+  body.has-screen-overlay #placeSearch {
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: none !important;
+  }
+
+  body.has-mobile-floating-panel .top-left .compact-buttons *,
+  body.has-mobile-floating-panel .map-search-wrapper *,
+  body.has-mobile-floating-panel .menu-wrapper *,
+  body.has-screen-overlay .top-left .compact-buttons *,
+  body.has-screen-overlay .map-search-wrapper *,
+  body.has-screen-overlay .menu-wrapper * {
+    pointer-events: none !important;
+  }
+
+  body.has-mobile-floating-panel #btnClearPlaceSearch,
+  body.has-mobile-floating-panel .map-search-clear,
+  body.has-screen-overlay #btnClearPlaceSearch,
+  body.has-screen-overlay .map-search-clear {
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+  }
+}
