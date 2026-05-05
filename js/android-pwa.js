@@ -89,10 +89,73 @@
     } catch (error) {}
   }
 
+
+
+  var androidZoomGuardInstalled = false;
+
+  function isEditableTarget(target) {
+    if (!target || typeof target.closest !== "function") return false;
+    return Boolean(target.closest('input, textarea, select, [contenteditable="true"], [contenteditable=""]'));
+  }
+
+  function isMapGestureTarget(target) {
+    if (!target || typeof target.closest !== "function") return false;
+    return Boolean(target.closest('#mapCanvas, #mapCanvas *, .gm-style, .gm-style *'));
+  }
+
+  function preventAndroidPageZoom(event) {
+    if (!event || isMapGestureTarget(event.target)) return;
+    if (typeof event.preventDefault === "function") event.preventDefault();
+    if (typeof event.stopPropagation === "function") event.stopPropagation();
+  }
+
+  function installAndroidPageZoomGuard() {
+    if (androidZoomGuardInstalled) return;
+    androidZoomGuardInstalled = true;
+
+    var lastSingleTapAt = 0;
+    var lastSingleTapTarget = null;
+
+    document.addEventListener("touchmove", function (event) {
+      if (!event.touches || event.touches.length < 2) return;
+      preventAndroidPageZoom(event);
+    }, { passive: false, capture: true });
+
+    document.addEventListener("touchend", function (event) {
+      if (!event.changedTouches || event.changedTouches.length !== 1) return;
+      if (isMapGestureTarget(event.target) || isEditableTarget(event.target)) {
+        lastSingleTapAt = 0;
+        lastSingleTapTarget = null;
+        return;
+      }
+
+      var now = Date.now();
+      var sameTarget = lastSingleTapTarget === event.target;
+      var isDoubleTap = sameTarget && now - lastSingleTapAt > 0 && now - lastSingleTapAt < 340;
+
+      lastSingleTapAt = now;
+      lastSingleTapTarget = event.target;
+
+      if (!isDoubleTap) return;
+      if (typeof event.preventDefault === "function") event.preventDefault();
+      if (typeof event.stopPropagation === "function") event.stopPropagation();
+
+      var active = document.activeElement;
+      if (active && active !== document.body && typeof active.blur === "function") {
+        try { active.blur(); } catch (error) {}
+      }
+    }, { passive: false, capture: true });
+
+    ["gesturestart", "gesturechange", "gestureend"].forEach(function (eventName) {
+      document.addEventListener(eventName, preventAndroidPageZoom, { passive: false, capture: true });
+    });
+  }
+
   function applyAndroidPwaLock() {
     swapAndroidManifest();
     markMode();
     syncAndroidViewport();
+    installAndroidPageZoomGuard();
   }
 
   applyAndroidPwaLock();
