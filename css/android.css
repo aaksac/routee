@@ -308,3 +308,70 @@
     overflow: hidden !important;
   }
 }
+
+/* =========================================================
+   ROUTEE — ANDROID MAP INFO CARD FIT
+   Samsung A12 / Android 13 gibi dar ekranlarda harita üzerindeki
+   konum bilgisi kartı taşmadan sığar. Scrollbar eklemez.
+   iPhone/iPad seçicisi içermez.
+   ========================================================= */
+@media (max-width: 720px), (hover: none) and (pointer: coarse) {
+  html.routee-android .gm-style .gm-style-iw,
+  body.routee-android .gm-style .gm-style-iw,
+  html.routee-android .gm-style .gm-style-iw-c,
+  body.routee-android .gm-style .gm-style-iw-c,
+  html.routee-android .gm-style .gm-style-iw-d,
+  body.routee-android .gm-style .gm-style-iw-d {
+    max-width: min(224px, calc(100vw - 72px)) !important;
+    min-width: 0 !important;
+    overflow: visible !important;
+    scrollbar-width: none !important;
+    -ms-overflow-style: none !important;
+    scrollbar-gutter: auto !important;
+  }
+
+  html.routee-android .gm-style .gm-style-iw::-webkit-scrollbar,
+  body.routee-android .gm-style .gm-style-iw::-webkit-scrollbar,
+  html.routee-android .gm-style .gm-style-iw-c::-webkit-scrollbar,
+  body.routee-android .gm-style .gm-style-iw-c::-webkit-scrollbar,
+  html.routee-android .gm-style .gm-style-iw-d::-webkit-scrollbar,
+  body.routee-android .gm-style .gm-style-iw-d::-webkit-scrollbar {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+    background: transparent !important;
+  }
+
+  html.routee-android .gm-style .routee-marker-info-card--android,
+  body.routee-android .gm-style .routee-marker-info-card--android {
+    width: min(196px, calc(100vw - 72px)) !important;
+    max-width: min(196px, calc(100vw - 72px)) !important;
+    min-width: 0 !important;
+    box-sizing: border-box !important;
+    overflow: visible !important;
+  }
+
+  html.routee-android .gm-style .routee-marker-info-card--android .custom-info-note-preview,
+  body.routee-android .gm-style .routee-marker-info-card--android .custom-info-note-preview,
+  html.routee-android .gm-style .custom-info-note-preview,
+  body.routee-android .gm-style .custom-info-note-preview {
+    max-height: 44px !important;
+    overflow: hidden !important;
+    overflow-y: hidden !important;
+    overflow-x: hidden !important;
+    scrollbar-gutter: auto !important;
+    padding: 6px 8px 6px 7px !important;
+    margin-bottom: 7px !important;
+    font-size: 10px !important;
+    line-height: 1.28 !important;
+  }
+
+  html.routee-android .gm-style .custom-info-note-preview > span:last-child,
+  body.routee-android .gm-style .custom-info-note-preview > span:last-child {
+    display: -webkit-box !important;
+    -webkit-box-orient: vertical !important;
+    -webkit-line-clamp: 2 !important;
+    overflow: hidden !important;
+    white-space: normal !important;
+  }
+}
