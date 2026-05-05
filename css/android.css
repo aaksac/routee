@@ -908,3 +908,137 @@
     border-radius: 11px !important;
   }
 }
+
+/* =========================================================
+   ROUTEE — ANDROID MAP CONTROLS + INFO CARD STRONG COMPACT
+   Samsung A12 / Android 13 gibi Android telefonlarda harita içi
+   butonlar ve konum bilgisi kartı büyük görünmesin. iOS/iPadOS'a dokunmaz.
+   ========================================================= */
+@media (max-width: 520px), (hover: none) and (pointer: coarse) {
+  html.routee-android .map-overlay.top-left,
+  body.routee-android .map-overlay.top-left {
+    left: 10px !important;
+    top: 10px !important;
+  }
+
+  html.routee-android .map-overlay.top-right,
+  body.routee-android .map-overlay.top-right {
+    left: 70px !important;
+    right: 10px !important;
+    top: 10px !important;
+  }
+
+  html.routee-android .map-overlay .stack-row,
+  html.routee-android .stack-row.right-tools,
+  html.routee-android .stack-row.compact-buttons,
+  body.routee-android .map-overlay .stack-row,
+  body.routee-android .stack-row.right-tools,
+  body.routee-android .stack-row.compact-buttons {
+    gap: 6px !important;
+    align-items: center !important;
+  }
+
+  html.routee-android .overlay-btn.icon-only-btn,
+  html.routee-android .fab-btn.icon-only-btn,
+  body.routee-android .overlay-btn.icon-only-btn,
+  body.routee-android .fab-btn.icon-only-btn {
+    width: 36px !important;
+    min-width: 36px !important;
+    max-width: 36px !important;
+    height: 36px !important;
+    min-height: 36px !important;
+    max-height: 36px !important;
+    flex: 0 0 36px !important;
+    border-radius: 13px !important;
+    padding: 0 !important;
+  }
+
+  html.routee-android .overlay-btn.icon-only-btn svg,
+  html.routee-android .fab-btn.icon-only-btn svg,
+  body.routee-android .overlay-btn.icon-only-btn svg,
+  body.routee-android .fab-btn.icon-only-btn svg {
+    width: 17px !important;
+    height: 17px !important;
+  }
+
+  html.routee-android .map-search-wrapper,
+  body.routee-android .map-search-wrapper {
+    width: min(100%, 210px) !important;
+    max-width: 210px !important;
+    min-width: 0 !important;
+  }
+
+  html.routee-android .map-search-input,
+  body.routee-android .map-search-input,
+  html.routee-android #placeSearch,
+  body.routee-android #placeSearch {
+    height: 40px !important;
+    min-height: 40px !important;
+    max-height: 40px !important;
+    padding: 8px 34px 8px 13px !important;
+    font-size: 13px !important;
+    line-height: 1.1 !important;
+    border-radius: 14px !important;
+  }
+
+  html.routee-android .map-search-clear,
+  body.routee-android .map-search-clear {
+    width: 26px !important;
+    min-width: 26px !important;
+    max-width: 26px !important;
+    height: 26px !important;
+    min-height: 26px !important;
+    max-height: 26px !important;
+    right: 6px !important;
+  }
+
+  html.routee-android .map-search-clear svg,
+  body.routee-android .map-search-clear svg {
+    width: 13px !important;
+    height: 13px !important;
+  }
+
+  html.routee-android .gm-style .gm-control-active,
+  html.routee-android .gm-style .gm-fullscreen-control,
+  html.routee-android .gm-style .gmnoprint button,
+  body.routee-android .gm-style .gm-control-active,
+  body.routee-android .gm-style .gm-fullscreen-control,
+  body.routee-android .gm-style .gmnoprint button {
+    width: 34px !important;
+    min-width: 34px !important;
+    max-width: 34px !important;
+    height: 34px !important;
+    min-height: 34px !important;
+    max-height: 34px !important;
+  }
+
+  html.routee-android .gm-style .gm-control-active img,
+  html.routee-android .gm-style .gm-fullscreen-control img,
+  html.routee-android .gm-style .gmnoprint button img,
+  body.routee-android .gm-style .gm-control-active img,
+  body.routee-android .gm-style .gm-fullscreen-control img,
+  body.routee-android .gm-style .gmnoprint button img {
+    width: 15px !important;
+    height: 15px !important;
+  }
+
+  html.routee-android .gm-style .routee-marker-info-card--android,
+  body.routee-android .gm-style .routee-marker-info-card--android {
+    width: min(178px, calc(100vw - 92px)) !important;
+    max-width: min(178px, calc(100vw - 92px)) !important;
+    padding: 6px !important;
+    border-radius: 12px !important;
+    transform: translateZ(0) scale(0.94) !important;
+    transform-origin: center bottom !important;
+  }
+
+  html.routee-android .gm-style .gm-style-iw,
+  html.routee-android .gm-style .gm-style-iw-c,
+  html.routee-android .gm-style .gm-style-iw-d,
+  body.routee-android .gm-style .gm-style-iw,
+  body.routee-android .gm-style .gm-style-iw-c,
+  body.routee-android .gm-style .gm-style-iw-d {
+    max-width: min(198px, calc(100vw - 76px)) !important;
+    overflow: visible !important;
+  }
+}
