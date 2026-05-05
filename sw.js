@@ -1,7 +1,7 @@
-const SW_VERSION = new URL(self.location.href).searchParams.get("v") || "dev";
+const SW_VERSION = new URL(self.location.href).searchParams.get("v") || "2026.05.5.303-android-parity-focus";
 const CACHE_NAME = `routee-shell-${SW_VERSION}`;
 const NETWORK_TIMEOUT_MS = 1200;
-const ROUTEE_ASSET_REVISION = "2026.05.5.105-android-scrollbar-lock";
+const ROUTEE_ASSET_REVISION = "2026.05.5.303-android-parity-focus";
 
 const APP_SHELL = [
   "./",
