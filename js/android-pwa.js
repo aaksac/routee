@@ -34,6 +34,8 @@
     }
   }
 
+  var lockedAndroidHeight = 0;
+
   function swapAndroidManifest() {
     var manifest = document.head && document.head.querySelector('link[rel="manifest"]');
     if (manifest && manifest.getAttribute("href") !== "./manifest.android.webmanifest") {
@@ -41,15 +43,24 @@
     }
   }
 
-  function syncAndroidViewport() {
+  function syncAndroidViewport(options) {
     try {
+      var resetLock = options && options.resetLock;
+      if (resetLock) lockedAndroidHeight = 0;
+
       var viewport = window.visualViewport;
-      var height = Math.ceil(
+      var visibleHeight = Math.ceil(
         (viewport && viewport.height) ||
         window.innerHeight ||
         document.documentElement.clientHeight ||
         0
       );
+      var height = Math.ceil(Math.max(
+        visibleHeight || 0,
+        window.innerHeight || 0,
+        document.documentElement.clientHeight || 0
+      ));
+      var fallbackHeight = Math.ceil((window.screen && window.screen.height) || 0);
       var width = Math.ceil(
         (viewport && viewport.width) ||
         window.innerWidth ||
@@ -57,9 +68,19 @@
         0
       );
 
-      if (height > 0) {
-        root.style.setProperty("--routee-android-visible-height", height + "px");
-        root.style.setProperty("--routee-visual-height", height + "px");
+      if (height > lockedAndroidHeight) {
+        lockedAndroidHeight = height;
+      }
+
+      if (visibleHeight > 0) {
+        root.style.setProperty("--routee-android-visible-height", visibleHeight + "px");
+      }
+      if (lockedAndroidHeight > 0) {
+        root.style.setProperty("--routee-android-app-height", lockedAndroidHeight + "px");
+        root.style.setProperty("--routee-visual-height", lockedAndroidHeight + "px");
+      } else if (fallbackHeight > 0) {
+        root.style.setProperty("--routee-android-app-height", fallbackHeight + "px");
+        root.style.setProperty("--routee-visual-height", fallbackHeight + "px");
       }
       if (width > 0) {
         root.style.setProperty("--routee-android-visible-width", width + "px");
@@ -85,7 +106,8 @@
   window.addEventListener("pageshow", applyAndroidPwaLock, { passive: true });
   window.addEventListener("resize", syncAndroidViewport, { passive: true });
   window.addEventListener("orientationchange", function () {
-    window.setTimeout(applyAndroidPwaLock, 80);
+    lockedAndroidHeight = 0;
+    window.setTimeout(function () { syncAndroidViewport({ resetLock: true }); applyAndroidPwaLock(); }, 80);
     window.setTimeout(applyAndroidPwaLock, 260);
   }, { passive: true });
 
