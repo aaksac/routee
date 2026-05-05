@@ -435,3 +435,31 @@
   }
 }
 
+
+/* =========================================================
+   ROUTEE — ANDROID PHONE MAP HEIGHT BALANCE
+   Android telefonlarda harita alanını büyütür ve Gezi Listesi'ni
+   haritanın biraz daha aşağısına alır. iPhone/iPad seçicisi içermez.
+   Tablet, masaüstü ve JS işlevleri etkilenmez.
+   ========================================================= */
+@media (max-width: 720px) and (orientation: portrait) {
+  html.routee-android .app-layout,
+  body.routee-android .app-layout {
+    gap: 16px !important;
+  }
+
+  html.routee-android .map-canvas,
+  body.routee-android .map-canvas {
+    height: clamp(380px, calc(var(--routee-android-visible-height, 100dvh) - 258px), 560px) !important;
+    min-height: clamp(380px, calc(var(--routee-android-visible-height, 100svh) - 258px), 560px) !important;
+    max-height: none !important;
+  }
+}
+
+@media (max-width: 390px) and (orientation: portrait) {
+  html.routee-android .map-canvas,
+  body.routee-android .map-canvas {
+    height: clamp(372px, calc(var(--routee-android-visible-height, 100dvh) - 252px), 540px) !important;
+    min-height: clamp(372px, calc(var(--routee-android-visible-height, 100svh) - 252px), 540px) !important;
+  }
+}
