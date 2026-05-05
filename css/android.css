@@ -40,7 +40,10 @@
     height: var(--routee-android-app-height) !important;
     min-height: var(--routee-android-app-height) !important;
     max-height: var(--routee-android-app-height) !important;
-    overflow: hidden !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    overscroll-behavior-y: contain !important;
     background: var(--bg, #f4f7fb) !important;
     background-color: var(--bg, #f4f7fb) !important;
   }
@@ -130,48 +133,5 @@
     background: transparent !important;
     border: 0 !important;
     box-shadow: none !important;
-  }
-}
-
-/* =========================================================
-   ROUTEE — ANDROID MOBILE PAGE SCROLL RESTORE
-   Android PWA/native surface modunda sayfanın kilitlenmiş gibi
-   kalmasını engeller. iPhone/iPad sınıflarına veya seçicilerine
-   dokunmaz; gövde sabit kalır, gerçek kaydırma #app içinde yapılır.
-   ========================================================= */
-@media (max-width: 720px), (hover: none) and (pointer: coarse) {
-  html.routee-android-native-surface body:not(.routee-splash-active):not(.routee-app-startup-active),
-  body.routee-android-native-surface:not(.routee-splash-active):not(.routee-app-startup-active) {
-    position: fixed !important;
-    inset: 0 !important;
-    width: 100% !important;
-    height: var(--routee-android-app-height) !important;
-    min-height: var(--routee-android-app-height) !important;
-    max-height: var(--routee-android-app-height) !important;
-    overflow: hidden !important;
-  }
-
-  html.routee-android-native-surface body:not(.routee-splash-active):not(.routee-app-startup-active) #app,
-  body.routee-android-native-surface:not(.routee-splash-active):not(.routee-app-startup-active) #app {
-    height: var(--routee-android-app-height) !important;
-    min-height: var(--routee-android-app-height) !important;
-    max-height: var(--routee-android-app-height) !important;
-    overflow-y: auto !important;
-    overflow-x: hidden !important;
-    -webkit-overflow-scrolling: touch !important;
-    overscroll-behavior-y: contain !important;
-    scrollbar-width: none !important;
-  }
-
-  html.routee-android-native-surface body:not(.routee-splash-active):not(.routee-app-startup-active) #app::-webkit-scrollbar,
-  body.routee-android-native-surface:not(.routee-splash-active):not(.routee-app-startup-active) #app::-webkit-scrollbar {
-    display: none !important;
-    width: 0 !important;
-    height: 0 !important;
-  }
-
-  html.routee-android-native-surface body:not(.routee-splash-active):not(.routee-app-startup-active) .app-layout,
-  body.routee-android-native-surface:not(.routee-splash-active):not(.routee-app-startup-active) .app-layout {
-    min-height: auto !important;
   }
 }
