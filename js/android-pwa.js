@@ -34,6 +34,26 @@
     }
   }
 
+
+  var androidInstallServiceWorkerRegistered = false;
+
+  function registerAndroidServiceWorkerForInstall() {
+    if (androidInstallServiceWorkerRegistered) return;
+    androidInstallServiceWorkerRegistered = true;
+
+    if (!("serviceWorker" in navigator)) return;
+
+    try {
+      navigator.serviceWorker.register("./sw.js?v=2026.05.6.501-android-installable", {
+        updateViaCache: "none"
+      }).catch(function () {
+        androidInstallServiceWorkerRegistered = false;
+      });
+    } catch (error) {
+      androidInstallServiceWorkerRegistered = false;
+    }
+  }
+
   var lockedAndroidHeight = 0;
 
   function swapAndroidManifest() {
@@ -153,6 +173,7 @@
 
   function applyAndroidPwaLock() {
     swapAndroidManifest();
+    registerAndroidServiceWorkerForInstall();
     markMode();
     syncAndroidViewport();
     installAndroidPageZoomGuard();
