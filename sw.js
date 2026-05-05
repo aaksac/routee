@@ -1,7 +1,7 @@
-const SW_VERSION = new URL(self.location.href).searchParams.get("v") || "2026.05.5.306-android-page-zoom-guard";
+const SW_VERSION = new URL(self.location.href).searchParams.get("v") || "2026.05.5.307-android-narrow-compact-buttons";
 const CACHE_NAME = `routee-shell-${SW_VERSION}`;
 const NETWORK_TIMEOUT_MS = 1200;
-const ROUTEE_ASSET_REVISION = "2026.05.5.306-android-page-zoom-guard";
+const ROUTEE_ASSET_REVISION = "2026.05.5.307-android-narrow-compact-buttons";
 
 const APP_SHELL = [
   "./",
