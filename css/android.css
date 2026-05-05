@@ -438,10 +438,11 @@
 
 /* =========================================================
    ROUTEE — ANDROID NARROW SCREEN COMPACT BUTTONS
-   Samsung A12 / Android 13 gibi dar Android ekranlarda butonları
-   daha kompakt tutar. Daha geniş Androidleri ve iPhone/iPad'i etkilemez.
+   Samsung A12 / Android 13 ve iPhone 11 benzeri CSS genişlikteki
+   Android ekranlarda butonları daha kompakt tutar. Daha geniş Androidleri
+   ve iPhone/iPad'i etkilemez.
    ========================================================= */
-@media (max-width: 390px) and (hover: none) and (pointer: coarse) {
+@media (max-width: 430px) {
   html.routee-android .topbar .page-action-btn,
   body.routee-android .topbar .page-action-btn {
     height: 34px !important;
