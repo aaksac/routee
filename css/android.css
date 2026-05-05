@@ -135,3 +135,76 @@
     box-shadow: none !important;
   }
 }
+
+/* =========================================================
+   ROUTEE — ANDROID PARITY LAYER
+   iPhone/iPad seçicisi içermez. Android tarayıcı ve Android PWA
+   yüzeyinde kaydırma/scrollbar ve odakla davranışını aynılaştırır.
+   ========================================================= */
+@media (max-width: 720px), (hover: none) and (pointer: coarse) {
+  html.routee-android,
+  html.routee-android body,
+  body.routee-android {
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow-x: hidden !important;
+    overscroll-behavior-x: none !important;
+    background: var(--bg, #f4f7fb) !important;
+    background-color: var(--bg, #f4f7fb) !important;
+    -ms-overflow-style: none !important;
+    scrollbar-width: none !important;
+    scrollbar-color: transparent transparent !important;
+  }
+
+  html.routee-android #app,
+  body.routee-android #app {
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow-x: hidden !important;
+    background: var(--bg, #f4f7fb) !important;
+    background-color: var(--bg, #f4f7fb) !important;
+    -ms-overflow-style: none !important;
+    scrollbar-width: none !important;
+    scrollbar-color: transparent transparent !important;
+  }
+
+  html.routee-android::-webkit-scrollbar,
+  html.routee-android body::-webkit-scrollbar,
+  body.routee-android::-webkit-scrollbar,
+  html.routee-android #app::-webkit-scrollbar,
+  body.routee-android #app::-webkit-scrollbar,
+  html.routee-android *::-webkit-scrollbar,
+  body.routee-android *::-webkit-scrollbar {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    background: transparent !important;
+  }
+
+  html.routee-android-native-surface #app,
+  body.routee-android-native-surface #app {
+    scroll-behavior: smooth !important;
+  }
+
+  html.routee-android .map-area,
+  html.routee-android .map-shell,
+  html.routee-android .trip-column,
+  html.routee-android .trip-panel,
+  body.routee-android .map-area,
+  body.routee-android .map-shell,
+  body.routee-android .trip-column,
+  body.routee-android .trip-panel {
+    max-width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  html.routee-android .new-map-mobile-fab,
+  body.routee-android .new-map-mobile-fab {
+    right: max(14px, calc(var(--routee-safe-right, 0px) + 12px)) !important;
+    top: var(--routee-mobile-fab-top, calc(var(--routee-android-app-height, 100dvh) - 62px)) !important;
+    bottom: auto !important;
+  }
+}
+
