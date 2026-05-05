@@ -40,7 +40,11 @@
     height: var(--routee-android-app-height) !important;
     min-height: var(--routee-android-app-height) !important;
     max-height: var(--routee-android-app-height) !important;
-    overflow: hidden !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    overscroll-behavior-y: contain !important;
+    touch-action: pan-y !important;
     background: var(--bg, #f4f7fb) !important;
     background-color: var(--bg, #f4f7fb) !important;
   }
@@ -130,5 +134,69 @@
     background: transparent !important;
     border: 0 !important;
     box-shadow: none !important;
+  }
+}
+
+
+/* =========================================================
+   ROUTEE — ANDROID NATIVE SURFACE SCROLL RESTORE
+   Android'de gövde kilitli kalır; asıl uygulama yüzeyi #app içinde
+   kayar. Böylece Gezi Listesi'ne aşağı inilebilir, scrollbar görünmez
+   ve iPhone/iPad seçicilerine dokunulmaz.
+   ========================================================= */
+@media (max-width: 720px), (hover: none) and (pointer: coarse) {
+  html.routee-android-native-surface body,
+  body.routee-android-native-surface {
+    overflow: hidden !important;
+    overscroll-behavior-y: none !important;
+  }
+
+  html.routee-android-native-surface #app,
+  body.routee-android-native-surface #app {
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    overscroll-behavior-y: contain !important;
+    touch-action: pan-y !important;
+    padding-bottom: max(10px, env(safe-area-inset-bottom, 0px)) !important;
+  }
+
+  html.routee-android-native-surface .app-layout,
+  body.routee-android-native-surface .app-layout {
+    min-height: auto !important;
+  }
+
+  html.routee-android-native-surface .trip-panel,
+  body.routee-android-native-surface .trip-panel {
+    display: flex !important;
+    flex-direction: column !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
+  }
+
+  html.routee-android-native-surface .trip-list,
+  body.routee-android-native-surface .trip-list,
+  html.routee-android-native-surface #tripList,
+  body.routee-android-native-surface #tripList {
+    flex: 1 1 auto !important;
+    min-height: 120px !important;
+    max-height: min(46vh, 360px) !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    overscroll-behavior-y: contain !important;
+    touch-action: pan-y !important;
+  }
+
+  html.routee-android-native-surface .map-list,
+  body.routee-android-native-surface .map-list,
+  html.routee-android-native-surface .screen-overlay-panel,
+  body.routee-android-native-surface .screen-overlay-panel,
+  html.routee-android-native-surface .note-editor-panel,
+  body.routee-android-native-surface .note-editor-panel {
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    overscroll-behavior-y: contain !important;
+    touch-action: pan-y !important;
   }
 }
