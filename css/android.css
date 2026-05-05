@@ -375,3 +375,63 @@
     white-space: normal !important;
   }
 }
+
+/* =========================================================
+   ROUTEE — ANDROID PAGE ZOOM GUARD
+   Harita içinde Google Maps yakınlaştırması korunur.
+   Harita dışındaki uygulama yüzeyinde çift dokunma/pinch ile sayfa zoom'u engellenir.
+   iPhone/iPad seçicisi içermez.
+   ========================================================= */
+@media (max-width: 720px), (hover: none) and (pointer: coarse) {
+  html.routee-android .topbar,
+  html.routee-android .topbar *,
+  html.routee-android .status-strip,
+  html.routee-android .status-strip *,
+  html.routee-android .trip-column,
+  html.routee-android .trip-column *,
+  html.routee-android .trip-panel,
+  html.routee-android .trip-panel *,
+  html.routee-android .screen-overlay-panel,
+  html.routee-android .screen-overlay-panel *,
+  html.routee-android .note-editor-panel,
+  html.routee-android .note-editor-panel *,
+  body.routee-android .topbar,
+  body.routee-android .topbar *,
+  body.routee-android .status-strip,
+  body.routee-android .status-strip *,
+  body.routee-android .trip-column,
+  body.routee-android .trip-column *,
+  body.routee-android .trip-panel,
+  body.routee-android .trip-panel *,
+  body.routee-android .screen-overlay-panel,
+  body.routee-android .screen-overlay-panel *,
+  body.routee-android .note-editor-panel,
+  body.routee-android .note-editor-panel * {
+    touch-action: pan-y;
+  }
+
+  html.routee-android button,
+  html.routee-android a,
+  html.routee-android .overlay-btn,
+  html.routee-android .tiny-btn,
+  html.routee-android .page-action-btn,
+  body.routee-android button,
+  body.routee-android a,
+  body.routee-android .overlay-btn,
+  body.routee-android .tiny-btn,
+  body.routee-android .page-action-btn {
+    touch-action: manipulation;
+  }
+
+  html.routee-android #mapCanvas,
+  html.routee-android #mapCanvas *,
+  html.routee-android .gm-style,
+  html.routee-android .gm-style *,
+  body.routee-android #mapCanvas,
+  body.routee-android #mapCanvas *,
+  body.routee-android .gm-style,
+  body.routee-android .gm-style * {
+    touch-action: auto;
+  }
+}
+
