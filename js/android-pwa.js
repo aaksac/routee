@@ -68,10 +68,96 @@
     } catch (error) {}
   }
 
+  function lockAndroidViewportScale() {
+    try {
+      var viewport = document.head && document.head.querySelector('meta[name="viewport"]');
+      var lockedContent = "width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, viewport-fit=cover";
+
+      if (!viewport && document.head) {
+        viewport = document.createElement("meta");
+        viewport.setAttribute("name", "viewport");
+        document.head.appendChild(viewport);
+      }
+
+      if (viewport && viewport.getAttribute("content") !== lockedContent) {
+        viewport.setAttribute("content", lockedContent);
+      }
+    } catch (error) {}
+  }
+
+  var zoomGuardInstalled = false;
+
+  function installAndroidPageZoomGuard() {
+    if (zoomGuardInstalled) return;
+    zoomGuardInstalled = true;
+
+    var lastTouchEnd = 0;
+
+    function androidActive() {
+      return root.classList.contains("routee-android");
+    }
+
+    function isEditableTarget(target) {
+      if (!target || !target.closest) return false;
+      return !!target.closest('input, textarea, select, [contenteditable="true"]');
+    }
+
+    function isMapTarget(target) {
+      if (!target || !target.closest) return false;
+      return !!target.closest('#mapCanvas, .map-canvas, .gm-style');
+    }
+
+    function preventPagePinch(event) {
+      if (!androidActive()) return;
+      if (!event.touches || event.touches.length < 2) return;
+
+      // Android'de iki parmak hareketi sayfayı büyütmesin.
+      // Hedef harita ise dokunmuyoruz; Google Maps kendi yakınlaşmasını alır.
+      if (isMapTarget(event.target)) return;
+
+      if (event.cancelable) event.preventDefault();
+    }
+
+    function preventDoubleTapPageZoom(event) {
+      if (!androidActive()) return;
+      if (isEditableTarget(event.target)) return;
+
+      var now = Date.now();
+      if (now - lastTouchEnd <= 320) {
+        if (!isMapTarget(event.target) && event.cancelable) {
+          event.preventDefault();
+        }
+      }
+      lastTouchEnd = now;
+    }
+
+    function preventGesturePageZoom(event) {
+      if (!androidActive()) return;
+      if (isMapTarget(event.target)) return;
+      if (event.cancelable) event.preventDefault();
+    }
+
+    function preventCtrlWheelPageZoom(event) {
+      if (!androidActive()) return;
+      if (!event.ctrlKey) return;
+      if (isMapTarget(event.target)) return;
+      if (event.cancelable) event.preventDefault();
+    }
+
+    document.addEventListener("touchstart", preventPagePinch, { passive: false, capture: true });
+    document.addEventListener("touchmove", preventPagePinch, { passive: false, capture: true });
+    document.addEventListener("touchend", preventDoubleTapPageZoom, { passive: false, capture: true });
+    document.addEventListener("gesturestart", preventGesturePageZoom, { passive: false, capture: true });
+    document.addEventListener("gesturechange", preventGesturePageZoom, { passive: false, capture: true });
+    document.addEventListener("wheel", preventCtrlWheelPageZoom, { passive: false, capture: true });
+  }
+
   function applyAndroidPwaLock() {
     swapAndroidManifest();
+    lockAndroidViewportScale();
     markMode();
     syncAndroidViewport();
+    installAndroidPageZoomGuard();
   }
 
   applyAndroidPwaLock();
