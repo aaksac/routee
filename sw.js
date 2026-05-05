@@ -1,7 +1,7 @@
-const SW_VERSION = new URL(self.location.href).searchParams.get("v") || "2026.05.5.309-android-a12-density";
+const SW_VERSION = new URL(self.location.href).searchParams.get("v") || "2026.05.6.501-android-installable";
 const CACHE_NAME = `routee-shell-${SW_VERSION}`;
 const NETWORK_TIMEOUT_MS = 1200;
-const ROUTEE_ASSET_REVISION = "2026.05.5.309-android-a12-density";
+const ROUTEE_ASSET_REVISION = "2026.05.6.501-android-installable";
 
 const APP_SHELL = [
   "./",
