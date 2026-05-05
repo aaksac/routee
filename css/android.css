@@ -646,3 +646,265 @@
     height: 23px !important;
   }
 }
+
+/* =========================================================
+   ROUTEE — ANDROID A12 / LARGE TEXT DENSITY CORRECTION
+   Samsung A12 gibi Android 13 + One UI Core cihazlarda sistem yazı/ekran
+   ölçeği yüksek olduğunda butonlar şişmesin. Sadece Android dar/yüksek
+   mobil viewportlarda çalışır; iPhone/iPad seçicisi içermez.
+   ========================================================= */
+@media (max-width: 480px) and (max-height: 950px) {
+  html.routee-android,
+  body.routee-android {
+    --routee-android-compact-control: 32px !important;
+    --routee-android-compact-icon: 34px !important;
+    --routee-android-compact-gap: 5px !important;
+  }
+
+  html.routee-android .topbar,
+  body.routee-android .topbar {
+    height: 58px !important;
+    min-height: 58px !important;
+    max-height: 58px !important;
+    flex-basis: 58px !important;
+    padding-left: 12px !important;
+    padding-right: 12px !important;
+  }
+
+  html.routee-android .topbar > .brand-area,
+  html.routee-android .topbar > .topbar-actions,
+  body.routee-android .topbar > .brand-area,
+  body.routee-android .topbar > .topbar-actions {
+    height: 58px !important;
+    min-height: 58px !important;
+    max-height: 58px !important;
+  }
+
+  html.routee-android .topbar .brand-icon,
+  body.routee-android .topbar .brand-icon {
+    width: 36px !important;
+    min-width: 36px !important;
+    max-width: 36px !important;
+    height: 36px !important;
+    min-height: 36px !important;
+    max-height: 36px !important;
+    flex-basis: 36px !important;
+    border-radius: 12px !important;
+  }
+
+  html.routee-android .topbar .brand-text h1,
+  body.routee-android .topbar .brand-text h1 {
+    font-size: 18px !important;
+    line-height: 1 !important;
+  }
+
+  html.routee-android .topbar .page-action-btn,
+  body.routee-android .topbar .page-action-btn {
+    height: 32px !important;
+    min-height: 32px !important;
+    max-height: 32px !important;
+    padding: 0 12px !important;
+    font-size: 13px !important;
+    line-height: 1 !important;
+    white-space: nowrap !important;
+  }
+
+  html.routee-android .map-overlay-toolbar,
+  body.routee-android .map-overlay-toolbar {
+    left: 12px !important;
+    right: 12px !important;
+    gap: 6px !important;
+  }
+
+  html.routee-android .map-search-box,
+  body.routee-android .map-search-box {
+    height: 44px !important;
+    min-height: 44px !important;
+    max-height: 44px !important;
+    border-radius: 15px !important;
+    padding-left: 13px !important;
+    padding-right: 34px !important;
+  }
+
+  html.routee-android .map-search-box input,
+  body.routee-android .map-search-box input,
+  html.routee-android #mapSearchInput,
+  body.routee-android #mapSearchInput {
+    font-size: 14px !important;
+    line-height: 1.1 !important;
+  }
+
+  html.routee-android .overlay-btn.icon-only-btn,
+  html.routee-android .fab-btn.icon-only-btn,
+  body.routee-android .overlay-btn.icon-only-btn,
+  body.routee-android .fab-btn.icon-only-btn,
+  html.routee-android .trip-header-actions .trip-map-list-icon-btn,
+  html.routee-android .trip-header-actions .trip-save-icon-btn,
+  body.routee-android .trip-header-actions .trip-map-list-icon-btn,
+  body.routee-android .trip-header-actions .trip-save-icon-btn {
+    width: 36px !important;
+    min-width: 36px !important;
+    max-width: 36px !important;
+    height: 36px !important;
+    min-height: 36px !important;
+    max-height: 36px !important;
+    flex: 0 0 36px !important;
+    border-radius: 13px !important;
+    padding: 0 !important;
+  }
+
+  html.routee-android .overlay-btn.icon-only-btn svg,
+  html.routee-android .fab-btn.icon-only-btn svg,
+  html.routee-android .trip-header-actions .trip-map-list-icon-btn svg,
+  html.routee-android .trip-header-actions .trip-save-icon-btn svg,
+  body.routee-android .overlay-btn.icon-only-btn svg,
+  body.routee-android .fab-btn.icon-only-btn svg,
+  body.routee-android .trip-header-actions .trip-map-list-icon-btn svg,
+  body.routee-android .trip-header-actions .trip-save-icon-btn svg {
+    width: 17px !important;
+    height: 17px !important;
+  }
+
+  html.routee-android .trip-panel,
+  body.routee-android .trip-panel {
+    padding: 14px 12px !important;
+    border-radius: 24px !important;
+  }
+
+  html.routee-android .trip-panel h2,
+  body.routee-android .trip-panel h2 {
+    font-size: 21px !important;
+    line-height: 1.05 !important;
+  }
+
+  html.routee-android .trip-item,
+  body.routee-android .trip-item {
+    padding: 12px !important;
+    gap: 10px !important;
+    border-radius: 20px !important;
+  }
+
+  html.routee-android .trip-order,
+  body.routee-android .trip-order {
+    width: 42px !important;
+    min-width: 42px !important;
+    max-width: 42px !important;
+    height: 42px !important;
+    min-height: 42px !important;
+    max-height: 42px !important;
+    flex: 0 0 42px !important;
+    font-size: 18px !important;
+    line-height: 42px !important;
+    border-radius: 14px !important;
+  }
+
+  html.routee-android .trip-info h3,
+  body.routee-android .trip-info h3 {
+    font-size: 16px !important;
+    line-height: 1.12 !important;
+  }
+
+  html.routee-android .trip-info p,
+  body.routee-android .trip-info p {
+    font-size: 12px !important;
+    line-height: 1.2 !important;
+  }
+
+  html.routee-android .trip-panel .trip-actions,
+  html.routee-android .trip-list .trip-actions,
+  body.routee-android .trip-panel .trip-actions,
+  body.routee-android .trip-list .trip-actions {
+    gap: 4px !important;
+    flex-wrap: nowrap !important;
+  }
+
+  html.routee-android .trip-panel .trip-actions .tiny-btn,
+  html.routee-android .trip-list .trip-actions .tiny-btn,
+  body.routee-android .trip-panel .trip-actions .tiny-btn,
+  body.routee-android .trip-list .trip-actions .tiny-btn {
+    height: 30px !important;
+    min-height: 30px !important;
+    max-height: 30px !important;
+    padding: 0 8px !important;
+    font-size: 11px !important;
+    line-height: 1 !important;
+    border-radius: 11px !important;
+  }
+
+  html.routee-android .trip-panel .trip-actions .tiny-btn.icon-route-btn,
+  html.routee-android .trip-panel .trip-actions .tiny-btn.icon-note-btn,
+  html.routee-android .trip-list .trip-actions .tiny-btn.icon-route-btn,
+  html.routee-android .trip-list .trip-actions .tiny-btn.icon-note-btn,
+  body.routee-android .trip-panel .trip-actions .tiny-btn.icon-route-btn,
+  body.routee-android .trip-panel .trip-actions .tiny-btn.icon-note-btn,
+  body.routee-android .trip-list .trip-actions .tiny-btn.icon-route-btn,
+  body.routee-android .trip-list .trip-actions .tiny-btn.icon-note-btn {
+    width: 32px !important;
+    min-width: 32px !important;
+    max-width: 32px !important;
+    height: 32px !important;
+    min-height: 32px !important;
+    max-height: 32px !important;
+    flex: 0 0 32px !important;
+    padding: 0 !important;
+    border-radius: 11px !important;
+  }
+
+  html.routee-android .trip-panel .trip-actions .tiny-btn.icon-route-btn svg,
+  html.routee-android .trip-panel .trip-actions .tiny-btn.icon-note-btn svg,
+  html.routee-android .trip-list .trip-actions .tiny-btn.icon-route-btn svg,
+  html.routee-android .trip-list .trip-actions .tiny-btn.icon-note-btn svg,
+  html.routee-android .trip-panel .route-directions-icon,
+  html.routee-android .trip-list .route-directions-icon,
+  body.routee-android .trip-panel .trip-actions .tiny-btn.icon-route-btn svg,
+  body.routee-android .trip-panel .trip-actions .tiny-btn.icon-note-btn svg,
+  body.routee-android .trip-list .trip-actions .tiny-btn.icon-route-btn svg,
+  body.routee-android .trip-list .trip-actions .tiny-btn.icon-note-btn svg,
+  body.routee-android .trip-panel .route-directions-icon,
+  body.routee-android .trip-list .route-directions-icon {
+    width: 14px !important;
+    height: 14px !important;
+  }
+
+  html.routee-android .trip-panel .trip-actions .tiny-btn[data-action^="focus"],
+  html.routee-android .trip-list .trip-actions .tiny-btn[data-action^="focus"],
+  body.routee-android .trip-panel .trip-actions .tiny-btn[data-action^="focus"],
+  body.routee-android .trip-list .trip-actions .tiny-btn[data-action^="focus"] {
+    min-width: 52px !important;
+    padding-left: 8px !important;
+    padding-right: 8px !important;
+  }
+
+  html.routee-android .trip-panel .trip-actions .tiny-btn[data-action^="delete"],
+  html.routee-android .trip-list .trip-actions .tiny-btn[data-action^="delete"],
+  body.routee-android .trip-panel .trip-actions .tiny-btn[data-action^="delete"],
+  body.routee-android .trip-list .trip-actions .tiny-btn[data-action^="delete"] {
+    min-width: 36px !important;
+    padding-left: 7px !important;
+    padding-right: 7px !important;
+  }
+
+  html.routee-android .new-map-mobile-fab,
+  body.routee-android .new-map-mobile-fab {
+    width: 46px !important;
+    min-width: 46px !important;
+    max-width: 46px !important;
+    height: 46px !important;
+    min-height: 46px !important;
+    max-height: 46px !important;
+    border-radius: 999px !important;
+  }
+
+  html.routee-android .gm-style .routee-marker-info-card--android .tiny-btn,
+  body.routee-android .gm-style .routee-marker-info-card--android .tiny-btn,
+  html.routee-android .gm-style .routee-marker-info-card--android .info-action-btn,
+  body.routee-android .gm-style .routee-marker-info-card--android .info-action-btn {
+    min-height: 30px !important;
+    height: 30px !important;
+    max-height: 30px !important;
+    padding: 0 8px !important;
+    font-size: 11px !important;
+    line-height: 1 !important;
+    border-radius: 11px !important;
+  }
+}
