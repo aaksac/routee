@@ -1,0 +1,134 @@
+/* =========================================================
+   ROUTEE — ANDROID INSTALLED APP / NATIVE SURFACE FIX
+   Bu dosya yalnızca Android cihazlarda, özellikle uygulama olarak
+   yüklendiğinde eklenen .routee-android-native-surface sınıfıyla çalışır.
+   iPhone/iPad için hiçbir seçici içermez.
+   ========================================================= */
+
+@media (max-width: 720px), (hover: none) and (pointer: coarse) {
+  html.routee-android {
+    --routee-android-app-height: var(--routee-android-visible-height, 100dvh);
+    --routee-android-app-width: var(--routee-android-visible-width, 100vw);
+  }
+
+  html.routee-android-standalone,
+  html.routee-android-native-surface,
+  html.routee-android-standalone body,
+  html.routee-android-native-surface body,
+  body.routee-android-standalone,
+  body.routee-android-native-surface {
+    --routee-safe-bottom: 0px !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-height: var(--routee-android-app-height) !important;
+    height: var(--routee-android-app-height) !important;
+    max-height: var(--routee-android-app-height) !important;
+    overflow: hidden !important;
+    overscroll-behavior: none !important;
+    background: var(--bg, #f4f7fb) !important;
+    background-color: var(--bg, #f4f7fb) !important;
+  }
+
+  html.routee-android-native-surface body {
+    position: fixed !important;
+    inset: 0 !important;
+  }
+
+  html.routee-android-native-surface #app,
+  body.routee-android-native-surface #app {
+    width: 100% !important;
+    height: var(--routee-android-app-height) !important;
+    min-height: var(--routee-android-app-height) !important;
+    max-height: var(--routee-android-app-height) !important;
+    overflow: hidden !important;
+    background: var(--bg, #f4f7fb) !important;
+    background-color: var(--bg, #f4f7fb) !important;
+  }
+
+  /* Mobil CSS'te Android'de şerit gibi algılanan alt güvenli alan katmanını
+     yalnızca Android yüklü uygulama yüzeyinde kapatır. */
+  html.routee-android-native-surface body:not(.routee-splash-active)::after,
+  body.routee-android-native-surface:not(.routee-splash-active)::after {
+    display: none !important;
+    content: none !important;
+    height: 0 !important;
+    min-height: 0 !important;
+    max-height: 0 !important;
+    background: transparent !important;
+  }
+
+  html.routee-android-native-surface:not(.routee-splash-active):not(.routee-mobile-splash-active):not(.routee-mobile-entry-splash):not(.routee-mobile-routing-splash):not(.show-app-startup-splash),
+  html.routee-android-native-surface:not(.routee-splash-active):not(.routee-mobile-splash-active):not(.routee-mobile-entry-splash):not(.routee-mobile-routing-splash):not(.show-app-startup-splash) body,
+  body.routee-android-native-surface:not(.routee-splash-active):not(.routee-mobile-splash-active):not(.routee-mobile-entry-splash):not(.routee-mobile-routing-splash):not(.routee-app-startup-active),
+  body.routee-android-native-surface:not(.routee-splash-active):not(.routee-mobile-splash-active):not(.routee-mobile-entry-splash):not(.routee-mobile-routing-splash):not(.routee-app-startup-active) #app,
+  html.routee-android-native-surface:not(.routee-splash-active):not(.routee-mobile-splash-active):not(.routee-mobile-entry-splash):not(.routee-mobile-routing-splash):not(.show-app-startup-splash) #app {
+    min-height: var(--routee-android-app-height) !important;
+    height: var(--routee-android-app-height) !important;
+    max-height: var(--routee-android-app-height) !important;
+  }
+
+  html.routee-android-native-surface .login-page,
+  body.routee-android-native-surface .login-page,
+  html.routee-android-native-surface .register-page,
+  body.routee-android-native-surface .register-page,
+  html.routee-android-native-surface .reset-page,
+  body.routee-android-native-surface .reset-page {
+    min-height: var(--routee-android-app-height) !important;
+    height: var(--routee-android-app-height) !important;
+    max-height: var(--routee-android-app-height) !important;
+    overflow: hidden !important;
+  }
+
+  html.routee-android-native-surface .screen-overlay-panel,
+  html.routee-android-native-surface .note-editor-panel,
+  body.routee-android-native-surface .screen-overlay-panel,
+  body.routee-android-native-surface .note-editor-panel {
+    max-height: calc(var(--routee-android-app-height) - var(--routee-safe-top, 0px) - 32px) !important;
+  }
+}
+
+/* =========================================================
+   ROUTEE — ANDROID INSTALLED APP NO VISIBLE SCROLLBAR LOCK
+   Yalnızca Android'de uygulama/native surface modunda çalışır.
+   Kaydırma davranışını kapatmaz; sadece scrollbar görüntüsünü gizler.
+   iPhone/iPad seçicisi içermez.
+   ========================================================= */
+@media (max-width: 720px), (hover: none) and (pointer: coarse) {
+  html.routee-android-native-surface,
+  html.routee-android-native-surface body,
+  body.routee-android-native-surface,
+  html.routee-android-native-surface *,
+  body.routee-android-native-surface * {
+    -ms-overflow-style: none !important;
+    scrollbar-width: none !important;
+    scrollbar-color: transparent transparent !important;
+    scrollbar-gutter: auto !important;
+  }
+
+  html.routee-android-native-surface::-webkit-scrollbar,
+  html.routee-android-native-surface body::-webkit-scrollbar,
+  body.routee-android-native-surface::-webkit-scrollbar,
+  html.routee-android-native-surface *::-webkit-scrollbar,
+  body.routee-android-native-surface *::-webkit-scrollbar {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    background: transparent !important;
+  }
+
+  html.routee-android-native-surface *::-webkit-scrollbar-track,
+  html.routee-android-native-surface *::-webkit-scrollbar-thumb,
+  html.routee-android-native-surface *::-webkit-scrollbar-corner,
+  body.routee-android-native-surface *::-webkit-scrollbar-track,
+  body.routee-android-native-surface *::-webkit-scrollbar-thumb,
+  body.routee-android-native-surface *::-webkit-scrollbar-corner {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+    background: transparent !important;
+    border: 0 !important;
+    box-shadow: none !important;
+  }
+}
