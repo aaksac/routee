@@ -1,0 +1,12 @@
+# Local GitHub push configuration
+.github-push-config.cmd
+
+# Local CMD helper scripts - do not publish to live hosting
+github-*.cmd
+GITHUB_CMD_KULLANIM.txt
+
+# OS/editor temporary files
+.DS_Store
+Thumbs.db
+*.log
+*.tmp
